@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:fitnc_trainer/widget/add_workout.page.dart';
 import 'package:fitnc_trainer/widget/login.page.dart';
 import 'package:fitnc_trainer/widget/my-home-page.widget.dart';
@@ -12,10 +14,16 @@ void main() {
 
 class MyApp extends StatelessWidget {
   final MainBloc bloc = MainBloc.getInstance();
+  final AuthService authService = AuthService.getInstance();
   final appTitle = 'Les tribus de la Province Nord de la Nouvelle Calédonie';
 
   @override
   Widget build(BuildContext context) {
+    // Listen for user update.
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      authService.updateUser(user);
+    });
+
     return MaterialApp(
         title: appTitle,
         theme: ThemeData(primarySwatch: Colors.deepPurple),

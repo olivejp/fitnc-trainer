@@ -35,9 +35,10 @@ class FirestoreFieldConverter {
 class FirestoreConverterTools<T extends FirestoreSerializable> {
   final T expectedClass;
 
+  late void Function(String? token) passToken;
+
   FirestoreConverterTools(this.expectedClass);
 
-  void Function(String token) passToken;
 
   /// Conversion d'une réponse Http en une liste d'objet de type T.
   List<T> convertHttpResponseToList(Response response) {
@@ -82,7 +83,7 @@ class FirestoreConverterTools<T extends FirestoreSerializable> {
   }
 
   FirestoreConverterTools<T> getToken(
-      void Function(String token) passTokenFunction) {
+      void Function(String? token) passTokenFunction) {
     this.passToken = passTokenFunction;
     return this;
   }

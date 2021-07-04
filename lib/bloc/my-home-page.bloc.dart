@@ -1,29 +1,33 @@
-import 'package:fitnc_trainer/domain/workout.domain.dart';
-import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MyHomePageBloc {
-  static MyHomePageBloc _instance;
+  static MyHomePageBloc? _instance;
+
+  final AuthService authService = AuthService.getInstance();
 
   int _currentPage = 0;
-  BehaviorSubject<int> _streamCurrentPage;
+  late BehaviorSubject<int> _streamCurrentPage;
 
-  Observable<int> get currentPageObs => _streamCurrentPage.stream;
+  Stream<int> get currentPageObs => _streamCurrentPage.stream;
 
   MyHomePageBloc._() {
-    _streamCurrentPage = BehaviorSubject(seedValue: 0);
+    _streamCurrentPage = BehaviorSubject.seeded(0);
   }
 
   static MyHomePageBloc getInstance() {
     if (_instance == null) {
       _instance = MyHomePageBloc._();
     }
-    return _instance;
+    return _instance!;
   }
-
 
   changePage(int newPage) {
     _currentPage = newPage;
     _streamCurrentPage.sink.add(_currentPage);
+  }
+
+  Future<bool> logout() {
+    return authService.disconnect();
   }
 }

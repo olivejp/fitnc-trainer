@@ -8,9 +8,9 @@ import 'firestore.utils.dart';
 class FirestorePagination {
   int _pageNumber = 0;
   int pageSize;
-  List<String> pageTokens;
+  List<String> pageTokens = [];
 
-  FirestorePagination({this.pageSize});
+  FirestorePagination({required this.pageSize});
 
   void incrementPageNumber() {
     this._pageNumber++;
@@ -20,8 +20,8 @@ class FirestorePagination {
     this._pageNumber--;
   }
 
-  String addPageToken(String pageToken) {
-    this.pageTokens.add(pageToken);
+  String? addPageToken(String? pageToken) {
+    this.pageTokens.add(pageToken!);
     return pageToken;
   }
 
@@ -46,9 +46,9 @@ abstract class FirestoreDomainService<T extends FirestoreSerializable>
   /// qui étendra FirestoreDomainService.
   T getModelInstance();
 
-  String Function(String) passToken;
+  late String Function(String) passToken;
 
-  FirestoreDomainService(String path, {bool isHttps, String authority})
+  FirestoreDomainService(String path, {bool isHttps = false, String authority = ''})
       : super(path, isHttps: isHttps, authority: authority);
 
   /// Méthode pour aller à une nouvelle page.
@@ -69,7 +69,7 @@ abstract class FirestoreDomainService<T extends FirestoreSerializable>
         .findAll(queryParameters: queryParameters)
         .then((response) {
       return FirestoreConverterTools<T>(getModelInstance())
-          .getToken((String token) {
+          .getToken((String? token) {
         firestorePagination.incrementPageNumber();
         firestorePagination.addPageToken(token);
       }).convertHttpResponseToList(response);

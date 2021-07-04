@@ -9,7 +9,7 @@ abstract class AbstractAbsoluteFirestoreService<T>
     extends AbstractFirestoreService<T> {
   CollectionReference collectionReference;
 
-  AbstractAbsoluteFirestoreService({this.collectionReference});
+  AbstractAbsoluteFirestoreService({required this.collectionReference});
 
   CollectionReference getCollectionReferenceItemsSubcollection(
       String uid, String subcollectionName) {

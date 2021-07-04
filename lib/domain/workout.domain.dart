@@ -1,17 +1,18 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'workout.domain.g.dart';
+
+@JsonSerializable()
 class Workout {
   String uid;
   String name;
+  String? imageUrl;
   dynamic createDate;
 
-  Workout({this.uid, this.name, this.createDate});
+  Workout({this.uid = '', this.name = '', this.createDate = 0});
 
-  factory Workout.fromJson(String uid, Map<String, dynamic> json) {
-    return new Workout(
-        uid: uid,
-        name: json['name'],
-        createDate: json['createDate']);
-  }
+  factory Workout.fromJson(Map<String, dynamic> data) =>
+      _$WorkoutFromJson(data);
 
-  Map<String, dynamic> toJson() =>
-      {'uid': uid, 'name': name, 'createDate': createDate};
+  Map<String, dynamic> toJson() => _$WorkoutToJson(this);
 }

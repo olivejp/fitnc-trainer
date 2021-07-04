@@ -10,7 +10,7 @@ abstract class AbstractFirestoreService<T> {
   T mapSnapshotToModel(DocumentSnapshot snapshot);
 
   Future<T> getSpecific(CollectionReference collectionReference, String uid) {
-    Completer completer = Completer();
+    Completer<T> completer = Completer();
     collectionReference
         .doc(uid)
         .get()

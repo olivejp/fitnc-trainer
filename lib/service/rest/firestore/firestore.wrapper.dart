@@ -4,7 +4,7 @@ class FirestoreWrapper {
   final List<dynamic> documents;
   final String nextPageToken;
 
-  FirestoreWrapper({this.documents, this.nextPageToken});
+  FirestoreWrapper({required this.documents, required this.nextPageToken});
 
   factory FirestoreWrapper.fromJson(Map<String, dynamic> json) {
     return new FirestoreWrapper(
@@ -15,7 +15,7 @@ class FirestoreWrapper {
 
 /// Classe utilitaire représentant un niveau d'enveloppe sur le document.
 class FirestoreDocumentWrapper {
-  final String name;
+  final String? name;
   final dynamic fields;
   final dynamic createTime;
   final dynamic updateTime;

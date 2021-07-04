@@ -2,7 +2,7 @@ import 'package:localstorage/localstorage.dart';
 
 class StorageService {
   final LocalStorage storage = new LocalStorage('food_nc_storage');
-  static StorageService _instance;
+  static StorageService? _instance;
 
   // Private constructor with the ._()
   StorageService._();
@@ -11,15 +11,17 @@ class StorageService {
     if (_instance == null) {
       _instance = StorageService._();
     }
-    return _instance;
+    return _instance!;
   }
 
   Future<bool> initStorage() {
     return storage.ready.then((value) {
       if (value) {
         print('Storage is ready');
+        return true;
       } else {
         print('!!! Storage is NOT ready !!!');
+        return false;
       }
     }).catchError(
         (error) => print('Erreur lors du chargement du storage : ' + error));

@@ -1,39 +1,39 @@
-import 'package:fitnc_trainer/bloc/add_workout.bloc.dart';
-import 'package:fitnc_trainer/domain/workout.domain.dart';
+import 'package:fitnc_trainer/bloc/abonne.bloc.dart';
+import 'package:fitnc_trainer/domain/abonne.domain.dart';
 import 'package:flutter/material.dart';
 
-class WorkoutPage extends StatefulWidget {
-  final AddWorkoutBloc bloc = AddWorkoutBloc.getInstance();
+class AbonnePage extends StatefulWidget {
+  final AbonneBloc bloc = AbonneBloc.getInstance();
 
-  WorkoutPage({Key? key}) : super(key: key);
+  AbonnePage({Key? key}) : super(key: key);
 
   @override
-  _WorkoutPageState createState() {
-    return new _WorkoutPageState();
+  _AbonnePageState createState() {
+    return new _AbonnePageState();
   }
 }
 
-class _WorkoutPageState extends State<WorkoutPage> {
-  _WorkoutPageState();
+class _AbonnePageState extends State<AbonnePage> {
+  _AbonnePageState();
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(25.0),
-      child: StreamBuilder<List<Workout?>>(
-        stream: widget.bloc.getStreamWorkout(),
+      child: StreamBuilder<List<Abonne?>>(
+        stream: widget.bloc.getStreamAbonne(),
         builder: (context, snapshot) {
           bool isEmpty = snapshot.data?.isEmpty == true;
           if (!snapshot.hasData || isEmpty) {
-            return Center(child: Text('Aucun workout trouvé.'));
+            return Center(child: Text('Aucun abonné trouvé.'));
           } else {
             return ListView.separated(
                 separatorBuilder: (context, index) => Divider(),
-                itemCount: snapshot.data != null ? snapshot.data!.length: 0,
+                itemCount: snapshot.data != null ? snapshot.data!.length : 0,
                 itemBuilder: (context, index) {
-                  Workout workout = snapshot.data![index] as Workout;
+                  Abonne abonne = snapshot.data![index] as Abonne;
                   return ListTile(
-                    title: Text(workout.name),
+                    title: Text(abonne.name),
                     trailing: Wrap(
                       children: [
                         IconButton(
@@ -43,12 +43,12 @@ class _WorkoutPageState extends State<WorkoutPage> {
                               context: context,
                               builder: (context) => AlertDialog(
                                 title: Text(
-                                    'Etes vous sûr de vouloir supprimer ce workout?'),
+                                    'Etes vous sûr de vouloir supprimer cet abonné?'),
                                 actions: [
                                   TextButton(
                                       onPressed: () {
                                         widget.bloc
-                                            .deleteWorkout(workout)
+                                            .deleteAbonne(abonne)
                                             .then((value) =>
                                                 Navigator.pop(context))
                                             .catchError((error) =>
@@ -74,16 +74,16 @@ class _WorkoutPageState extends State<WorkoutPage> {
                             showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                      title: Text('Modifier le Workout'),
+                                      title: Text("Modifier l'abonné"),
                                       content: ListTile(
                                         title: TextFormField(
                                           onChanged: (value) =>
-                                              workout.name = value,
-                                          initialValue: workout.name,
+                                              abonne.name = value,
+                                          initialValue: abonne.name,
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
-                                              return 'Veuillez rentrer un nom pour ce workout';
+                                              return 'Veuillez rentrer un nom pour cet abonné';
                                             }
                                             return null;
                                           },
@@ -92,7 +92,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                                       actions: [
                                         TextButton(
                                             onPressed: () {
-                                              widget.bloc.update(workout);
+                                              widget.bloc.update(abonne);
                                               Navigator.pop(context);
                                             },
                                             child: Text('Modifier'))

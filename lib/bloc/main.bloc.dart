@@ -2,22 +2,20 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:fitnc_trainer/service/storage.service.dart';
-import 'package:rxdart/rxdart.dart';
 
 class MainBloc {
-  static MainBloc _instance;
+  static MainBloc? _instance;
 
   final StorageService storageService = StorageService.getInstance();
-  final AuthService userService = AuthService.getInstance();
+  final AuthService authService = AuthService.getInstance();
 
-  // Private constructor with the ._()
   MainBloc._();
 
   static MainBloc getInstance() {
     if (_instance == null) {
       _instance = MainBloc._();
     }
-    return _instance;
+    return _instance!;
   }
 
   // Future builder wich initiate the Firebase framework.
@@ -32,10 +30,10 @@ class MainBloc {
   }
 
   Future<dynamic> isConnected() {
-    return userService.isConnected();
+    return authService.isConnected();
   }
 
-  Observable<User> streamUser() {
-    return userService.userObservable;
+  Stream<User?> streamUser() {
+    return authService.userStream;
   }
 }

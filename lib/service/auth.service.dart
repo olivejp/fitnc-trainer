@@ -4,33 +4,27 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rxdart/rxdart.dart';
 
 class AuthService {
-  static AuthService _instance;
+  static AuthService? _instance;
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  User _user;
-  BehaviorSubject<User> _streamUser;
+  User? _user;
+  late BehaviorSubject<User?> _streamUser;
 
-  Observable<User> get userObservable => _streamUser.stream;
+  Stream<User?> get userStream => _streamUser.stream;
 
-  // Private constructor with the ._()
   AuthService._() {
-    _streamUser = BehaviorSubject(seedValue: null);
-
-    // Listen for user update.
-    _firebaseAuth.idTokenChanges().listen((User user) {
-      _updateUser(user);
-    });
+    _streamUser = BehaviorSubject.seeded(null);
   }
 
   static AuthService getInstance() {
     if (_instance == null) {
       _instance = AuthService._();
     }
-    return _instance;
+    return _instance!;
   }
 
-  void _updateUser(User user) {
+  void updateUser(User? user) {
     _user = user;
     _streamUser.sink.add(_user);
   }
@@ -44,7 +38,7 @@ class AuthService {
   Future<bool> disconnect() {
     Completer<bool> completer = Completer<bool>();
     _firebaseAuth.signOut().then((value) {
-      _updateUser(null);
+      updateUser(null);
       completer.complete(true);
     }).catchError((error) => completer.completeError(false));
     return completer.future;

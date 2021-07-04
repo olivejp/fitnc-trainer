@@ -1,25 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/domain/abonne.domain.dart';
-import 'package:fitnc_trainer/domain/trainers.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 
 import 'firestore/abstract.absolute-firestore.service.dart';
 
-class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
-  static TrainersService? _instance;
+class AbonneService extends AbstractAbsoluteFirestoreService<Abonne> {
+  static AbonneService? _instance;
 
   // Private constructor with the ._()
-  TrainersService._()
+  AbonneService._()
       : super(
             collectionReference:
-                FirebaseFirestore.instance.collection('trainers')) {
+                FirebaseFirestore.instance.collection('abonne')) {
     _instance = this;
   }
 
-  static TrainersService getInstance() {
+  static AbonneService getInstance() {
     if (_instance == null) {
-      _instance = TrainersService._();
+      _instance = AbonneService._();
     }
     return _instance!;
   }
@@ -32,10 +31,6 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
     return getCurrentTrainerRef().collection('workout');
   }
 
-  CollectionReference getAbonneReference() {
-    return getCurrentTrainerRef().collection('abonne');
-  }
-
   Stream<List<Workout?>> listenToWorkout() {
     return getWorkoutReference().snapshots().map((QuerySnapshot event) => event
         .docs
@@ -43,15 +38,8 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
         .toList());
   }
 
-  Stream<List<Abonne?>> listenToAbonne() {
-    return getAbonneReference().snapshots().map((QuerySnapshot event) => event
-        .docs
-        .map((doc) => Abonne.fromJson(doc.data() as Map<String, dynamic>))
-        .toList());
-  }
-
   @override
-  Trainers mapSnapshotToModel(DocumentSnapshot snapshot) {
-    return Trainers.fromJson(snapshot.data() as Map<String, dynamic>);
+  Abonne mapSnapshotToModel(DocumentSnapshot snapshot) {
+    return Abonne.fromJson(snapshot.data() as Map<String, dynamic>);
   }
 }
