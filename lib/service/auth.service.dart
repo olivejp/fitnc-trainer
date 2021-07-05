@@ -29,8 +29,8 @@ class AuthService {
     _streamUser.sink.add(_user);
   }
 
-  Future<dynamic> isConnected() {
-    Completer completer = Completer();
+  Future<bool> isConnected() {
+    Completer<bool> completer = Completer();
     completer.complete(_firebaseAuth.currentUser != null);
     return completer.future;
   }

@@ -59,6 +59,10 @@ class AddWorkoutBloc {
     _workout.name = value;
   }
 
+  changeDescription(String value) {
+    _workout.description = value;
+  }
+
   Future<void> update(Workout workout) {
     return trainersService
         .getWorkoutReference()

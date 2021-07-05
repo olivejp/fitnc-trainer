@@ -29,7 +29,7 @@ class MainBloc {
                 error.toString()));
   }
 
-  Future<dynamic> isConnected() {
+  Future<bool> isConnected() {
     return authService.isConnected();
   }
 

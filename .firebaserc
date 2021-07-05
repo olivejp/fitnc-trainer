@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "fitnc-7be2e"
+  },
+  "targets": {
+    "fitnc-7be2e": {
+      "hosting": {
+        "trainer": [
+          "fitnc-trainer"
+        ]
+      }
+    }
   }
 }

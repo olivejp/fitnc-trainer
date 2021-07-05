@@ -2,6 +2,7 @@ import 'package:fitnc_trainer/bloc/my-home-page.bloc.dart';
 import 'package:fitnc_trainer/widget/abonne.page.dart';
 import 'package:fitnc_trainer/widget/workout.page.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MyHomePage extends StatelessWidget {
   static final int PAGE_WORKOUT = 0;
@@ -13,62 +14,136 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: StreamBuilder(
-        stream: bloc.currentPageObs,
-        builder: (context, snapshot) {
-          if (snapshot.data == PAGE_WORKOUT) {
-            return FloatingActionButton.extended(
-              onPressed: () {
-                Navigator.pushNamed(context, '/add_workout');
-              },
-              label: Text('Ajouter un workout'),
-              icon: Icon(
-                Icons.sports,
-                size: 20.0,
-              ),
-            );
-          }
-          if (snapshot.data == PAGE_ABONNE) {
-            return FloatingActionButton.extended(
-              onPressed: () {
-                Navigator.pushNamed(context, '/add_abonne');
-              },
-              label: Text('Ajouter un abonné'),
-              icon: Icon(
-                Icons.sports,
-                size: 20.0,
-              ),
-            );
-          }
-          return Container();
-        },
-      ),
-      appBar: AppBar(
-        title: Text(this.title),
-        actions: [
-          IconButton(onPressed: () => bloc.logout(), icon: Icon(Icons.person))
-        ],
-      ),
-      body: LayoutBuilder(builder: (context, constraints) {
-        if (constraints.maxWidth > 800) {
-          return Row(
+    return LayoutBuilder(builder: (context, constraints) {
+      Widget body;
+      if (constraints.maxWidth > 900) {
+        body = Row(
+          children: [
+            Flexible(
+              flex: 1,
+              child: getLeftDrawer(),
+            ),
+            Flexible(
+              flex: 5,
+              child: getMainPage(),
+            ),
+          ],
+        );
+      } else {
+        body = getMainPage();
+      }
+
+      Widget bottomAppBar;
+      if (constraints.maxWidth > 900) {
+        bottomAppBar = BottomAppBar();
+      } else {
+        bottomAppBar = StreamBuilder<int>(
+            stream: bloc.currentPageObs,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return BottomNavigationBar(
+                  unselectedItemColor: Color(Colors.grey.value),
+                  items: [
+                    BottomNavigationBarItem(
+                      label: 'Workout',
+                      icon: Icon(Icons.sports_volleyball),
+                    ),
+                    BottomNavigationBarItem(
+                      label: 'Abonnes',
+                      icon: Icon(Icons.group),
+                    )
+                  ],
+                  onTap: (value) => bloc.changePage(value),
+                  currentIndex: snapshot.data!,
+                  backgroundColor: Color(Colors.black87.value),
+                );
+              } else {
+                return Container();
+              }
+            });
+      }
+
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color(Colors.black87.value),
+          toolbarHeight: 80,
+          centerTitle: true,
+          title: Wrap(
             children: [
-              Flexible(
-                flex: 1,
-                child: getLeftDrawer(),
+              Icon(
+                Icons.sports_volleyball,
+                color: Color(Colors.amber.value),
               ),
-              Flexible(
-                flex: 5,
-                child: getMainPage(),
+              Text(
+                this.title,
+                style: GoogleFonts.alfaSlabOne(
+                    color: Color(Colors.amber.value), fontSize: 35),
               ),
             ],
-          );
-        } else {
-          return getMainPage();
-        }
-      }),
-    );
+          ),
+          actions: [
+            StreamBuilder<bool>(
+                stream: bloc.currentDisplayObs,
+                builder: (context, snapshot) {
+                  return Switch(
+                    value: snapshot.hasData ? snapshot.data! : false,
+                    onChanged: (value) => bloc.toggleDisplay(),
+                  );
+                }),
+            IconButton(
+                onPressed: () => bloc.logout(),
+                tooltip: 'Se déconnecter',
+                icon: Icon(
+                  Icons.person,
+                  size: 30,
+                  color: Color(Colors.amber.value),
+                )),
+          ],
+        ),
+        body: body,
+        bottomNavigationBar: bottomAppBar,
+        floatingActionButton: StreamBuilder(
+          stream: bloc.currentPageObs,
+          builder: (context, snapshot) {
+            if (snapshot.data == PAGE_WORKOUT) {
+              return FloatingActionButton.extended(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/add_workout');
+                },
+                label: Text(
+                  'Ajouter un workout',
+                  style: GoogleFonts.roboto(
+                      fontSize: 15, color: Color(Colors.white.value)),
+                ),
+                icon: Icon(
+                  Icons.add,
+                  color: Color(Colors.white.value),
+                  size: 25.0,
+                ),
+              );
+            }
+            if (snapshot.data == PAGE_ABONNE) {
+              return FloatingActionButton.extended(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/add_abonne');
+                },
+                label: Text(
+                  'Ajouter un abonné',
+                  style: GoogleFonts.roboto(
+                      fontSize: 15, color: Color(Colors.white.value)),
+                ),
+                icon: Icon(
+                  Icons.add,
+                  color: Color(Colors.white.value),
+                  size: 20.0,
+                ),
+              );
+            }
+            return Container();
+          },
+        ),
+      );
+    });
   }
 
   StreamBuilder<int> getMainPage() {
@@ -89,32 +164,36 @@ class MyHomePage extends StatelessWidget {
   Container getLeftDrawer() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.deepPurple.shade900,
-            blurRadius: 5.0,
-            spreadRadius: 0.0,
-            offset: Offset(0.5, 0.5), // shadow direction: bottom right
-          )
-        ],
+        color: Colors.black54,
+        boxShadow: [],
       ),
-      child: Column(
-        children: [
-          ListTile(
-            onTap: () => bloc.changePage(PAGE_WORKOUT),
-            subtitle: Text('Gérer vos entraînements'),
-            title: Text('Workout'),
-            trailing: Icon(Icons.sports),
-          ),
-          Divider(),
-          ListTile(
-            onTap: () => bloc.changePage(PAGE_ABONNE),
-            subtitle: Text('Gérer vos abonnés'),
-            title: Text('Abonnés'),
-            trailing: Icon(Icons.group),
-          ),
-        ],
+      child: ListTileTheme(
+        iconColor: Color(Colors.white.value),
+        textColor: Color(Colors.white.value),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: StreamBuilder<int>(
+            stream: bloc.currentPageObs,
+            builder: (context, snapshot) {
+              return Column(
+                children: [
+                  ListTile(
+                    onTap: () => bloc.changePage(PAGE_WORKOUT),
+                    subtitle: Text('Gérer vos entraînements'),
+                    title: Text('Workout'),
+                    trailing: Icon(Icons.sports_volleyball),
+                    selected: snapshot.data == PAGE_WORKOUT,
+                  ),
+                  Divider(),
+                  ListTile(
+                    onTap: () => bloc.changePage(PAGE_ABONNE),
+                    subtitle: Text('Gérer vos abonnés'),
+                    title: Text('Abonnés'),
+                    trailing: Icon(Icons.group),
+                    selected: snapshot.data == PAGE_ABONNE,
+                  ),
+                ],
+              );
+            }),
       ),
     );
   }

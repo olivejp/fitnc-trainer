@@ -15,7 +15,7 @@ void main() {
 class MyApp extends StatelessWidget {
   final MainBloc bloc = MainBloc.getInstance();
   final AuthService authService = AuthService.getInstance();
-  final appTitle = 'Les tribus de la Province Nord de la Nouvelle Calédonie';
+  final appTitle = 'Fitness Nc';
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
         title: appTitle,
-        theme: ThemeData(primarySwatch: Colors.deepPurple),
+        theme: ThemeData(primarySwatch: Colors.amber),
         routes: {'/add_workout': (context) => AddWorkoutPage()},
         home: FutureBuilder(
             future: bloc.initThridParty(),
@@ -36,10 +36,11 @@ class MyApp extends StatelessWidget {
                 return StreamBuilder(
                     stream: bloc.streamUser(),
                     builder: (context, snapshot) {
-                      if (snapshot.hasData && snapshot.data != null) {
-                        return MyHomePage('FitNc');
-                      }
-                      return LoginPage(namePage: 'Connexion');
+                      return FutureBuilder<bool>(
+                          future: bloc.isConnected(),
+                          builder: (context, snapshot) => snapshot.data == true
+                              ? MyHomePage('Fitness Nc')
+                              : LoginPage(namePage: 'Connexion'));
                     });
               } else if (snapshot.hasError) {
                 return Center(

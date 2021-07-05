@@ -62,7 +62,7 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
                               return null;
                             }),
                         TextFormField(
-                          onChanged: (value) => widget.bloc.changeName(value),
+                          onChanged: (value) => widget.bloc.changeDescription(value),
                           decoration: InputDecoration(
                               hintText: 'Description (optionel)'),
                         ),

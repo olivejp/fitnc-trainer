@@ -7,12 +7,16 @@ class MyHomePageBloc {
   final AuthService authService = AuthService.getInstance();
 
   int _currentPage = 0;
+  bool _currentDisplay = false;
   late BehaviorSubject<int> _streamCurrentPage;
+  late BehaviorSubject<bool> _streamDisplayList;
 
   Stream<int> get currentPageObs => _streamCurrentPage.stream;
+  Stream<bool> get currentDisplayObs => _streamDisplayList.stream;
 
   MyHomePageBloc._() {
     _streamCurrentPage = BehaviorSubject.seeded(0);
+    _streamDisplayList = BehaviorSubject.seeded(_currentDisplay);
   }
 
   static MyHomePageBloc getInstance() {
@@ -29,5 +33,10 @@ class MyHomePageBloc {
 
   Future<bool> logout() {
     return authService.disconnect();
+  }
+
+  toggleDisplay() {
+    _currentDisplay = !_currentDisplay;
+    _streamDisplayList.sink.add(_currentDisplay);
   }
 }
