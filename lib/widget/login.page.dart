@@ -61,8 +61,6 @@ class _LoginPageState extends State<LoginPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               TextField(
-                                style: GoogleFonts.roboto(fontSize: 20),
-                                autofocus: true,
                                 decoration: InputDecoration(
                                     hintText: 'Email',
                                     hintStyle:
@@ -72,7 +70,6 @@ class _LoginPageState extends State<LoginPage> {
                                 onSubmitted: (value) => onPressedEnter(),
                               ),
                               TextField(
-                                style: GoogleFonts.roboto(fontSize: 20),
                                 obscureText: true,
                                 enableSuggestions: false,
                                 decoration: InputDecoration(
@@ -81,8 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                                         GoogleFonts.roboto(fontSize: 20)),
                                 onChanged: (value) =>
                                     widget.bloc.changePassword(value),
-                                onSubmitted: (value) => onPressedEnter(),
-                                // textInputAction: TextInputAction.done,
+                                onSubmitted: (value) => onPressedEnter()
                               ),
                               Padding(
                                   padding: EdgeInsets.only(
