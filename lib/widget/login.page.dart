@@ -58,17 +58,17 @@ class _LoginPageState extends State<LoginPage> {
                               decoration: InputDecoration(
                                   hintText: 'Email',
                                   hintStyle: GoogleFonts.roboto(fontSize: 20)),
-                              validator: (String? value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Merci de renseigner votre adresse email.';
-                                }
-                                if (!RegExp(
-                                        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-                                    .hasMatch(value)) {
-                                  return "L'adresse mail n'est pas formattée correctement'.";
-                                }
-                                return null;
-                              },
+                              // validator: (String? value) {
+                              //   if (value == null || value.isEmpty) {
+                              //     return 'Merci de renseigner votre adresse email.';
+                              //   }
+                              //   if (!RegExp(
+                              //           r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+                              //       .hasMatch(value)) {
+                              //     return "L'adresse mail n'est pas formattée correctement'.";
+                              //   }
+                              //   return null;
+                              // },
                               onChanged: (value) =>
                                   widget.bloc.changeEmail(value),
                               onFieldSubmitted: (value) => onPressedEnter(),
@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                               onChanged: (value) =>
                                   widget.bloc.changePassword(value),
                               onFieldSubmitted: (value) => onPressedEnter(),
-                              textInputAction: TextInputAction.done,
+                              // textInputAction: TextInputAction.done,
                             ),
                             Padding(
                                 padding: EdgeInsets.only(left: 10, right: 10, top: 30),
