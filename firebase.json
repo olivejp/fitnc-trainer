@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "target": "trainer",
     "public": "build/web",
     "ignore": [
       "firebase.json",
