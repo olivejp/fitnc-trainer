@@ -60,26 +60,40 @@ class _LoginPageState extends State<LoginPage> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              TextField(
+                              TextFormField(
                                 decoration: InputDecoration(
                                     hintText: 'Email',
                                     hintStyle:
                                         GoogleFonts.roboto(fontSize: 20)),
+                                enableSuggestions: true,
                                 onChanged: (value) =>
                                     widget.bloc.changeEmail(value),
-                                onSubmitted: (value) => onPressedEnter(),
+                                onFieldSubmitted: (value) => onPressedEnter(),
+                                validator: (String? value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Merci de renseigner votre adresse email.';
+                                  }
+                                  if (!RegExp(
+                                          r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+                                      .hasMatch(value)) {
+                                    return "L'adresse mail n'est pas formattée correctement'.";
+                                  }
+                                  return null;
+                                },
+                                textInputAction: TextInputAction.done,
                               ),
-                              TextField(
-                                obscureText: true,
-                                enableSuggestions: false,
-                                decoration: InputDecoration(
-                                    hintText: 'Mot de passe',
-                                    hintStyle:
-                                        GoogleFonts.roboto(fontSize: 20)),
-                                onChanged: (value) =>
-                                    widget.bloc.changePassword(value),
-                                onSubmitted: (value) => onPressedEnter()
-                              ),
+                              TextFormField(
+                                  obscureText: true,
+                                  enableSuggestions: false,
+                                  autocorrect: false,
+                                  decoration: InputDecoration(
+                                      hintText: 'Mot de passe',
+                                      hintStyle:
+                                          GoogleFonts.roboto(fontSize: 20)),
+                                  onChanged: (value) =>
+                                      widget.bloc.changePassword(value),
+                                  onFieldSubmitted: (value) =>
+                                      onPressedEnter()),
                               Padding(
                                   padding: EdgeInsets.only(
                                       left: 10, right: 10, top: 30),
@@ -120,12 +134,10 @@ class _LoginPageState extends State<LoginPage> {
     widget.bloc.cleanError();
     if (_formKey.currentState?.validate() == true) {
       widget.bloc.login().then((value) {
-        print('Test validé');
         if (widget.callback != null) {
           widget.callback!(value);
         }
       }).catchError((error) {
-        print('Test échoué');
         widget.bloc.setError(error.toString());
       });
     }
