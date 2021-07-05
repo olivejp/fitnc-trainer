@@ -5,6 +5,7 @@ import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class WorkoutPage extends StatefulWidget {
@@ -187,26 +188,65 @@ class _WorkoutPageState extends State<WorkoutPage> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text('Modifier le Workout'),
-              content: ListTile(
-                title: TextFormField(
-                  onChanged: (value) => workout.name = value,
-                  initialValue: workout.name,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Veuillez rentrer un nom pour ce workout';
-                    }
-                    return null;
-                  },
+              title: Text('Modifier le workout'),
+              content: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 500, maxWidth: 1200),
+                  child: Form(
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          decoration: InputDecoration(
+                              hintText: 'Nom',
+                              hintStyle: GoogleFonts.roboto(fontSize: 20)),
+                          onChanged: (value) => workout.name = value,
+                          initialValue: workout.name,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Veuillez rentrer un nom pour ce workout';
+                            }
+                            return null;
+                          },
+                        ),
+                        TextFormField(
+                          decoration: InputDecoration(
+                              hintText: 'Description',
+                              hintStyle: GoogleFonts.roboto(fontSize: 20)),
+                          textInputAction: TextInputAction.newline,
+                          keyboardType: TextInputType.multiline,
+                          minLines: 3,
+                          maxLines: 20,
+                          maxLength: 2000,
+                          onChanged: (value) => workout.description = value,
+                          initialValue: workout.description,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Veuillez rentrer un nom pour ce workout';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               actions: [
-                TextButton(
-                    onPressed: () {
-                      widget.bloc.update(workout);
-                      Navigator.pop(context);
-                    },
-                    child: Text('Modifier'))
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextButton(
+                      child: Text('Modifier'),
+                      onPressed: () {
+                        widget.bloc.update(workout);
+                        Navigator.pop(context);
+                      }),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextButton(
+                      child: Text('Annuler'),
+                      onPressed: () => Navigator.pop(context)),
+                )
               ],
             ));
   }
