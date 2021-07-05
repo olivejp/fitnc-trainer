@@ -61,6 +61,7 @@ class _LoginPageState extends State<LoginPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               TextFormField(
+                                autofocus: true,
                                 decoration: InputDecoration(
                                     hintText: 'Email',
                                     hintStyle:
