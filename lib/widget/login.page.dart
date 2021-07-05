@@ -55,7 +55,6 @@ class _LoginPageState extends State<LoginPage> {
                             TextFormField(
                               style: GoogleFonts.roboto(fontSize: 20),
                               autofocus: true,
-                              enableSuggestions: true,
                               decoration: InputDecoration(
                                   hintText: 'Email',
                                   hintStyle: GoogleFonts.roboto(fontSize: 20)),
@@ -73,13 +72,11 @@ class _LoginPageState extends State<LoginPage> {
                               onChanged: (value) =>
                                   widget.bloc.changeEmail(value),
                               onFieldSubmitted: (value) => onPressedEnter(),
-                              textInputAction: TextInputAction.done,
                             ),
                             TextFormField(
                               style: GoogleFonts.roboto(fontSize: 20),
                               obscureText: true,
                               enableSuggestions: false,
-                              autocorrect: false,
                               decoration: InputDecoration(
                                   hintText: 'Mot de passe',
                                   hintStyle: GoogleFonts.roboto(fontSize: 20)),
