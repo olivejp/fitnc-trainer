@@ -29,8 +29,11 @@ class MyApp extends StatelessWidget {
         title: appTitle,
         theme: ThemeData(
             primarySwatch: Colors.amber,
+            floatingActionButtonTheme: FloatingActionButtonThemeData(
+                foregroundColor: Color(Colors.white.value)),
             appBarTheme: AppBarTheme(
-              iconTheme: IconThemeData(color: Color(Colors.white.value)),
+              iconTheme:
+                  IconThemeData(color: Color(Colors.amber.value), size: 30),
               backgroundColor: Color(Colors.black87.value),
               toolbarHeight: 80,
               centerTitle: true,

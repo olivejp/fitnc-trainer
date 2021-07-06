@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:rxdart/rxdart.dart';
 
 class AddWorkoutBloc {
   TrainersService trainersService = TrainersService.getInstance();
@@ -11,6 +12,10 @@ class AddWorkoutBloc {
 
   Uint8List? fileBytes;
   String? fileName;
+
+  BehaviorSubject<Uint8List?>? _streamSelectedImage;
+
+  Stream<Uint8List?>? get selectedImageObs => _streamSelectedImage?.stream;
 
   static AddWorkoutBloc? _instance;
 
@@ -21,6 +26,16 @@ class AddWorkoutBloc {
       _instance = AddWorkoutBloc._();
     }
     return _instance!;
+  }
+
+  void init() {
+    fileBytes = null;
+    fileName = null;
+    _streamSelectedImage = BehaviorSubject();
+  }
+
+  void dispose() {
+    _streamSelectedImage?.close();
   }
 
   Future<void> addWorkout() async {
@@ -75,10 +90,9 @@ class AddWorkoutBloc {
         .set(workout.toJson());
   }
 
-  void setImage(Uint8List? bytes, String name) {
-    if (bytes != null) {
-      fileBytes = bytes;
-      fileName = name;
-    }
+  void setImage(Uint8List? bytes, String? name) {
+    fileBytes = bytes;
+    fileName = name;
+    _streamSelectedImage?.sink.add(fileBytes);
   }
 }
