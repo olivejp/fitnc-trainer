@@ -8,11 +8,13 @@ part of 'workout.domain.dart';
 
 Workout _$WorkoutFromJson(Map<String, dynamic> json) {
   return Workout(
-    uid: json['uid'] as String,
+    uid: json['uid'] as String?,
     name: json['name'] as String,
     description: json['description'] as String?,
     createDate: json['createDate'],
-  )..imageUrl = json['imageUrl'] as String?;
+  )
+    ..imageUrl = json['imageUrl'] as String?
+    ..timerType = json['timerType'] as String?;
 }
 
 Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
@@ -21,4 +23,5 @@ Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
       'description': instance.description,
       'imageUrl': instance.imageUrl,
       'createDate': instance.createDate,
+      'timerType': instance.timerType,
     };

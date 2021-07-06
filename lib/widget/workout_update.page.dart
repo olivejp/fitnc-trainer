@@ -28,8 +28,9 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    String appBarTitle =
-    widget.bloc.getWorkout()?.uid != null ? widget.bloc.getWorkout()!.name : 'Nouveau workout';
+    String appBarTitle = widget.bloc.getWorkout()?.uid != null
+        ? widget.bloc.getWorkout()!.name
+        : 'Nouveau workout';
     return Scaffold(
         appBar: AppBar(
           title: Text(appBarTitle,
@@ -167,33 +168,61 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                           children: [
                             Form(
                               key: _formKey,
-                              child: Column(
-                                children: [
-                                  TextFormField(
-                                      initialValue: widget.bloc.getWorkout()?.name,
-                                      autofocus: true,
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Column(
+                                  children: [
+                                    TextFormField(
+                                        initialValue:
+                                            widget.bloc.getWorkout()?.name,
+                                        autofocus: true,
+                                        onChanged: (value) =>
+                                            widget.bloc.changeName(value),
+                                        decoration:
+                                            InputDecoration(hintText: 'Nom'),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Merci de renseigner le nom du workout.';
+                                          }
+                                          return null;
+                                        }),
+                                    TextFormField(
+                                      initialValue:
+                                          widget.bloc.getWorkout()?.description,
+                                      maxLength: 2000,
+                                      minLines: 5,
+                                      maxLines: 20,
                                       onChanged: (value) =>
-                                          widget.bloc.changeName(value),
-                                      decoration:
-                                          InputDecoration(hintText: 'Nom'),
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Merci de renseigner le nom du workout.';
-                                        }
-                                        return null;
-                                      }),
-                                  TextFormField(
-                                    initialValue: widget.bloc.getWorkout()?.description,
-                                    maxLength: 2000,
-                                    minLines: 5,
-                                    maxLines: 20,
-                                    onChanged: (value) =>
-                                        widget.bloc.changeDescription(value),
-                                    decoration: InputDecoration(
-                                        alignLabelWithHint: true,
-                                        hintText: 'Description (optionel)'),
-                                  ),
-                                ],
+                                          widget.bloc.changeDescription(value),
+                                      decoration: InputDecoration(
+                                          alignLabelWithHint: true,
+                                          hintText: 'Description (optionel)'),
+                                    ),
+                                    DropdownButtonFormField<String>(
+                                        icon: Icon(Icons.timer),
+                                        onChanged: (String? value) => widget.bloc.changeTimerType(value),
+                                        value:
+                                            widget.bloc.getWorkout()?.timerType,
+                                        items: [
+                                          DropdownMenuItem(
+                                            child: Text('Aucun type de timer', style: TextStyle(fontStyle: FontStyle.italic),),
+                                            value: null,
+                                          ),
+                                          DropdownMenuItem(
+                                            child: Text('AMRAP'),
+                                            value: 'AMRAP',
+                                          ),
+                                          DropdownMenuItem(
+                                            child: Text('EMOM'),
+                                            value: 'EMOM',
+                                          ),
+                                          DropdownMenuItem(
+                                            child: Text('For Time'),
+                                            value: 'For Time',
+                                          ),
+                                        ])
+                                  ],
+                                ),
                               ),
                             ),
                           ],

@@ -142,6 +142,10 @@ class WorkoutUpdateBloc {
     _workout.description = value;
   }
 
+  changeTimerType(String? value) {
+    _workout.timerType = value;
+  }
+
   Future<void> update(Workout workout) {
     return trainersService
         .getWorkoutReference()

@@ -9,6 +9,7 @@ class Workout {
   String? description;
   String? imageUrl;
   dynamic createDate;
+  String? timerType;
 
   Workout({this.uid, this.name = '', this.description = '', this.createDate = 0});
 
