@@ -34,7 +34,7 @@ class AddWorkoutBloc {
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (fileBytes != null) {
       _workout.imageUrl = await FirebaseStorage.instance
-          .ref('uploads/$fileName')
+          .ref('uploads/${_workout.uid}/$fileName')
           .putData(fileBytes!)
           .then((ref) => ref.ref.getDownloadURL());
     }
@@ -52,7 +52,12 @@ class AddWorkoutBloc {
   }
 
   Future<void> deleteWorkout(Workout workout) {
-    return trainersService.getWorkoutReference().doc(workout.uid).delete();
+    return trainersService.getWorkoutReference().doc(workout.uid).delete().then(
+        (value) => FirebaseStorage.instance
+            .ref('uploads/${workout.uid}')
+            .listAll()
+            .then((value) => value.items.forEach((element) => element.delete()))
+            .catchError((error) => print(error)));
   }
 
   changeName(String value) {

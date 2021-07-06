@@ -65,9 +65,6 @@ class MyHomePage extends StatelessWidget {
 
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: Color(Colors.black87.value),
-          toolbarHeight: 80,
-          centerTitle: true,
           title: Wrap(
             children: [
               Icon(

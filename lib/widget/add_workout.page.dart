@@ -1,7 +1,4 @@
-import 'dart:typed_data';
-
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/bloc/add_workout.bloc.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +22,8 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ajouter un Workout'),
+        title: Text('Ajouter un Workout',
+            style: Theme.of(context).appBarTheme.titleTextStyle),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -62,7 +60,8 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
                               return null;
                             }),
                         TextFormField(
-                          onChanged: (value) => widget.bloc.changeDescription(value),
+                          onChanged: (value) =>
+                              widget.bloc.changeDescription(value),
                           decoration: InputDecoration(
                               hintText: 'Description (optionel)'),
                         ),
@@ -77,7 +76,8 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
                                   'gif'
                                 ]).then((result) {
                               if (result != null) {
-                                widget.bloc.setImage(result.files.first.bytes, result.files.first.name);
+                                widget.bloc.setImage(result.files.first.bytes,
+                                    result.files.first.name);
                               }
                             });
                           },

@@ -4,6 +4,7 @@ import 'package:fitnc_trainer/widget/add_workout.page.dart';
 import 'package:fitnc_trainer/widget/login.page.dart';
 import 'package:fitnc_trainer/widget/my-home-page.widget.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animations/loading_animations.dart';
 
 import 'bloc/main.bloc.dart';
@@ -26,7 +27,16 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
         title: appTitle,
-        theme: ThemeData(primarySwatch: Colors.amber),
+        theme: ThemeData(
+            primarySwatch: Colors.amber,
+            appBarTheme: AppBarTheme(
+              iconTheme: IconThemeData(color: Color(Colors.white.value)),
+              backgroundColor: Color(Colors.black87.value),
+              toolbarHeight: 80,
+              centerTitle: true,
+              titleTextStyle: GoogleFonts.alfaSlabOne(
+                  color: Color(Colors.amber.value), fontSize: 35),
+            )),
         routes: {'/add_workout': (context) => AddWorkoutPage()},
         home: FutureBuilder(
             future: bloc.initThridParty(),
