@@ -75,15 +75,22 @@ class _WorkoutPageState extends State<WorkoutPage> {
         crossAxisSpacing: 20.0,
         crossAxisCount: nbColumns,
         children: listWorkout.map((workout) {
-          Widget image = workout?.imageUrl != null
-              ? Image.network(workout!.imageUrl!, fit: BoxFit.fitWidth)
-              : Expanded(
-                  child: Container(
-                      decoration:
-                          BoxDecoration(color: Color(Colors.amber.value))));
+          Widget leading = workout?.imageUrl != null
+              ? CircleAvatar(foregroundImage: NetworkImage(workout!.imageUrl!))
+              : Icon(
+                  Icons.sports_volleyball,
+                  color: Color(Colors.amber.value),
+                );
 
           Widget description = workout?.description != null
-              ? Text(workout!.description!)
+              ? Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                    workout!.description!,
+                    maxLines: 5,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+              )
               : Container();
 
           Widget subtitle = workout?.createDate != null
@@ -107,23 +114,25 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ListTile(
-                      leading: Icon(
-                        Icons.sports_volleyball,
-                        color: Color(Colors.amber.value),
-                      ),
+                      leading: leading,
                       title: Text(workout.name),
                       subtitle: subtitle,
                     ),
-                    Padding(padding: EdgeInsets.all(16.0), child: description),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 10, left: 10),
+                        child: description,
+                      ),
+                    ),
                     ButtonBar(
-                      alignment: MainAxisAlignment.start,
+                      alignment: MainAxisAlignment.end,
                       children: [
                         getDeleteButton(context, workout),
                       ],
                     ),
-                    image,
                   ],
                 ),
                 elevation: 2,
@@ -159,6 +168,12 @@ class _WorkoutPageState extends State<WorkoutPage> {
             trailing: Wrap(
               children: [getDeleteButton(context, workout)],
             ),
+            onTap: () {Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => WorkoutUpdatePage(
+                      workout: workout,
+                    )));},
           );
         });
   }
@@ -188,73 +203,6 @@ class _WorkoutPageState extends State<WorkoutPage> {
         size: 24,
       ),
     );
-  }
-
-  void updateWorkout(BuildContext context, Workout workout) {
-    showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Text('Modifier le workout'),
-              content: SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: 500, maxWidth: 1200),
-                  child: Form(
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          decoration: InputDecoration(
-                              hintText: 'Nom',
-                              hintStyle: GoogleFonts.roboto(fontSize: 20)),
-                          onChanged: (value) => workout.name = value,
-                          initialValue: workout.name,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez rentrer un nom pour ce workout';
-                            }
-                            return null;
-                          },
-                        ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                              hintText: 'Description',
-                              hintStyle: GoogleFonts.roboto(fontSize: 20)),
-                          textInputAction: TextInputAction.newline,
-                          keyboardType: TextInputType.multiline,
-                          minLines: 3,
-                          maxLines: 20,
-                          maxLength: 2000,
-                          onChanged: (value) => workout.description = value,
-                          initialValue: workout.description,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Veuillez rentrer un nom pour ce workout';
-                            }
-                            return null;
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextButton(
-                      child: Text('Modifier'),
-                      onPressed: () {
-                        widget.bloc.update(workout);
-                        Navigator.pop(context);
-                      }),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextButton(
-                      child: Text('Annuler'),
-                      onPressed: () => Navigator.pop(context)),
-                )
-              ],
-            ));
   }
 
   void deleteWorkout(Workout workout, BuildContext context) {
