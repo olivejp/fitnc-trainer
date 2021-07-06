@@ -10,10 +10,8 @@ class WorkoutUpdatePage extends StatefulWidget {
   final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
 
   final double containerHeight = 240;
-  Workout? workout;
 
   WorkoutUpdatePage({Key? key, Workout? workout}) : super(key: key) {
-    this.workout = workout;
     bloc.init(workout);
   }
 
@@ -31,7 +29,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
   @override
   Widget build(BuildContext context) {
     String appBarTitle =
-        widget.workout?.uid != null ? widget.workout!.name : 'Nouveau workout';
+    widget.bloc.getWorkout()?.uid != null ? widget.bloc.getWorkout()!.name : 'Nouveau workout';
     return Scaffold(
         appBar: AppBar(
           title: Text(appBarTitle,
@@ -172,7 +170,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                               child: Column(
                                 children: [
                                   TextFormField(
-                                      initialValue: widget.workout?.name,
+                                      initialValue: widget.bloc.getWorkout()?.name,
                                       autofocus: true,
                                       onChanged: (value) =>
                                           widget.bloc.changeName(value),
@@ -185,7 +183,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                                         return null;
                                       }),
                                   TextFormField(
-                                    initialValue: widget.workout?.description,
+                                    initialValue: widget.bloc.getWorkout()?.description,
                                     maxLength: 2000,
                                     minLines: 5,
                                     maxLines: 20,

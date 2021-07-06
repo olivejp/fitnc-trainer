@@ -49,6 +49,10 @@ class WorkoutUpdateBloc {
     }
   }
 
+  Workout? getWorkout() {
+    return _workout;
+  }
+
   void dispose() {
     _streamSelectedImage?.close();
   }
@@ -62,7 +66,7 @@ class WorkoutUpdateBloc {
   }
 
   Future<void> createWorkout() async {
-    CollectionReference<Object?>  collectionReference =
+    CollectionReference<Object?> collectionReference =
         trainersService.getWorkoutReference();
 
     _workout.uid =
@@ -92,7 +96,8 @@ class WorkoutUpdateBloc {
     return sendToFireStore(collectionReference);
   }
 
-  Future<void> sendToFireStore(CollectionReference<Object?> collectionReference) {
+  Future<void> sendToFireStore(
+      CollectionReference<Object?> collectionReference) {
     _workout.createDate = FieldValue.serverTimestamp();
     return collectionReference
         .doc(_workout.uid)
@@ -101,7 +106,6 @@ class WorkoutUpdateBloc {
       _workout = Workout();
     });
   }
-
 
   Future<void> sendToStorage() async {
     _workout.imageUrl = await FirebaseStorage.instance
