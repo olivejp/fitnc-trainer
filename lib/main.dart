@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/service/auth.service.dart';
-import 'package:fitnc_trainer/widget/add_workout.page.dart';
+import 'package:fitnc_trainer/widget/workout_update.page.dart';
 import 'package:fitnc_trainer/widget/login.page.dart';
 import 'package:fitnc_trainer/widget/my-home-page.widget.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
               titleTextStyle: GoogleFonts.alfaSlabOne(
                   color: Color(Colors.amber.value), fontSize: 35),
             )),
-        routes: {'/add_workout': (context) => AddWorkoutPage()},
+        routes: {'/add_workout': (context) => WorkoutUpdatePage(workout: null,)},
         home: FutureBuilder(
             future: bloc.initThridParty(),
             builder: (context, snapshot) {

@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fitnc_trainer/bloc/add_workout.bloc.dart';
+import 'package:fitnc_trainer/bloc/workout_update.bloc.dart';
 import 'package:fitnc_trainer/bloc/my-home-page.bloc.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
+import 'package:fitnc_trainer/widget/workout_update.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -10,7 +11,7 @@ import 'package:intl/intl.dart';
 
 class WorkoutPage extends StatefulWidget {
   final MyHomePageBloc homePageBloc = MyHomePageBloc.getInstance();
-  final AddWorkoutBloc bloc = AddWorkoutBloc.getInstance();
+  final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
 
   WorkoutPage({Key? key}) : super(key: key);
 
@@ -95,7 +96,12 @@ class _WorkoutPageState extends State<WorkoutPage> {
               splashColor: Color(Colors.amber.value),
               hoverColor: Color(Colors.amber.value),
               borderRadius: BorderRadius.circular(10),
-              onTap: () => updateWorkout(context, workout),
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => WorkoutUpdatePage(
+                            workout: workout,
+                          ))),
               child: Card(
                 clipBehavior: Clip.antiAlias,
                 shape: RoundedRectangleBorder(

@@ -4,13 +4,13 @@ part 'workout.domain.g.dart';
 
 @JsonSerializable()
 class Workout {
-  String uid;
+  String? uid;
   String name;
   String? description;
   String? imageUrl;
   dynamic createDate;
 
-  Workout({this.uid = '', this.name = '', this.description = '', this.createDate = 0});
+  Workout({this.uid, this.name = '', this.description = '', this.createDate = 0});
 
   factory Workout.fromJson(Map<String, dynamic> data) =>
       _$WorkoutFromJson(data);
