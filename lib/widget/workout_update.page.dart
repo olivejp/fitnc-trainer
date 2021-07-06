@@ -195,13 +195,6 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                                         alignLabelWithHint: true,
                                         hintText: 'Description (optionel)'),
                                   ),
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: TextButton(
-                                      child: Text('Selectionner une image'),
-                                      onPressed: () => callPhotoPicker(),
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
