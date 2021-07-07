@@ -179,7 +179,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                                         onChanged: (value) =>
                                             widget.bloc.changeName(value),
                                         decoration:
-                                            InputDecoration(hintText: 'Nom'),
+                                            InputDecoration(helperText: 'Nom'),
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
                                             return 'Merci de renseigner le nom du workout.';
@@ -195,17 +195,23 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                                       onChanged: (value) =>
                                           widget.bloc.changeDescription(value),
                                       decoration: InputDecoration(
+                                          border: OutlineInputBorder(),
                                           alignLabelWithHint: true,
-                                          hintText: 'Description (optionel)'),
+                                          helperText: 'Description (optionel)'),
                                     ),
                                     DropdownButtonFormField<String>(
                                         icon: Icon(Icons.timer),
-                                        onChanged: (String? value) => widget.bloc.changeTimerType(value),
+                                        onChanged: (String? value) =>
+                                            widget.bloc.changeTimerType(value),
                                         value:
                                             widget.bloc.getWorkout()?.timerType,
                                         items: [
                                           DropdownMenuItem(
-                                            child: Text('Aucun type de timer', style: TextStyle(fontStyle: FontStyle.italic),),
+                                            child: Text(
+                                              'Aucun type de timer',
+                                              style: TextStyle(
+                                                  fontStyle: FontStyle.italic),
+                                            ),
                                             value: null,
                                           ),
                                           DropdownMenuItem(

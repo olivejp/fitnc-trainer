@@ -4,11 +4,20 @@ part 'abonne.domain.g.dart';
 
 @JsonSerializable()
 class Abonne {
-  String uid;
-  String name;
+  String? uid;
+  String? nom;
+  String? prenom;
+  dynamic dateNaissance;
+  int? telephone1;
+  int? telephone2;
+  String? email;
+  String? adresse1;
+  String? adresse2;
+  String? adresse3;
+  String? imageUrl;
   dynamic createDate;
 
-  Abonne({this.uid = '', this.name = '', this.createDate = 0});
+  Abonne();
 
   factory Abonne.fromJson(Map<String, dynamic> data) =>
       _$AbonneFromJson(data);

@@ -40,7 +40,7 @@ class AbonneBloc {
   }
 
   changeName(String value) {
-    _abonne.name = value;
+    _abonne.nom = value;
   }
 
   Future<void> update(Abonne abonne) {
