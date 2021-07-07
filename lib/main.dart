@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:fitnc_trainer/widget/abonne_update.page.dart';
+import 'package:fitnc_trainer/widget/exercice_update.page.dart';
 import 'package:fitnc_trainer/widget/workout_update.page.dart';
 import 'package:fitnc_trainer/widget/login.page.dart';
 import 'package:fitnc_trainer/widget/my-home-page.widget.dart';
@@ -47,7 +48,10 @@ class MyApp extends StatelessWidget {
               ),
           '/add_abonne': (context) => AbonneUpdatePage(
                 abonne: null,
-              )
+              ),
+          '/add_exercice': (context) => ExerciceUpdatePage(
+            exercice: null,
+          )
         },
         home: FutureBuilder(
             future: bloc.initThridParty(),

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/domain/abonne.domain.dart';
+import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/trainers.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 
@@ -36,6 +37,10 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
     return getCurrentTrainerRef().collection('abonne');
   }
 
+  CollectionReference getExerciceReference() {
+    return getCurrentTrainerRef().collection('exercice');
+  }
+
   Stream<List<Workout?>> listenToWorkout() {
     return getWorkoutReference().snapshots().map((QuerySnapshot event) => event
         .docs
@@ -47,6 +52,13 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
     return getAbonneReference().snapshots().map((QuerySnapshot event) => event
         .docs
         .map((doc) => Abonne.fromJson(doc.data() as Map<String, dynamic>))
+        .toList());
+  }
+
+  Stream<List<Exercice?>> listenToExercice() {
+    return getExerciceReference().snapshots().map((QuerySnapshot event) => event
+        .docs
+        .map((doc) => Exercice.fromJson(doc.data() as Map<String, dynamic>))
         .toList());
   }
 

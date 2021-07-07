@@ -138,8 +138,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(right: 5),
                                     child: TextFormField(
-                                        autovalidateMode:
-                                            AutovalidateMode.always,
+
                                         initialValue: widget.bloc.abonne.nom,
                                         autofocus: true,
                                         onChanged: (value) =>
@@ -161,7 +160,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                                     padding: const EdgeInsets.only(left: 5),
                                     child: TextFormField(
                                         autovalidateMode:
-                                            AutovalidateMode.always,
+                                            AutovalidateMode.onUserInteraction,
                                         initialValue:
                                             widget.bloc.abonne.prenom,
                                         onChanged: (value) =>
@@ -225,7 +224,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                                         initialValue:
                                             widget.bloc.abonne.email,
                                         autovalidateMode:
-                                            AutovalidateMode.always,
+                                            AutovalidateMode.onUserInteraction,
                                         onChanged: widget.bloc.changeEmail,
                                         decoration: InputDecoration(
                                             helperText: 'Email'),

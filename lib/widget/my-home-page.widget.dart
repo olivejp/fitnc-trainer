@@ -1,5 +1,6 @@
 import 'package:fitnc_trainer/bloc/my-home-page.bloc.dart';
 import 'package:fitnc_trainer/widget/abonne.page.dart';
+import 'package:fitnc_trainer/widget/exercice.page.dart';
 import 'package:fitnc_trainer/widget/workout.page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 class MyHomePage extends StatelessWidget {
   static final int PAGE_WORKOUT = 0;
   static final int PAGE_ABONNE = 1;
+  static final int PAGE_EXERCICE = 2;
   final MyHomePageBloc bloc = MyHomePageBloc.getInstance();
   final String title;
 
@@ -49,8 +51,12 @@ class MyHomePage extends StatelessWidget {
                       icon: Icon(Icons.sports_volleyball),
                     ),
                     BottomNavigationBarItem(
-                      label: 'Abonnes',
+                      label: 'Abonnés',
                       icon: Icon(Icons.group),
+                    ),
+                    BottomNavigationBarItem(
+                      label: 'Exercices',
+                      icon: Icon(Icons.sports_handball_outlined),
                     )
                   ],
                   onTap: (value) => bloc.changePage(value),
@@ -136,6 +142,23 @@ class MyHomePage extends StatelessWidget {
                 ),
               );
             }
+            if (snapshot.data == PAGE_EXERCICE) {
+              return FloatingActionButton.extended(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/add_exercice');
+                },
+                label: Text(
+                  'Ajouter un exercice',
+                  style: GoogleFonts.roboto(
+                      fontSize: 15, color: Color(Colors.white.value)),
+                ),
+                icon: Icon(
+                  Icons.add,
+                  color: Color(Colors.white.value),
+                  size: 20.0,
+                ),
+              );
+            }
             return Container();
           },
         ),
@@ -151,6 +174,9 @@ class MyHomePage extends StatelessWidget {
         }
         if (snapshot.data == PAGE_ABONNE) {
           return AbonnePage();
+        }
+        if (snapshot.data == PAGE_EXERCICE) {
+          return ExercicePage();
         }
         return Text('Aie');
       },
@@ -175,7 +201,6 @@ class MyHomePage extends StatelessWidget {
                 children: [
                   ListTile(
                     onTap: () => bloc.changePage(PAGE_WORKOUT),
-                    subtitle: Text('Gérer vos entraînements'),
                     title: Text('Workout'),
                     trailing: Icon(Icons.sports_volleyball),
                     selected: snapshot.data == PAGE_WORKOUT,
@@ -183,10 +208,16 @@ class MyHomePage extends StatelessWidget {
                   Divider(),
                   ListTile(
                     onTap: () => bloc.changePage(PAGE_ABONNE),
-                    subtitle: Text('Gérer vos abonnés'),
-                    title: Text('Abonnés'),
+                    title: Text('Abonné'),
                     trailing: Icon(Icons.group),
                     selected: snapshot.data == PAGE_ABONNE,
+                  ),
+                  Divider(),
+                  ListTile(
+                    onTap: () => bloc.changePage(PAGE_EXERCICE),
+                    title: Text('Exercice'),
+                    trailing: Icon(Icons.sports_handball),
+                    selected: snapshot.data == PAGE_EXERCICE,
                   ),
                 ],
               );

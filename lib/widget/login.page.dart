@@ -50,6 +50,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: 500),
                   child: Card(
+                    color: Color(Colors.white70.value),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
                     child: Padding(
@@ -59,11 +60,11 @@ class _LoginPageState extends State<LoginPage> {
                         child: Wrap(
                           children: [
                             TextFormField(
+                              style: GoogleFonts.roboto(fontSize: 20),
                               decoration: InputDecoration(
                                   border: OutlineInputBorder(),
                                   hintText: 'Email',
-                                  hintStyle:
-                                      GoogleFonts.roboto(fontSize: 20)),
+                                  hintStyle: GoogleFonts.roboto(fontSize: 20)),
                               enableSuggestions: true,
                               onChanged: (value) =>
                                   widget.bloc.changeEmail(value),
@@ -82,6 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                               textInputAction: TextInputAction.done,
                             ),
                             TextFormField(
+                                style: GoogleFonts.roboto(fontSize: 20),
                                 obscureText: true,
                                 enableSuggestions: false,
                                 autocorrect: false,
@@ -92,8 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                                         GoogleFonts.roboto(fontSize: 20)),
                                 onChanged: (value) =>
                                     widget.bloc.changePassword(value),
-                                onFieldSubmitted: (value) =>
-                                    onPressedEnter()),
+                                onFieldSubmitted: (value) => onPressedEnter()),
                             FloatingActionButton.extended(
                               onPressed: onPressedEnter,
                               label: Text(
