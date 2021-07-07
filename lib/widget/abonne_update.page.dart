@@ -243,6 +243,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 5),
                                     child: TextFormField(
+                                      maxLength: 10,
                                       keyboardType: TextInputType.phone,
                                       inputFormatters: [
                                         FilteringTextInputFormatter.digitsOnly
@@ -268,6 +269,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 5),
                                     child: TextFormField(
+                                      maxLength: 10,
                                       keyboardType: TextInputType.phone,
                                       inputFormatters: [
                                         FilteringTextInputFormatter.digitsOnly

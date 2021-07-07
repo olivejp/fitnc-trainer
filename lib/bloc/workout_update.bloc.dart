@@ -146,13 +146,6 @@ class WorkoutUpdateBloc {
     _workout.timerType = value;
   }
 
-  Future<void> update(Workout workout) {
-    return trainersService
-        .getWorkoutReference()
-        .doc(workout.uid)
-        .set(workout.toJson());
-  }
-
   void setImage(Uint8List? bytes, String? name) {
     _fileBytes = bytes;
     _fileName = name;
@@ -161,5 +154,13 @@ class WorkoutUpdateBloc {
 
   Future<Uint8List> getRemoteImageToUint8List(String imageUrl) async {
     return http.readBytes(Uri.parse(imageUrl));
+  }
+
+  changeDateDebut(String value) {
+    _workout.dateDebut = value;
+  }
+
+  changeDateFin(String value) {
+    _workout.dateFin = value;
   }
 }
