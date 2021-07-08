@@ -152,7 +152,7 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
                 child: TextFormField(
                   initialValue: widget.bloc.exercice.videoUrl,
                   onChanged: (value) => widget.bloc.setVideoUrl(value),
-                  decoration: InputDecoration(helperText: 'URL de la vidéo - Optionnel'),
+                  decoration: InputDecoration(helperText: 'URL de la vidéo - Exemple : https://myStorage.com/squat_video.mp4'),
                 ),
               )
             ],
@@ -165,10 +165,13 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
                   onChanged: (value) {
                     widget.bloc.setYoutubeUrl(value);
                   },
-                  decoration: InputDecoration(helperText: 'URL d\'une vidéo Youtube - Optionnel'),
+                  decoration: InputDecoration(helperText: 'Identifiant vidéo Youtube - Exemple : v-7oKGvVADk'),
                 ),
               )
             ],
+          ),
+          Row(
+            children: [Text('Vous pouvez joindre ici un vidéo au format MP4, si celle ci est directement accessible depuis internet. Exemple : https://firebasestorage.googleapis.com/v0/b/fitnc-7be2e.appspot.com/o/YZBEpGXXvI.mp4')],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

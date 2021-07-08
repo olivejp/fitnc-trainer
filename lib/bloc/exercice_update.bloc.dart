@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
@@ -23,7 +24,9 @@ class ExerciceUpdateBloc {
   BehaviorSubject<String?>? _streamSelectedYoutubeUrl;
 
   Stream<Uint8List?>? get selectedImageObs => _streamSelectedImage?.stream;
+
   Stream<String?>? get selectedVideoUrlObs => _streamSelectedVideoUrl?.stream;
+
   Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl?.stream;
 
   static ExerciceUpdateBloc? _instance;
@@ -77,11 +80,9 @@ class ExerciceUpdateBloc {
   }
 
   Future<void> createExercice() async {
-    CollectionReference<Object?> collectionReference =
-        trainersService.getExerciceReference();
+    CollectionReference<Object?> collectionReference = trainersService.getExerciceReference();
 
-    exercice.uid =
-        collectionReference.doc().id; // Récupération d'une nouvelle ID.
+    exercice.uid = collectionReference.doc().id; // Récupération d'une nouvelle ID.
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (_fileBytes != null) {
@@ -91,8 +92,7 @@ class ExerciceUpdateBloc {
   }
 
   Future<void> updateExercice() async {
-    CollectionReference<Object?> collectionReference =
-        trainersService.getExerciceReference();
+    CollectionReference<Object?> collectionReference = trainersService.getExerciceReference();
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (_fileBytes != null && _oldFileName != _fileName) {
@@ -107,22 +107,21 @@ class ExerciceUpdateBloc {
     return sendToFireStore(collectionReference);
   }
 
-  Future<void> sendToFireStore(
-      CollectionReference<Object?> collectionReference) {
+  Future<void> sendToFireStore(CollectionReference<Object?> collectionReference) {
     exercice.createDate = FieldValue.serverTimestamp();
-    return collectionReference
-        .doc(exercice.uid)
-        .set(exercice.toJson())
-        .then((value) {
+    return collectionReference.doc(exercice.uid).set(exercice.toJson()).then((value) {
       exercice = Exercice();
     });
   }
 
   Future<void> sendToStorage() async {
-    exercice.imageUrl = await FirebaseStorage.instance
-        .ref('${exercice.uid}/$pathExerciceMainImage/$_fileName')
-        .putData(_fileBytes!)
-        .then((ref) => ref.ref.getDownloadURL());
+    String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
+    if (trainerUid != null) {
+      exercice.imageUrl = await FirebaseStorage.instance
+          .ref('trainers/${trainerUid}/exercices/${exercice.uid}/$pathExerciceMainImage/$_fileName')
+          .putData(_fileBytes!)
+          .then((ref) => ref.ref.getDownloadURL());
+    }
   }
 
   Stream<List<Exercice?>> getStreamExercice() {
@@ -130,19 +129,20 @@ class ExerciceUpdateBloc {
   }
 
   Future<void> deleteExercice(Exercice exercice) {
-    return trainersService
-        .getExerciceReference()
-        .doc(exercice.uid)
-        .delete()
-        .then((value) => deleteExerciceMainImage(exercice));
+    return trainersService.getExerciceReference().doc(exercice.uid).delete().then((value) => deleteExerciceMainImage(exercice));
   }
 
   Future<void> deleteExerciceMainImage(Exercice exercice) {
-    return FirebaseStorage.instance
-        .ref('${exercice.uid}/$pathExerciceMainImage')
-        .listAll()
-        .then((value) => value.items.forEach((element) => element.delete()))
-        .catchError((error) => print(error));
+    String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
+    if (trainerUid != null) {
+      return FirebaseStorage.instance
+          .ref('trainers/${trainerUid}/exercices/${exercice.uid}/$pathExerciceMainImage')
+          .listAll()
+          .then((value) => value.items.forEach((element) => element.delete()))
+          .catchError((error) => print(error));
+    } else {
+      return Future.error('Aucun compte trainer connecté');
+    }
   }
 
   changeName(String value) {
@@ -173,4 +173,3 @@ class ExerciceUpdateBloc {
     _streamSelectedYoutubeUrl?.sink.add(value);
   }
 }
-
