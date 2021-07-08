@@ -29,19 +29,14 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    String appBarTitle = widget.bloc.getWorkout()?.uid != null
-        ? widget.bloc.getWorkout()!.name
-        : 'Nouveau workout';
+    String appBarTitle = widget.bloc.getWorkout()?.uid != null ? widget.bloc.getWorkout()!.name : 'Nouveau workout';
     return DefaultTabController(
       length: 2,
       child: Scaffold(
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               if (_formKey.currentState?.validate() == true) {
-                widget.bloc
-                    .saveWorkout()
-                    .then((value) => Navigator.pop(context))
-                    .catchError((error) => print(error.toString()));
+                widget.bloc.saveWorkout().then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
               }
             },
             child: Icon(Icons.check),
@@ -79,11 +74,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                 ),
               ],
             ),
-            title: Text(appBarTitle,
-                style: Theme.of(context)
-                    .appBarTheme
-                    .titleTextStyle
-                    ?.copyWith(fontSize: 30)),
+            title: Text(appBarTitle, style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(fontSize: 30)),
             leading: IconButton(
               icon: Icon(
                 Icons.arrow_back,
@@ -93,11 +84,8 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
             ),
           ),
           body: Container(
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: NetworkImage(
-                        "https://s3.envato.com/files/189120872/0Q7A7108.jpg"),
-                    fit: BoxFit.cover)),
+            decoration:
+                BoxDecoration(image: DecorationImage(image: NetworkImage("https://s3.envato.com/files/189120872/0Q7A7108.jpg"), fit: BoxFit.cover)),
             child: TabBarView(
               children: [
                 getFirstPanel(),
@@ -129,18 +117,13 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
       }
 
       return Padding(
-        padding: EdgeInsets.only(
-            left: leftAndRightPadding,
-            right: leftAndRightPadding,
-            top: topAndBottomPadding,
-            bottom: topAndBottomPadding),
+        padding: EdgeInsets.only(left: leftAndRightPadding, right: leftAndRightPadding, top: topAndBottomPadding, bottom: topAndBottomPadding),
         child: Card(
           shadowColor: Color(Colors.black.value),
           clipBehavior: Clip.antiAlias,
           color: Color(Colors.white.value).withOpacity(0.85),
           elevation: 5.0,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           child: Stack(
             children: [
               Form(
@@ -156,8 +139,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                               stream: widget.bloc.selectedImageObs,
                               builder: (context, snapshot) {
                                 ImageProvider? provider;
-                                if (snapshot.hasData &&
-                                    snapshot.data != null) {
+                                if (snapshot.hasData && snapshot.data != null) {
                                   provider = MemoryImage(snapshot.data!);
                                 }
 
@@ -169,11 +151,9 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                                       ),
                                       radius: 50,
                                       foregroundImage: provider,
-                                      backgroundColor:
-                                          Color(Colors.amber.value)),
+                                      backgroundColor: Color(Colors.amber.value)),
                                   onTap: callPhotoPicker,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(50)),
+                                  borderRadius: BorderRadius.all(Radius.circular(50)),
                                 );
                               }),
                           IconButton(
@@ -187,13 +167,10 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 20),
                               child: TextFormField(
-                                  initialValue:
-                                      widget.bloc.getWorkout()?.name,
+                                  initialValue: widget.bloc.getWorkout()?.name,
                                   autofocus: true,
-                                  onChanged: (value) =>
-                                      widget.bloc.changeName(value),
-                                  decoration:
-                                      InputDecoration(helperText: 'Nom'),
+                                  onChanged: (value) => widget.bloc.changeName(value),
+                                  decoration: InputDecoration(helperText: 'Nom'),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Merci de renseigner le nom du workout.';
@@ -204,105 +181,79 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                           ),
                         ],
                       ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 10),
-                              child: TextFormField(
-                                maxLength: 10,
-                                initialValue:
-                                    widget.bloc.getWorkout()?.dateDebut !=
-                                            null
-                                        ? widget.bloc
-                                            .getWorkout()
-                                            ?.dateDebut
-                                            .toString()
-                                        : '',
-                                onChanged: (value) =>
-                                    widget.bloc.changeDateDebut(value),
-                                autovalidateMode: AutovalidateMode.always,
-                                validator: (value) {
-                                  if (value?.length != null &&
-                                      value!.length >= 8) {
-                                    DateTime time;
-                                    DateTime today = DateTime.now();
-                                    try {
-                                      time = DateFormat('dd/MM/yyyy')
-                                          .parseStrict(value);
-                                    } on Exception catch (e) {
-                                      return 'Date incorrecte. Format accepté dd/mm/aaaa.';
+                      Padding(
+                        padding: const EdgeInsets.only(top: 30),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: TextFormField(
+                                  maxLength: 10,
+                                  initialValue: widget.bloc.getWorkout()?.dateDebut != null ? widget.bloc.getWorkout()?.dateDebut.toString() : '',
+                                  onChanged: (value) => widget.bloc.changeDateDebut(value),
+                                  autovalidateMode: AutovalidateMode.always,
+                                  validator: (value) {
+                                    if (value?.length != null && value!.length >= 8) {
+                                      DateTime time;
+                                      DateTime today = DateTime.now();
+                                      try {
+                                        time = DateFormat('dd/MM/yyyy').parseStrict(value);
+                                      } on Exception catch (e) {
+                                        return 'Date incorrecte. Format accepté dd/mm/aaaa.';
+                                      }
+                                      if (time.isAfter(today)) {
+                                        return 'Date supérieure à la date du jour';
+                                      }
+                                      return null;
                                     }
-                                    if (time.isAfter(today)) {
-                                      return 'Date supérieure à la date du jour';
-                                    }
-                                    return null;
-                                  }
-                                },
-                                decoration: InputDecoration(
-                                    suffixIcon: Icon(Icons.event_note),
-                                    hintText: 'dd/mm/aaaa',
-                                    helperText: 'Date de début'),
+                                  },
+                                  decoration:
+                                      InputDecoration(suffixIcon: Icon(Icons.event_note), hintText: 'dd/mm/aaaa', helperText: 'Date de début'),
+                                ),
                               ),
                             ),
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 10),
-                              child: TextFormField(
-                                maxLength: 10,
-                                initialValue:
-                                    widget.bloc.getWorkout()?.dateFin != null
-                                        ? widget.bloc
-                                            .getWorkout()
-                                            ?.dateFin
-                                            .toString()
-                                        : '',
-                                onChanged: (value) =>
-                                    widget.bloc.changeDateFin(value),
-                                autovalidateMode: AutovalidateMode.always,
-                                validator: (value) {
-                                  if (value?.length != null &&
-                                      value!.length >= 8) {
-                                    DateTime time;
-                                    DateTime today = DateTime.now();
-                                    try {
-                                      time = DateFormat('dd/MM/yyyy')
-                                          .parseStrict(value);
-                                    } on Exception catch (e) {
-                                      return 'Date incorrecte. Format accepté dd/mm/aaaa.';
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: TextFormField(
+                                  maxLength: 10,
+                                  initialValue: widget.bloc.getWorkout()?.dateFin != null ? widget.bloc.getWorkout()?.dateFin.toString() : '',
+                                  onChanged: (value) => widget.bloc.changeDateFin(value),
+                                  autovalidateMode: AutovalidateMode.always,
+                                  validator: (value) {
+                                    if (value?.length != null && value!.length >= 8) {
+                                      DateTime time;
+                                      DateTime today = DateTime.now();
+                                      try {
+                                        time = DateFormat('dd/MM/yyyy').parseStrict(value);
+                                      } on Exception catch (e) {
+                                        return 'Date incorrecte. Format accepté dd/mm/aaaa.';
+                                      }
+                                      if (time.isAfter(today)) {
+                                        return 'Date supérieure à la date du jour';
+                                      }
+                                      return null;
                                     }
-                                    if (time.isAfter(today)) {
-                                      return 'Date supérieure à la date du jour';
-                                    }
-                                    return null;
-                                  }
-                                },
-                                decoration: InputDecoration(
-                                    suffixIcon: Icon(Icons.event_note),
-                                    hintText: 'dd/mm/aaaa',
-                                    helperText: 'Date de fin'),
+                                  },
+                                  decoration: InputDecoration(suffixIcon: Icon(Icons.event_note), hintText: 'dd/mm/aaaa', helperText: 'Date de fin'),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       TextFormField(
                         initialValue: widget.bloc.getWorkout()?.description,
                         maxLength: 2000,
                         minLines: 5,
                         maxLines: 20,
-                        onChanged: (value) =>
-                            widget.bloc.changeDescription(value),
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            alignLabelWithHint: true,
-                            helperText: 'Description (optionel)'),
+                        onChanged: (value) => widget.bloc.changeDescription(value),
+                        decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Description (optionel)'),
                       ),
                       DropdownButtonFormField<String>(
                           icon: Icon(Icons.timer),
-                          onChanged: (String? value) =>
-                              widget.bloc.changeTimerType(value),
+                          onChanged: (String? value) => widget.bloc.changeTimerType(value),
                           value: widget.bloc.getWorkout()?.timerType,
                           items: [
                             DropdownMenuItem(
@@ -348,8 +299,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
               clipBehavior: Clip.antiAlias,
               color: Color(Colors.white.value).withOpacity(0.85),
               elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               child: Column(
                 children: [
                   Draggable<String>(
@@ -383,8 +333,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                 clipBehavior: Clip.antiAlias,
                 color: Color(Colors.white.value).withOpacity(0.85),
                 elevation: 5.0,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 child: Column(
                   children: [],
                 ),
@@ -401,9 +350,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
   }
 
   void callPhotoPicker() {
-    FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['jpg', 'png', 'gif']).then((result) {
+    FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['jpg', 'png', 'gif']).then((result) {
       if (result != null) {
         widget.bloc.setImage(result.files.first.bytes, result.files.first.name);
       }

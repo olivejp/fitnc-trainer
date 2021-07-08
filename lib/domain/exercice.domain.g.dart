@@ -12,7 +12,11 @@ Exercice _$ExerciceFromJson(Map<String, dynamic> json) {
     name: json['name'] as String,
     description: json['description'] as String?,
     createDate: json['createDate'],
-  )..imageUrl = json['imageUrl'] as String?;
+  )
+    ..imageUrl = json['imageUrl'] as String?
+    ..typeExercice = json['typeExercice'] as String?
+    ..videoUrl = json['videoUrl'] as String?
+    ..youtubeUrl = json['youtubeUrl'] as String?;
 }
 
 Map<String, dynamic> _$ExerciceToJson(Exercice instance) => <String, dynamic>{
@@ -20,5 +24,8 @@ Map<String, dynamic> _$ExerciceToJson(Exercice instance) => <String, dynamic>{
       'name': instance.name,
       'description': instance.description,
       'imageUrl': instance.imageUrl,
+      'typeExercice': instance.typeExercice,
+      'videoUrl': instance.videoUrl,
+      'youtubeUrl': instance.youtubeUrl,
       'createDate': instance.createDate,
     };

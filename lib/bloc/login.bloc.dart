@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/service/auth.service.dart';
-import 'package:fitnc_trainer/service/storage.service.dart';
 import 'package:rxdart/rxdart.dart';
 
 class AuthParam {
@@ -13,7 +12,6 @@ class AuthParam {
 }
 
 class LoginBloc {
-  final StorageService storage = StorageService.getInstance();
   final AuthService authService = AuthService.getInstance();
 
   AuthParam _authParam = AuthParam();

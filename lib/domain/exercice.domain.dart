@@ -8,6 +8,9 @@ class Exercice {
   String name;
   String? description;
   String? imageUrl;
+  String? typeExercice;
+  String? videoUrl;
+  String? youtubeUrl;
   dynamic createDate;
 
   Exercice({this.uid, this.name = '', this.description = '', this.createDate = 0});

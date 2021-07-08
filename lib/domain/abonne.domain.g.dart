@@ -11,6 +11,7 @@ Abonne _$AbonneFromJson(Map<String, dynamic> json) {
     ..uid = json['uid'] as String?
     ..nom = json['nom'] as String?
     ..prenom = json['prenom'] as String?
+    ..sexe = json['sexe'] as String?
     ..dateNaissance = json['dateNaissance']
     ..telephone1 = json['telephone1'] as int?
     ..telephone2 = json['telephone2'] as int?
@@ -26,6 +27,7 @@ Map<String, dynamic> _$AbonneToJson(Abonne instance) => <String, dynamic>{
       'uid': instance.uid,
       'nom': instance.nom,
       'prenom': instance.prenom,
+      'sexe': instance.sexe,
       'dateNaissance': instance.dateNaissance,
       'telephone1': instance.telephone1,
       'telephone2': instance.telephone2,

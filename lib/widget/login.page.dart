@@ -60,6 +60,7 @@ class _LoginPageState extends State<LoginPage> {
                         child: Wrap(
                           children: [
                             TextFormField(
+                              autofocus: true,
                               style: GoogleFonts.roboto(fontSize: 20),
                               decoration: InputDecoration(
                                   border: OutlineInputBorder(),

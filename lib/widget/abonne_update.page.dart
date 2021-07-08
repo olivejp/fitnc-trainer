@@ -32,16 +32,10 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    String appBarTitle = widget.bloc.abonne.uid != null
-        ? '${widget.bloc.abonne.nom!} ${widget.bloc.abonne.prenom!}'
-        : 'Nouveau abonné';
+    String appBarTitle = widget.bloc.abonne.uid != null ? '${widget.bloc.abonne.nom!} ${widget.bloc.abonne.prenom!}' : 'Nouveau abonné';
     return Scaffold(
         appBar: AppBar(
-          title: Text(appBarTitle,
-              style: Theme.of(context)
-                  .appBarTheme
-                  .titleTextStyle
-                  ?.copyWith(fontSize: 30)),
+          title: Text(appBarTitle, style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(fontSize: 30)),
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back,
@@ -70,24 +64,16 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
           }
 
           return Container(
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: NetworkImage(
-                        "https://s3.envato.com/files/189120872/0Q7A7108.jpg"),
-                    fit: BoxFit.cover)),
+            decoration:
+                BoxDecoration(image: DecorationImage(image: NetworkImage("https://s3.envato.com/files/189120872/0Q7A7108.jpg"), fit: BoxFit.cover)),
             child: Padding(
-              padding: EdgeInsets.only(
-                  left: leftAndRightPadding,
-                  right: leftAndRightPadding,
-                  top: topAndBottomPadding,
-                  bottom: topAndBottomPadding),
+              padding: EdgeInsets.only(left: leftAndRightPadding, right: leftAndRightPadding, top: topAndBottomPadding, bottom: topAndBottomPadding),
               child: Card(
                 shadowColor: Color(Colors.black.value),
                 clipBehavior: Clip.antiAlias,
                 color: Color(Colors.white.value).withOpacity(0.85),
                 elevation: 5.0,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 child: Stack(
                   children: [
                     Form(
@@ -103,8 +89,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                                     stream: widget.bloc.selectedImageObs,
                                     builder: (context, snapshot) {
                                       ImageProvider? provider;
-                                      if (snapshot.hasData &&
-                                          snapshot.data != null) {
+                                      if (snapshot.hasData && snapshot.data != null) {
                                         provider = MemoryImage(snapshot.data!);
                                       }
 
@@ -116,11 +101,9 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                                             ),
                                             radius: 50,
                                             foregroundImage: provider,
-                                            backgroundColor:
-                                                Color(Colors.amber.value)),
+                                            backgroundColor: Color(Colors.amber.value)),
                                         onTap: callPhotoPicker,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(50)),
+                                        borderRadius: BorderRadius.all(Radius.circular(50)),
                                       );
                                     }),
                                 IconButton(
@@ -132,86 +115,102 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                                     )),
                               ],
                             ),
-                            Row(
-                              children: [
-                                Flexible(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 5),
-                                    child: TextFormField(
-
-                                        initialValue: widget.bloc.abonne.nom,
-                                        autofocus: true,
-                                        onChanged: (value) =>
-                                            widget.bloc.abonne.nom = value,
-                                        decoration:
-                                            InputDecoration(helperText: 'Nom'),
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Merci de renseigner le nom du abonne.';
-                                          }
-                                          return null;
-                                        }),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 30),
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 5),
+                                      child: DropdownButtonFormField<String>(
+                                          decoration: InputDecoration(helperText: 'Genre'),
+                                          icon: Icon(Icons.transgender_rounded),
+                                          onChanged: (String? value) => widget.bloc.abonne.sexe = value,
+                                          value: widget.bloc.abonne.sexe,
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty){
+                                              return 'Merci de renseigner le genre de l\'abonné';
+                                            }
+                                            return null;
+                                          },
+                                          items: [
+                                            DropdownMenuItem(
+                                              child: Text('Homme'),
+                                              value: 'Homme',
+                                            ),
+                                            DropdownMenuItem(
+                                              child: Text('Femme'),
+                                              value: 'Femme',
+                                            ),
+                                          ]),
+                                    ),
+                                    flex: 1,
                                   ),
-                                  flex: 1,
-                                ),
-                                Flexible(
-                                  flex: 1,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 5),
-                                    child: TextFormField(
-                                        autovalidateMode:
-                                            AutovalidateMode.onUserInteraction,
-                                        initialValue:
-                                            widget.bloc.abonne.prenom,
-                                        onChanged: (value) =>
-                                            widget.bloc.changePrenom(value),
-                                        decoration: InputDecoration(
-                                            helperText: 'Prénom'),
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Merci de renseigner le prénom de l\'abonné.';
-                                          }
-                                          return null;
-                                        }),
+                                  Flexible(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 5),
+                                      child: TextFormField(
+                                          initialValue: widget.bloc.abonne.nom,
+                                          autofocus: true,
+                                          onChanged: (value) => widget.bloc.abonne.nom = value,
+                                          decoration: InputDecoration(helperText: 'Nom'),
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Merci de renseigner le nom du abonne.';
+                                            }
+                                            return null;
+                                          }),
+                                    ),
+                                    flex: 1,
                                   ),
-                                ),
-                                Flexible(
-                                  flex: 1,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 5),
-                                    child: TextFormField(
-                                      maxLength: 10,
-                                      initialValue: widget.bloc
-                                          .abonne
-                                          .dateNaissance,
-                                      onChanged:
-                                          widget.bloc.changeDateNaissance,
-                                      autovalidateMode: AutovalidateMode.always,
-                                      validator: (value) {
-                                        if (value?.length != null &&
-                                            value!.length >= 8) {
-                                          DateTime time;
-                                          DateTime today = DateTime.now();
-                                          try {
-                                            time = DateFormat('dd/MM/yyyy')
-                                                .parseStrict(value);
-                                          } on Exception catch (e) {
-                                            return 'Date incorrecte. Format accepté dd/mm/aaaa.';
-                                          }
-                                          if (time.isAfter(today)) {
-                                            return 'Date supérieure à la date du jour';
-                                          }
-                                          return null;
-                                        }
-                                      },
-                                      decoration: InputDecoration(
-                                          suffixIcon: Icon(Icons.event_note),
-                                          hintText: 'dd/mm/aaaa',
-                                          helperText: 'Date de naissance'),
+                                  Flexible(
+                                    flex: 1,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 5),
+                                      child: TextFormField(
+                                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                                          initialValue: widget.bloc.abonne.prenom,
+                                          onChanged: (value) => widget.bloc.changePrenom(value),
+                                          decoration: InputDecoration(helperText: 'Prénom'),
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Merci de renseigner le prénom de l\'abonné.';
+                                            }
+                                            return null;
+                                          }),
                                     ),
                                   ),
-                                ),
-                              ],
+                                  Flexible(
+                                    flex: 1,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 5),
+                                      child: TextFormField(
+                                        maxLength: 10,
+                                        initialValue: widget.bloc.abonne.dateNaissance,
+                                        onChanged: widget.bloc.changeDateNaissance,
+                                        autovalidateMode: AutovalidateMode.always,
+                                        validator: (value) {
+                                          if (value?.length != null && value!.length >= 8) {
+                                            DateTime time;
+                                            DateTime today = DateTime.now();
+                                            try {
+                                              time = DateFormat('dd/MM/yyyy').parseStrict(value);
+                                            } on Exception catch (e) {
+                                              return 'Date incorrecte. Format accepté dd/mm/aaaa.';
+                                            }
+                                            if (time.isAfter(today)) {
+                                              return 'Date supérieure à la date du jour';
+                                            }
+                                            return null;
+                                          }
+                                        },
+                                        decoration: InputDecoration(
+                                            suffixIcon: Icon(Icons.event_note), hintText: 'dd/mm/aaaa', helperText: 'Date de naissance'),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             Row(
                               children: [
@@ -219,15 +218,11 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(right: 5),
                                     child: TextFormField(
-                                        keyboardType:
-                                            TextInputType.emailAddress,
-                                        initialValue:
-                                            widget.bloc.abonne.email,
-                                        autovalidateMode:
-                                            AutovalidateMode.onUserInteraction,
+                                        keyboardType: TextInputType.emailAddress,
+                                        initialValue: widget.bloc.abonne.email,
+                                        autovalidateMode: AutovalidateMode.onUserInteraction,
                                         onChanged: widget.bloc.changeEmail,
-                                        decoration: InputDecoration(
-                                            helperText: 'Email'),
+                                        decoration: InputDecoration(helperText: 'Email'),
                                         validator: (value) {
                                           if (value == null || value.isEmpty) {
                                             return 'Merci de renseigner l\'email de l\abonné.';
@@ -244,22 +239,10 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                                     child: TextFormField(
                                       maxLength: 10,
                                       keyboardType: TextInputType.phone,
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.digitsOnly
-                                      ],
-                                      initialValue: (widget.bloc
-                                                  .abonne
-                                                  .telephone1) !=
-                                              null
-                                          ? widget.bloc
-                                              .abonne
-                                              .telephone1
-                                              .toString()
-                                          : '',
-                                      onChanged: (value) => widget.bloc.abonne
-                                          .telephone1 = int.tryParse(value),
-                                      decoration: InputDecoration(
-                                          helperText: 'Téléphone fixe'),
+                                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                      initialValue: (widget.bloc.abonne.telephone1) != null ? widget.bloc.abonne.telephone1.toString() : '',
+                                      onChanged: (value) => widget.bloc.abonne.telephone1 = int.tryParse(value),
+                                      decoration: InputDecoration(helperText: 'Téléphone fixe'),
                                     ),
                                   ),
                                 ),
@@ -270,22 +253,10 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                                     child: TextFormField(
                                       maxLength: 10,
                                       keyboardType: TextInputType.phone,
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.digitsOnly
-                                      ],
-                                      initialValue:  (widget.bloc
-                                          .abonne
-                                          .telephone2) !=
-                                          null
-                                          ? widget.bloc
-                                          .abonne
-                                          .telephone2
-                                          .toString()
-                                          : '',
-                                      onChanged: (value) => widget.bloc.abonne
-                                          .telephone2 = int.tryParse(value),
-                                      decoration: InputDecoration(
-                                          helperText: 'Téléphone mobile'),
+                                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                                      initialValue: (widget.bloc.abonne.telephone2) != null ? widget.bloc.abonne.telephone2.toString() : '',
+                                      onChanged: (value) => widget.bloc.abonne.telephone2 = int.tryParse(value),
+                                      decoration: InputDecoration(helperText: 'Téléphone mobile'),
                                     ),
                                   ),
                                 ),
@@ -295,29 +266,20 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                               TextFormField(
                                 maxLength: 50,
                                 initialValue: widget.bloc.abonne.adresse1,
-                                onChanged: (value) =>
-                                    widget.bloc.abonne.adresse1 = value,
-                                decoration: InputDecoration(
-                                    alignLabelWithHint: true,
-                                    helperText: 'Adresse ligne 1'),
+                                onChanged: (value) => widget.bloc.abonne.adresse1 = value,
+                                decoration: InputDecoration(alignLabelWithHint: true, helperText: 'Adresse ligne 1'),
                               ),
                               TextFormField(
                                 maxLength: 50,
                                 initialValue: widget.bloc.abonne.adresse2,
-                                onChanged: (value) =>
-                                    widget.bloc.abonne.adresse2 = value,
-                                decoration: InputDecoration(
-                                    alignLabelWithHint: true,
-                                    helperText: 'Adresse ligne 2'),
+                                onChanged: (value) => widget.bloc.abonne.adresse2 = value,
+                                decoration: InputDecoration(alignLabelWithHint: true, helperText: 'Adresse ligne 2'),
                               ),
                               TextFormField(
                                 maxLength: 50,
                                 initialValue: widget.bloc.abonne.adresse3,
-                                onChanged: (value) =>
-                                    widget.bloc.abonne.adresse3 = value,
-                                decoration: InputDecoration(
-                                    alignLabelWithHint: true,
-                                    helperText: 'Adresse ligne 3'),
+                                onChanged: (value) => widget.bloc.abonne.adresse3 = value,
+                                decoration: InputDecoration(alignLabelWithHint: true, helperText: 'Adresse ligne 3'),
                               ),
                             ]),
                           ],
@@ -330,11 +292,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                         child: FloatingActionButton(
                           onPressed: () {
                             if (_formKey.currentState?.validate() == true) {
-                              widget.bloc
-                                  .saveAbonne()
-                                  .then((value) => Navigator.pop(context))
-                                  .catchError(
-                                      (error) => print(error.toString()));
+                              widget.bloc.saveAbonne().then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
                             }
                           },
                           child: Icon(Icons.check),
@@ -352,9 +310,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
   }
 
   void callPhotoPicker() {
-    FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['jpg', 'png', 'gif']).then((result) {
+    FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['jpg', 'png', 'gif']).then((result) {
       if (result != null) {
         widget.bloc.setImage(result.files.first.bytes, result.files.first.name);
       }
