@@ -35,7 +35,7 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    String appBarTitle = widget.bloc.getExercice()?.uid != null ? widget.bloc.getExercice()!.name : 'Nouveau exercice';
+    String appBarTitle = widget.bloc.exercice.uid != null ? widget.bloc.exercice.name : 'Nouveau exercice';
     return Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -103,7 +103,7 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: TextFormField(
-                      initialValue: widget.bloc.getExercice()?.name,
+                      initialValue: widget.bloc.exercice.name,
                       autofocus: true,
                       onChanged: (value) => widget.bloc.changeName(value),
                       decoration: InputDecoration(helperText: 'Nom'),
@@ -120,7 +120,7 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
           Padding(
             padding: const EdgeInsets.only(top: 30),
             child: TextFormField(
-              initialValue: widget.bloc.getExercice()?.description,
+              initialValue: widget.bloc.exercice.description,
               maxLength: 2000,
               minLines: 5,
               maxLines: 20,
@@ -171,7 +171,14 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
             ],
           ),
           Row(
-            children: [Text('Vous pouvez joindre ici un vidéo au format MP4, si celle ci est directement accessible depuis internet. Exemple : https://firebasestorage.googleapis.com/v0/b/fitnc-7be2e.appspot.com/o/YZBEpGXXvI.mp4')],
+            children: [
+              Expanded(
+                child: Text(
+                  'Vous pouvez joindre ici un vidéo au format MP4, si celle ci est directement accessible depuis internet. Exemple : https://firebasestorage.googleapis.com/v0/b/fitnc-7be2e.appspot.com/o/YZBEpGXXvI.mp4',
+                  maxLines: 5,
+                ),
+              )
+            ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

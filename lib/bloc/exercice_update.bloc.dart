@@ -107,6 +107,11 @@ class ExerciceUpdateBloc {
     return sendToFireStore(collectionReference);
   }
 
+  String getUrl() {
+    String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
+    return 'trainers/${trainerUid}/exercices/${exercice.uid}/$pathExerciceMainImage';
+  }
+
   Future<void> sendToFireStore(CollectionReference<Object?> collectionReference) {
     exercice.createDate = FieldValue.serverTimestamp();
     return collectionReference.doc(exercice.uid).set(exercice.toJson()).then((value) {
@@ -118,7 +123,7 @@ class ExerciceUpdateBloc {
     String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
     if (trainerUid != null) {
       exercice.imageUrl = await FirebaseStorage.instance
-          .ref('trainers/${trainerUid}/exercices/${exercice.uid}/$pathExerciceMainImage/$_fileName')
+          .ref('${getUrl()}/$_fileName')
           .putData(_fileBytes!)
           .then((ref) => ref.ref.getDownloadURL());
     }
@@ -136,7 +141,7 @@ class ExerciceUpdateBloc {
     String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
     if (trainerUid != null) {
       return FirebaseStorage.instance
-          .ref('trainers/${trainerUid}/exercices/${exercice.uid}/$pathExerciceMainImage')
+          .ref(getUrl())
           .listAll()
           .then((value) => value.items.forEach((element) => element.delete()))
           .catchError((error) => print(error));
