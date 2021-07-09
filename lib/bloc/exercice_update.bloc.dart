@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
+import 'package:fitnc_trainer/service/firestorage.service.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +12,7 @@ import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ExerciceUpdateBloc {
+  FirestorageService firestorageService = FirestorageService.getInstance();
   TrainersService trainersService = TrainersService.getInstance();
   ParamService paramService = ParamService.getInstance();
   late Exercice exercice;
@@ -121,11 +123,8 @@ class ExerciceUpdateBloc {
 
   Future<void> sendToStorage() async {
     String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    if (trainerUid != null) {
-      exercice.imageUrl = await FirebaseStorage.instance
-          .ref('${getUrl()}/$_fileName')
-          .putData(_fileBytes!)
-          .then((ref) => ref.ref.getDownloadURL());
+    if (trainerUid != null && _fileBytes != null) {
+      exercice.imageUrl = await firestorageService.sendToStorageAndGetReference('${getUrl()}/$_fileName', _fileBytes!);
     }
   }
 
