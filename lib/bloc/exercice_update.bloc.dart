@@ -1,3 +1,4 @@
+import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +8,7 @@ import 'package:fitnc_trainer/service/firestorage.service.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/storage_image.widget.dart';
+import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ExerciceUpdateBloc {
@@ -16,11 +18,15 @@ class ExerciceUpdateBloc {
   late Exercice exercice;
   StoragePair? storagePair;
 
-  BehaviorSubject<String?>? _streamSelectedVideoUrl;
-  BehaviorSubject<String?>? _streamSelectedYoutubeUrl;
+  BehaviorSubject<StoragePair?> subjectStoragePair = BehaviorSubject<StoragePair?>();
+  BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject();
+  BehaviorSubject<String?> _streamSelectedYoutubeUrl = BehaviorSubject();
 
-  Stream<String?>? get selectedVideoUrlObs => _streamSelectedVideoUrl?.stream;
-  Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl?.stream;
+  Stream<String?>? get selectedVideoUrlObs => _streamSelectedVideoUrl.stream;
+
+  Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl.stream;
+
+  Stream<StoragePair?> get obsStoragePair => subjectStoragePair.stream;
 
   static ExerciceUpdateBloc? _instance;
   final String pathExerciceMainImage = 'mainImage';
@@ -35,10 +41,20 @@ class ExerciceUpdateBloc {
   }
 
   void init(Exercice? exerciceEntered) {
-    _streamSelectedVideoUrl = BehaviorSubject();
-    _streamSelectedYoutubeUrl = BehaviorSubject();
+    storagePair = StoragePair();
+    subjectStoragePair.sink.add(null);
+
     if (exerciceEntered != null) {
       exercice = exerciceEntered;
+
+      if (exercice.imageUrl != null && exercice.imageUrl!.isNotEmpty) {
+        firestorageService.getRemoteImageToUint8List(exercice.imageUrl!).then((bytes) {
+          storagePair!.fileName = basename(exercice.imageUrl!);
+          storagePair!.fileBytes = bytes;
+          subjectStoragePair.sink.add(storagePair);
+        });
+      }
+
       if (exercice.videoUrl != null) {
         setVideoUrl(exercice.videoUrl!);
       }
@@ -47,6 +63,7 @@ class ExerciceUpdateBloc {
       }
     } else {
       exercice = Exercice();
+      subjectStoragePair.sink.add(null);
     }
   }
 
@@ -140,12 +157,12 @@ class ExerciceUpdateBloc {
 
   setVideoUrl(String value) {
     exercice.videoUrl = value;
-    _streamSelectedVideoUrl?.sink.add(value);
+    _streamSelectedVideoUrl.sink.add(value);
   }
 
   setYoutubeUrl(String value) {
     exercice.youtubeUrl = value;
-    _streamSelectedYoutubeUrl?.sink.add(value);
+    _streamSelectedYoutubeUrl.sink.add(value);
   }
 
   setStoragePair(StoragePair? storagePair) {

@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,8 +7,6 @@ import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/service/firestorage.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/storage_image.widget.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -21,6 +19,9 @@ class WorkoutUpdateBloc {
   final String pathWorkoutMainImage = 'mainImage';
   StoragePair? storagePair;
 
+  BehaviorSubject<StoragePair?> subjectStoragePair = BehaviorSubject<StoragePair?>();
+  Stream<StoragePair?> get obsStoragePair => subjectStoragePair.stream;
+
   WorkoutUpdateBloc._();
 
   static WorkoutUpdateBloc getInstance() {
@@ -31,10 +32,21 @@ class WorkoutUpdateBloc {
   }
 
   void init(Workout? workout) {
+    storagePair = StoragePair();
+    subjectStoragePair.sink.add(null);
+
     if (workout != null) {
       _workout = workout;
+      if (_workout.imageUrl != null && _workout.imageUrl!.isNotEmpty) {
+        firestorageService.getRemoteImageToUint8List(_workout.imageUrl!).then((bytes) {
+          storagePair!.fileName = basename(_workout.imageUrl!);
+          storagePair!.fileBytes = bytes;
+          subjectStoragePair.sink.add(storagePair);
+        });
+      }
     } else {
       _workout = Workout();
+      subjectStoragePair.sink.add(null);
     }
   }
 

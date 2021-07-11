@@ -9,6 +9,8 @@ import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
+import 'firestore_param_dropdown.widget.dart';
+
 class ExerciceUpdatePage extends StatefulWidget {
   final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.getInstance();
 
@@ -65,58 +67,50 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
       key: _formKey,
       child: Column(
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              StorageImageWidget(
-                onSaved: (storagePair) => widget.bloc.setStoragePair(storagePair),
-                initialUrl: widget.bloc.exercice.imageUrl,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: TextFormField(
-                      initialValue: widget.bloc.exercice.name,
-                      autofocus: true,
-                      onChanged: (value) => widget.bloc.setName(value),
-                      decoration: InputDecoration(helperText: 'Nom'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Merci de renseigner le nom du exercice.';
-                        }
-                        return null;
-                      }),
-                ),
-              ),
-            ],
-          ),
           Padding(
-            padding: const EdgeInsets.only(top: 30),
-            child: TextFormField(
-              initialValue: widget.bloc.exercice.description,
-              maxLength: 2000,
-              minLines: 5,
-              maxLines: 20,
-              onChanged: (value) => widget.bloc.setDescription(value),
-              decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Description (optionel)'),
+            padding: const EdgeInsets.only(bottom: 30.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                StorageImageWidget(
+                  onSaved: (storagePair) => widget.bloc.setStoragePair(storagePair),
+                  streamInitialStoragePair: widget.bloc.obsStoragePair,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: TextFormField(
+                        initialValue: widget.bloc.exercice.name,
+                        autofocus: true,
+                        onChanged: (value) => widget.bloc.setName(value),
+                        decoration: InputDecoration(helperText: 'Nom'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Merci de renseigner le nom du exercice.';
+                          }
+                          return null;
+                        }),
+                  ),
+                ),
+              ],
             ),
           ),
+          TextFormField(
+            initialValue: widget.bloc.exercice.description,
+            maxLength: 2000,
+            minLines: 5,
+            maxLines: 20,
+            onChanged: (value) => widget.bloc.setDescription(value),
+            decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Description (optionel)'),
+          ),
           Row(
             children: [
               Expanded(
-                child: FutureBuilder<dynamic>(
-                    future: widget.bloc.paramService.getParamAsDropdown('type_exercice'),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return DropdownButtonFormField<String>(
-                            icon: Icon(Icons.track_changes),
-                            onChanged: (String? value) => widget.bloc.exercice.typeExercice = value,
-                            value: widget.bloc.exercice.typeExercice,
-                            items: snapshot.data);
-                      }
-                      return Container();
-                    }),
-              )
+                  child: ParamDropdownButton(
+                paramName: 'type_exercice',
+                initialValue: widget.bloc.exercice.typeExercice,
+                onChanged: (onChangedValue) => widget.bloc.exercice.typeExercice = onChangedValue,
+              ))
             ],
           ),
           Row(
@@ -215,5 +209,20 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
         ],
       ),
     );
+  }
+
+  FutureBuilder<dynamic> getDropdown(String paramName, dynamic initialValue) {
+    return FutureBuilder<dynamic>(
+        future: widget.bloc.paramService.getParamAsDropdown(paramName),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return DropdownButtonFormField<String>(
+                icon: Icon(Icons.track_changes),
+                onChanged: (String? value) => widget.bloc.exercice.typeExercice = value,
+                value: initialValue,
+                items: snapshot.data);
+          }
+          return Container();
+        });
   }
 }

@@ -4,7 +4,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:fitnc_trainer/service/firestorage.service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
 class StoragePair {
@@ -21,22 +20,33 @@ class StorageImageWidget extends StatelessWidget {
   final FormFieldSetter<StoragePair> onSaved;
   final FormFieldValidator<StoragePair>? validator;
   final List<String> allowedExtensions;
-  final String? initialUrl;
+  final Stream<StoragePair?> streamInitialStoragePair;
   final void Function(StoragePair? storagePair)? onDeleted;
 
-  StorageImageWidget({required this.onSaved, this.initialUrl, this.validator, this.allowedExtensions = DEFAULT_ALLOWED_EXTENSIONS, this.onDeleted});
+  StorageImageWidget({required this.onSaved, required this.streamInitialStoragePair, this.validator, this.allowedExtensions = DEFAULT_ALLOWED_EXTENSIONS, this.onDeleted});
 
   @override
   Widget build(BuildContext context) {
-    if (this.initialUrl != null && this.initialUrl!.isNotEmpty) {
-      firestorageService.getRemoteImageToUint8List(this.initialUrl!).then((bytes) {
-        _storagePair.fileName = basename(this.initialUrl!);
-        _storagePair.fileBytes = bytes;
-        _streamSelectedImage.sink.add(_storagePair);
-      });
-    }
-    return StorageImageFormField<StoragePair>(
-      builder: builderWidget,
+    return StreamBuilder<StoragePair?>(
+      stream: streamInitialStoragePair,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          _storagePair.fileName = snapshot.data!.fileName;
+          _storagePair.fileBytes = snapshot.data!.fileBytes;
+          _streamSelectedImage.sink.add(_storagePair);
+          return StorageImageFormField<StoragePair>(
+            builder: builderWidget,
+          );
+        } else {
+          return CircleAvatar(
+              child: Icon(
+                Icons.add_photo_alternate,
+                color: Color(Colors.white.value),
+              ),
+              radius: 50,
+              backgroundColor: Color(Colors.amber.value));
+        }
+      },
     );
   }
 

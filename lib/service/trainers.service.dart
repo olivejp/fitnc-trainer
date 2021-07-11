@@ -4,6 +4,7 @@ import 'package:fitnc_trainer/domain/abonne.domain.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/trainers.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
+import 'package:flutter/material.dart';
 
 import 'firestore/abstract.absolute-firestore.service.dart';
 
@@ -11,10 +12,7 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
   static TrainersService? _instance;
 
   // Private constructor with the ._()
-  TrainersService._()
-      : super(
-            collectionReference:
-                FirebaseFirestore.instance.collection('trainers')) {
+  TrainersService._() : super(collectionReference: FirebaseFirestore.instance.collection('trainers')) {
     _instance = this;
   }
 
@@ -42,24 +40,33 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
   }
 
   Stream<List<Workout?>> listenToWorkout() {
-    return getWorkoutReference().snapshots().map((QuerySnapshot event) => event
-        .docs
-        .map((doc) => Workout.fromJson(doc.data() as Map<String, dynamic>))
-        .toList());
+    return getWorkoutReference()
+        .snapshots()
+        .map((QuerySnapshot event) => event.docs.map((doc) => Workout.fromJson(doc.data() as Map<String, dynamic>)).toList());
   }
 
   Stream<List<Abonne?>> listenToAbonne() {
-    return getAbonneReference().snapshots().map((QuerySnapshot event) => event
-        .docs
-        .map((doc) => Abonne.fromJson(doc.data() as Map<String, dynamic>))
-        .toList());
+    return getAbonneReference()
+        .snapshots()
+        .map((QuerySnapshot event) => event.docs.map((doc) => Abonne.fromJson(doc.data() as Map<String, dynamic>)).toList());
   }
 
   Stream<List<Exercice?>> listenToExercice() {
-    return getExerciceReference().snapshots().map((QuerySnapshot event) => event
-        .docs
-        .map((doc) => Exercice.fromJson(doc.data() as Map<String, dynamic>))
-        .toList());
+    return getExerciceReference()
+        .snapshots()
+        .map((QuerySnapshot event) => event.docs.map((doc) => Exercice.fromJson(doc.data() as Map<String, dynamic>)).toList());
+  }
+
+  Stream<List<DropdownMenuItem<Exercice>>> getExerciceStreamDropdownMenuItem() {
+    return getExerciceReference().snapshots().map((QuerySnapshot querysnapshot) => querysnapshot.docs.map((QueryDocumentSnapshot queryDocSnapshot) {
+          Exercice exercice = Exercice.fromJson(queryDocSnapshot.data() as Map<String, dynamic>);
+          return DropdownMenuItem(
+            child: Row(children: [
+              Text(exercice.name),
+            ]),
+            value: exercice,
+          );
+        }).toList());
   }
 
   @override

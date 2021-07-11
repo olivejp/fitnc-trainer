@@ -1,14 +1,13 @@
-import 'dart:typed_data';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:fitnc_trainer/bloc/workout_update.bloc.dart';
+import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/widget/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/generic_update.widget.dart';
 import 'package:fitnc_trainer/widget/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
+import 'firestore_param_dropdown.widget.dart';
 
 class WorkoutUpdatePage extends StatefulWidget {
   final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
@@ -104,30 +103,33 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
       key: _formKey,
       child: Column(
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              StorageImageWidget(
-                onSaved: (storagePair) => widget.bloc.setStoragePair(storagePair),
-                initialUrl: widget.bloc.getWorkout()?.imageUrl,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: TextFormField(
-                      initialValue: widget.bloc.getWorkout()?.name,
-                      autofocus: true,
-                      onChanged: (value) => widget.bloc.setName(value),
-                      decoration: InputDecoration(helperText: 'Nom'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Merci de renseigner le nom du workout.';
-                        }
-                        return null;
-                      }),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 30.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                StorageImageWidget(
+                  onSaved: (storagePair) => widget.bloc.setStoragePair(storagePair),
+                  streamInitialStoragePair: widget.bloc.obsStoragePair,
                 ),
-              ),
-            ],
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: TextFormField(
+                        initialValue: widget.bloc.getWorkout()?.name,
+                        autofocus: true,
+                        onChanged: (value) => widget.bloc.setName(value),
+                        decoration: InputDecoration(helperText: 'Nom'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Merci de renseigner le nom du workout.';
+                          }
+                          return null;
+                        }),
+                  ),
+                ),
+              ],
+            ),
           ),
           TextFormField(
             initialValue: widget.bloc.getWorkout()?.description,
@@ -167,7 +169,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
     );
   }
 
-  Row getSecondPanel() {
+  Widget getSecondPanel() {
     return Row(
       children: [
         Expanded(
@@ -182,11 +184,11 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               child: Column(
                 children: [
-                  Draggable<String>(
-                    child: ListTile(title: Text('Bdule')),
-                    feedback: Card(child: Text('Feedback')),
-                    data: 'Bdule',
-                    childWhenDragging: Text('Bdule en plein drag'),
+                  StreamDropdownButton<Exercice>(
+                    onChanged: (onChangedValue) => print(onChangedValue),
+                    icon: Icon(Icons.description),
+                    initialValue: null,
+                    stream: widget.bloc.trainersService.getExerciceStreamDropdownMenuItem(),
                   )
                 ],
               ),
@@ -224,4 +226,62 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
       ],
     );
   }
+
+// Widget getSecondPanel() {
+//   return Row(
+//     children: [
+//       Expanded(
+//         flex: 1,
+//         child: Padding(
+//           padding: const EdgeInsets.all(8.0),
+//           child: Card(
+//             shadowColor: Color(Colors.black.value),
+//             clipBehavior: Clip.antiAlias,
+//             color: Color(Colors.white.value).withOpacity(0.85),
+//             elevation: 5.0,
+//             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+//             child: Column(
+//               children: [
+//                 Draggable<String>(
+//                   child: ListTile(title: Text('Bdule')),
+//                   feedback: Card(child: Text('Feedback')),
+//                   data: 'Bdule',
+//                   childWhenDragging: Text('Bdule en plein drag'),
+//                 )
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//       Expanded(
+//         flex: 1,
+//         child: Padding(
+//           padding: const EdgeInsets.all(8.0),
+//           child: DragTarget<String>(
+//             onWillAccept: (data) {
+//               print(data);
+//               return true;
+//             },
+//             onAccept: (data) {
+//               print(data);
+//             },
+//             onLeave: (data) {
+//               print(data);
+//             },
+//             builder: (context, candidateData, rejectedData) => Card(
+//               shadowColor: Color(Colors.black.value),
+//               clipBehavior: Clip.antiAlias,
+//               color: Color(Colors.white.value).withOpacity(0.85),
+//               elevation: 5.0,
+//               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+//               child: Column(
+//                 children: [],
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     ],
+//   );
+// }
 }
