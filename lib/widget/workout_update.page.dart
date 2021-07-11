@@ -29,7 +29,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    String appBarTitle = widget.bloc.getWorkout()?.uid != null ? widget.bloc.getWorkout()!.name : 'Nouveau workout';
+    String appBarTitle = widget.bloc.getWorkout().uid != null ? widget.bloc.getWorkout().name : 'Nouveau workout';
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -111,12 +111,13 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                 StorageImageWidget(
                   onSaved: (storagePair) => widget.bloc.setStoragePair(storagePair),
                   streamInitialStoragePair: widget.bloc.obsStoragePair,
+                  onDeleted: (storagePair) => widget.bloc.setStoragePair(null),
                 ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 20),
                     child: TextFormField(
-                        initialValue: widget.bloc.getWorkout()?.name,
+                        initialValue: widget.bloc.getWorkout().name,
                         autofocus: true,
                         onChanged: (value) => widget.bloc.setName(value),
                         decoration: InputDecoration(helperText: 'Nom'),
@@ -132,7 +133,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
             ),
           ),
           TextFormField(
-            initialValue: widget.bloc.getWorkout()?.description,
+            initialValue: widget.bloc.getWorkout().description,
             maxLength: 2000,
             minLines: 5,
             maxLines: 20,
@@ -142,7 +143,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           DropdownButtonFormField<String>(
               icon: Icon(Icons.timer),
               onChanged: (String? value) => widget.bloc.setTimerType(value),
-              value: widget.bloc.getWorkout()?.timerType,
+              value: widget.bloc.getWorkout().timerType,
               items: [
                 DropdownMenuItem(
                   child: Text(

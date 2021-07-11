@@ -20,7 +20,7 @@ class RepsWeight {
 class WorkoutUpdateBloc {
   FirestorageService firestorageService = FirestorageService.getInstance();
   TrainersService trainersService = TrainersService.getInstance();
-  late Workout _workout;
+  Workout _workout = Workout();
 
   static WorkoutUpdateBloc? _instance;
   final String pathWorkoutMainImage = 'mainImage';
@@ -55,19 +55,18 @@ class WorkoutUpdateBloc {
     if (workout != null) {
       _workout = workout;
       if (_workout.imageUrl != null && _workout.imageUrl!.isNotEmpty) {
-        firestorageService.getRemoteImageToUint8List(_workout.imageUrl!).then((bytes) {
-          storagePair!.fileName = basename(_workout.imageUrl!);
+        firestorageService.getThumbnailImageBytes(getUrl(_workout), _workout.imageUrl!).then((bytes) {
+          storagePair!.fileName = _workout.imageUrl!;
           storagePair!.fileBytes = bytes;
           subjectStoragePair.sink.add(storagePair);
         });
       }
     } else {
-      _workout = Workout();
       subjectStoragePair.sink.add(null);
     }
   }
 
-  Workout? getWorkout() {
+  Workout getWorkout() {
     return _workout;
   }
 
@@ -91,9 +90,9 @@ class WorkoutUpdateBloc {
     return sendToFireStore(collectionReference);
   }
 
-  String getUrl() {
+  String getUrl(Workout workout) {
     String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    return 'trainers/${trainerUid}/exercices/${_workout.uid}/$pathWorkoutMainImage';
+    return 'trainers/$trainerUid/workouts/${workout.uid}/$pathWorkoutMainImage';
   }
 
   Future<void> updateWorkout() async {
@@ -122,7 +121,8 @@ class WorkoutUpdateBloc {
   Future<void> sendToStorage() async {
     String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
     if (trainerUid != null && storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
-      _workout.imageUrl = await firestorageService.sendToStorageAndGetReference('${getUrl()}/${storagePair!.fileName}', storagePair!.fileBytes!);
+      firestorageService.sendToStorage('${getUrl(_workout)}/${storagePair!.fileName}', storagePair!.fileBytes!);
+      _workout.imageUrl = storagePair!.fileName;
     }
   }
 
@@ -136,7 +136,7 @@ class WorkoutUpdateBloc {
 
   Future<void> deleteWorkoutMainImage(Workout workout) {
     return FirebaseStorage.instance
-        .ref('${workout.uid}/$pathWorkoutMainImage')
+        .ref(getUrl(workout))
         .listAll()
         .then((value) => value.items.forEach((element) => element.delete()))
         .catchError((error) => print(error));

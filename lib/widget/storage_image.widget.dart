@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:fitnc_trainer/service/firestorage.service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animations/loading_animations.dart';
 import 'package:rxdart/rxdart.dart';
 
 class StoragePair {
@@ -33,30 +34,21 @@ class StorageImageWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<StoragePair?>(
-      stream: streamInitialStoragePair,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          _storagePair.fileName = snapshot.data!.fileName;
-          _storagePair.fileBytes = snapshot.data!.fileBytes;
-          _streamSelectedImage.sink.add(_storagePair);
-          return StorageImageFormField<StoragePair>(
-            builder: builderWidget,
-          );
-        } else {
-          return InkWell(
-            child: CircleAvatar(
-                child: Icon(
-                  Icons.add_photo_alternate,
-                  color: Color(Colors.white.value),
-                ),
-                radius: 50,
-                backgroundColor: Color(Colors.amber.value)),
-            onTap: () => onTap(),
-            borderRadius: BorderRadius.all(Radius.circular(50)),
-          );
+        stream: streamInitialStoragePair,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.waiting) {
+            _storagePair.fileName = snapshot.data?.fileName;
+            _storagePair.fileBytes = snapshot.data?.fileBytes;
+            _streamSelectedImage.sink.add(_storagePair);
+            return StorageImageFormField<StoragePair>(
+              builder: builderWidget,
+            );
+          } else {
+            return LoadingBouncingGrid.circle();
+          }
         }
-      },
-    );
+        // ,
+        );
   }
 
   Widget builderWidget(FormFieldState<StoragePair> field) {

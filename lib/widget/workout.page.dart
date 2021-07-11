@@ -1,12 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fitnc_trainer/bloc/workout_update.bloc.dart';
 import 'package:fitnc_trainer/bloc/my-home-page.bloc.dart';
+import 'package:fitnc_trainer/bloc/workout_update.bloc.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/widget/workout_update.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class WorkoutPage extends StatefulWidget {
@@ -31,8 +30,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     return StreamBuilder<List<Workout?>>(
       stream: widget.bloc.getStreamWorkout(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData ||
-            (snapshot.hasData && snapshot.data!.isEmpty)) {
+        if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
           return Center(child: Text('Aucun workout trouvé.'));
         } else {
           List<Workout?> listWorkout = snapshot.data!;
@@ -73,27 +71,21 @@ class _WorkoutPageState extends State<WorkoutPage> {
         crossAxisSpacing: 20.0,
         crossAxisCount: nbColumns,
         children: listWorkout.map((workout) {
-          Widget leading = workout?.imageUrl != null
-              ? CircleAvatar(foregroundImage: NetworkImage(workout!.imageUrl!))
-              : Icon(
-                  Icons.sports_volleyball,
-                  color: Color(Colors.amber.value),
-                );
+          Widget leading = widget.bloc.firestorageService.getAvatarThumbnail(widget.bloc.getUrl(workout!), workout.imageUrl);
 
-          Widget description = workout?.description != null
+          Widget description = workout.description != null
               ? Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                    workout!.description!,
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    workout.description!,
                     maxLines: 5,
                     overflow: TextOverflow.ellipsis,
                   ),
-              )
+                )
               : Container();
 
-          Widget subtitle = workout?.createDate != null
-              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch(
-                  (workout!.createDate as Timestamp).millisecondsSinceEpoch)))
+          Widget subtitle = workout.createDate != null
+              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((workout.createDate as Timestamp).millisecondsSinceEpoch)))
               : Container();
 
           if (workout != null) {
@@ -109,8 +101,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                           ))),
               child: Card(
                 clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -150,13 +141,10 @@ class _WorkoutPageState extends State<WorkoutPage> {
         itemCount: listWorkout.length,
         itemBuilder: (context, index) {
           Workout workout = listWorkout[index] as Workout;
-          Widget leading = (workout.imageUrl != null)
-              ? CircleAvatar(foregroundImage: NetworkImage(workout.imageUrl!))
-              : CircleAvatar();
+          Widget leading = widget.bloc.firestorageService.getAvatarThumbnail(widget.bloc.getUrl(workout), workout.imageUrl);
 
           Widget subtitle = workout.createDate != null
-              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch(
-                  (workout.createDate as Timestamp).millisecondsSinceEpoch)))
+              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((workout.createDate as Timestamp).millisecondsSinceEpoch)))
               : Container();
 
           return ListTile(
@@ -167,12 +155,14 @@ class _WorkoutPageState extends State<WorkoutPage> {
             trailing: Wrap(
               children: [getDeleteButton(context, workout)],
             ),
-            onTap: () {Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => WorkoutUpdatePage(
-                      workout: workout,
-                    )));},
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => WorkoutUpdatePage(
+                            workout: workout,
+                          )));
+            },
           );
         });
   }
@@ -186,12 +176,8 @@ class _WorkoutPageState extends State<WorkoutPage> {
           builder: (context) => AlertDialog(
             title: Text('Etes vous sûr de vouloir supprimer ce workout?'),
             actions: [
-              TextButton(
-                  onPressed: () => deleteWorkout(workout, context),
-                  child: Text('Oui')),
-              TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Annuler'))
+              TextButton(onPressed: () => deleteWorkout(workout, context), child: Text('Oui')),
+              TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler'))
             ],
           ),
         );
@@ -205,9 +191,6 @@ class _WorkoutPageState extends State<WorkoutPage> {
   }
 
   void deleteWorkout(Workout workout, BuildContext context) {
-    widget.bloc
-        .deleteWorkout(workout)
-        .then((value) => Navigator.pop(context))
-        .catchError((error) => print(error.toString()));
+    widget.bloc.deleteWorkout(workout).then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
   }
 }
