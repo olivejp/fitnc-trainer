@@ -156,6 +156,7 @@ class WorkoutUpdateBloc {
 
   setStoragePair(StoragePair? storagePair) {
     this.storagePair = storagePair;
+    this.subjectStoragePair.sink.add(this.storagePair);
   }
 
   setTypeExercice(String? typeExercice) {

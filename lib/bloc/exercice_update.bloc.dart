@@ -167,5 +167,6 @@ class ExerciceUpdateBloc {
 
   setStoragePair(StoragePair? storagePair) {
     this.storagePair = storagePair;
+    this.subjectStoragePair.sink.add(this.storagePair);
   }
 }

@@ -75,6 +75,7 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
                 StorageImageWidget(
                   onSaved: (storagePair) => widget.bloc.setStoragePair(storagePair),
                   streamInitialStoragePair: widget.bloc.obsStoragePair,
+                  onDeleted: (storagePair) => widget.bloc.setStoragePair(null),
                 ),
                 Expanded(
                   child: Padding(
