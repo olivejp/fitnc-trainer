@@ -58,9 +58,7 @@ class ExerciceUpdateBloc {
       if (exercice.videoUrl != null) {
         setVideoUrl(exercice.videoUrl!);
       }
-      if (exercice.youtubeUrl != null) {
-        setYoutubeUrl(exercice.youtubeUrl!);
-      }
+      setYoutubeUrl(exercice.youtubeUrl);
     } else {
       exercice = Exercice();
       subjectStoragePair.sink.add(null);
@@ -160,7 +158,7 @@ class ExerciceUpdateBloc {
     _streamSelectedVideoUrl.sink.add(value);
   }
 
-  setYoutubeUrl(String value) {
+  setYoutubeUrl(String? value) {
     exercice.youtubeUrl = value;
     _streamSelectedYoutubeUrl.sink.add(value);
   }

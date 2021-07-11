@@ -183,7 +183,7 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
               StreamBuilder<String?>(
                 stream: widget.bloc.selectedYoutubeUrlObs,
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
+                  if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
                     _youtubeController = YoutubePlayerController(
                       initialVideoId: snapshot.data!,
                       params: YoutubePlayerParams(
