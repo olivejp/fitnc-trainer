@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'package:http/http.dart' as http;
 
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -19,6 +20,10 @@ class FirestorageService {
 
   Future<String> sendToStorageAndGetReference(String url, Uint8List fileByte) async {
     return await FirebaseStorage.instance.ref(url).putData(fileByte).then((ref) => ref.ref.getDownloadURL());
+  }
+
+  Future<Uint8List> getRemoteImageToUint8List(String imageUrl) async {
+    return http.readBytes(Uri.parse(imageUrl));
   }
 
   // TODO A tester

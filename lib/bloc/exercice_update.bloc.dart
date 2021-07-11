@@ -7,6 +7,8 @@ import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/service/firestorage.service.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/widget/storage_image.widget.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
@@ -16,19 +18,12 @@ class ExerciceUpdateBloc {
   TrainersService trainersService = TrainersService.getInstance();
   ParamService paramService = ParamService.getInstance();
   late Exercice exercice;
+  StoragePair? storagePair;
 
-  Uint8List? _fileBytes;
-  String? _fileName;
-  String? _oldFileName;
-
-  BehaviorSubject<Uint8List?>? _streamSelectedImage;
   BehaviorSubject<String?>? _streamSelectedVideoUrl;
   BehaviorSubject<String?>? _streamSelectedYoutubeUrl;
 
-  Stream<Uint8List?>? get selectedImageObs => _streamSelectedImage?.stream;
-
   Stream<String?>? get selectedVideoUrlObs => _streamSelectedVideoUrl?.stream;
-
   Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl?.stream;
 
   static ExerciceUpdateBloc? _instance;
@@ -44,19 +39,10 @@ class ExerciceUpdateBloc {
   }
 
   void init(Exercice? exerciceEntered) {
-    _fileBytes = null;
-    _fileName = null;
-    _streamSelectedImage = BehaviorSubject();
     _streamSelectedVideoUrl = BehaviorSubject();
     _streamSelectedYoutubeUrl = BehaviorSubject();
     if (exerciceEntered != null) {
       exercice = exerciceEntered;
-      if (exercice.imageUrl != null) {
-        getRemoteImageToUint8List(exercice.imageUrl!).then((bytes) {
-          _oldFileName = basename(exercice.imageUrl!);
-          setImage(bytes, _oldFileName);
-        });
-      }
       if (exercice.videoUrl != null) {
         setVideoUrl(exercice.videoUrl!);
       }
@@ -67,10 +53,6 @@ class ExerciceUpdateBloc {
 
   Exercice? getExercice() {
     return exercice;
-  }
-
-  void dispose() {
-    _streamSelectedImage?.close();
   }
 
   Future<void> saveExercice() {
@@ -87,7 +69,8 @@ class ExerciceUpdateBloc {
     exercice.uid = collectionReference.doc().id; // Récupération d'une nouvelle ID.
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
-    if (_fileBytes != null) {
+    if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
+      await deleteExerciceMainImage(exercice);
       await sendToStorage();
     }
     return sendToFireStore(collectionReference);
@@ -97,12 +80,12 @@ class ExerciceUpdateBloc {
     CollectionReference<Object?> collectionReference = trainersService.getExerciceReference();
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
-    if (_fileBytes != null && _oldFileName != _fileName) {
+    if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
       await deleteExerciceMainImage(exercice);
       await sendToStorage();
     }
 
-    if (_fileBytes == null) {
+    if (storagePair == null || storagePair?.fileName == null || storagePair?.fileBytes == null) {
       await deleteExerciceMainImage(exercice);
       exercice.imageUrl = null;
     }
@@ -123,8 +106,8 @@ class ExerciceUpdateBloc {
 
   Future<void> sendToStorage() async {
     String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    if (trainerUid != null && _fileBytes != null) {
-      exercice.imageUrl = await firestorageService.sendToStorageAndGetReference('${getUrl()}/$_fileName', _fileBytes!);
+    if (trainerUid != null && storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
+      exercice.imageUrl = await firestorageService.sendToStorageAndGetReference('${getUrl()}/${storagePair!.fileName}', storagePair!.fileBytes!);
     }
   }
 
@@ -149,22 +132,12 @@ class ExerciceUpdateBloc {
     }
   }
 
-  changeName(String value) {
+  setName(String value) {
     exercice.name = value;
   }
 
   changeDescription(String value) {
     exercice.description = value;
-  }
-
-  void setImage(Uint8List? bytes, String? name) {
-    _fileBytes = bytes;
-    _fileName = name;
-    _streamSelectedImage?.sink.add(_fileBytes);
-  }
-
-  Future<Uint8List> getRemoteImageToUint8List(String imageUrl) async {
-    return http.readBytes(Uri.parse(imageUrl));
   }
 
   setVideoUrl(String value) {
@@ -175,5 +148,9 @@ class ExerciceUpdateBloc {
   setYoutubeUrl(String value) {
     exercice.youtubeUrl = value;
     _streamSelectedYoutubeUrl?.sink.add(value);
+  }
+
+  setStoragePair(StoragePair? storagePair) {
+    this.storagePair = storagePair;
   }
 }

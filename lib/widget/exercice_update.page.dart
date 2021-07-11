@@ -1,10 +1,8 @@
-import 'dart:typed_data';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:fitnc_trainer/bloc/exercice_update.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/widget/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/generic_update.widget.dart';
+import 'package:fitnc_trainer/widget/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -13,8 +11,6 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class ExerciceUpdatePage extends StatefulWidget {
   final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.getInstance();
-
-  final double containerHeight = 240;
 
   ExerciceUpdatePage({Key? key, Exercice? exercice}) : super(key: key) {
     bloc.init(exercice);
@@ -72,40 +68,17 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              StreamBuilder<Uint8List?>(
-                  stream: widget.bloc.selectedImageObs,
-                  builder: (context, snapshot) {
-                    ImageProvider? provider;
-                    if (snapshot.hasData && snapshot.data != null) {
-                      provider = MemoryImage(snapshot.data!);
-                    }
-                    return InkWell(
-                      child: CircleAvatar(
-                          child: Icon(
-                            Icons.add_photo_alternate,
-                            color: Color(Colors.white.value),
-                          ),
-                          radius: 50,
-                          foregroundImage: provider,
-                          backgroundColor: Color(Colors.amber.value)),
-                      onTap: callPhotoPicker,
-                      borderRadius: BorderRadius.all(Radius.circular(50)),
-                    );
-                  }),
-              IconButton(
-                  tooltip: 'Supprimer la photo',
-                  onPressed: () => deletePhoto(),
-                  icon: Icon(
-                    Icons.delete,
-                    color: Color(Colors.amber.value),
-                  )),
+              StorageImageWidget(
+                onSaved: (storagePair) => widget.bloc.setStoragePair(storagePair),
+                initialUrl: widget.bloc.exercice.imageUrl,
+              ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: TextFormField(
                       initialValue: widget.bloc.exercice.name,
                       autofocus: true,
-                      onChanged: (value) => widget.bloc.changeName(value),
+                      onChanged: (value) => widget.bloc.setName(value),
                       decoration: InputDecoration(helperText: 'Nom'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -162,9 +135,7 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
               Expanded(
                 child: TextFormField(
                   initialValue: widget.bloc.exercice.youtubeUrl,
-                  onChanged: (value) {
-                    widget.bloc.setYoutubeUrl(value);
-                  },
+                  onChanged: (value) => widget.bloc.setYoutubeUrl(value),
                   decoration: InputDecoration(helperText: 'Identifiant vidéo Youtube - Exemple : v-7oKGvVADk'),
                 ),
               )
@@ -236,17 +207,5 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
         ],
       ),
     );
-  }
-
-  void deletePhoto() {
-    widget.bloc.setImage(null, null);
-  }
-
-  void callPhotoPicker() {
-    FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['jpg', 'png', 'gif']).then((result) {
-      if (result != null) {
-        widget.bloc.setImage(result.files.first.bytes, result.files.first.name);
-      }
-    });
   }
 }
