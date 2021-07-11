@@ -58,11 +58,16 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
   }
 
   Stream<List<DropdownMenuItem<Exercice>>> getExerciceStreamDropdownMenuItem() {
-    return getExerciceReference().snapshots().map((QuerySnapshot querysnapshot) => querysnapshot.docs.map((QueryDocumentSnapshot queryDocSnapshot) {
+    return getExerciceReference().orderBy('name').snapshots().map((QuerySnapshot querysnapshot) => querysnapshot.docs.map((QueryDocumentSnapshot queryDocSnapshot) {
           Exercice exercice = Exercice.fromJson(queryDocSnapshot.data() as Map<String, dynamic>);
+          ImageProvider? provider = exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null;
           return DropdownMenuItem(
             child: Row(children: [
-              Text(exercice.name),
+              CircleAvatar(foregroundImage: provider,),
+              Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: Text(exercice.name),
+              ),
             ]),
             value: exercice,
           );

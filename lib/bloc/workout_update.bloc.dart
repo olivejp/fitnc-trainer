@@ -10,6 +10,13 @@ import 'package:fitnc_trainer/widget/storage_image.widget.dart';
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
+class RepsWeight {
+  String reps;
+  String weight;
+
+  RepsWeight({this.reps = '0', this.weight = '0'});
+}
+
 class WorkoutUpdateBloc {
   FirestorageService firestorageService = FirestorageService.getInstance();
   TrainersService trainersService = TrainersService.getInstance();
@@ -19,12 +26,18 @@ class WorkoutUpdateBloc {
   final String pathWorkoutMainImage = 'mainImage';
   StoragePair? storagePair;
 
+  List<RepsWeight> listRepsWeight = [];
+  RepsWeight repsWeight = RepsWeight();
+
   BehaviorSubject<StoragePair?> subjectStoragePair = BehaviorSubject<StoragePair?>();
   BehaviorSubject<String?> subjectTypeExercice = BehaviorSubject<String?>();
+  BehaviorSubject<List<RepsWeight>?> subjectListRepsWeight = BehaviorSubject<List<RepsWeight>?>();
 
   Stream<StoragePair?> get obsStoragePair => subjectStoragePair.stream;
 
   Stream<String?> get obsTypeExercice => subjectTypeExercice.stream;
+
+  Stream<List<RepsWeight>?> get obsRepsWeight => subjectListRepsWeight.stream;
 
   WorkoutUpdateBloc._();
 
@@ -147,5 +160,15 @@ class WorkoutUpdateBloc {
 
   setTypeExercice(String? typeExercice) {
     this.subjectTypeExercice.sink.add(typeExercice);
+  }
+
+  clearListRepsWeight() {
+    listRepsWeight.clear();
+  }
+
+  addRepsWeight() {
+    listRepsWeight.add(RepsWeight(reps: this.repsWeight.reps, weight: this.repsWeight.weight));
+    this.subjectListRepsWeight.sink.add(listRepsWeight);
+    this.repsWeight = RepsWeight();
   }
 }
