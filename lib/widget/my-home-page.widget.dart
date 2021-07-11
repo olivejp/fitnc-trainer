@@ -7,8 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 class MyHomePage extends StatelessWidget {
   static final int PAGE_WORKOUT = 0;
-  static final int PAGE_ABONNE = 1;
-  static final int PAGE_EXERCICE = 2;
+  // static final int PAGE_ABONNE = 1;
+  static final int PAGE_EXERCICE = 1;
   final MyHomePageBloc bloc = MyHomePageBloc.getInstance();
   final String title;
 

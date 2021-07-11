@@ -47,7 +47,7 @@ class FutureDropdownButton extends StatelessWidget {
 
 class StreamDropdownButton<T> extends StatelessWidget {
   final dynamic initialValue;
-  final void Function(dynamic onChangedValue) onChanged;
+  final void Function(T? onChangedValue) onChanged;
   final Icon icon;
   final Stream<List<DropdownMenuItem<T>>> stream;
   final List<DropdownMenuItem<T>> list = [];

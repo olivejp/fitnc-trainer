@@ -20,7 +20,11 @@ class WorkoutUpdateBloc {
   StoragePair? storagePair;
 
   BehaviorSubject<StoragePair?> subjectStoragePair = BehaviorSubject<StoragePair?>();
+  BehaviorSubject<String?> subjectTypeExercice = BehaviorSubject<String?>();
+
   Stream<StoragePair?> get obsStoragePair => subjectStoragePair.stream;
+
+  Stream<String?> get obsTypeExercice => subjectTypeExercice.stream;
 
   WorkoutUpdateBloc._();
 
@@ -139,5 +143,9 @@ class WorkoutUpdateBloc {
 
   setStoragePair(StoragePair? storagePair) {
     this.storagePair = storagePair;
+  }
+
+  setTypeExercice(String? typeExercice) {
+    this.subjectTypeExercice.sink.add(typeExercice);
   }
 }

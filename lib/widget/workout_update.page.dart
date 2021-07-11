@@ -182,15 +182,104 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
               color: Color(Colors.white.value).withOpacity(0.85),
               elevation: 5.0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              child: Column(
-                children: [
-                  StreamDropdownButton<Exercice>(
-                    onChanged: (onChangedValue) => print(onChangedValue),
-                    icon: Icon(Icons.description),
-                    initialValue: null,
-                    stream: widget.bloc.trainersService.getExerciceStreamDropdownMenuItem(),
-                  )
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        StreamDropdownButton<Exercice>(
+                          onChanged: (exerciceSelected) => widget.bloc.setTypeExercice(exerciceSelected?.typeExercice),
+                          icon: Icon(Icons.arrow_downward),
+                          initialValue: null,
+                          stream: widget.bloc.trainersService.getExerciceStreamDropdownMenuItem(),
+                        ),
+                        StreamBuilder(
+                          stream: widget.bloc.obsTypeExercice,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              if (snapshot.data != null) {
+                                if (snapshot.data == 'REPS_WEIGHT') {
+                                  return Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                            initialValue: '0',
+                                            autofocus: true,
+                                            onChanged: (value) => print(value),
+                                            decoration: InputDecoration(helperText: 'Reps'),
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return 'Merci de renseigner le nombre de répétition.';
+                                              }
+                                              return null;
+                                            }),
+                                      ),
+                                      Expanded(
+                                        child: TextFormField(
+                                            initialValue: '0',
+                                            autofocus: true,
+                                            onChanged: (value) => print(value),
+                                            decoration: InputDecoration(helperText: 'Weight'),
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return 'Merci de renseigner le poids.';
+                                              }
+                                              return null;
+                                            }),
+                                      )
+                                    ],
+                                  );
+                                }
+                                if (snapshot.data == 'REPS_ONLY') {
+                                  return Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                            initialValue: '0',
+                                            autofocus: true,
+                                            onChanged: (value) => print(value),
+                                            decoration: InputDecoration(helperText: 'Reps'),
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return 'Merci de renseigner le nombre de répétition.';
+                                              }
+                                              return null;
+                                            }),
+                                      ),
+                                    ],
+                                  );
+                                }
+                                if (snapshot.data == 'TIME') {
+                                  return Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                            initialValue: '0',
+                                            autofocus: true,
+                                            onChanged: (value) => print(value),
+                                            decoration: InputDecoration(helperText: 'Temps'),
+                                            validator: (value) {
+                                              if (value == null || value.isEmpty) {
+                                                return 'Merci de renseigner le temps.';
+                                              }
+                                              return null;
+                                            }),
+                                      ),
+                                    ],
+                                  );
+                                }
+                              }
+                            }
+                            return Container();
+                          },
+                        )
+                      ],
+                    ),
+                    Column(children: [TextButton.icon(onPressed: () => print('Sallut'), icon: Icon(Icons.add), label: Text('Ajouter exercice'))])
+                  ],
+                ),
               ),
             ),
           ),
