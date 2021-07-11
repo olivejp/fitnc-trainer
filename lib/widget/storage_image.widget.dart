@@ -23,7 +23,12 @@ class StorageImageWidget extends StatelessWidget {
   final Stream<StoragePair?> streamInitialStoragePair;
   final void Function(StoragePair? storagePair)? onDeleted;
 
-  StorageImageWidget({required this.onSaved, required this.streamInitialStoragePair, this.validator, this.allowedExtensions = DEFAULT_ALLOWED_EXTENSIONS, this.onDeleted});
+  StorageImageWidget(
+      {required this.onSaved,
+      required this.streamInitialStoragePair,
+      this.validator,
+      this.allowedExtensions = DEFAULT_ALLOWED_EXTENSIONS,
+      this.onDeleted});
 
   @override
   Widget build(BuildContext context) {
@@ -38,13 +43,17 @@ class StorageImageWidget extends StatelessWidget {
             builder: builderWidget,
           );
         } else {
-          return CircleAvatar(
-              child: Icon(
-                Icons.add_photo_alternate,
-                color: Color(Colors.white.value),
-              ),
-              radius: 50,
-              backgroundColor: Color(Colors.amber.value));
+          return InkWell(
+            child: CircleAvatar(
+                child: Icon(
+                  Icons.add_photo_alternate,
+                  color: Color(Colors.white.value),
+                ),
+                radius: 50,
+                backgroundColor: Color(Colors.amber.value)),
+            onTap: () => onTap(),
+            borderRadius: BorderRadius.all(Radius.circular(50)),
+          );
         }
       },
     );
@@ -70,16 +79,7 @@ class StorageImageWidget extends StatelessWidget {
                     foregroundImage: provider,
                     backgroundColor: Color(Colors.amber.value));
               }),
-          onTap: () {
-            FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: this.allowedExtensions).then((result) {
-              if (result != null) {
-                _storagePair.fileBytes = result.files.first.bytes;
-                _storagePair.fileName = result.files.first.name;
-                this.onSaved(_storagePair);
-                _streamSelectedImage.sink.add(_storagePair);
-              }
-            });
-          },
+          onTap: () => onTap(),
           borderRadius: BorderRadius.all(Radius.circular(50)),
         ),
         IconButton(
@@ -98,6 +98,17 @@ class StorageImageWidget extends StatelessWidget {
             )),
       ],
     );
+  }
+
+  void onTap() {
+    FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: this.allowedExtensions).then((result) {
+      if (result != null) {
+        _storagePair.fileBytes = result.files.first.bytes;
+        _storagePair.fileName = result.files.first.name;
+        this.onSaved(_storagePair);
+        _streamSelectedImage.sink.add(_storagePair);
+      }
+    });
   }
 
   void dispose() {
