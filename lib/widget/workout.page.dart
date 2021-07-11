@@ -28,32 +28,29 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(25.0),
-      child: StreamBuilder<List<Workout?>>(
-        stream: widget.bloc.getStreamWorkout(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData ||
-              (snapshot.hasData && snapshot.data!.isEmpty)) {
-            return Center(child: Text('Aucun workout trouvé.'));
-          } else {
-            List<Workout?> listWorkout = snapshot.data!;
-            return StreamBuilder<bool>(
-                stream: widget.homePageBloc.currentDisplayObs,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (snapshot.data != null && snapshot.data == true) {
-                      return getListView(listWorkout);
-                    } else {
-                      return getGridView(listWorkout);
-                    }
+    return StreamBuilder<List<Workout?>>(
+      stream: widget.bloc.getStreamWorkout(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData ||
+            (snapshot.hasData && snapshot.data!.isEmpty)) {
+          return Center(child: Text('Aucun workout trouvé.'));
+        } else {
+          List<Workout?> listWorkout = snapshot.data!;
+          return StreamBuilder<bool>(
+              stream: widget.homePageBloc.currentDisplayObs,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data != null && snapshot.data == true) {
+                    return getListView(listWorkout);
+                  } else {
+                    return getGridView(listWorkout);
                   }
-                  return Container();
-                });
-            // return getListView(snapshot.data);
-          }
-        },
-      ),
+                }
+                return Container();
+              });
+          // return getListView(snapshot.data);
+        }
+      },
     );
   }
 
@@ -71,6 +68,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
       }
 
       return GridView.count(
+        padding: const EdgeInsets.all(20.0),
         mainAxisSpacing: 20.0,
         crossAxisSpacing: 20.0,
         crossAxisCount: nbColumns,
@@ -149,7 +147,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
   ListView getListView(List<Workout?> listWorkout) {
     return ListView.separated(
         separatorBuilder: (context, index) => Divider(),
-        itemCount: listWorkout != null ? listWorkout.length : 0,
+        itemCount: listWorkout.length,
         itemBuilder: (context, index) {
           Workout workout = listWorkout[index] as Workout;
           Widget leading = (workout.imageUrl != null)
@@ -162,6 +160,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
               : Container();
 
           return ListTile(
+            contentPadding: const EdgeInsets.all(20.0),
             leading: leading,
             title: Text(workout.name),
             subtitle: subtitle,

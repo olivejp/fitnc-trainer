@@ -27,32 +27,29 @@ class _ExercicePageState extends State<ExercicePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(25.0),
-      child: StreamBuilder<List<Exercice?>>(
-        stream: widget.bloc.getStreamExercice(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData ||
-              (snapshot.hasData && snapshot.data!.isEmpty)) {
-            return Center(child: Text('Aucun exercice trouvé.'));
-          } else {
-            List<Exercice?> listExercice = snapshot.data!;
-            return StreamBuilder<bool>(
-                stream: widget.homePageBloc.currentDisplayObs,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (snapshot.data != null && snapshot.data == true) {
-                      return getListView(listExercice);
-                    } else {
-                      return getGridView(listExercice);
-                    }
+    return StreamBuilder<List<Exercice?>>(
+      stream: widget.bloc.getStreamExercice(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData ||
+            (snapshot.hasData && snapshot.data!.isEmpty)) {
+          return Center(child: Text('Aucun exercice trouvé.'));
+        } else {
+          List<Exercice?> listExercice = snapshot.data!;
+          return StreamBuilder<bool>(
+              stream: widget.homePageBloc.currentDisplayObs,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data != null && snapshot.data == true) {
+                    return getListView(listExercice);
+                  } else {
+                    return getGridView(listExercice);
                   }
-                  return Container();
-                });
-            // return getListView(snapshot.data);
-          }
-        },
-      ),
+                }
+                return Container();
+              });
+          // return getListView(snapshot.data);
+        }
+      },
     );
   }
 
@@ -70,6 +67,7 @@ class _ExercicePageState extends State<ExercicePage> {
       }
 
       return GridView.count(
+        padding: const EdgeInsets.all(20.0),
         mainAxisSpacing: 20.0,
         crossAxisSpacing: 20.0,
         crossAxisCount: nbColumns,
@@ -161,6 +159,7 @@ class _ExercicePageState extends State<ExercicePage> {
               : Container();
 
           return ListTile(
+            contentPadding: const EdgeInsets.all(20.0),
             leading: leading,
             title: Text(exercice.name),
             subtitle: subtitle,

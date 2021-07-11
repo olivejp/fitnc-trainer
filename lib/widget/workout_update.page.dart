@@ -5,14 +5,13 @@ import 'package:fitnc_trainer/bloc/workout_update.bloc.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/widget/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/generic_update.widget.dart';
+import 'package:fitnc_trainer/widget/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class WorkoutUpdatePage extends StatefulWidget {
   final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
-
-  final double containerHeight = 240;
 
   WorkoutUpdatePage({Key? key, Workout? workout}) : super(key: key) {
     bloc.init(workout);
@@ -67,37 +66,37 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
 
   TabBar getTabBar() {
     return TabBar(
-            tabs: [
-              Tab(
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.file_copy,
-                      color: Color(Colors.amber.value),
-                    ),
-                    Text(
-                      'Description',
-                      style: TextStyle(color: Color(Colors.amber.value)),
-                    )
-                  ],
-                ),
+      tabs: [
+        Tab(
+          child: Column(
+            children: [
+              Icon(
+                Icons.file_copy,
+                color: Color(Colors.amber.value),
               ),
-              Tab(
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.sports_volleyball,
-                      color: Color(Colors.amber.value),
-                    ),
-                    Text(
-                      'Exercices',
-                      style: TextStyle(color: Color(Colors.amber.value)),
-                    )
-                  ],
-                ),
-              ),
+              Text(
+                'Description',
+                style: TextStyle(color: Color(Colors.amber.value)),
+              )
             ],
-          );
+          ),
+        ),
+        Tab(
+          child: Column(
+            children: [
+              Icon(
+                Icons.sports_volleyball,
+                color: Color(Colors.amber.value),
+              ),
+              Text(
+                'Exercices',
+                style: TextStyle(color: Color(Colors.amber.value)),
+              )
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   Widget getFirstPanel() {
@@ -108,41 +107,17 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              StreamBuilder<Uint8List?>(
-                  stream: widget.bloc.selectedImageObs,
-                  builder: (context, snapshot) {
-                    ImageProvider? provider;
-                    if (snapshot.hasData && snapshot.data != null) {
-                      provider = MemoryImage(snapshot.data!);
-                    }
-
-                    return InkWell(
-                      child: CircleAvatar(
-                          child: Icon(
-                            Icons.add_photo_alternate,
-                            color: Color(Colors.white.value),
-                          ),
-                          radius: 50,
-                          foregroundImage: provider,
-                          backgroundColor: Color(Colors.amber.value)),
-                      onTap: callPhotoPicker,
-                      borderRadius: BorderRadius.all(Radius.circular(50)),
-                    );
-                  }),
-              IconButton(
-                  tooltip: 'Supprimer la photo',
-                  onPressed: () => deletePhoto(),
-                  icon: Icon(
-                    Icons.delete,
-                    color: Color(Colors.amber.value),
-                  )),
+              StorageImageWidget(
+                onSaved: (storagePair) => widget.bloc.setStoragePair(storagePair),
+                initialUrl: widget.bloc.getWorkout()?.imageUrl,
+              ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20),
                   child: TextFormField(
                       initialValue: widget.bloc.getWorkout()?.name,
                       autofocus: true,
-                      onChanged: (value) => widget.bloc.changeName(value),
+                      onChanged: (value) => widget.bloc.setName(value),
                       decoration: InputDecoration(helperText: 'Nom'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -154,79 +129,17 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
               ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 30),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: TextFormField(
-                      maxLength: 10,
-                      initialValue: widget.bloc.getWorkout()?.dateDebut != null ? widget.bloc.getWorkout()?.dateDebut.toString() : '',
-                      onChanged: (value) => widget.bloc.changeDateDebut(value),
-                      autovalidateMode: AutovalidateMode.always,
-                      validator: (value) {
-                        if (value?.length != null && value!.length >= 8) {
-                          DateTime time;
-                          DateTime today = DateTime.now();
-                          try {
-                            time = DateFormat('dd/MM/yyyy').parseStrict(value);
-                          } on Exception catch (e) {
-                            return 'Date incorrecte. Format accepté dd/mm/aaaa.';
-                          }
-                          if (time.isAfter(today)) {
-                            return 'Date supérieure à la date du jour';
-                          }
-                          return null;
-                        }
-                      },
-                      decoration:
-                      InputDecoration(suffixIcon: Icon(Icons.event_note), hintText: 'dd/mm/aaaa', helperText: 'Date de début'),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: TextFormField(
-                      maxLength: 10,
-                      initialValue: widget.bloc.getWorkout()?.dateFin != null ? widget.bloc.getWorkout()?.dateFin.toString() : '',
-                      onChanged: (value) => widget.bloc.changeDateFin(value),
-                      autovalidateMode: AutovalidateMode.always,
-                      validator: (value) {
-                        if (value?.length != null && value!.length >= 8) {
-                          DateTime time;
-                          DateTime today = DateTime.now();
-                          try {
-                            time = DateFormat('dd/MM/yyyy').parseStrict(value);
-                          } on Exception catch (e) {
-                            return 'Date incorrecte. Format accepté dd/mm/aaaa.';
-                          }
-                          if (time.isAfter(today)) {
-                            return 'Date supérieure à la date du jour';
-                          }
-                          return null;
-                        }
-                      },
-                      decoration: InputDecoration(suffixIcon: Icon(Icons.event_note), hintText: 'dd/mm/aaaa', helperText: 'Date de fin'),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
           TextFormField(
             initialValue: widget.bloc.getWorkout()?.description,
             maxLength: 2000,
             minLines: 5,
             maxLines: 20,
-            onChanged: (value) => widget.bloc.changeDescription(value),
+            onChanged: (value) => widget.bloc.setDescription(value),
             decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Description (optionel)'),
           ),
           DropdownButtonFormField<String>(
               icon: Icon(Icons.timer),
-              onChanged: (String? value) => widget.bloc.changeTimerType(value),
+              onChanged: (String? value) => widget.bloc.setTimerType(value),
               value: widget.bloc.getWorkout()?.timerType,
               items: [
                 DropdownMenuItem(
@@ -310,17 +223,5 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
         ),
       ],
     );
-  }
-
-  void deletePhoto() {
-    widget.bloc.setImage(null, null);
-  }
-
-  void callPhotoPicker() {
-    FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['jpg', 'png', 'gif']).then((result) {
-      if (result != null) {
-        widget.bloc.setImage(result.files.first.bytes, result.files.first.name);
-      }
-    });
   }
 }

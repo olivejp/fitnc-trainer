@@ -1,27 +1,25 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
+import 'package:fitnc_trainer/service/firestorage.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/widget/storage_image.widget.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
 class WorkoutUpdateBloc {
+  FirestorageService firestorageService = FirestorageService.getInstance();
   TrainersService trainersService = TrainersService.getInstance();
   late Workout _workout;
 
-  Uint8List? _fileBytes;
-  String? _fileName;
-  String? _oldFileName;
-
-  BehaviorSubject<Uint8List?>? _streamSelectedImage;
-
-  Stream<Uint8List?>? get selectedImageObs => _streamSelectedImage?.stream;
-
   static WorkoutUpdateBloc? _instance;
   final String pathWorkoutMainImage = 'mainImage';
+  StoragePair? storagePair;
 
   WorkoutUpdateBloc._();
 
@@ -33,17 +31,8 @@ class WorkoutUpdateBloc {
   }
 
   void init(Workout? workout) {
-    _fileBytes = null;
-    _fileName = null;
-    _streamSelectedImage = BehaviorSubject();
     if (workout != null) {
       _workout = workout;
-      if (_workout.imageUrl != null) {
-        getRemoteImageToUint8List(_workout.imageUrl!).then((bytes) {
-          _oldFileName = basename(_workout.imageUrl!);
-          setImage(bytes, _oldFileName);
-        });
-      }
     } else {
       _workout = Workout();
     }
@@ -51,10 +40,6 @@ class WorkoutUpdateBloc {
 
   Workout? getWorkout() {
     return _workout;
-  }
-
-  void dispose() {
-    _streamSelectedImage?.close();
   }
 
   Future<void> saveWorkout() {
@@ -66,52 +51,50 @@ class WorkoutUpdateBloc {
   }
 
   Future<void> createWorkout() async {
-    CollectionReference<Object?> collectionReference =
-        trainersService.getWorkoutReference();
+    CollectionReference<Object?> collectionReference = trainersService.getWorkoutReference();
 
-    _workout.uid =
-        collectionReference.doc().id; // Récupération d'une nouvelle ID.
+    _workout.uid = collectionReference.doc().id; // Récupération d'une nouvelle ID.
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
-    if (_fileBytes != null) {
+    if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
       await sendToStorage();
     }
     return sendToFireStore(collectionReference);
   }
 
+  String getUrl() {
+    String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
+    return 'trainers/${trainerUid}/exercices/${_workout.uid}/$pathWorkoutMainImage';
+  }
+
   Future<void> updateWorkout() async {
-    CollectionReference<Object?> collectionReference =
-        trainersService.getWorkoutReference();
+    CollectionReference<Object?> collectionReference = trainersService.getWorkoutReference();
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
-    if (_fileBytes != null && _oldFileName != _fileName) {
+    if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
       await deleteWorkoutMainImage(_workout);
       await sendToStorage();
     }
 
-    if (_fileBytes == null) {
+    if (storagePair == null || storagePair?.fileName == null || storagePair?.fileBytes == null) {
       await deleteWorkoutMainImage(_workout);
       _workout.imageUrl = null;
     }
     return sendToFireStore(collectionReference);
   }
 
-  Future<void> sendToFireStore(
-      CollectionReference<Object?> collectionReference) {
+  Future<void> sendToFireStore(CollectionReference<Object?> collectionReference) {
     _workout.createDate = FieldValue.serverTimestamp();
-    return collectionReference
-        .doc(_workout.uid)
-        .set(_workout.toJson())
-        .then((value) {
+    return collectionReference.doc(_workout.uid).set(_workout.toJson()).then((value) {
       _workout = Workout();
     });
   }
 
   Future<void> sendToStorage() async {
-    _workout.imageUrl = await FirebaseStorage.instance
-        .ref('${_workout.uid}/$pathWorkoutMainImage/$_fileName')
-        .putData(_fileBytes!)
-        .then((ref) => ref.ref.getDownloadURL());
+    String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
+    if (trainerUid != null && storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
+      _workout.imageUrl = await firestorageService.sendToStorageAndGetReference('${getUrl()}/${storagePair!.fileName}', storagePair!.fileBytes!);
+    }
   }
 
   Stream<List<Workout?>> getStreamWorkout() {
@@ -119,11 +102,7 @@ class WorkoutUpdateBloc {
   }
 
   Future<void> deleteWorkout(Workout workout) {
-    return trainersService
-        .getWorkoutReference()
-        .doc(workout.uid)
-        .delete()
-        .then((value) => deleteWorkoutMainImage(workout));
+    return trainersService.getWorkoutReference().doc(workout.uid).delete().then((value) => deleteWorkoutMainImage(workout));
   }
 
   Future<void> deleteWorkoutMainImage(Workout workout) {
@@ -134,33 +113,19 @@ class WorkoutUpdateBloc {
         .catchError((error) => print(error));
   }
 
-  changeName(String value) {
+  setName(String value) {
     _workout.name = value;
   }
 
-  changeDescription(String value) {
+  setDescription(String value) {
     _workout.description = value;
   }
 
-  changeTimerType(String? value) {
+  setTimerType(String? value) {
     _workout.timerType = value;
   }
 
-  void setImage(Uint8List? bytes, String? name) {
-    _fileBytes = bytes;
-    _fileName = name;
-    _streamSelectedImage?.sink.add(_fileBytes);
-  }
-
-  Future<Uint8List> getRemoteImageToUint8List(String imageUrl) async {
-    return http.readBytes(Uri.parse(imageUrl));
-  }
-
-  changeDateDebut(String value) {
-    _workout.dateDebut = value;
-  }
-
-  changeDateFin(String value) {
-    _workout.dateFin = value;
+  setStoragePair(StoragePair? storagePair) {
+    this.storagePair = storagePair;
   }
 }

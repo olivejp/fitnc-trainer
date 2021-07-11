@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,9 +7,6 @@ import 'package:fitnc_trainer/service/firestorage.service.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/storage_image.widget.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ExerciceUpdateBloc {
@@ -46,6 +42,9 @@ class ExerciceUpdateBloc {
       if (exercice.videoUrl != null) {
         setVideoUrl(exercice.videoUrl!);
       }
+      if (exercice.youtubeUrl != null) {
+        setYoutubeUrl(exercice.youtubeUrl!);
+      }
     } else {
       exercice = Exercice();
     }
@@ -70,7 +69,6 @@ class ExerciceUpdateBloc {
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
-      await deleteExerciceMainImage(exercice);
       await sendToStorage();
     }
     return sendToFireStore(collectionReference);
@@ -136,7 +134,7 @@ class ExerciceUpdateBloc {
     exercice.name = value;
   }
 
-  changeDescription(String value) {
+  setDescription(String value) {
     exercice.description = value;
   }
 

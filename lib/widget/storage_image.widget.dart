@@ -13,7 +13,7 @@ class StoragePair {
 }
 
 class StorageImageWidget extends StatelessWidget {
-  static const List<String> DEFAULT_ALLOWED_EXTENSIONS = ['jpg', 'png', 'gif'];
+  static const List<String> DEFAULT_ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif'];
   final FirestorageService firestorageService = FirestorageService.getInstance();
   final BehaviorSubject<StoragePair?> _streamSelectedImage = BehaviorSubject();
   final StoragePair _storagePair = StoragePair();
@@ -22,8 +22,9 @@ class StorageImageWidget extends StatelessWidget {
   final FormFieldValidator<StoragePair>? validator;
   final List<String> allowedExtensions;
   final String? initialUrl;
+  final void Function(StoragePair? storagePair)? onDeleted;
 
-  StorageImageWidget({required this.onSaved, this.initialUrl, this.validator, this.allowedExtensions = DEFAULT_ALLOWED_EXTENSIONS});
+  StorageImageWidget({required this.onSaved, this.initialUrl, this.validator, this.allowedExtensions = DEFAULT_ALLOWED_EXTENSIONS, this.onDeleted});
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +75,9 @@ class StorageImageWidget extends StatelessWidget {
         IconButton(
             tooltip: 'Supprimer la photo',
             onPressed: () {
+              if (this.onDeleted != null) {
+                this.onDeleted!(_storagePair);
+              }
               _storagePair.fileName = null;
               _storagePair.fileBytes = null;
               _streamSelectedImage.sink.add(_storagePair);
@@ -96,6 +100,5 @@ class StorageImageFormField<T> extends FormField<T> {
   final FormFieldSetter<T>? onSaved;
   final FormFieldValidator<T>? validator;
 
-  StorageImageFormField({required this.builder, this.onSaved, this.validator})
-      : super(builder: builder, onSaved: onSaved, validator: validator);
+  StorageImageFormField({required this.builder, this.onSaved, this.validator}) : super(builder: builder, onSaved: onSaved, validator: validator);
 }

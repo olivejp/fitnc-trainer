@@ -97,7 +97,7 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
               maxLength: 2000,
               minLines: 5,
               maxLines: 20,
-              onChanged: (value) => widget.bloc.changeDescription(value),
+              onChanged: (value) => widget.bloc.setDescription(value),
               decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Description (optionel)'),
             ),
           ),
@@ -189,7 +189,15 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
                 stream: widget.bloc.selectedYoutubeUrlObs,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    _youtubeController = YoutubePlayerController(initialVideoId: snapshot.data!);
+                    _youtubeController = YoutubePlayerController(
+                      initialVideoId: snapshot.data!,
+                      params: YoutubePlayerParams(
+                        autoPlay: false,
+                        showControls: true,
+                        showFullscreenButton: true,
+                      ),
+                    );
+                    _youtubeController!.pause();
                     return LimitedBox(
                       maxWidth: 500,
                       child: YoutubePlayerIFrame(
