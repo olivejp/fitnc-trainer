@@ -1,5 +1,6 @@
 import 'package:fitnc_trainer/bloc/workout_update.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
+import 'package:fitnc_trainer/domain/line.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/widget/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/generic_update.widget.dart';
@@ -223,13 +224,15 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                             maxLines: 20,
                             initialValue: null,
                             autofocus: true,
-                            onChanged: (value) => print(value),
-                            decoration: InputDecoration(helperText: 'Commentaire - optionel', border: OutlineInputBorder()),
+                            onChanged: (value) => widget.bloc.setConsigne(value),
+                            decoration: InputDecoration(helperText: 'Consigne - optionel', border: OutlineInputBorder()),
                           ),
                         )
                       ],
                     ),
-                    Column(children: [TextButton.icon(onPressed: () => widget.bloc.saveExercice(), icon: Icon(Icons.add), label: Text('Ajouter exercice'))])
+                    Column(children: [
+                      TextButton.icon(onPressed: () => widget.bloc.saveSet(), icon: Icon(Icons.add), label: Text('Ajouter exercice'))
+                    ])
                   ],
                 ),
               ),
@@ -312,17 +315,17 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        StreamBuilder<List<RepsWeight>?>(
+        StreamBuilder<List<Line>?>(
           stream: widget.bloc.obsRepsWeight,
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
-              List<RepsWeight> list = snapshot.data!;
+              List<Line> list = snapshot.data!;
               return ListView.separated(
                 separatorBuilder: (context, index) => Divider(),
                 shrinkWrap: true,
-                itemCount: widget.bloc.listRepsWeight.length,
+                itemCount: widget.bloc.set.lines.length,
                 itemBuilder: (context, index) {
-                  RepsWeight re = widget.bloc.listRepsWeight.elementAt(index);
+                  Line re = widget.bloc.set.lines.elementAt(index);
                   return Row(
                     key: ObjectKey(re),
                     children: [
@@ -343,10 +346,6 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                     ],
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   );
-                  // return ListTile(
-                  //   title: Text('${re.reps} X ${re.weight}'),
-                  //   trailing: IconButton(onPressed: () => print('Hello'), icon: Icon(Icons.update)),
-                  // );
                 },
               );
             }

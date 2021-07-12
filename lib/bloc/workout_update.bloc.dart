@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
+import 'package:fitnc_trainer/domain/line.domain.dart';
+import 'package:fitnc_trainer/domain/workout_set.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/service/firestorage.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
@@ -11,50 +13,28 @@ import 'package:fitnc_trainer/widget/storage_image.widget.dart';
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ExerciceSet {
-  String? uid;
-  String? uidExercice;
-  String? consigne;
-  List<RepsWeight> repsWeight = [];
-}
-
-class RepsWeight {
-  late String uid;
-  String? reps;
-  String? weight;
-  String? repos;
-  String? type;
-  int? order;
-
-  RepsWeight({this.reps, this.weight, this.order, this.type}) {
-    this.uid = FirebaseFirestore.instance
-        .collection('auto')
-        .id;
-  }
-}
-
 class WorkoutUpdateBloc {
   FirestorageService firestorageService = FirestorageService.getInstance();
   TrainersService trainersService = TrainersService.getInstance();
-  late Workout _workout;
 
   static WorkoutUpdateBloc? _instance;
   final String pathWorkoutMainImage = 'mainImage';
-  StoragePair? storagePair;
 
-  List<RepsWeight> listRepsWeight = [];
-  RepsWeight repsWeight = RepsWeight();
-  Exercice? exercice;
+  StoragePair? storagePair;
+  late Workout _workout;
+  Line repsWeight = Line();
+  WorkoutSet set = WorkoutSet();
+  Exercice? exerciceSelected;
 
   BehaviorSubject<StoragePair?> subjectStoragePair = BehaviorSubject<StoragePair?>();
   BehaviorSubject<String?> subjectTypeExercice = BehaviorSubject<String?>();
-  BehaviorSubject<List<RepsWeight>?> subjectListRepsWeight = BehaviorSubject<List<RepsWeight>?>();
+  BehaviorSubject<List<Line>?> subjectListRepsWeight = BehaviorSubject<List<Line>?>();
 
   Stream<StoragePair?> get obsStoragePair => subjectStoragePair.stream;
 
   Stream<String?> get obsTypeExercice => subjectTypeExercice.stream;
 
-  Stream<List<RepsWeight>?> get obsRepsWeight => subjectListRepsWeight.stream;
+  Stream<List<Line>?> get obsRepsWeight => subjectListRepsWeight.stream;
 
   WorkoutUpdateBloc._();
 
@@ -99,9 +79,7 @@ class WorkoutUpdateBloc {
   Future<void> createWorkout() async {
     CollectionReference<Object?> collectionReference = trainersService.getWorkoutReference();
 
-    _workout.uid = collectionReference
-        .doc()
-        .id; // Récupération d'une nouvelle ID.
+    _workout.uid = collectionReference.doc().id; // Récupération d'une nouvelle ID.
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
@@ -178,23 +156,19 @@ class WorkoutUpdateBloc {
     this.subjectStoragePair.sink.add(this.storagePair);
   }
 
-  setTypeExercice(String? typeExercice) {
-    this.subjectTypeExercice.sink.add(typeExercice);
-  }
-
   clearListRepsWeight() {
-    listRepsWeight.clear();
+    this.set.lines.clear();
   }
 
-  void deleteRepsWeight(RepsWeight re) {
-    listRepsWeight.remove(re);
-    this.subjectListRepsWeight.sink.add(listRepsWeight);
+  void deleteRepsWeight(Line re) {
+    this.set.lines.remove(re);
+    this.subjectListRepsWeight.sink.add(this.set.lines);
   }
 
   addRepsWeight() {
     // Recherche du nouvel ordre.
     int max = 0;
-    listRepsWeight.forEach((element) {
+    this.set.lines.forEach((element) {
       if (element.order != null) {
         if (element.order! > max) {
           max = element.order!;
@@ -203,12 +177,11 @@ class WorkoutUpdateBloc {
     });
     this.repsWeight.order = max + 1;
 
-    listRepsWeight
-        .add(RepsWeight(reps: this.repsWeight.reps, weight: this.repsWeight.weight, order: this.repsWeight.order, type: this.repsWeight.type));
-    this.subjectListRepsWeight.sink.add(listRepsWeight);
+    this.set.lines.add(Line(reps: this.repsWeight.reps, weight: this.repsWeight.weight, order: this.repsWeight.order, type: this.repsWeight.type));
+    this.subjectListRepsWeight.sink.add(this.set.lines);
 
     // RAZ du viewModel.
-    this.repsWeight = RepsWeight();
+    this.repsWeight = Line();
   }
 
   void setRepsWeightType(String type) {
@@ -223,14 +196,34 @@ class WorkoutUpdateBloc {
     this.repsWeight.weight = value;
   }
 
-  saveExercice() {
-    if (this.exercice != null) {
+  saveSet() async {
+    if (this.set.uidExercice != null && this.set.lines.isNotEmpty) {
+      this.set.uid = this.trainersService.getWorkoutReference().doc(_workout.uid).collection('sets').doc().id;
+      await this.trainersService.getWorkoutReference().doc(_workout.uid).collection('sets').doc(this.set.uid).set(this.set.toJson());
 
+      for (var i = 0; i < this.set.lines.length; i++) {
+        Line element = this.set.lines.elementAt(i);
+        element.uid = this.trainersService.getWorkoutReference().doc(_workout.uid).collection('sets').doc(this.set.uid).collection('lines').doc().id;
+        await this
+            .trainersService
+            .getWorkoutReference()
+            .doc(_workout.uid)
+            .collection('sets')
+            .doc(this.set.uid)
+            .collection('lines')
+            .doc(element.uid)
+            .set(element.toJson());
+      }
     }
   }
 
   setExercice(Exercice? exerciceSelected) {
-    this.exercice = exerciceSelected;
-    setTypeExercice(this.exercice?.typeExercice);
+    this.exerciceSelected = exerciceSelected;
+    this.set.uidExercice = this.exerciceSelected?.uid;
+    this.subjectTypeExercice.sink.add(this.exerciceSelected?.typeExercice);
+  }
+
+  setConsigne(String? consigne) {
+    this.set.consigne = consigne;
   }
 }
