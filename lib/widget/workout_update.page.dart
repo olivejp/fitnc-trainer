@@ -189,9 +189,10 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         StreamDropdownButton<Exercice>(
-                          onChanged: (exerciceSelected) => widget.bloc.setTypeExercice(exerciceSelected?.typeExercice),
+                          onChanged: (exerciceSelected) => widget.bloc.setExercice(exerciceSelected),
                           icon: Icon(Icons.arrow_downward),
                           initialValue: null,
                           stream: widget.bloc.trainersService.getExerciceStreamDropdownMenuItem(),
@@ -205,42 +206,10 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                                   return getRepsWeightDisplay(context);
                                 }
                                 if (snapshot.data == 'REPS_ONLY') {
-                                  return Row(
-                                    children: [
-                                      Expanded(
-                                        child: TextFormField(
-                                            initialValue: '0',
-                                            autofocus: true,
-                                            onChanged: (value) => print(value),
-                                            decoration: InputDecoration(helperText: 'Reps'),
-                                            validator: (value) {
-                                              if (value == null || value.isEmpty) {
-                                                return 'Merci de renseigner le nombre de répétition.';
-                                              }
-                                              return null;
-                                            }),
-                                      ),
-                                    ],
-                                  );
+                                  return getRepsOnlyDisplay();
                                 }
                                 if (snapshot.data == 'TIME') {
-                                  return Row(
-                                    children: [
-                                      Expanded(
-                                        child: TextFormField(
-                                            initialValue: '0',
-                                            autofocus: true,
-                                            onChanged: (value) => print(value),
-                                            decoration: InputDecoration(helperText: 'Temps'),
-                                            validator: (value) {
-                                              if (value == null || value.isEmpty) {
-                                                return 'Merci de renseigner le temps.';
-                                              }
-                                              return null;
-                                            }),
-                                      ),
-                                    ],
-                                  );
+                                  return getTimeDisplay();
                                 }
                               }
                             }
@@ -260,7 +229,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                         )
                       ],
                     ),
-                    Column(children: [TextButton.icon(onPressed: () => print('Sallut'), icon: Icon(Icons.add), label: Text('Ajouter exercice'))])
+                    Column(children: [TextButton.icon(onPressed: () => widget.bloc.saveExercice(), icon: Icon(Icons.add), label: Text('Ajouter exercice'))])
                   ],
                 ),
               ),
@@ -299,8 +268,49 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
     );
   }
 
+  Row getTimeDisplay() {
+    return Row(
+      children: [
+        Expanded(
+          child: TextFormField(
+              initialValue: '',
+              autofocus: true,
+              onChanged: (value) => print(value),
+              decoration: InputDecoration(helperText: 'Temps'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Merci de renseigner le temps.';
+                }
+                return null;
+              }),
+        ),
+      ],
+    );
+  }
+
+  Row getRepsOnlyDisplay() {
+    return Row(
+      children: [
+        Expanded(
+          child: TextFormField(
+              initialValue: '',
+              autofocus: true,
+              onChanged: (value) => print(value),
+              decoration: InputDecoration(helperText: 'Reps'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Merci de renseigner le nombre de répétition.';
+                }
+                return null;
+              }),
+        ),
+      ],
+    );
+  }
+
   Column getRepsWeightDisplay(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         StreamBuilder<List<RepsWeight>?>(
           stream: widget.bloc.obsRepsWeight,
@@ -310,10 +320,11 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
               return ListView.separated(
                 separatorBuilder: (context, index) => Divider(),
                 shrinkWrap: true,
-                itemCount: list.length,
+                itemCount: widget.bloc.listRepsWeight.length,
                 itemBuilder: (context, index) {
-                  RepsWeight re = list.elementAt(index);
+                  RepsWeight re = widget.bloc.listRepsWeight.elementAt(index);
                   return Row(
+                    key: ObjectKey(re),
                     children: [
                       Expanded(
                         child: TextFormField(
@@ -327,7 +338,8 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                           readOnly: true,
                         ),
                       ),
-                      IconButton(onPressed: () => print('Hello'), icon: Icon(Icons.update)),
+                      IconButton(onPressed: () => print('Hello'), icon: Icon(Icons.file_copy)),
+                      IconButton(onPressed: () => widget.bloc.deleteRepsWeight(re), icon: Icon(Icons.delete)),
                     ],
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   );
@@ -341,65 +353,121 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
             return Container();
           },
         ),
+        Row(
+          children: [
+            TextButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => getRepsWeightDialog(context),
+                  );
+                },
+                child: Text('Ajouter un set')),
+            TextButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => getReposDialog(context),
+                  );
+                },
+                child: Text('Ajouter un repos'))
+          ],
+        ),
+      ],
+    );
+  }
+
+  AlertDialog getRepsWeightDialog(BuildContext context) {
+    widget.bloc.setRepsWeightType('SETS');
+    return AlertDialog(
+      title: Text('Ajouter un set'),
+      content: Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                initialValue: '',
+                autofocus: true,
+                onChanged: (value) => widget.bloc.setRepsWeightReps(value),
+                decoration: InputDecoration(helperText: 'Reps'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Merci de renseigner le nombre de répétition.';
+                  }
+                  return null;
+                },
+              ),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                initialValue: '',
+                autofocus: true,
+                onChanged: (value) => widget.bloc.setRepsWeightWeight(value),
+                decoration: InputDecoration(helperText: 'Weight'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Merci de renseigner le poids.';
+                  }
+                  return null;
+                },
+                onFieldSubmitted: (value) {
+                  widget.bloc.addRepsWeight();
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          )
+        ],
+      ),
+      actions: [
         TextButton(
             onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text('Ajouter un set'),
-                  content: Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: '0',
-                          autofocus: true,
-                          onChanged: (value) => widget.bloc.repsWeight.reps = value,
-                          decoration: InputDecoration(helperText: 'Reps'),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Merci de renseigner le nombre de répétition.';
-                            }
-                            return null;
-                          },
-                          onFieldSubmitted: (value) {
-                            widget.bloc.addRepsWeight();
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: '0',
-                          autofocus: true,
-                          onChanged: (value) => widget.bloc.repsWeight.weight = value,
-                          decoration: InputDecoration(helperText: 'Weight'),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Merci de renseigner le poids.';
-                            }
-                            return null;
-                          },
-                          onFieldSubmitted: (value) {
-                            widget.bloc.addRepsWeight();
-                            Navigator.pop(context);
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                  actions: [
-                    TextButton(
-                        onPressed: () {
-                          widget.bloc.addRepsWeight();
-                          Navigator.pop(context);
-                        },
-                        child: Text('OK')),
-                    TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler'))
-                  ],
-                ),
-              );
+              widget.bloc.addRepsWeight();
+              Navigator.pop(context);
             },
-            child: Text('Ajouter un set')),
+            child: Text('OK')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler'))
+      ],
+    );
+  }
+
+  AlertDialog getReposDialog(BuildContext context) {
+    return AlertDialog(
+      title: Text('Ajouter un depos'),
+      content: Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+              initialValue: '',
+              autofocus: true,
+              onChanged: (value) => widget.bloc.repsWeight.reps = value,
+              decoration: InputDecoration(helperText: 'Repos'),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Merci de renseigner le nombre de secondes de repos.';
+                }
+                return null;
+              },
+              onFieldSubmitted: (value) {
+                widget.bloc.addRepsWeight();
+                Navigator.pop(context);
+              },
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+            onPressed: () {
+              widget.bloc.addRepsWeight();
+              Navigator.pop(context);
+            },
+            child: Text('OK')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler'))
       ],
     );
   }
