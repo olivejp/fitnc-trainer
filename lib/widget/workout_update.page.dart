@@ -2,6 +2,7 @@ import 'package:fitnc_trainer/bloc/workout_update.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/line.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
+import 'package:fitnc_trainer/domain/workout_set.domain.dart';
 import 'package:fitnc_trainer/widget/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/generic_update.widget.dart';
 import 'package:fitnc_trainer/widget/storage_image.widget.dart';
@@ -193,6 +194,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         StreamDropdownButton<Exercice>(
+                          key: widget.bloc.dropdownKey,
                           onChanged: (exerciceSelected) => widget.bloc.setExercice(exerciceSelected),
                           icon: Icon(Icons.arrow_downward),
                           initialValue: null,
@@ -220,6 +222,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                         Padding(
                           padding: const EdgeInsets.only(top: 15),
                           child: TextFormField(
+                            key: widget.bloc.consigneKey,
                             minLines: 5,
                             maxLines: 20,
                             initialValue: null,
@@ -231,7 +234,11 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                       ],
                     ),
                     Column(children: [
-                      TextButton.icon(onPressed: () => widget.bloc.saveSet(), icon: Icon(Icons.add), label: Text('Ajouter exercice'))
+                      FloatingActionButton.extended(
+                        onPressed: () => widget.bloc.saveSet(),
+                        label: Text('Ajouter exercice'),
+                        icon: Icon(Icons.add),
+                      )
                     ])
                   ],
                 ),
@@ -243,26 +250,28 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           flex: 1,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: DragTarget<String>(
-              onWillAccept: (data) {
-                print(data);
-                return true;
-              },
-              onAccept: (data) {
-                print(data);
-              },
-              onLeave: (data) {
-                print(data);
-              },
-              builder: (context, candidateData, rejectedData) => Card(
-                shadowColor: Color(Colors.black.value),
-                clipBehavior: Clip.antiAlias,
-                color: Color(Colors.white.value).withOpacity(0.85),
-                elevation: 5.0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                child: Column(
-                  children: [],
-                ),
+            child: Card(
+              shadowColor: Color(Colors.black.value),
+              clipBehavior: Clip.antiAlias,
+              color: Color(Colors.white.value).withOpacity(0.85),
+              elevation: 5.0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              child: StreamBuilder<List<WorkoutSet?>>(
+                stream: widget.bloc.listenToWorkoutStep(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
+                    List<WorkoutSet?> listSet = snapshot.data!;
+                    return Column(
+                      children: listSet
+                          .map((set) => ListTile(
+                                title: Text(set!.uidExercice!),
+                              ))
+                          .toList(),
+                    );
+                  } else {
+                    return Container();
+                  }
+                },
               ),
             ),
           ),
@@ -315,11 +324,19 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: () => widget.bloc.addLine(),
+              child: Text('Ajouter un set'),
+            ),
+          ],
+        ),
         StreamBuilder<List<Line>?>(
-          stream: widget.bloc.obsRepsWeight,
+          stream: widget.bloc.obsLines,
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
-              List<Line> list = snapshot.data!;
               return ListView.separated(
                 separatorBuilder: (context, index) => Divider(),
                 shrinkWrap: true,
@@ -330,19 +347,24 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                     key: ObjectKey(re),
                     children: [
                       Expanded(
-                        child: TextFormField(
-                          initialValue: re.reps,
-                          readOnly: true,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: TextFormField(
+                            initialValue: re.reps,
+                            decoration: InputDecoration(helperText: 'Répétitions'),
+                          ),
                         ),
                       ),
                       Expanded(
-                        child: TextFormField(
-                          initialValue: re.weight,
-                          readOnly: true,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: TextFormField(
+                            initialValue: re.weight,
+                            decoration: InputDecoration(helperText: 'Poids'),
+                          ),
                         ),
                       ),
-                      IconButton(onPressed: () => print('Hello'), icon: Icon(Icons.file_copy)),
-                      IconButton(onPressed: () => widget.bloc.deleteRepsWeight(re), icon: Icon(Icons.delete)),
+                      IconButton(onPressed: () => widget.bloc.deleteLine(re), icon: Icon(Icons.delete)),
                     ],
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   );
@@ -351,26 +373,6 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
             }
             return Container();
           },
-        ),
-        Row(
-          children: [
-            TextButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => getRepsWeightDialog(context),
-                  );
-                },
-                child: Text('Ajouter un set')),
-            TextButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => getReposDialog(context),
-                  );
-                },
-                child: Text('Ajouter un repos'))
-          ],
         ),
       ],
     );
@@ -414,7 +416,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                   return null;
                 },
                 onFieldSubmitted: (value) {
-                  widget.bloc.addRepsWeight();
+                  widget.bloc.addLine();
                   Navigator.pop(context);
                 },
               ),
@@ -425,7 +427,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
       actions: [
         TextButton(
             onPressed: () {
-              widget.bloc.addRepsWeight();
+              widget.bloc.addLine();
               Navigator.pop(context);
             },
             child: Text('OK')),
@@ -443,7 +445,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
             child: TextFormField(
               initialValue: '',
               autofocus: true,
-              onChanged: (value) => widget.bloc.repsWeight.reps = value,
+              onChanged: (value) => widget.bloc.line.reps = value,
               decoration: InputDecoration(helperText: 'Repos'),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -452,7 +454,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                 return null;
               },
               onFieldSubmitted: (value) {
-                widget.bloc.addRepsWeight();
+                widget.bloc.addLine();
                 Navigator.pop(context);
               },
             ),
@@ -462,7 +464,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
       actions: [
         TextButton(
             onPressed: () {
-              widget.bloc.addRepsWeight();
+              widget.bloc.addLine();
               Navigator.pop(context);
             },
             child: Text('OK')),

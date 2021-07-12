@@ -25,12 +25,13 @@ class ParamDropdownButton extends StatelessWidget {
 }
 
 class FutureDropdownButton extends StatelessWidget {
+  final Key? key;
   final dynamic initialValue;
   final void Function(String? onChangedValue) onChanged;
   final Icon icon;
   final Future<List<DropdownMenuItem<dynamic>>> future;
 
-  FutureDropdownButton({required this.future, required this.initialValue, required this.onChanged, required this.icon});
+  FutureDropdownButton({this.key, required this.future, required this.initialValue, required this.onChanged, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +39,8 @@ class FutureDropdownButton extends StatelessWidget {
         future: this.future,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return DropdownButtonFormField<String>(icon: this.icon, onChanged: this.onChanged, value: initialValue, items: snapshot.data);
+            return DropdownButtonFormField<String>(
+                key: this.key, icon: this.icon, onChanged: this.onChanged, value: initialValue, items: snapshot.data);
           }
           return Container();
         });
@@ -46,13 +48,14 @@ class FutureDropdownButton extends StatelessWidget {
 }
 
 class StreamDropdownButton<T> extends StatelessWidget {
+  final Key? key;
   final dynamic initialValue;
   final void Function(T? onChangedValue) onChanged;
   final Icon icon;
   final Stream<List<DropdownMenuItem<T>>> stream;
   final List<DropdownMenuItem<T>> list = [];
 
-  StreamDropdownButton({required this.stream, required this.initialValue, required this.onChanged, required this.icon});
+  StreamDropdownButton({this.key, required this.stream, required this.initialValue, required this.onChanged, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +65,7 @@ class StreamDropdownButton<T> extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             list.addAll(snapshot.data!);
-            return DropdownButtonFormField<T>(icon: this.icon, onChanged: this.onChanged, value: initialValue, items: list);
+            return DropdownButtonFormField<T>(key: this.key, icon: this.icon, onChanged: this.onChanged, value: initialValue, items: list);
           }
           return Container();
         });

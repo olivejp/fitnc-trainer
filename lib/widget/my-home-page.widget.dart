@@ -5,10 +5,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'calendar.page.dart';
+
 class MyHomePage extends StatelessWidget {
   static final int PAGE_WORKOUT = 0;
   // static final int PAGE_ABONNE = 1;
   static final int PAGE_EXERCICE = 1;
+  static final int PAGE_CALENDAR = 2;
   final MyHomePageBloc bloc = MyHomePageBloc.getInstance();
   final String title;
 
@@ -156,6 +159,22 @@ class MyHomePage extends StatelessWidget {
                 ),
               );
             }
+            if (snapshot.data == PAGE_CALENDAR) {
+              return FloatingActionButton.extended(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/add_exercice');
+                },
+                label: Text(
+                  'Ajouter un exercice',
+                  style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
+                ),
+                icon: Icon(
+                  Icons.add,
+                  color: Color(Colors.white.value),
+                  size: 20.0,
+                ),
+              );
+            }
             return Container();
           },
         ),
@@ -174,6 +193,9 @@ class MyHomePage extends StatelessWidget {
         // }
         if (snapshot.data == PAGE_EXERCICE) {
           return ExercicePage();
+        }
+        if (snapshot.data == PAGE_CALENDAR) {
+          return CalendarPage();
         }
         return Text('Aie');
       },
@@ -207,13 +229,13 @@ class MyHomePage extends StatelessWidget {
                           trailing: Icon(Icons.sports_volleyball),
                           selected: snapshot.data == PAGE_WORKOUT,
                         ),
-                        // Divider(),
-                        // ListTile(
-                        //   onTap: () => bloc.changePage(PAGE_ABONNE),
-                        //   title: Text('Abonné'),
-                        //   trailing: Icon(Icons.group),
-                        //   selected: snapshot.data == PAGE_ABONNE,
-                        // ),
+                        Divider(),
+                        ListTile(
+                          onTap: () => bloc.changePage(PAGE_CALENDAR),
+                          title: Text('Calendrier'),
+                          trailing: Icon(Icons.calendar_today_rounded),
+                          selected: snapshot.data == PAGE_CALENDAR,
+                        ),
                         Divider(
                           height: 2,
                         ),

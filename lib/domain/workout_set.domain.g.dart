@@ -10,7 +10,10 @@ WorkoutSet _$WorkoutSetFromJson(Map<String, dynamic> json) {
   return WorkoutSet()
     ..uid = json['uid'] as String?
     ..uidExercice = json['uidExercice'] as String?
-    ..consigne = json['consigne'] as String?;
+    ..consigne = json['consigne'] as String?
+    ..lines = (json['lines'] as List<dynamic>)
+        .map((e) => Line.fromJson(e as Map<String, dynamic>))
+        .toList();
 }
 
 Map<String, dynamic> _$WorkoutSetToJson(WorkoutSet instance) =>
@@ -18,4 +21,5 @@ Map<String, dynamic> _$WorkoutSetToJson(WorkoutSet instance) =>
       'uid': instance.uid,
       'uidExercice': instance.uidExercice,
       'consigne': instance.consigne,
+      'lines': instance.lines.map((e) => e.toJson()).toList(),
     };
