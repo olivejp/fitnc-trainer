@@ -48,14 +48,14 @@ class FutureDropdownButton extends StatelessWidget {
 }
 
 class StreamDropdownButton<T> extends StatelessWidget {
-  final Key? key;
+  final Key? dropdownKey;
   final dynamic initialValue;
   final void Function(T? onChangedValue) onChanged;
   final Icon icon;
   final Stream<List<DropdownMenuItem<T>>> stream;
   final List<DropdownMenuItem<T>> list = [];
 
-  StreamDropdownButton({this.key, required this.stream, required this.initialValue, required this.onChanged, required this.icon});
+  StreamDropdownButton({this.dropdownKey, required this.stream, required this.initialValue, required this.onChanged, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +65,7 @@ class StreamDropdownButton<T> extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             list.addAll(snapshot.data!);
-            return DropdownButtonFormField<T>(key: this.key, icon: this.icon, onChanged: this.onChanged, value: initialValue, items: list);
+            return DropdownButtonFormField<T>(key: this.dropdownKey, icon: this.icon, onChanged: this.onChanged, value: initialValue, items: list);
           }
           return Container();
         });

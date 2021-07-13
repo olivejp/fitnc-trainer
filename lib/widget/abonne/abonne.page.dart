@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fitnc_trainer/bloc/abonne_update.bloc.dart';
-import 'package:fitnc_trainer/bloc/my-home-page.bloc.dart';
+import 'package:fitnc_trainer/bloc/abonne/abonne_update.bloc.dart';
+import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/domain/abonne.domain.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +8,7 @@ import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-import 'abonne_update.page.dart';
+import 'abonne.update.page.dart';
 
 class AbonnePage extends StatefulWidget {
   final MyHomePageBloc homePageBloc = MyHomePageBloc.getInstance();

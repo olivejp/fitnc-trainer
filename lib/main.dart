@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/service/auth.service.dart';
-import 'package:fitnc_trainer/widget/abonne_update.page.dart';
-import 'package:fitnc_trainer/widget/exercice_update.page.dart';
-import 'package:fitnc_trainer/widget/workout_update.page.dart';
-import 'package:fitnc_trainer/widget/login.page.dart';
-import 'package:fitnc_trainer/widget/my-home-page.widget.dart';
+import 'package:fitnc_trainer/widget/abonne/abonne.update.page.dart';
+import 'package:fitnc_trainer/widget/exercice/exercice.update.page.dart';
+import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
+import 'package:fitnc_trainer/widget/login/login.page.dart';
+import 'package:fitnc_trainer/widget/home.page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animations/loading_animations.dart';

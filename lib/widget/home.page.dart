@@ -1,14 +1,17 @@
-import 'package:fitnc_trainer/bloc/my-home-page.bloc.dart';
-import 'package:fitnc_trainer/widget/exercice.page.dart';
-import 'package:fitnc_trainer/widget/workout.page.dart';
+import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
+import 'package:fitnc_trainer/widget/exercice/exercice.create.page.dart';
+import 'package:fitnc_trainer/widget/exercice/exercice.page.dart';
+import 'package:fitnc_trainer/widget/workout/workout.create.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'calendar.page.dart';
+import 'workout/workout.page.dart';
 
 class MyHomePage extends StatelessWidget {
   static final int PAGE_WORKOUT = 0;
+
   // static final int PAGE_ABONNE = 1;
   static final int PAGE_EXERCICE = 1;
   static final int PAGE_CALENDAR = 2;
@@ -112,9 +115,7 @@ class MyHomePage extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.data == PAGE_WORKOUT) {
               return FloatingActionButton.extended(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/add_workout');
-                },
+                onPressed: () => WorkoutCreatePage.showCreate(context),
                 label: Text(
                   'Ajouter un workout',
                   style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
@@ -145,9 +146,7 @@ class MyHomePage extends StatelessWidget {
             // }
             if (snapshot.data == PAGE_EXERCICE) {
               return FloatingActionButton.extended(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/add_exercice');
-                },
+                onPressed: () => ExerciceCreatePage.showCreate(context),
                 label: Text(
                   'Ajouter un exercice',
                   style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
@@ -229,9 +228,12 @@ class MyHomePage extends StatelessWidget {
                           trailing: Icon(Icons.sports_volleyball),
                           selected: snapshot.data == PAGE_WORKOUT,
                         ),
-                        Divider(),
+                        Divider(
+                          height: 2,
+                        ),
                         ListTile(
                           onTap: () => bloc.changePage(PAGE_CALENDAR),
+                          minVerticalPadding: 20,
                           title: Text('Calendrier'),
                           trailing: Icon(Icons.calendar_today_rounded),
                           selected: snapshot.data == PAGE_CALENDAR,

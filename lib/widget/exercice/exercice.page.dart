@@ -1,49 +1,48 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fitnc_trainer/bloc/workout_update.bloc.dart';
-import 'package:fitnc_trainer/bloc/my-home-page.bloc.dart';
-import 'package:fitnc_trainer/domain/workout.domain.dart';
-import 'package:fitnc_trainer/widget/workout_update.page.dart';
+import 'package:fitnc_trainer/bloc/exercice/exercice_update.bloc.dart';
+import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
+import 'package:fitnc_trainer/domain/exercice.domain.dart';
+import 'package:fitnc_trainer/widget/exercice/exercice.update.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-class WorkoutPage extends StatefulWidget {
+class ExercicePage extends StatefulWidget {
   final MyHomePageBloc homePageBloc = MyHomePageBloc.getInstance();
-  final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
+  final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.getInstance();
 
-  WorkoutPage({Key? key}) : super(key: key);
+  ExercicePage({Key? key}) : super(key: key);
 
   @override
-  _WorkoutPageState createState() {
-    return new _WorkoutPageState();
+  _ExercicePageState createState() {
+    return new _ExercicePageState();
   }
 }
 
-class _WorkoutPageState extends State<WorkoutPage> {
+class _ExercicePageState extends State<ExercicePage> {
   DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
-  _WorkoutPageState();
+  _ExercicePageState();
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Workout?>>(
-      stream: widget.bloc.getStreamWorkout(),
+    return StreamBuilder<List<Exercice?>>(
+      stream: widget.bloc.getStreamExercice(),
       builder: (context, snapshot) {
         if (!snapshot.hasData ||
             (snapshot.hasData && snapshot.data!.isEmpty)) {
-          return Center(child: Text('Aucun workout trouvé.'));
+          return Center(child: Text('Aucun exercice trouvé.'));
         } else {
-          List<Workout?> listWorkout = snapshot.data!;
+          List<Exercice?> listExercice = snapshot.data!;
           return StreamBuilder<bool>(
               stream: widget.homePageBloc.currentDisplayObs,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   if (snapshot.data != null && snapshot.data == true) {
-                    return getListView(listWorkout);
+                    return getListView(listExercice);
                   } else {
-                    return getGridView(listWorkout);
+                    return getGridView(listExercice);
                   }
                 }
                 return Container();
@@ -54,7 +53,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     );
   }
 
-  Widget getGridView(List<Workout?> listWorkout) {
+  Widget getGridView(List<Exercice?> listExercice) {
     return LayoutBuilder(builder: (context, constraints) {
       int nbColumns = 1;
       if (constraints.maxWidth > 1200) {
@@ -72,31 +71,31 @@ class _WorkoutPageState extends State<WorkoutPage> {
         mainAxisSpacing: 20.0,
         crossAxisSpacing: 20.0,
         crossAxisCount: nbColumns,
-        children: listWorkout.map((workout) {
-          Widget leading = workout?.imageUrl != null
-              ? CircleAvatar(foregroundImage: NetworkImage(workout!.imageUrl!))
+        children: listExercice.map((exercice) {
+          Widget leading = exercice?.imageUrl != null
+              ? CircleAvatar(foregroundImage: NetworkImage(exercice!.imageUrl!))
               : Icon(
                   Icons.sports_volleyball,
                   color: Color(Colors.amber.value),
                 );
 
-          Widget description = workout?.description != null
+          Widget description = exercice?.description != null
               ? Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                    workout!.description!,
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    exercice!.description!,
                     maxLines: 5,
                     overflow: TextOverflow.ellipsis,
                   ),
-              )
+                )
               : Container();
 
-          Widget subtitle = workout?.createDate != null
+          Widget subtitle = exercice?.createDate != null
               ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch(
-                  (workout!.createDate as Timestamp).millisecondsSinceEpoch)))
+                  (exercice!.createDate as Timestamp).millisecondsSinceEpoch)))
               : Container();
 
-          if (workout != null) {
+          if (exercice != null) {
             return InkWell(
               splashColor: Color(Colors.amber.value),
               hoverColor: Color(Colors.amber.value),
@@ -104,8 +103,8 @@ class _WorkoutPageState extends State<WorkoutPage> {
               onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => WorkoutUpdatePage(
-                            workout: workout,
+                      builder: (context) => ExerciceUpdatePage(
+                            exercice: exercice,
                           ))),
               child: Card(
                 clipBehavior: Clip.antiAlias,
@@ -116,7 +115,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                   children: [
                     ListTile(
                       leading: leading,
-                      title: Text(workout.name),
+                      title: Text(exercice.name),
                       subtitle: subtitle,
                     ),
                     Expanded(
@@ -128,7 +127,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                     ButtonBar(
                       alignment: MainAxisAlignment.end,
                       children: [
-                        getDeleteButton(context, workout),
+                        getDeleteButton(context, exercice),
                       ],
                     ),
                   ],
@@ -144,50 +143,52 @@ class _WorkoutPageState extends State<WorkoutPage> {
     });
   }
 
-  ListView getListView(List<Workout?> listWorkout) {
+  ListView getListView(List<Exercice?> listExercice) {
     return ListView.separated(
         separatorBuilder: (context, index) => Divider(),
-        itemCount: listWorkout.length,
+        itemCount: listExercice != null ? listExercice.length : 0,
         itemBuilder: (context, index) {
-          Workout workout = listWorkout[index] as Workout;
-          Widget leading = (workout.imageUrl != null)
-              ? CircleAvatar(foregroundImage: NetworkImage(workout.imageUrl!))
+          Exercice exercice = listExercice[index] as Exercice;
+          Widget leading = (exercice.imageUrl != null)
+              ? CircleAvatar(foregroundImage: NetworkImage(exercice.imageUrl!))
               : CircleAvatar();
 
-          Widget subtitle = workout.createDate != null
+          Widget subtitle = exercice.createDate != null
               ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch(
-                  (workout.createDate as Timestamp).millisecondsSinceEpoch)))
+                  (exercice.createDate as Timestamp).millisecondsSinceEpoch)))
               : Container();
 
           return ListTile(
             contentPadding: const EdgeInsets.all(20.0),
             leading: leading,
-            title: Text(workout.name),
+            title: Text(exercice.name),
             subtitle: subtitle,
             trailing: Wrap(
-              children: [getDeleteButton(context, workout)],
+              children: [getDeleteButton(context, exercice)],
             ),
-            onTap: () {Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => WorkoutUpdatePage(
-                      workout: workout,
-                    )));},
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ExerciceUpdatePage(
+                            exercice: exercice,
+                          )));
+            },
           );
         });
   }
 
-  IconButton getDeleteButton(BuildContext context, Workout workout) {
+  IconButton getDeleteButton(BuildContext context, Exercice exercice) {
     return IconButton(
       tooltip: 'Supprimer',
       onPressed: () {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Etes vous sûr de vouloir supprimer ce workout?'),
+            title: Text('Etes vous sûr de vouloir supprimer ce exercice?'),
             actions: [
               TextButton(
-                  onPressed: () => deleteWorkout(workout, context),
+                  onPressed: () => deleteExercice(exercice, context),
                   child: Text('Oui')),
               TextButton(
                   onPressed: () => Navigator.pop(context),
@@ -204,9 +205,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
     );
   }
 
-  void deleteWorkout(Workout workout, BuildContext context) {
+  void deleteExercice(Exercice exercice, BuildContext context) {
     widget.bloc
-        .deleteWorkout(workout)
+        .deleteExercice(exercice)
         .then((value) => Navigator.pop(context))
         .catchError((error) => print(error.toString()));
   }

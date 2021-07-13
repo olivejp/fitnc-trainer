@@ -7,7 +7,7 @@ import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/service/firestorage.service.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitnc_trainer/widget/storage_image.widget.dart';
+import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 

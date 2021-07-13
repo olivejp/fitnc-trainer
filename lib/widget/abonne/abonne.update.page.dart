@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:fitnc_trainer/bloc/abonne_update.bloc.dart';
+import 'package:fitnc_trainer/bloc/abonne/abonne_update.bloc.dart';
 import 'package:fitnc_trainer/domain/abonne.domain.dart';
-import 'package:fitnc_trainer/widget/generic_container.widget.dart';
-import 'package:fitnc_trainer/widget/generic_update.widget.dart';
+import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
+import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';

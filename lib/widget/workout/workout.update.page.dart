@@ -1,15 +1,15 @@
-import 'package:fitnc_trainer/bloc/workout_update.bloc.dart';
+import 'package:fitnc_trainer/bloc/workout/workout_update.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/line.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
-import 'package:fitnc_trainer/widget/generic_container.widget.dart';
-import 'package:fitnc_trainer/widget/generic_update.widget.dart';
-import 'package:fitnc_trainer/widget/storage_image.widget.dart';
+import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
+import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
+import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'firestore_param_dropdown.widget.dart';
+import 'workout.form.builder.dart';
 
 class WorkoutUpdatePage extends StatefulWidget {
   final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
@@ -57,7 +57,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           body: GenericContainerWidget(
             child: TabBarView(
               children: [
-                GenericUpdateWidget(child: getFirstPanel()),
+                GenericUpdateWidget(maximumWidth: 1200, child: WorkoutFormBuilder.getForm(_formKey, widget.bloc)),
                 getSecondPanel(),
               ],
             ),
@@ -100,78 +100,6 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
     );
   }
 
-  Widget getFirstPanel() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 30.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                StorageStreamImageWidget(
-                  onSaved: (storagePair) => widget.bloc.setStoragePair(storagePair),
-                  streamInitialStoragePair: widget.bloc.obsStoragePair,
-                  onDeleted: (storagePair) => widget.bloc.setStoragePair(null),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: TextFormField(
-                        initialValue: widget.bloc.getWorkout()?.name,
-                        autofocus: true,
-                        onChanged: (value) => widget.bloc.setName(value),
-                        decoration: InputDecoration(helperText: 'Nom'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Merci de renseigner le nom du workout.';
-                          }
-                          return null;
-                        }),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          TextFormField(
-            initialValue: widget.bloc.getWorkout()?.description,
-            maxLength: 2000,
-            minLines: 5,
-            maxLines: 20,
-            onChanged: (value) => widget.bloc.setDescription(value),
-            decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Description (optionel)'),
-          ),
-          DropdownButtonFormField<String>(
-              icon: Icon(Icons.timer),
-              onChanged: (String? value) => widget.bloc.setTimerType(value),
-              value: widget.bloc.getWorkout()?.timerType,
-              items: [
-                DropdownMenuItem(
-                  child: Text(
-                    'Aucun type de timer',
-                    style: TextStyle(fontStyle: FontStyle.italic),
-                  ),
-                  value: null,
-                ),
-                DropdownMenuItem(
-                  child: Text('AMRAP'),
-                  value: 'AMRAP',
-                ),
-                DropdownMenuItem(
-                  child: Text('EMOM'),
-                  value: 'EMOM',
-                ),
-                DropdownMenuItem(
-                  child: Text('For Time'),
-                  value: 'For Time',
-                ),
-              ]),
-        ],
-      ),
-    );
-  }
-
   Widget getSecondPanel() {
     return Row(
       children: [
@@ -194,7 +122,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         StreamDropdownButton<Exercice>(
-                          key: widget.bloc.dropdownKey,
+                          dropdownKey: widget.bloc.dropdownKey,
                           onChanged: (exerciceSelected) => widget.bloc.setExercice(exerciceSelected),
                           icon: Icon(Icons.arrow_downward),
                           initialValue: null,
