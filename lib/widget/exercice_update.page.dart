@@ -72,7 +72,7 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                StorageImageWidget(
+                StorageStreamImageWidget(
                   onSaved: (storagePair) => widget.bloc.setStoragePair(storagePair),
                   streamInitialStoragePair: widget.bloc.obsStoragePair,
                   onDeleted: (storagePair) => widget.bloc.setStoragePair(null),
