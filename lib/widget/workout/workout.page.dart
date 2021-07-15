@@ -5,8 +5,10 @@ import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_animations/loading_animations.dart';
 
 class WorkoutPage extends StatefulWidget {
   final MyHomePageBloc homePageBloc = MyHomePageBloc.getInstance();
@@ -30,8 +32,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     return StreamBuilder<List<Workout?>>(
       stream: widget.bloc.getStreamWorkout(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData ||
-            (snapshot.hasData && snapshot.data!.isEmpty)) {
+        if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
           return Center(child: Text('Aucun workout trouvé.'));
         } else {
           List<Workout?> listWorkout = snapshot.data!;
@@ -47,7 +48,6 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 }
                 return Container();
               });
-          // return getListView(snapshot.data);
         }
       },
     );
@@ -57,7 +57,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     return LayoutBuilder(builder: (context, constraints) {
       int nbColumns = 1;
       if (constraints.maxWidth > 1200) {
-        nbColumns = 5;
+        nbColumns = 6;
       } else if (constraints.maxWidth > 1000) {
         nbColumns = 4;
       } else if (constraints.maxWidth > 800) {
@@ -67,34 +67,12 @@ class _WorkoutPageState extends State<WorkoutPage> {
       }
 
       return GridView.count(
-        padding: const EdgeInsets.all(20.0),
-        mainAxisSpacing: 20.0,
-        crossAxisSpacing: 20.0,
+        padding: const EdgeInsets.all(10.0),
+        childAspectRatio: 13 / 9,
+        mainAxisSpacing: 10.0,
+        crossAxisSpacing: 10.0,
         crossAxisCount: nbColumns,
         children: listWorkout.map((workout) {
-          Widget leading = workout?.imageUrl != null
-              ? CircleAvatar(foregroundImage: NetworkImage(workout!.imageUrl!))
-              : Icon(
-                  Icons.sports_volleyball,
-                  color: Color(Colors.amber.value),
-                );
-
-          Widget description = workout?.description != null
-              ? Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                    workout!.description!,
-                    maxLines: 5,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-              )
-              : Container();
-
-          Widget subtitle = workout?.createDate != null
-              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch(
-                  (workout!.createDate as Timestamp).millisecondsSinceEpoch)))
-              : Container();
-
           if (workout != null) {
             return InkWell(
               splashColor: Color(Colors.amber.value),
@@ -106,34 +84,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                       builder: (context) => WorkoutUpdatePage(
                             workout: workout,
                           ))),
-              child: Card(
-                clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ListTile(
-                      leading: leading,
-                      title: Text(workout.name),
-                      subtitle: subtitle,
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 10, left: 10),
-                        child: description,
-                      ),
-                    ),
-                    ButtonBar(
-                      alignment: MainAxisAlignment.end,
-                      children: [
-                        getDeleteButton(context, workout),
-                      ],
-                    ),
-                  ],
-                ),
-                elevation: 2,
-              ),
+              child: getGridCard(workout),
             );
           } else {
             return Container();
@@ -143,19 +94,62 @@ class _WorkoutPageState extends State<WorkoutPage> {
     });
   }
 
+  Card getGridCard(Workout workout) {
+    Widget firstChild;
+    if (workout.imageUrl != null) {
+      firstChild = Image.network(
+        workout.imageUrl!,
+        fit: BoxFit.cover,
+      );
+    } else {
+      firstChild = Container(
+        decoration: BoxDecoration(color: Color(Colors.amber.value)),
+      );
+    }
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(flex: 3, child: firstChild),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Text(
+                    workout.name,
+                    style: TextStyle(
+                      fontSize: 15,
+                    ),
+                  ),
+                ),
+                getDeleteButton(context, workout)
+              ],
+            ),
+            flex: 1,
+          ),
+        ],
+      ),
+      elevation: 2,
+    );
+  }
+
   ListView getListView(List<Workout?> listWorkout) {
     return ListView.separated(
-        separatorBuilder: (context, index) => Divider(height: 2.0,),
+        separatorBuilder: (context, index) => Divider(
+              height: 2.0,
+            ),
         itemCount: listWorkout.length,
         itemBuilder: (context, index) {
           Workout workout = listWorkout[index] as Workout;
-          Widget leading = (workout.imageUrl != null)
-              ? CircleAvatar(foregroundImage: NetworkImage(workout.imageUrl!))
-              : CircleAvatar();
+          Widget leading = (workout.imageUrl != null) ? CircleAvatar(foregroundImage: NetworkImage(workout.imageUrl!)) : CircleAvatar();
 
           Widget subtitle = workout.createDate != null
-              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch(
-                  (workout.createDate as Timestamp).millisecondsSinceEpoch)))
+              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((workout.createDate as Timestamp).millisecondsSinceEpoch)))
               : Container();
 
           return ListTile(
@@ -166,12 +160,14 @@ class _WorkoutPageState extends State<WorkoutPage> {
             trailing: Wrap(
               children: [getDeleteButton(context, workout)],
             ),
-            onTap: () {Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => WorkoutUpdatePage(
-                      workout: workout,
-                    )));},
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => WorkoutUpdatePage(
+                            workout: workout,
+                          )));
+            },
           );
         });
   }
@@ -185,12 +181,8 @@ class _WorkoutPageState extends State<WorkoutPage> {
           builder: (context) => AlertDialog(
             title: Text('Etes vous sûr de vouloir supprimer ce workout?'),
             actions: [
-              TextButton(
-                  onPressed: () => deleteWorkout(workout, context),
-                  child: Text('Oui')),
-              TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Annuler'))
+              TextButton(onPressed: () => deleteWorkout(workout, context), child: Text('Oui')),
+              TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler'))
             ],
           ),
         );
@@ -204,9 +196,6 @@ class _WorkoutPageState extends State<WorkoutPage> {
   }
 
   void deleteWorkout(Workout workout, BuildContext context) {
-    widget.bloc
-        .deleteWorkout(workout)
-        .then((value) => Navigator.pop(context))
-        .catchError((error) => print(error.toString()));
+    widget.bloc.deleteWorkout(workout).then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
   }
 }

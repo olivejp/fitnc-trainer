@@ -29,10 +29,10 @@ class WorkoutFormBuilder {
                           initialValue: bloc.getWorkout()?.name,
                           autofocus: true,
                           onChanged: (value) => bloc.setName(value),
-                          decoration: InputDecoration(helperText: 'Nom'),
+                          decoration: InputDecoration(helperText: 'Nom du workout'),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Merci de renseigner le nom du workout.';
+                              return 'Le nom du workout est obligatoire.';
                             }
                             return null;
                           }),
@@ -42,6 +42,7 @@ class WorkoutFormBuilder {
               ),
             ),
             DropdownButtonFormField<String>(
+              decoration: InputDecoration(helperText: 'Type d\'entrainement'),
                 icon: Icon(Icons.timer),
                 onChanged: (String? value) => bloc.setTimerType(value),
                 value: bloc.getWorkout()?.timerType,

@@ -52,6 +52,7 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
 
   Stream<List<Workout?>> listenToWorkout() {
     return getWorkoutReference()
+        .orderBy('createDate')
         .snapshots()
         .map((QuerySnapshot event) => event.docs.map((doc) => Workout.fromJson(doc.data() as Map<String, dynamic>)).toList());
   }
@@ -64,6 +65,7 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
 
   Stream<List<Exercice?>> listenToExercice() {
     return getExerciceReference()
+        .orderBy('createDate')
         .snapshots()
         .map((QuerySnapshot event) => event.docs.map((doc) => Exercice.fromJson(doc.data() as Map<String, dynamic>)).toList());
   }

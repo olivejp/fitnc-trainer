@@ -57,7 +57,7 @@ class _ExercicePageState extends State<ExercicePage> {
     return LayoutBuilder(builder: (context, constraints) {
       int nbColumns = 1;
       if (constraints.maxWidth > 1200) {
-        nbColumns = 5;
+        nbColumns = 6;
       } else if (constraints.maxWidth > 1000) {
         nbColumns = 4;
       } else if (constraints.maxWidth > 800) {
@@ -67,9 +67,10 @@ class _ExercicePageState extends State<ExercicePage> {
       }
 
       return GridView.count(
-        padding: const EdgeInsets.all(20.0),
-        mainAxisSpacing: 20.0,
-        crossAxisSpacing: 20.0,
+        childAspectRatio: 13/9,
+        padding: const EdgeInsets.all(10.0),
+        mainAxisSpacing: 10.0,
+        crossAxisSpacing: 10.0,
         crossAxisCount: nbColumns,
         children: listExercice.map((exercice) {
           Widget leading = exercice?.imageUrl != null
@@ -187,7 +188,7 @@ class _ExercicePageState extends State<ExercicePage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Etes vous sûr de vouloir supprimer ce exercice?'),
+            title: Text('Êtes-vous sûr de vouloir supprimer cet exercice?'),
             actions: [
               TextButton(
                   onPressed: () => deleteExercice(exercice, context),
