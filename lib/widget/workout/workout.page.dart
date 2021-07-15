@@ -29,27 +29,56 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Workout?>>(
-      stream: widget.bloc.getStreamWorkout(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
-          return Center(child: Text('Aucun workout trouvé.'));
-        } else {
-          List<Workout?> listWorkout = snapshot.data!;
-          return StreamBuilder<bool>(
-              stream: widget.homePageBloc.currentDisplayObs,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  if (snapshot.data != null && snapshot.data == true) {
-                    return getListView(listWorkout);
-                  } else {
-                    return getGridView(listWorkout);
-                  }
-                }
-                return Container();
-              });
-        }
-      },
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 15, right: 15),
+          child: Row(
+            children: [
+              Expanded(
+                  flex: 3,
+                  child: Text(
+                    'Workouts',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                  )),
+              Expanded(
+                flex: 1,
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.search),
+                    hintText: 'Recherche...',
+                  ),
+                  textAlignVertical: TextAlignVertical.bottom,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: StreamBuilder<List<Workout?>>(
+            stream: widget.bloc.getStreamWorkout(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
+                return Center(child: Text('Aucun workout trouvé.'));
+              } else {
+                List<Workout?> listWorkout = snapshot.data!;
+                return StreamBuilder<bool>(
+                    stream: widget.homePageBloc.currentDisplayObs,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        if (snapshot.data != null && snapshot.data == true) {
+                          return getListView(listWorkout);
+                        } else {
+                          return getGridView(listWorkout);
+                        }
+                      }
+                      return Container();
+                    });
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 

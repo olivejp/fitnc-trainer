@@ -50,7 +50,7 @@ class ExerciceFormBuilder {
               children: [
                 Expanded(
                     child: ParamDropdownButton(
-                  hint: Text('Type de timer appliqué ', style: TextStyle(fontStyle: FontStyle.italic)),
+                  hint: Text('Type d\'exercice', style: TextStyle(fontStyle: FontStyle.italic)),
                   paramName: 'type_exercice',
                   initialValue: bloc.exercice.typeExercice,
                   onChanged: (onChangedValue) => bloc.exercice.typeExercice = onChangedValue,

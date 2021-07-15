@@ -25,10 +25,7 @@ class MyHomePage extends StatelessWidget {
       if (constraints.maxWidth > 900) {
         body = Row(
           children: [
-            Flexible(
-              flex: 1,
-              child: getLeftDrawer(),
-            ),
+            getLeftDrawer(),
             Flexible(
               flex: 5,
               child: getMainPage(),
@@ -160,13 +157,11 @@ class MyHomePage extends StatelessWidget {
 
   StreamBuilder<int> getMainPage() {
     return StreamBuilder<int>(
+      stream: bloc.currentPageObs,
       builder: (context, snapshot) {
         if (snapshot.data == PAGE_WORKOUT) {
           return WorkoutPage();
         }
-        // if (snapshot.data == PAGE_ABONNE) {
-        //   return AbonnePage();
-        // }
         if (snapshot.data == PAGE_EXERCICE) {
           return ExercicePage();
         }
@@ -175,77 +170,79 @@ class MyHomePage extends StatelessWidget {
         }
         return Text('Aie');
       },
-      stream: bloc.currentPageObs,
     );
   }
 
-  Container getLeftDrawer() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black54,
-        boxShadow: [],
-      ),
-      child: ListTileTheme(
-        iconColor: Color(Colors.white.value),
-        textColor: Color(Colors.white.value),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: StreamBuilder<int>(
-            stream: bloc.currentPageObs,
-            builder: (context, snapshot) {
-              return Column(
-                children: [
-                  Flexible(
-                    flex: 1,
-                    child: Column(
+  Widget getLeftDrawer() {
+    return LimitedBox(
+      maxWidth: 200,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black54,
+          boxShadow: [],
+        ),
+        child: ListTileTheme(
+          iconColor: Color(Colors.white.value),
+          textColor: Color(Colors.white.value),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: StreamBuilder<int>(
+              stream: bloc.currentPageObs,
+              builder: (context, snapshot) {
+                return Column(
+                  children: [
+                    Flexible(
+                      flex: 1,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            onTap: () => bloc.changePage(PAGE_WORKOUT),
+                            minVerticalPadding: 20,
+                            title: Text('Workout'),
+                            trailing: Icon(Icons.sports_volleyball),
+                            selected: snapshot.data == PAGE_WORKOUT,
+                          ),
+                          Divider(
+                            height: 2,
+                          ),
+                          ListTile(
+                            onTap: () => bloc.changePage(PAGE_CALENDAR),
+                            minVerticalPadding: 20,
+                            title: Text('Calendrier'),
+                            trailing: Icon(Icons.calendar_today_rounded),
+                            selected: snapshot.data == PAGE_CALENDAR,
+                          ),
+                          Divider(
+                            height: 2,
+                          ),
+                          ListTile(
+                            onTap: () => bloc.changePage(PAGE_EXERCICE),
+                            minVerticalPadding: 20,
+                            title: Text('Exercice'),
+                            trailing: Icon(Icons.sports_handball),
+                            selected: snapshot.data == PAGE_EXERCICE,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Flexible(
+                        child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        ListTile(
-                          onTap: () => bloc.changePage(PAGE_WORKOUT),
-                          minVerticalPadding: 20,
-                          title: Text('Workout'),
-                          trailing: Icon(Icons.sports_volleyball),
-                          selected: snapshot.data == PAGE_WORKOUT,
-                        ),
                         Divider(
-                          height: 2,
+                          height: 2.0,
                         ),
                         ListTile(
-                          onTap: () => bloc.changePage(PAGE_CALENDAR),
+                          onTap: () => bloc.logout(),
                           minVerticalPadding: 20,
-                          title: Text('Calendrier'),
-                          trailing: Icon(Icons.calendar_today_rounded),
-                          selected: snapshot.data == PAGE_CALENDAR,
-                        ),
-                        Divider(
-                          height: 2,
-                        ),
-                        ListTile(
-                          onTap: () => bloc.changePage(PAGE_EXERCICE),
-                          minVerticalPadding: 20,
-                          title: Text('Exercice'),
-                          trailing: Icon(Icons.sports_handball),
-                          selected: snapshot.data == PAGE_EXERCICE,
+                          title: Text('Se déconnecter'),
+                          trailing: Icon(Icons.do_disturb_outlined),
                         ),
                       ],
-                    ),
-                  ),
-                  Flexible(
-                      child: Column(
-                    children: [
-                      Divider(
-                        height: 2.0,
-                      ),
-                      ListTile(
-                        onTap: () => bloc.logout(),
-                        minVerticalPadding: 20,
-                        title: Text('Se déconnecter'),
-                        trailing: Icon(Icons.do_disturb_outlined),
-                      ),
-                    ],
-                    mainAxisAlignment: MainAxisAlignment.end,
-                  ))
-                ],
-              );
-            }),
+                    ))
+                  ],
+                );
+              }),
+        ),
       ),
     );
   }
