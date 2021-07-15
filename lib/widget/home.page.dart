@@ -26,10 +26,7 @@ class MyHomePage extends StatelessWidget {
         body = Row(
           children: [
             getLeftDrawer(),
-            Flexible(
-              flex: 5,
-              child: getMainPage(),
-            ),
+            Expanded(child: getMainPage()),
           ],
         );
       } else {

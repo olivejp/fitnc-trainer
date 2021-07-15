@@ -12,12 +12,10 @@ Line _$LineFromJson(Map<String, dynamic> json) {
     weight: json['weight'] as String?,
     order: json['order'] as int?,
     type: json['type'] as String?,
-  )
-    ..repos = json['repos'] as String?;
+  )..repos = json['repos'] as String?;
 }
 
 Map<String, dynamic> _$LineToJson(Line instance) => <String, dynamic>{
-
       'reps': instance.reps,
       'weight': instance.weight,
       'repos': instance.repos,
