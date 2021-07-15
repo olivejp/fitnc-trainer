@@ -11,8 +11,6 @@ import 'workout/workout.page.dart';
 
 class MyHomePage extends StatelessWidget {
   static final int PAGE_WORKOUT = 0;
-
-  // static final int PAGE_ABONNE = 1;
   static final int PAGE_EXERCICE = 1;
   static final int PAGE_CALENDAR = 2;
   final MyHomePageBloc bloc = MyHomePageBloc.getInstance();
@@ -56,10 +54,6 @@ class MyHomePage extends StatelessWidget {
                       label: 'Workout',
                       icon: Icon(Icons.sports_volleyball),
                     ),
-                    // BottomNavigationBarItem(
-                    //   label: 'Abonnés',
-                    //   icon: Icon(Icons.group),
-                    // ),
                     BottomNavigationBarItem(
                       label: 'Exercices',
                       icon: Icon(Icons.sports_handball_outlined),
@@ -127,23 +121,6 @@ class MyHomePage extends StatelessWidget {
                 ),
               );
             }
-            // if (snapshot.data == PAGE_ABONNE) {
-            //   return FloatingActionButton.extended(
-            //     onPressed: () {
-            //       Navigator.pushNamed(context, '/add_abonne');
-            //     },
-            //     label: Text(
-            //       'Ajouter un abonné',
-            //       style: GoogleFonts.roboto(
-            //           fontSize: 15, color: Color(Colors.white.value)),
-            //     ),
-            //     icon: Icon(
-            //       Icons.add,
-            //       color: Color(Colors.white.value),
-            //       size: 20.0,
-            //     ),
-            //   );
-            // }
             if (snapshot.data == PAGE_EXERCICE) {
               return FloatingActionButton.extended(
                 onPressed: () => ExerciceCreatePage.showCreate(context),

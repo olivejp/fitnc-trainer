@@ -6,7 +6,6 @@ import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class WorkoutPage extends StatefulWidget {

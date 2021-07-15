@@ -8,7 +8,7 @@ class GenericContainerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(image: DecorationImage(image: NetworkImage("https://s3.envato.com/files/189120872/0Q7A7108.jpg"), fit: BoxFit.cover)),
+      decoration: BoxDecoration(image: DecorationImage(image: AssetImage('images/background.jpg'), fit: BoxFit.cover)),
       child: this.child,
     );
   }
