@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'program.domain.dart';
+part of 'programme.domain.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Program _$ProgramFromJson(Map<String, dynamic> json) {
-  return Program(
+Programme _$ProgrammeFromJson(Map<String, dynamic> json) {
+  return Programme(
     uid: json['uid'] as String?,
     name: json['name'] as String,
     description: json['description'] as String?,
@@ -15,7 +15,7 @@ Program _$ProgramFromJson(Map<String, dynamic> json) {
   )..imageUrl = json['imageUrl'] as String?;
 }
 
-Map<String, dynamic> _$ProgramToJson(Program instance) => <String, dynamic>{
+Map<String, dynamic> _$ProgrammeToJson(Programme instance) => <String, dynamic>{
       'uid': instance.uid,
       'name': instance.name,
       'description': instance.description,

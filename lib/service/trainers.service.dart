@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/domain/abonne.domain.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
+import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/domain/trainers.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
@@ -40,6 +41,10 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
     return getCurrentTrainerRef().collection('exercice');
   }
 
+  CollectionReference getProgrammeReference() {
+    return getCurrentTrainerRef().collection('programme');
+  }
+
   CollectionReference getWorkoutSetsReference(Workout workout) {
     return getWorkoutReference().doc(workout.uid).collection('sets');
   }
@@ -68,6 +73,13 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
         .orderBy('createDate')
         .snapshots()
         .map((QuerySnapshot event) => event.docs.map((doc) => Exercice.fromJson(doc.data() as Map<String, dynamic>)).toList());
+  }
+
+  Stream<List<Programme?>> listenToProgramme() {
+    return getProgrammeReference()
+        .orderBy('createDate')
+        .snapshots()
+        .map((QuerySnapshot event) => event.docs.map((doc) => Programme.fromJson(doc.data() as Map<String, dynamic>)).toList());
   }
 
   Stream<List<DropdownMenuItem<Exercice>>> getExerciceStreamDropdownMenuItem() {

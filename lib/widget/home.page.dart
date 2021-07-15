@@ -5,14 +5,18 @@ import 'package:fitnc_trainer/widget/workout/workout.create.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:oktoast/oktoast.dart';
 
 import 'calendar.page.dart';
+import 'programme/programme.create.page.dart';
+import 'programme/programme.page.dart';
 import 'workout/workout.page.dart';
 
 class MyHomePage extends StatelessWidget {
   static final int PAGE_WORKOUT = 0;
   static final int PAGE_EXERCICE = 1;
   static final int PAGE_CALENDAR = 2;
+  static final int PAGE_PROGRAMME = 3;
   final MyHomePageBloc bloc = MyHomePageBloc.getInstance();
   final String title;
 
@@ -101,11 +105,25 @@ class MyHomePage extends StatelessWidget {
         floatingActionButton: StreamBuilder(
           stream: bloc.currentPageObs,
           builder: (context, snapshot) {
+            if (snapshot.data == PAGE_PROGRAMME) {
+              return FloatingActionButton.extended(
+                onPressed: () => ProgrammeCreatePage.showCreate(context),
+                label: Text(
+                  'Créer un programme',
+                  style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
+                ),
+                icon: Icon(
+                  Icons.add,
+                  color: Color(Colors.white.value),
+                  size: 25.0,
+                ),
+              );
+            }
             if (snapshot.data == PAGE_WORKOUT) {
               return FloatingActionButton.extended(
                 onPressed: () => WorkoutCreatePage.showCreate(context),
                 label: Text(
-                  'Ajouter un workout',
+                  'Créer un workout',
                   style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
                 ),
                 icon: Icon(
@@ -119,7 +137,7 @@ class MyHomePage extends StatelessWidget {
               return FloatingActionButton.extended(
                 onPressed: () => ExerciceCreatePage.showCreate(context),
                 label: Text(
-                  'Ajouter un exercice',
+                  'Créer un exercice',
                   style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
                 ),
                 icon: Icon(
@@ -156,6 +174,9 @@ class MyHomePage extends StatelessWidget {
     return StreamBuilder<int>(
       stream: bloc.currentPageObs,
       builder: (context, snapshot) {
+        if (snapshot.data == PAGE_PROGRAMME) {
+          return ProgrammePage();
+        }
         if (snapshot.data == PAGE_WORKOUT) {
           return WorkoutPage();
         }
@@ -192,11 +213,32 @@ class MyHomePage extends StatelessWidget {
                       child: Column(
                         children: [
                           ListTile(
+                            onTap: () => bloc.changePage(PAGE_PROGRAMME),
+                            minVerticalPadding: 20,
+                            title: Text('Programme'),
+                            leading: Icon(Icons.account_tree),
+                            selected: snapshot.data == PAGE_PROGRAMME,
+                          ),
+                          Divider(
+                            height: 2,
+                          ),
+                          ListTile(
                             onTap: () => bloc.changePage(PAGE_WORKOUT),
                             minVerticalPadding: 20,
                             title: Text('Workout'),
-                            trailing: Icon(Icons.sports_volleyball),
+                            leading: Icon(Icons.sports_volleyball),
                             selected: snapshot.data == PAGE_WORKOUT,
+                          ),
+
+                          Divider(
+                            height: 2,
+                          ),
+                          ListTile(
+                            onTap: () => bloc.changePage(PAGE_EXERCICE),
+                            minVerticalPadding: 20,
+                            title: Text('Exercice'),
+                            leading: Icon(Icons.sports_handball),
+                            selected: snapshot.data == PAGE_EXERCICE,
                           ),
                           Divider(
                             height: 2,
@@ -205,18 +247,8 @@ class MyHomePage extends StatelessWidget {
                             onTap: () => bloc.changePage(PAGE_CALENDAR),
                             minVerticalPadding: 20,
                             title: Text('Calendrier'),
-                            trailing: Icon(Icons.calendar_today_rounded),
+                            leading: Icon(Icons.calendar_today_rounded),
                             selected: snapshot.data == PAGE_CALENDAR,
-                          ),
-                          Divider(
-                            height: 2,
-                          ),
-                          ListTile(
-                            onTap: () => bloc.changePage(PAGE_EXERCICE),
-                            minVerticalPadding: 20,
-                            title: Text('Exercice'),
-                            trailing: Icon(Icons.sports_handball),
-                            selected: snapshot.data == PAGE_EXERCICE,
                           ),
                         ],
                       ),
