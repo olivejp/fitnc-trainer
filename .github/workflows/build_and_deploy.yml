@@ -32,7 +32,7 @@ jobs:
         run: flutter pub get
 
       - name: Build web application
-        run: flutter build web --web-renderer html
+        run: flutter build web --web-renderer auto
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2.2.3
