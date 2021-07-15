@@ -13,7 +13,7 @@ class WorkoutFormBuilder {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.only(bottom: 30.0),
+              padding: const EdgeInsets.only(bottom: 20.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -41,14 +41,6 @@ class WorkoutFormBuilder {
                 ],
               ),
             ),
-            TextFormField(
-              initialValue: bloc.getWorkout()?.description,
-              maxLength: 2000,
-              minLines: 5,
-              maxLines: 20,
-              onChanged: (value) => bloc.setDescription(value),
-              decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Description (optionel)'),
-            ),
             DropdownButtonFormField<String>(
                 icon: Icon(Icons.timer),
                 onChanged: (String? value) => bloc.setTimerType(value),
@@ -74,6 +66,17 @@ class WorkoutFormBuilder {
                     value: 'For Time',
                   ),
                 ]),
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: TextFormField(
+                initialValue: bloc.getWorkout()?.description,
+                maxLength: 2000,
+                minLines: 5,
+                maxLines: 20,
+                onChanged: (value) => bloc.setDescription(value),
+                decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Description (optionel)'),
+              ),
+            ),
           ],
         ),
       ),

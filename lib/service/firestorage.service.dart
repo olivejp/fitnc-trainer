@@ -19,7 +19,8 @@ class FirestorageService {
   }
 
   Future<String> sendToStorageAndGetReference(String url, Uint8List fileByte) async {
-    return await FirebaseStorage.instance.ref(url).putData(fileByte).then((ref) => ref.ref.getDownloadURL());
+    SettableMetadata metadata = SettableMetadata(cacheControl: 'max-age=36000');
+    return await FirebaseStorage.instance.ref(url).putData(fileByte, metadata).then((ref) => ref.ref.getDownloadURL());
   }
 
   Future<Uint8List> getRemoteImageToUint8List(String imageUrl) async {

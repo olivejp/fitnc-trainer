@@ -145,7 +145,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   ListView getListView(List<Workout?> listWorkout) {
     return ListView.separated(
-        separatorBuilder: (context, index) => Divider(),
+        separatorBuilder: (context, index) => Divider(height: 2.0,),
         itemCount: listWorkout.length,
         itemBuilder: (context, index) {
           Workout workout = listWorkout[index] as Workout;

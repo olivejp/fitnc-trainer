@@ -145,8 +145,10 @@ class _ExercicePageState extends State<ExercicePage> {
 
   ListView getListView(List<Exercice?> listExercice) {
     return ListView.separated(
-        separatorBuilder: (context, index) => Divider(),
-        itemCount: listExercice != null ? listExercice.length : 0,
+        separatorBuilder: (context, index) => Divider(
+          height: 2.0,
+        ),
+        itemCount: listExercice.length,
         itemBuilder: (context, index) {
           Exercice exercice = listExercice[index] as Exercice;
           Widget leading = (exercice.imageUrl != null)

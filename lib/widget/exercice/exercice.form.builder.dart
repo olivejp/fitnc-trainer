@@ -46,23 +46,27 @@ class ExerciceFormBuilder {
                 ],
               ),
             ),
-            TextFormField(
-              initialValue: bloc.exercice.description,
-              maxLength: 2000,
-              minLines: 5,
-              maxLines: 20,
-              onChanged: (value) => bloc.setDescription(value),
-              decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Description (optionel)'),
-            ),
             Row(
               children: [
                 Expanded(
                     child: ParamDropdownButton(
+                  hint: Text('Type de timer appliqué ', style: TextStyle(fontStyle: FontStyle.italic)),
                   paramName: 'type_exercice',
                   initialValue: bloc.exercice.typeExercice,
                   onChanged: (onChangedValue) => bloc.exercice.typeExercice = onChangedValue,
                 ))
               ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: TextFormField(
+                initialValue: bloc.exercice.description,
+                maxLength: 2000,
+                minLines: 5,
+                maxLines: 20,
+                onChanged: (value) => bloc.setDescription(value),
+                decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Description (optionel)'),
+              ),
             ),
             Row(
               children: [
