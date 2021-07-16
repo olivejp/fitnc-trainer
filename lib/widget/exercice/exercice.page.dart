@@ -118,8 +118,8 @@ class ExercicePage extends StatelessWidget {
         children: listExercice.map((exercice) {
           if (exercice != null) {
             return InkWell(
-              splashColor: Color(Colors.amber.value),
-              hoverColor: Color(Colors.amber.value),
+              splashColor: Colors.amber,
+              hoverColor: Colors.amber,
               borderRadius: BorderRadius.circular(10),
               onTap: () => goToUpdatePage(context, exercice),
               child: getGridCard(context, exercice),
@@ -183,7 +183,7 @@ class ExercicePage extends StatelessWidget {
                     ),
                   ),
                 ),
-                getDeleteButton(context, exercice)
+                getDeleteButton(context, exercice),
               ],
             ),
             flex: 1,
@@ -194,7 +194,7 @@ class ExercicePage extends StatelessWidget {
     );
   }
 
- ListView getListView(List<Exercice?> listExercice) {
+  ListView getListView(List<Exercice?> listExercice) {
     return ListView.separated(
         separatorBuilder: (context, index) => Divider(height: 2.0),
         itemCount: listExercice.length,

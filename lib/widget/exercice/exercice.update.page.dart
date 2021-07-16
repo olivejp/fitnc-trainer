@@ -1,7 +1,6 @@
 import 'package:fitnc_trainer/bloc/exercice/exercice_update.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.form.builder.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

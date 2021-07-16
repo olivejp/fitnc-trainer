@@ -68,6 +68,10 @@ class WorkoutUpdateBloc {
     }
   }
 
+  Stream<List<Exercice?>> getStreamExercice() {
+    return trainersService.listenToExercice();
+  }
+
   Workout? getWorkout() {
     return _workout;
   }

@@ -126,12 +126,25 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                         getTabBar(),
                         LimitedBox(
                             maxWidth: 1200,
-                            maxHeight: 100,
+                            maxHeight: 500,
                             child: TabBarView(children: [
                               Text('1'),
                               Column(
                                 children: [
-
+                                  Expanded(
+                                    child: StreamBuilder<List<Exercice?>>(
+                                      stream: bloc.getStreamExercice(),
+                                      builder: (context, snapshot) {
+                                        if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
+                                          return Center(child: Text('Aucun exercice trouvé.'));
+                                        } else {
+                                          // TODO JPO Finir de faire la liste.
+                                          List<Exercice?> listExercice = snapshot.data!;
+                                          return Container();
+                                        }
+                                      },
+                                    ),
+                                  ),
                                 ],
                               )
                             ]))
