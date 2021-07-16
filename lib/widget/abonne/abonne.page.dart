@@ -5,8 +5,8 @@ import 'package:fitnc_trainer/domain/abonne.domain.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:page_transition/page_transition.dart';
 
 import 'abonne.update.page.dart';
 
@@ -34,8 +34,7 @@ class _AbonnePageState extends State<AbonnePage> {
       child: StreamBuilder<List<Abonne?>>(
         stream: widget.bloc.getStreamAbonne(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData ||
-              (snapshot.hasData && snapshot.data!.isEmpty)) {
+          if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
             return Center(child: Text('Aucun abonne trouvé.'));
           } else {
             List<Abonne?> listAbonne = snapshot.data!;
@@ -79,24 +78,23 @@ class _AbonnePageState extends State<AbonnePage> {
           Widget leading = abonne?.imageUrl != null
               ? CircleAvatar(foregroundImage: NetworkImage(abonne!.imageUrl!))
               : Icon(
-            Icons.sports_volleyball,
-            color: Color(Colors.amber.value),
-          );
+                  Icons.sports_volleyball,
+                  color: Colors.amber,
+                );
 
           Widget dateNaissance = abonne?.dateNaissance != null
               ? Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              abonne!.dateNaissance!,
-              maxLines: 5,
-              overflow: TextOverflow.ellipsis,
-            ),
-          )
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    abonne!.dateNaissance!,
+                    maxLines: 5,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                )
               : Container();
 
           Widget subtitle = abonne?.createDate != null
-              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch(
-              (abonne!.createDate as Timestamp).millisecondsSinceEpoch)))
+              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((abonne!.createDate as Timestamp).millisecondsSinceEpoch)))
               : Container();
 
           if (abonne != null) {
@@ -106,14 +104,16 @@ class _AbonnePageState extends State<AbonnePage> {
               borderRadius: BorderRadius.circular(10),
               onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => AbonneUpdatePage(
+                  PageTransition(
+                      duration: Duration.zero,
+                      reverseDuration: Duration.zero,
+                      type: PageTransitionType.fade,
+                      child: AbonneUpdatePage(
                         abonne: abonne,
                       ))),
               child: Card(
                 clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -153,13 +153,10 @@ class _AbonnePageState extends State<AbonnePage> {
         itemCount: listAbonne != null ? listAbonne.length : 0,
         itemBuilder: (context, index) {
           Abonne abonne = listAbonne[index] as Abonne;
-          Widget leading = (abonne.imageUrl != null)
-              ? CircleAvatar(foregroundImage: NetworkImage(abonne.imageUrl!))
-              : CircleAvatar();
+          Widget leading = (abonne.imageUrl != null) ? CircleAvatar(foregroundImage: NetworkImage(abonne.imageUrl!)) : CircleAvatar();
 
           Widget subtitle = abonne.createDate != null
-              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch(
-              (abonne.createDate as Timestamp).millisecondsSinceEpoch)))
+              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((abonne.createDate as Timestamp).millisecondsSinceEpoch)))
               : Container();
 
           return ListTile(
@@ -169,12 +166,17 @@ class _AbonnePageState extends State<AbonnePage> {
             trailing: Wrap(
               children: [getDeleteButton(context, abonne)],
             ),
-            onTap: () {Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AbonneUpdatePage(
-                      abonne: abonne,
-                    )));},
+            onTap: () {
+              Navigator.push(
+                  context,
+                  PageTransition(
+                      duration: Duration.zero,
+                      reverseDuration: Duration.zero,
+                      type: PageTransitionType.fade,
+                      child: AbonneUpdatePage(
+                        abonne: abonne,
+                      )));
+            },
           );
         });
   }
@@ -188,12 +190,8 @@ class _AbonnePageState extends State<AbonnePage> {
           builder: (context) => AlertDialog(
             title: Text('Etes vous sûr de vouloir supprimer ce abonne?'),
             actions: [
-              TextButton(
-                  onPressed: () => deleteAbonne(abonne, context),
-                  child: Text('Oui')),
-              TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Annuler'))
+              TextButton(onPressed: () => deleteAbonne(abonne, context), child: Text('Oui')),
+              TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler'))
             ],
           ),
         );
@@ -207,9 +205,6 @@ class _AbonnePageState extends State<AbonnePage> {
   }
 
   void deleteAbonne(Abonne abonne, BuildContext context) {
-    widget.bloc
-        .deleteAbonne(abonne)
-        .then((value) => Navigator.pop(context))
-        .catchError((error) => print(error.toString()));
+    widget.bloc.deleteAbonne(abonne).then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
   }
 }

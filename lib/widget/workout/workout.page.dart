@@ -1,14 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fitnc_trainer/bloc/workout/workout_update.bloc.dart';
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
+import 'package:fitnc_trainer/bloc/workout/workout_update.bloc.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
+import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
+import 'package:fitnc_trainer/widget/workout/workout.create.page.dart';
 import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animations/loading_animations.dart';
+import 'package:page_transition/page_transition.dart';
 
 class WorkoutPage extends StatefulWidget {
   final MyHomePageBloc homePageBloc = MyHomePageBloc.getInstance();
@@ -29,56 +33,76 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 15, right: 15),
-          child: Row(
-            children: [
-              Expanded(
-                  flex: 3,
-                  child: Text(
-                    'Workouts',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                  )),
-              Expanded(
-                flex: 1,
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    hintText: 'Recherche...',
+    return RoutedPage(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () => WorkoutCreatePage.showCreate(context),
+          label: Text(
+            'Créer un workout',
+            style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
+          ),
+          icon: Icon(
+            Icons.add,
+            color: Color(Colors.white.value),
+            size: 25.0,
+          ),
+        ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 15, right: 15),
+              child: Row(
+                children: [
+                  Expanded(
+                      flex: 3,
+                      child: Text(
+                        'Workouts',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                      )),
+                  Expanded(
+                    flex: 1,
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.search),
+                        hintText: 'Recherche...',
+                      ),
+                      textAlignVertical: TextAlignVertical.bottom,
+                    ),
                   ),
-                  textAlignVertical: TextAlignVertical.bottom,
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: StreamBuilder<List<Workout?>>(
+                stream: widget.bloc.getStreamWorkout(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.active) {
+                    if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
+                      return Center(child: Text('Aucun workout trouvé.'));
+                    } else {
+                      List<Workout?> listWorkout = snapshot.data!;
+                      return StreamBuilder<bool>(
+                          stream: widget.homePageBloc.currentDisplayObs,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              if (snapshot.data != null && snapshot.data == true) {
+                                return getListView(listWorkout);
+                              } else {
+                                return getGridView(listWorkout);
+                              }
+                            }
+                            return Container();
+                          });
+                    }
+                  }
+                  return LoadingBouncingGrid.circle();
+                },
+              ),
+            ),
+          ],
         ),
-        Expanded(
-          child: StreamBuilder<List<Workout?>>(
-            stream: widget.bloc.getStreamWorkout(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
-                return Center(child: Text('Aucun workout trouvé.'));
-              } else {
-                List<Workout?> listWorkout = snapshot.data!;
-                return StreamBuilder<bool>(
-                    stream: widget.homePageBloc.currentDisplayObs,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        if (snapshot.data != null && snapshot.data == true) {
-                          return getListView(listWorkout);
-                        } else {
-                          return getGridView(listWorkout);
-                        }
-                      }
-                      return Container();
-                    });
-              }
-            },
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -109,10 +133,13 @@ class _WorkoutPageState extends State<WorkoutPage> {
               borderRadius: BorderRadius.circular(10),
               onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => WorkoutUpdatePage(
-                            workout: workout,
-                          ))),
+                  PageTransition(
+                      duration: Duration.zero,
+                      reverseDuration: Duration.zero,
+                      type: PageTransitionType.fade,
+                      child: WorkoutUpdatePage(
+                        workout: workout,
+                      ))),
               child: getGridCard(workout),
             );
           } else {
@@ -192,10 +219,13 @@ class _WorkoutPageState extends State<WorkoutPage> {
             onTap: () {
               Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => WorkoutUpdatePage(
-                            workout: workout,
-                          )));
+                  PageTransition(
+                      duration: Duration.zero,
+                      reverseDuration: Duration.zero,
+                      type: PageTransitionType.fade,
+                      child: WorkoutUpdatePage(
+                        workout: workout,
+                      )));
             },
           );
         });

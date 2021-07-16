@@ -1,14 +1,7 @@
 import 'package:fitnc_trainer/bloc/exercice/exercice_update.bloc.dart';
-import 'package:fitnc_trainer/domain/exercice.domain.dart';
-import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
-import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:video_player/video_player.dart';
-import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 import 'exercice.form.builder.dart';
 

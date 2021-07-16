@@ -31,13 +31,13 @@ class MyApp extends StatelessWidget {
         title: appTitle,
         theme: ThemeData(
             primarySwatch: Colors.amber,
-            floatingActionButtonTheme: FloatingActionButtonThemeData(foregroundColor: Color(Colors.white.value)),
+            floatingActionButtonTheme: FloatingActionButtonThemeData(foregroundColor: Colors.white),
             appBarTheme: AppBarTheme(
-              iconTheme: IconThemeData(color: Color(Colors.amber.value), size: 30),
-              backgroundColor: Color(Colors.black87.value),
+              iconTheme: IconThemeData(color: Colors.amber, size: 30),
+              backgroundColor: Colors.black87,
               toolbarHeight: 80,
               centerTitle: true,
-              titleTextStyle: GoogleFonts.alfaSlabOne(color: Color(Colors.amber.value), fontSize: 35),
+              titleTextStyle: GoogleFonts.alfaSlabOne(color: Colors.amber, fontSize: 35),
             )),
         routes: {
           '/add_workout': (context) => WorkoutUpdatePage(

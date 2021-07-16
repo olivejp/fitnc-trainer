@@ -15,7 +15,6 @@ class ExerciceFormBuilder {
       child: Form(
         key: _formKey,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
               padding: const EdgeInsets.only(bottom: 30.0),

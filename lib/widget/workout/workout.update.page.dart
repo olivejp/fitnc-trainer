@@ -6,10 +6,9 @@ import 'package:fitnc_trainer/domain/workout_set.domain.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
+import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'workout.form.builder.dart';
 
 class WorkoutUpdatePage extends StatefulWidget {
   final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
@@ -31,34 +30,96 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    String appBarTitle = widget.bloc.getWorkout()?.uid != null ? widget.bloc.getWorkout()!.name : 'Nouveau workout';
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              if (_formKey.currentState?.validate() == true) {
-                widget.bloc.saveWorkout().then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
-              }
-            },
-            child: Icon(Icons.check),
-          ),
-          appBar: AppBar(
-            bottom: getTabBar(),
-            title: Text(appBarTitle, style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(fontSize: 30)),
-            leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                size: Theme.of(context).appBarTheme.iconTheme?.size,
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
-          body: GenericContainerWidget(
-            child: TabBarView(
+    WorkoutUpdateBloc bloc = widget.bloc;
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          if (_formKey.currentState?.validate() == true) {
+            bloc.saveWorkout().then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
+          }
+        },
+        child: Icon(Icons.check),
+      ),
+      body: GenericUpdateWidget(
+          child: Form(
+            key: _formKey,
+            child: Column(
               children: [
-                GenericUpdateWidget(maximumWidth: 1200, child: WorkoutFormBuilder.getForm(_formKey, widget.bloc)),
-                getSecondPanel(),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      StorageStreamImageWidget(
+                        onSaved: (storagePair) => bloc.setStoragePair(storagePair),
+                        streamInitialStoragePair: bloc.obsStoragePair,
+                        onDeleted: (storagePair) => bloc.setStoragePair(null),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20),
+                          child: TextFormField(
+                              initialValue: bloc.getWorkout()?.name,
+                              autofocus: true,
+                              onChanged: (value) => bloc.setName(value),
+                              decoration: InputDecoration(helperText: 'Nom du workout'),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Le nom du workout est obligatoire.';
+                                }
+                                return null;
+                              }),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                DropdownButtonFormField<String>(
+                    decoration: InputDecoration(helperText: 'Type d\'entrainement'),
+                    icon: Icon(Icons.timer),
+                    onChanged: (String? value) => bloc.setTimerType(value),
+                    value: bloc.getWorkout()?.timerType,
+                    items: [
+                      DropdownMenuItem(
+                        child: Text(
+                          'Aucun type de timer',
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                        value: null,
+                      ),
+                      DropdownMenuItem(
+                        child: Text('AMRAP'),
+                        value: 'AMRAP',
+                      ),
+                      DropdownMenuItem(
+                        child: Text('EMOM'),
+                        value: 'EMOM',
+                      ),
+                      DropdownMenuItem(
+                        child: Text('For Time'),
+                        value: 'For Time',
+                      ),
+                    ]),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: TextFormField(
+                    initialValue: bloc.getWorkout()?.description,
+                    maxLength: 2000,
+                    minLines: 5,
+                    maxLines: 20,
+                    onChanged: (value) => bloc.setDescription(value),
+                    decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Instructions (optionel)'),
+                  ),
+                ),
+                DefaultTabController(
+                    length: 2,
+                    child: Wrap(
+                      children: [
+                        getTabBar(),
+                        LimitedBox(maxWidth: 1200, maxHeight: 100, child: TabBarView(children: [Text('1'), Text('2')]))
+                      ],
+                    ))
               ],
             ),
           )),
@@ -77,7 +138,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
               ),
               Text(
                 'Description',
-                style: TextStyle(color: Color(Colors.amber.value)),
+                style: TextStyle(color: Colors.amber),
               )
             ],
           ),
@@ -87,11 +148,11 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
             children: [
               Icon(
                 Icons.sports_volleyball,
-                color: Color(Colors.amber.value),
+                color: Colors.amber,
               ),
               Text(
                 'Exercices',
-                style: TextStyle(color: Color(Colors.amber.value)),
+                style: TextStyle(color: (Colors.amber)),
               )
             ],
           ),
@@ -108,7 +169,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Card(
-              shadowColor: Color(Colors.black.value),
+              shadowColor: Colors.black,
               clipBehavior: Clip.antiAlias,
               color: Color(Colors.white.value).withOpacity(0.85),
               elevation: 5.0,
@@ -179,7 +240,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Card(
-              shadowColor: Color(Colors.black.value),
+              shadowColor: Colors.black,
               clipBehavior: Clip.antiAlias,
               color: Color(Colors.white.value).withOpacity(0.85),
               elevation: 5.0,

@@ -1,7 +1,6 @@
 import 'package:fitnc_trainer/bloc/programme/programme_update.bloc.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/widget/programme/programme.form.builder.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +27,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.transparent,
         floatingActionButton: ButtonBar(children: [
           FloatingActionButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -44,9 +44,8 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
             tooltip: 'Valider',
           )
         ]),
-        body: GenericContainerWidget(
-            child: GenericUpdateWidget(
+        body: GenericUpdateWidget(
           child: ProgrammeFormBuilder.getForm(_formKey, widget.bloc),
-        )));
+        ));
   }
 }
