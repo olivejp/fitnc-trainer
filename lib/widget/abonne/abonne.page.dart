@@ -150,7 +150,7 @@ class _AbonnePageState extends State<AbonnePage> {
   ListView getListView(List<Abonne?> listAbonne) {
     return ListView.separated(
         separatorBuilder: (context, index) => Divider(),
-        itemCount: listAbonne != null ? listAbonne.length : 0,
+        itemCount: listAbonne.length,
         itemBuilder: (context, index) {
           Abonne abonne = listAbonne[index] as Abonne;
           Widget leading = (abonne.imageUrl != null) ? CircleAvatar(foregroundImage: NetworkImage(abonne.imageUrl!)) : CircleAvatar();

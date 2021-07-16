@@ -128,20 +128,17 @@ class _WorkoutPageState extends State<WorkoutPage> {
         children: listWorkout.map((workout) {
           if (workout != null) {
             return InkWell(
-              splashColor: Color(Colors.amber.value),
-              hoverColor: Color(Colors.amber.value),
-              borderRadius: BorderRadius.circular(10),
-              onTap: () => Navigator.push(
-                  context,
-                  PageTransition(
-                      duration: Duration.zero,
-                      reverseDuration: Duration.zero,
-                      type: PageTransitionType.fade,
-                      child: WorkoutUpdatePage(
-                        workout: workout,
-                      ))),
-              child: getGridCard(workout),
-            );
+                splashColor: Color(Colors.amber.value),
+                hoverColor: Color(Colors.amber.value),
+                borderRadius: BorderRadius.circular(10),
+                onTap: () => Navigator.push(
+                    context,
+                    PageTransition(
+                        duration: Duration.zero,
+                        reverseDuration: Duration.zero,
+                        type: PageTransitionType.fade,
+                        child: WorkoutUpdatePage(workout: workout))),
+                child: getGridCard(workout));
           } else {
             return Container();
           }
@@ -153,14 +150,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
   Card getGridCard(Workout workout) {
     Widget firstChild;
     if (workout.imageUrl != null) {
-      firstChild = Image.network(
-        workout.imageUrl!,
-        fit: BoxFit.cover,
-      );
+      firstChild = Image.network(workout.imageUrl!, fit: BoxFit.cover);
     } else {
-      firstChild = Container(
-        decoration: BoxDecoration(color: Color(Colors.amber.value)),
-      );
+      firstChild = Container(decoration: BoxDecoration(color: Color(Colors.amber.value)));
     }
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -176,12 +168,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
-                  child: Text(
-                    workout.name,
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
+                  child: Text(workout.name, style: TextStyle(fontSize: 15)),
                 ),
                 getDeleteButton(context, workout)
               ],
@@ -196,14 +183,11 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   ListView getListView(List<Workout?> listWorkout) {
     return ListView.separated(
-        separatorBuilder: (context, index) => Divider(
-              height: 2.0,
-            ),
+        separatorBuilder: (context, index) => Divider(height: 2.0),
         itemCount: listWorkout.length,
         itemBuilder: (context, index) {
           Workout workout = listWorkout[index] as Workout;
           Widget leading = (workout.imageUrl != null) ? CircleAvatar(foregroundImage: NetworkImage(workout.imageUrl!)) : CircleAvatar();
-
           Widget subtitle = workout.createDate != null
               ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((workout.createDate as Timestamp).millisecondsSinceEpoch)))
               : Container();
@@ -213,9 +197,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
             leading: leading,
             title: Text(workout.name),
             subtitle: subtitle,
-            trailing: Wrap(
-              children: [getDeleteButton(context, workout)],
-            ),
+            trailing: Wrap(children: [getDeleteButton(context, workout)]),
             onTap: () {
               Navigator.push(
                   context,
@@ -223,9 +205,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                       duration: Duration.zero,
                       reverseDuration: Duration.zero,
                       type: PageTransitionType.fade,
-                      child: WorkoutUpdatePage(
-                        workout: workout,
-                      )));
+                      child: WorkoutUpdatePage(workout: workout)));
             },
           );
         });
@@ -246,11 +226,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
           ),
         );
       },
-      icon: Icon(
-        Icons.delete,
-        color: Color(Colors.amber.value),
-        size: 24,
-      ),
+      icon: Icon(Icons.delete, color: Colors.amber, size: 24),
     );
   }
 

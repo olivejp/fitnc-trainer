@@ -3,7 +3,6 @@ import 'package:fitnc_trainer/bloc/exercice/exercice_update.bloc.dart';
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.update.page.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,22 +16,12 @@ import 'package:page_transition/page_transition.dart';
 
 import 'exercice.create.page.dart';
 
-class ExercicePage extends StatefulWidget {
+class ExercicePage extends StatelessWidget {
   final MyHomePageBloc homePageBloc = MyHomePageBloc.getInstance();
   final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.getInstance();
+  static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
   ExercicePage({Key? key}) : super(key: key);
-
-  @override
-  _ExercicePageState createState() {
-    return new _ExercicePageState();
-  }
-}
-
-class _ExercicePageState extends State<ExercicePage> {
-  DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
-
-  _ExercicePageState();
 
   @override
   Widget build(BuildContext context) {
@@ -78,14 +67,14 @@ class _ExercicePageState extends State<ExercicePage> {
             ),
             Expanded(
               child: StreamBuilder<List<Exercice?>>(
-                stream: widget.bloc.getStreamExercice(),
+                stream: bloc.getStreamExercice(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
                     return Center(child: Text('Aucun exercice trouvé.'));
                   } else {
                     List<Exercice?> listExercice = snapshot.data!;
                     return StreamBuilder<bool>(
-                        stream: widget.homePageBloc.currentDisplayObs,
+                        stream: homePageBloc.currentDisplayObs,
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             if (snapshot.data != null && snapshot.data == true) {
@@ -133,7 +122,7 @@ class _ExercicePageState extends State<ExercicePage> {
               hoverColor: Color(Colors.amber.value),
               borderRadius: BorderRadius.circular(10),
               onTap: () => goToUpdatePage(context, exercice),
-              child: getGridCard(exercice),
+              child: getGridCard(context, exercice),
             );
           } else {
             return Container();
@@ -143,14 +132,18 @@ class _ExercicePageState extends State<ExercicePage> {
     });
   }
 
-  Future<dynamic> goToUpdatePage(BuildContext context, Exercice exercice) {
+  static Future<dynamic> goToUpdatePage(BuildContext context, Exercice exercice) {
     return Navigator.push(
         context,
         PageTransition(
-            duration: Duration.zero, reverseDuration: Duration.zero, type: PageTransitionType.fade, child: ExerciceUpdatePage(exercice: exercice)));
+          duration: Duration.zero,
+          reverseDuration: Duration.zero,
+          type: PageTransitionType.fade,
+          child: ExerciceUpdatePage(exercice: exercice),
+        ));
   }
 
-  Card getGridCard(Exercice exercice) {
+  Card getGridCard(BuildContext context, Exercice exercice) {
     Widget firstChild;
     if (exercice.imageUrl != null) {
       firstChild = Image.network(
@@ -201,30 +194,24 @@ class _ExercicePageState extends State<ExercicePage> {
     );
   }
 
-  ListView getListView(List<Exercice?> listExercice) {
+ ListView getListView(List<Exercice?> listExercice) {
     return ListView.separated(
-        separatorBuilder: (context, index) => Divider(
-              height: 2.0,
-            ),
+        separatorBuilder: (context, index) => Divider(height: 2.0),
         itemCount: listExercice.length,
         itemBuilder: (context, index) {
           Exercice exercice = listExercice[index] as Exercice;
           Widget leading = (exercice.imageUrl != null) ? CircleAvatar(foregroundImage: NetworkImage(exercice.imageUrl!)) : CircleAvatar();
-
           Widget subtitle = exercice.createDate != null
               ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((exercice.createDate as Timestamp).millisecondsSinceEpoch)))
               : Container();
 
           return ListTile(
-            contentPadding: const EdgeInsets.all(20.0),
-            leading: leading,
-            title: Text(exercice.name),
-            subtitle: subtitle,
-            trailing: Wrap(
-              children: [getDeleteButton(context, exercice)],
-            ),
-            onTap: () => goToUpdatePage(context, exercice),
-          );
+              contentPadding: const EdgeInsets.all(20.0),
+              leading: leading,
+              title: Text(exercice.name),
+              subtitle: subtitle,
+              trailing: Wrap(children: [getDeleteButton(context, exercice)]),
+              onTap: () => goToUpdatePage(context, exercice));
         });
   }
 
@@ -252,6 +239,6 @@ class _ExercicePageState extends State<ExercicePage> {
   }
 
   void deleteExercice(Exercice exercice, BuildContext context) {
-    widget.bloc.deleteExercice(exercice).then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
+    bloc.deleteExercice(exercice).then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
   }
 }

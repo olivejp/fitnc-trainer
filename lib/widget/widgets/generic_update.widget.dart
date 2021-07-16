@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class GenericUpdateWidget extends StatelessWidget {
   final Widget child;
   final double maximumWidth;
+  final opacity;
 
-  GenericUpdateWidget({required this.child, this.maximumWidth = 800});
+  GenericUpdateWidget({required this.child, this.maximumWidth = 800, this.opacity=0.8});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,7 @@ class GenericUpdateWidget extends StatelessWidget {
                   ConstrainedBox(
                     constraints: BoxConstraints.expand(width: limit),
                     child: Container(
-                        decoration: BoxDecoration(color: Color(Colors.white.withOpacity(0.8).value)),
+                        decoration: BoxDecoration(color: Color(Colors.white.withOpacity(this.opacity).value)),
                         child: Padding(
                           padding: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 40),
                           child: SingleChildScrollView(child: child),

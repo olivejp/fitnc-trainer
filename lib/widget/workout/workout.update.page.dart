@@ -4,7 +4,6 @@ import 'package:fitnc_trainer/domain/line.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -33,15 +32,23 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
     WorkoutUpdateBloc bloc = widget.bloc;
     return Scaffold(
       backgroundColor: Colors.transparent,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (_formKey.currentState?.validate() == true) {
-            bloc.saveWorkout().then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
-          }
-        },
-        child: Icon(Icons.check),
-      ),
+      floatingActionButton: ButtonBar(children: [
+        FloatingActionButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Icon(Icons.clear),
+          tooltip: 'Annuler',
+        ),
+        FloatingActionButton(
+          onPressed: () {
+            if (_formKey.currentState?.validate() == true) {
+              bloc.saveWorkout().then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
+            }
+          },
+          child: Icon(Icons.check),
+        ),
+      ]),
       body: GenericUpdateWidget(
+          maximumWidth: 1680,
           child: Form(
             key: _formKey,
             child: Column(
@@ -117,7 +124,17 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                     child: Wrap(
                       children: [
                         getTabBar(),
-                        LimitedBox(maxWidth: 1200, maxHeight: 100, child: TabBarView(children: [Text('1'), Text('2')]))
+                        LimitedBox(
+                            maxWidth: 1200,
+                            maxHeight: 100,
+                            child: TabBarView(children: [
+                              Text('1'),
+                              Column(
+                                children: [
+
+                                ],
+                              )
+                            ]))
                       ],
                     ))
               ],
