@@ -5,7 +5,6 @@ import 'package:fitnc_trainer/widget/workout/workout.create.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:oktoast/oktoast.dart';
 
 import 'calendar.page.dart';
 import 'programme/programme.create.page.dart';
@@ -229,7 +228,6 @@ class MyHomePage extends StatelessWidget {
                             leading: Icon(Icons.sports_volleyball),
                             selected: snapshot.data == PAGE_WORKOUT,
                           ),
-
                           Divider(
                             height: 2,
                           ),
