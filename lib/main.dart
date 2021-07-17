@@ -11,6 +11,7 @@ import 'package:loading_animations/loading_animations.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'bloc/main.bloc.dart';
+import 'domain/workout.domain.dart';
 
 void main() {
   runApp(MyApp());
@@ -41,7 +42,7 @@ class MyApp extends StatelessWidget {
             )),
         routes: {
           '/add_workout': (context) => WorkoutUpdatePage(
-                workout: null,
+                workout: Workout(),
               ),
           '/add_abonne': (context) => AbonneUpdatePage(
                 abonne: null,

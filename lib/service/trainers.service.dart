@@ -6,6 +6,8 @@ import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/domain/trainers.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
+import 'package:fitnc_trainer/domain/workout_set.dto.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'firestore/abstract.absolute-firestore.service.dart';
@@ -53,6 +55,25 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
     return getWorkoutSetsReference(workout)
         .snapshots()
         .map((QuerySnapshot event) => event.docs.map((doc) => WorkoutSet.fromJson(doc.data() as Map<String, dynamic>)).toList());
+  }
+
+  Stream<List<WorkoutSetDto?>> listenToWorkoutStepDto(Workout workout) {
+    return getWorkoutSetsReference(workout)
+        .snapshots()
+        .map((event) =>
+            event.docs.map((doc) => WorkoutSet.fromJson(doc.data() as Map<String, dynamic>)).map((workoutSet) => mapToDto(workoutSet)).toList())
+        .asyncMap((futures) => Future.wait(futures));
+  }
+
+  Future<WorkoutSetDto> mapToDto(WorkoutSet workoutSet) async {
+    WorkoutSetDto dto = WorkoutSetDto(workoutSet);
+    if (workoutSet.uidExercice != null) {
+      DocumentSnapshot documentSnapshot = await getExerciceReference().doc(workoutSet.uidExercice).get();
+      Exercice exercice = Exercice.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+      dto.imageUrlExercice = exercice.imageUrl;
+      dto.nameExercice = exercice.name;
+    }
+    return dto;
   }
 
   Stream<List<Workout?>> listenToWorkout() {
