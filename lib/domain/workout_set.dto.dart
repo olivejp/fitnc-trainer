@@ -8,12 +8,14 @@ class WorkoutSetDto {
   String? nameExercice;
   String? imageUrlExercice;
   String? consigne;
+  int order = 0;
   List<Line> lines = [];
 
   WorkoutSetDto(WorkoutSet workoutSet) {
     this.uid = workoutSet.uid;
     this.uidExercice = workoutSet.uidExercice;
     this.consigne = workoutSet.consigne;
+    this.order = workoutSet.order;
     this.lines = workoutSet.lines;
   }
 }

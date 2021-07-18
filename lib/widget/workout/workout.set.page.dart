@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
@@ -20,20 +22,46 @@ class WorkoutSetPage extends StatelessWidget {
 
   WorkoutSetPage({Key? key, required this.workout}) : super(key: key);
 
-  Widget getListTile(WorkoutSetDto dto) {
+  void switchOrder(WorkoutSetDto dto, List<WorkoutSetDto?> dtos, int newOrder) {
+    WriteBatch writeBatch = FirebaseFirestore.instance.batch();
+    FieldValue increment = FieldValue.increment(1);
+    dtos.where((element) => element!.order >= newOrder).forEach((element) {
+      writeBatch.update(trainersService.getWorkoutSetsReference(workout).doc(element!.uid), {'order': increment});
+    });
+    writeBatch.update(trainersService.getWorkoutSetsReference(workout).doc(dto.uid), {'order': newOrder});
+    writeBatch.commit();
+  }
+
+  Widget getListTile(WorkoutSetDto dto, List<WorkoutSetDto?> listWorkout) {
     return DragTarget<WorkoutSetDto>(
-      onAccept: (data) => print('OK'),
+      onWillAccept: (data) => (data is WorkoutSetDto && data.uid != dto.uid),
+      onAccept: (data) => switchOrder(data, listWorkout, dto.order),
       builder: (context, candidateData, rejectedData) {
+        Widget upWidget = ListTile(
+          title: Text('Déplacer ici'),
+          tileColor: Colors.amber,
+        );
         Widget tile = ListTile(
           title: Text(dto.nameExercice!),
           trailing: IconButton(
               onPressed: () => trainersService.getWorkoutSetsReference(workout).doc(dto.uid).delete().then((value) => print('OK')),
               icon: Icon(Icons.delete)),
         );
-        return Draggable(
-          feedback: SizedBox(child: tile, width: 200, height: 100,),
-          child: tile,
-        );
+        if (candidateData.isNotEmpty) {
+          return Column(
+            children: [upWidget, tile],
+          );
+        } else {
+          return Draggable<WorkoutSetDto>(
+            feedback: SizedBox(
+              child: tile,
+              width: 200,
+              height: 100,
+            ),
+            child: tile,
+            data: dto,
+          );
+        }
       },
     );
   }
@@ -63,6 +91,13 @@ class WorkoutSetPage extends StatelessWidget {
                     subjectDrag.sink.add(false);
                     WorkoutSet set = WorkoutSet(uidExercice: exerciceDragged.uid);
                     set.uid = trainersService.getWorkoutSetsReference(workout).doc().id;
+                    int maxOrder = 0;
+                    listWorkoutSetDto.forEach((workoutSet) {
+                      if (workoutSet!.order > maxOrder) {
+                        maxOrder = workoutSet.order;
+                      }
+                    });
+                    set.order = maxOrder + 1;
                     trainersService.getWorkoutSetsReference(workout).doc(set.uid).set(set.toJson()).then((value) => print('OK'));
                   },
                   builder: (context, candidateData, rejectedData) {
@@ -83,7 +118,7 @@ class WorkoutSetPage extends StatelessWidget {
                                   child: ListView.separated(
                                 separatorBuilder: (context, index) => Divider(height: 2),
                                 itemCount: listWorkoutSetDto.length,
-                                itemBuilder: (context, index) => getListTile(listWorkoutSetDto.elementAt(index)!),
+                                itemBuilder: (context, index) => getListTile(listWorkoutSetDto.elementAt(index)!, listWorkoutSetDto),
                               )),
                             ],
                           ),
@@ -146,7 +181,7 @@ class WorkoutSetPage extends StatelessWidget {
 
   Widget getGridView(List<Exercice?> listExercice) {
     return LayoutBuilder(builder: (context, constraints) {
-      int nbColumns = 1;
+      int nbColumns = 2;
       if (constraints.maxWidth > 1200) {
         nbColumns = 8;
       } else if (constraints.maxWidth > 1000) {
