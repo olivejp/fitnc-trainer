@@ -4,6 +4,7 @@ import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.dto.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -74,7 +75,56 @@ class WorkoutSetPage extends StatelessWidget {
           ],
         );
       case 'REPS_ONLY':
+        return Row(
+          children: [
+            LimitedBox(
+              maxHeight: 25,
+              maxWidth: 60,
+              child: TextFormField(
+                textAlignVertical: TextAlignVertical.bottom,
+                style: TextStyle(fontSize: 15),
+                decoration: InputDecoration(
+                  hintText: 'Reps',
+                  hintStyle: TextStyle(fontSize: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
       case 'TIME':
+        return Row(
+          children: [
+            LimitedBox(
+              maxHeight: 25,
+              maxWidth: 120,
+              child: ParamDropdownButton(
+                style: TextStyle(fontSize: 15),
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                )),
+                hint: Text('Type d\'exercice', style: TextStyle(fontSize: 15)),
+                paramName: 'type_exercice',
+                initialValue: null,
+                onChanged: (onChangedValue) => print(onChangedValue),
+              ),
+              // TextFormField(
+              //   textAlignVertical: TextAlignVertical.bottom,
+              //   style: TextStyle(fontSize: 15),
+              //   decoration: InputDecoration(
+              //     hintText: 'Temps',
+              //     hintStyle: TextStyle(fontSize: 12),
+              //     border: OutlineInputBorder(
+              //       borderRadius: BorderRadius.all(Radius.circular(5.0)),
+              //     ),
+              //   ),
+              // ),
+            ),
+          ],
+        );
       default:
         return Container();
     }
