@@ -74,6 +74,7 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
       Exercice exercice = Exercice.fromJson(documentSnapshot.data() as Map<String, dynamic>);
       dto.imageUrlExercice = exercice.imageUrl;
       dto.nameExercice = exercice.name;
+      dto.typeExercice = exercice.typeExercice;
     }
     return dto;
   }

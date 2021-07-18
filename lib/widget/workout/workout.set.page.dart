@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
@@ -32,6 +31,55 @@ class WorkoutSetPage extends StatelessWidget {
     writeBatch.commit();
   }
 
+  Widget getSecondLine(WorkoutSetDto dto) {
+    switch (dto.typeExercice) {
+      case 'REPS_WEIGHT':
+        return Row(
+          children: [
+            LimitedBox(
+              maxHeight: 25,
+              maxWidth: 60,
+              child: TextFormField(
+                textAlignVertical: TextAlignVertical.bottom,
+                style: TextStyle(fontSize: 15),
+                decoration: InputDecoration(
+                  hintText: 'Reps',
+                  hintStyle: TextStyle(fontSize: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  ),
+                ),
+              ),
+            ),
+            LimitedBox(
+              maxHeight: 25,
+              maxWidth: 60,
+              child: Text(' x '),
+            ),
+            LimitedBox(
+              maxHeight: 25,
+              maxWidth: 60,
+              child: TextFormField(
+                textAlignVertical: TextAlignVertical.bottom,
+                style: TextStyle(fontSize: 15),
+                decoration: InputDecoration(
+                  hintText: 'Weight',
+                  hintStyle: TextStyle(fontSize: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      case 'REPS_ONLY':
+      case 'TIME':
+      default:
+        return Container();
+    }
+  }
+
   Widget getListTile(WorkoutSetDto dto, List<WorkoutSetDto?> listWorkout) {
     return DragTarget<WorkoutSetDto>(
       onWillAccept: (data) => (data is WorkoutSetDto && data.uid != dto.uid),
@@ -42,7 +90,25 @@ class WorkoutSetPage extends StatelessWidget {
           tileColor: Colors.amber,
         );
         Widget tile = ListTile(
-          title: Text(dto.nameExercice!),
+          leading: Draggable<WorkoutSetDto>(
+            child: Icon(Icons.view_headline),
+            data: dto,
+            feedback: SizedBox(
+              child: Text(dto.nameExercice!),
+              width: 200,
+              height: 100,
+            ),
+          ),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(dto.nameExercice!),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: getSecondLine(dto),
+              ),
+            ],
+          ),
           trailing: IconButton(
               onPressed: () => trainersService.getWorkoutSetsReference(workout).doc(dto.uid).delete().then((value) => print('OK')),
               icon: Icon(Icons.delete)),
@@ -52,15 +118,7 @@ class WorkoutSetPage extends StatelessWidget {
             children: [upWidget, tile],
           );
         } else {
-          return Draggable<WorkoutSetDto>(
-            feedback: SizedBox(
-              child: tile,
-              width: 200,
-              height: 100,
-            ),
-            child: tile,
-            data: dto,
-          );
+          return tile;
         }
       },
     );
@@ -113,7 +171,9 @@ class WorkoutSetPage extends StatelessWidget {
                               borderRadius: BorderRadius.all(Radius.circular(10)),
                               border: Border.all(style: BorderStyle.solid, color: color, width: 4)),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
+                              Text('Faites glisser ici les exercices du workout.'),
                               Expanded(
                                   child: ListView.separated(
                                 separatorBuilder: (context, index) => Divider(height: 2),

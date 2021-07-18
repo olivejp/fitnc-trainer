@@ -5,8 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/line.domain.dart';
-import 'package:fitnc_trainer/domain/workout_set.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
+import 'package:fitnc_trainer/domain/workout_set.domain.dart';
 import 'package:fitnc_trainer/service/firestorage.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
@@ -21,8 +21,8 @@ class WorkoutUpdateBloc {
   static WorkoutUpdateBloc? _instance;
   final String pathWorkoutMainImage = 'mainImage';
 
-  final GlobalKey<FormFieldState> consigneKey= GlobalKey<FormFieldState>();
-  final GlobalKey<FormFieldState> dropdownKey= GlobalKey<FormFieldState>();
+  final GlobalKey<FormFieldState> consigneKey = GlobalKey<FormFieldState>();
+  final GlobalKey<FormFieldState> dropdownKey = GlobalKey<FormFieldState>();
 
   StoragePair? storagePair;
   late Workout _workout;
@@ -164,34 +164,6 @@ class WorkoutUpdateBloc {
     this.subjectStoragePair.sink.add(this.storagePair);
   }
 
-  clearListRepsWeight() {
-    this.set.lines.clear();
-  }
-
-  void deleteLine(Line re) {
-    this.set.lines.remove(re);
-    this.subjectListRepsWeight.sink.add(this.set.lines);
-  }
-
-  addLine() {
-    // Recherche du nouvel ordre.
-    // int max = 0;
-    // this.set.lines.forEach((element) {
-    //   if (element.order != null) {
-    //     if (element.order! > max) {
-    //       max = element.order!;
-    //     }
-    //   }
-    // });
-    // this.line.order = max + 1;
-
-    this.set.lines.add(Line());
-    this.subjectListRepsWeight.sink.add(this.set.lines);
-
-    // RAZ du viewModel.
-    // this.line = Line();
-  }
-
   void setRepsWeightType(String type) {
     this.line.type = type;
   }
@@ -202,18 +174,6 @@ class WorkoutUpdateBloc {
 
   void setRepsWeightWeight(String value) {
     this.line.weight = value;
-  }
-
-  saveSet() async {
-    if (this.set.uidExercice != null && this.set.lines.isNotEmpty) {
-      this.set.uid = this.trainersService.getWorkoutSetsReference(_workout).doc().id;
-      await this.trainersService.getWorkoutSetsReference(_workout).doc(this.set.uid).set(this.set.toJson());
-      this.set = WorkoutSet();
-      this.line = Line();
-      this.consigneKey.currentState?.reset();
-      this.dropdownKey.currentState?.reset();
-      this.subjectListRepsWeight.sink.add(this.set.lines);
-    }
   }
 
   setExercice(Exercice? exerciceSelected) {

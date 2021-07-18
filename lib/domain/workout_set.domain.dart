@@ -9,7 +9,12 @@ class WorkoutSet {
   String? uidExercice;
   String? consigne;
   int order;
-  List<Line> lines = [];
+
+  String? sets; // REPS_WEIGHT, REPS_ONLY , TIME
+  int? reps; // REPS_WEIGHT, REPS_ONLY
+  String? weight; // REPS_WEIGHT
+  String? restTime; // REPS_WEIGHT, REPS_ONLY
+  String? time; // TIME
 
   WorkoutSet({this.uidExercice = '', this.consigne = '', this.order = 0});
 
