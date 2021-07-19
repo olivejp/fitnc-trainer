@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
+import 'package:fitnc_trainer/domain/line.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.dto.dart';
@@ -12,7 +13,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animations/loading_animations.dart';
-import 'package:rxdart/rxdart.dart';
 
 class WorkoutSetPage extends StatelessWidget {
   final TrainersService trainersService = TrainersService.getInstance();
@@ -31,7 +31,7 @@ class WorkoutSetPage extends StatelessWidget {
     writeBatch.commit();
   }
 
-  Widget getSecondLine(WorkoutSetDto dto) {
+  Widget mapLine(WorkoutSetDto dto, Line line) {
     switch (dto.typeExercice) {
       case 'REPS_WEIGHT':
         return Row(
@@ -100,28 +100,21 @@ class WorkoutSetPage extends StatelessWidget {
                 onlyValue: true,
                 decoration: InputDecoration(contentPadding: EdgeInsets.all(10)),
                 style: TextStyle(fontSize: 12),
-                hint: Text('Type d\'exercice', style: TextStyle(fontSize: 10)),
+                hint: Text('Temps', style: TextStyle(fontSize: 10)),
                 paramName: 'type_exercice',
                 initialValue: null,
                 onChanged: (onChangedValue) => print(onChangedValue),
               ),
-              // TextFormField(
-              //   textAlignVertical: TextAlignVertical.bottom,
-              //   style: TextStyle(fontSize: 15),
-              //   decoration: InputDecoration(
-              //     hintText: 'Temps',
-              //     hintStyle: TextStyle(fontSize: 12),
-              //     border: OutlineInputBorder(
-              //       borderRadius: BorderRadius.all(Radius.circular(5.0)),
-              //     ),
-              //   ),
-              // ),
             ),
           ],
         );
       default:
         return Container();
     }
+  }
+
+  Widget getSecondLine(WorkoutSetDto dto) {
+    return Column(children: dto.lines.map((line) => mapLine(dto, line)).toList());
   }
 
   Widget getListTile(WorkoutSetDto dto, List<WorkoutSetDto?> listWorkout) {
@@ -193,6 +186,7 @@ class WorkoutSetPage extends StatelessWidget {
                         }
                       });
                       set.order = maxOrder + 1;
+                      set.lines.add(Line());
                       trainersService.getWorkoutSetsReference(workout).doc(set.uid).set(set.toJson()).then((value) => print('OK'));
                     },
                     builder: (context, candidateData, rejectedData) {
@@ -209,7 +203,10 @@ class WorkoutSetPage extends StatelessWidget {
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('Glisser ici les exercices du workout.', style: TextStyle(fontStyle: FontStyle.italic),),
+                              child: Text(
+                                'Glisser ici les exercices du workout.',
+                                style: TextStyle(fontStyle: FontStyle.italic),
+                              ),
                             ),
                             Expanded(
                                 child: ListView.separated(
@@ -223,7 +220,7 @@ class WorkoutSetPage extends StatelessWidget {
                     },
                   );
                 } else {
-                  return Text('Aucun set trouvé pour ce workout.');
+                  return LoadingFlipping.circle();
                 }
               },
             ),
