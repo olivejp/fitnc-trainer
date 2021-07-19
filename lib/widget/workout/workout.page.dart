@@ -150,7 +150,19 @@ class _WorkoutPageState extends State<WorkoutPage> {
   Card getGridCard(Workout workout) {
     Widget firstChild;
     if (workout.imageUrl != null) {
-      firstChild = Image.network(workout.imageUrl!, fit: BoxFit.cover);
+      firstChild = Image.network(
+        workout.imageUrl!,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) {
+            return child;
+          }
+          return LoadingFadingLine.circle(
+            backgroundColor: Colors.amber,
+            borderColor: Colors.amberAccent,
+          );
+        },
+      );
     } else {
       firstChild = Container(decoration: BoxDecoration(color: Color(Colors.amber.value)));
     }

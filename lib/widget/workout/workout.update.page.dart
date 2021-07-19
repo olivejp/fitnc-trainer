@@ -79,41 +79,46 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                                 }),
                           ),
                         ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left : 20),
+                            child: DropdownButtonFormField<String>(
+                                decoration: InputDecoration(helperText: 'Type d\'entrainement', constraints: BoxConstraints(maxHeight: 72)),
+                                icon: Icon(Icons.timer),
+                                onChanged: (String? value) => bloc.setTimerType(value),
+                                value: bloc.getWorkout()?.timerType,
+                                items: [
+                                  DropdownMenuItem(
+                                    child: Text(
+                                      'Aucun type d\'entraînement',
+                                      style: TextStyle(fontStyle: FontStyle.italic),
+                                    ),
+                                    value: null,
+                                  ),
+                                  DropdownMenuItem(
+                                    child: Text('AMRAP'),
+                                    value: 'AMRAP',
+                                  ),
+                                  DropdownMenuItem(
+                                    child: Text('EMOM'),
+                                    value: 'EMOM',
+                                  ),
+                                  DropdownMenuItem(
+                                    child: Text('For Time'),
+                                    value: 'For Time',
+                                  ),
+                                  DropdownMenuItem(
+                                    child: Text('Circuit'),
+                                    value: 'CIRCUIT',
+                                  ),
+                                ]),
+                          ),
+                        )
                       ],
                     ),
                   ),
-                  DropdownButtonFormField<String>(
-                      decoration: InputDecoration(helperText: 'Type d\'entrainement'),
-                      icon: Icon(Icons.timer),
-                      onChanged: (String? value) => bloc.setTimerType(value),
-                      value: bloc.getWorkout()?.timerType,
-                      items: [
-                        DropdownMenuItem(
-                          child: Text(
-                            'Aucun type d\'entraînement',
-                            style: TextStyle(fontStyle: FontStyle.italic),
-                          ),
-                          value: null,
-                        ),
-                        DropdownMenuItem(
-                          child: Text('AMRAP'),
-                          value: 'AMRAP',
-                        ),
-                        DropdownMenuItem(
-                          child: Text('EMOM'),
-                          value: 'EMOM',
-                        ),
-                        DropdownMenuItem(
-                          child: Text('For Time'),
-                          value: 'For Time',
-                        ),
-                        DropdownMenuItem(
-                          child: Text('Circuit'),
-                          value: 'CIRCUIT',
-                        ),
-                      ]),
                   Padding(
-                    padding: const EdgeInsets.only(top: 20),
+                    padding: const EdgeInsets.only(top: 0),
                     child: TextFormField(
                       initialValue: bloc.getWorkout()?.description,
                       maxLength: 2000,

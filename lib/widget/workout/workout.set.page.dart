@@ -175,8 +175,7 @@ class WorkoutSetPage extends StatelessWidget {
         Expanded(
           child: Card(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-            color: Colors.tealAccent,
-            elevation: 5,
+            elevation: 10,
             child: StreamBuilder<List<WorkoutSetDto?>>(
               stream: trainersService.listenToWorkoutStepDto(workout),
               builder: (context, snapshot) {

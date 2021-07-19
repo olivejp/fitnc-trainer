@@ -26,7 +26,7 @@ class GenericUpdateWidget extends StatelessWidget {
                     child: Container(
                         decoration: BoxDecoration(color: Color(Colors.white.withOpacity(this.opacity).value)),
                         child: Padding(
-                          padding: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 40),
+                          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
                           child: SingleChildScrollView(child: child),
                         )),
                   ),
