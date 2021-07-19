@@ -4,6 +4,7 @@ import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'calendar.page.dart';
@@ -26,14 +27,17 @@ class MyHomePage extends StatelessWidget {
       return Scaffold(
         appBar: AppBar(
           title: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Icon(
                 Icons.sports_volleyball,
                 color: Color(Colors.amber.value),
+                size: 20,
               ),
               Text(
                 this.title,
-                style: GoogleFonts.alfaSlabOne(color: Color(Colors.amber.value), fontSize: 35),
+                style: GoogleFonts.alfaSlabOne(color: Color(Colors.amber.value), fontSize: 20),
               ),
             ],
           ),
@@ -117,46 +121,41 @@ class MyHomePage extends StatelessWidget {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: Column(
-                          children: [
-                            ListTile(
-                              onTap: () => bloc.changePage(PAGE_PROGRAMME),
-                              minVerticalPadding: 20,
-                              title: Text('Programme'),
-                              leading: Icon(Icons.account_tree),
-                              selected: snapshot.data == PAGE_PROGRAMME,
+                        child: ListTileTheme(
+                          minVerticalPadding: 15,
+                          textColor: Colors.white,
+                          iconColor: Colors.white,
+                          child: IconTheme(
+                            data: IconThemeData(size: 18),
+                            child: Column(
+                              children: [
+                                ListTile(
+                                  onTap: () => bloc.changePage(PAGE_PROGRAMME),
+                                  title: Text('Programme'),
+                                  leading: Icon(Icons.account_tree),
+                                  selected: snapshot.data == PAGE_PROGRAMME,
+                                ),
+                                ListTile(
+                                  onTap: () => bloc.changePage(PAGE_WORKOUT),
+                                  title: Text('Workout'),
+                                  leading: Icon(Icons.sports_volleyball),
+                                  selected: snapshot.data == PAGE_WORKOUT,
+                                ),
+                                ListTile(
+                                  onTap: () => bloc.changePage(PAGE_EXERCICE),
+                                  title: Text('Exercice'),
+                                  leading: Icon(Icons.sports_handball),
+                                  selected: snapshot.data == PAGE_EXERCICE,
+                                ),
+                                ListTile(
+                                  onTap: () => bloc.changePage(PAGE_CALENDAR),
+                                  title: Text('Calendrier'),
+                                  leading: Icon(Icons.calendar_today_rounded),
+                                  selected: snapshot.data == PAGE_CALENDAR,
+                                ),
+                              ],
                             ),
-                            Divider(
-                              height: 2,
-                            ),
-                            ListTile(
-                              onTap: () => bloc.changePage(PAGE_WORKOUT),
-                              minVerticalPadding: 20,
-                              title: Text('Workout'),
-                              leading: Icon(Icons.sports_volleyball),
-                              selected: snapshot.data == PAGE_WORKOUT,
-                            ),
-                            Divider(
-                              height: 2,
-                            ),
-                            ListTile(
-                              onTap: () => bloc.changePage(PAGE_EXERCICE),
-                              minVerticalPadding: 20,
-                              title: Text('Exercice'),
-                              leading: Icon(Icons.sports_handball),
-                              selected: snapshot.data == PAGE_EXERCICE,
-                            ),
-                            Divider(
-                              height: 2,
-                            ),
-                            ListTile(
-                              onTap: () => bloc.changePage(PAGE_CALENDAR),
-                              minVerticalPadding: 20,
-                              title: Text('Calendrier'),
-                              leading: Icon(Icons.calendar_today_rounded),
-                              selected: snapshot.data == PAGE_CALENDAR,
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                       Flexible(

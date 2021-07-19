@@ -49,7 +49,7 @@ class ProgrammeFormBuilder {
                 minLines: 5,
                 maxLines: 20,
                 onChanged: (value) => bloc.setDescription(value),
-                decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Description (optionel)'),
+                decoration: InputDecoration(helperText: 'Description (optionel)'),
               ),
             ),
           ],

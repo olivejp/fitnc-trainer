@@ -61,7 +61,6 @@ class _LoginPageState extends State<LoginPage> {
                             TextFormField(
                               style: GoogleFonts.roboto(fontSize: 20),
                               decoration: InputDecoration(
-                                  border: OutlineInputBorder(),
                                   hintText: 'Email',
                                   hintStyle: GoogleFonts.roboto(fontSize: 20)),
                               enableSuggestions: true,
@@ -87,7 +86,6 @@ class _LoginPageState extends State<LoginPage> {
                                 enableSuggestions: false,
                                 autocorrect: false,
                                 decoration: InputDecoration(
-                                    border: OutlineInputBorder(),
                                     hintText: 'Mot de passe',
                                     hintStyle:
                                         GoogleFonts.roboto(fontSize: 20)),

@@ -23,16 +23,27 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
     return findAllSpecific(this.collectionReference.doc(paramName).collection('values'));
   }
 
-  Future<List<DropdownMenuItem<dynamic>>> getParamAsDropdown(String paramName) async {
+  Future<List<DropdownMenuItem<dynamic>>> getParamAsDropdown(String paramName, bool onlyName) async {
     return (await getListParam(paramName))
         .map((param) => DropdownMenuItem(
-              child: Row(children: [
-                Text(param.nom! + '  -  '),
-                Text(param.libelle!, style: TextStyle(fontStyle: FontStyle.italic, color: Color(Colors.grey.value)),),
-              ]),
+              child: getRowFromParam(param, onlyName),
               value: param.valeur,
             ))
         .toList();
+  }
+
+  Widget getRowFromParam(Param param, bool onlyName) {
+    if (onlyName) {
+      return Text(param.nom!);
+    } else {
+      return Row(children: [
+        Text(param.nom! + '  -  '),
+        Text(
+          param.libelle!,
+          style: TextStyle(fontStyle: FontStyle.italic, color: Color(Colors.grey.value)),
+        ),
+      ]);
+    }
   }
 
   @override

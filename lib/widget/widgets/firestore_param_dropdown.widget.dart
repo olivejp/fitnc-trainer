@@ -12,6 +12,7 @@ class ParamDropdownButton extends StatelessWidget {
   final void Function(String? onChangedValue) onChanged;
   final Icon? icon;
   final Widget? hint;
+  final bool onlyValue;
 
   ParamDropdownButton(
       {this.style,
@@ -20,6 +21,7 @@ class ParamDropdownButton extends StatelessWidget {
       required this.initialValue,
       required this.onChanged,
       this.icon = DEFAULT_ICON,
+      this.onlyValue = false,
       this.hint});
 
   @override
@@ -28,7 +30,7 @@ class ParamDropdownButton extends StatelessWidget {
       style: this.style,
       decoration: this.decoration,
       initialValue: this.initialValue,
-      future: this.paramService.getParamAsDropdown(this.paramName),
+      future: this.paramService.getParamAsDropdown(this.paramName, this.onlyValue),
       onChanged: this.onChanged,
       icon: this.icon,
       hint: this.hint,

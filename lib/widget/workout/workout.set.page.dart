@@ -15,7 +15,6 @@ import 'package:loading_animations/loading_animations.dart';
 import 'package:rxdart/rxdart.dart';
 
 class WorkoutSetPage extends StatelessWidget {
-  final BehaviorSubject<bool> subjectDrag = BehaviorSubject.seeded(false);
   final TrainersService trainersService = TrainersService.getInstance();
   final Workout workout;
   static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
@@ -39,36 +38,32 @@ class WorkoutSetPage extends StatelessWidget {
           children: [
             LimitedBox(
               maxHeight: 25,
-              maxWidth: 60,
+              maxWidth: 100,
               child: TextFormField(
+                maxLines: 1,
                 textAlignVertical: TextAlignVertical.bottom,
                 style: TextStyle(fontSize: 15),
                 decoration: InputDecoration(
                   hintText: 'Reps',
                   hintStyle: TextStyle(fontSize: 12),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  ),
                 ),
               ),
             ),
             LimitedBox(
               maxHeight: 25,
-              maxWidth: 60,
+              maxWidth: 70,
               child: Text(' x '),
             ),
             LimitedBox(
               maxHeight: 25,
-              maxWidth: 60,
+              maxWidth: 100,
               child: TextFormField(
+                maxLines: 1,
                 textAlignVertical: TextAlignVertical.bottom,
                 style: TextStyle(fontSize: 15),
                 decoration: InputDecoration(
                   hintText: 'Weight',
                   hintStyle: TextStyle(fontSize: 12),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  ),
                 ),
               ),
             ),
@@ -86,9 +81,6 @@ class WorkoutSetPage extends StatelessWidget {
                 decoration: InputDecoration(
                   hintText: 'Reps',
                   hintStyle: TextStyle(fontSize: 12),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  ),
                 ),
               ),
             ),
@@ -99,14 +91,16 @@ class WorkoutSetPage extends StatelessWidget {
           children: [
             LimitedBox(
               maxHeight: 25,
-              maxWidth: 120,
+              maxWidth: 150,
               child: ParamDropdownButton(
-                style: TextStyle(fontSize: 15),
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                )),
-                hint: Text('Type d\'exercice', style: TextStyle(fontSize: 15)),
+                icon: Icon(
+                  Icons.arrow_downward,
+                  size: 12,
+                ),
+                onlyValue: true,
+                decoration: InputDecoration(contentPadding: EdgeInsets.all(10)),
+                style: TextStyle(fontSize: 12),
+                hint: Text('Type d\'exercice', style: TextStyle(fontSize: 10)),
                 paramName: 'type_exercice',
                 initialValue: null,
                 onChanged: (onChangedValue) => print(onChangedValue),
@@ -179,68 +173,61 @@ class WorkoutSetPage extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: StreamBuilder<List<WorkoutSetDto?>>(
-            stream: trainersService.listenToWorkoutStepDto(workout),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                List<WorkoutSetDto?> listWorkoutSetDto = snapshot.data!;
-                return DragTarget<Exercice>(
-                  onLeave: (exercice) {
-                    subjectDrag.sink.add(false);
-                  },
-                  onWillAccept: (exerciceToAccept) {
-                    if (exerciceToAccept is Exercice) {
-                      subjectDrag.sink.add(true);
-                      return true;
-                    }
-                    return false;
-                  },
-                  onAccept: (exerciceDragged) {
-                    subjectDrag.sink.add(false);
-                    WorkoutSet set = WorkoutSet(uidExercice: exerciceDragged.uid);
-                    set.uid = trainersService.getWorkoutSetsReference(workout).doc().id;
-                    int maxOrder = 0;
-                    listWorkoutSetDto.forEach((workoutSet) {
-                      if (workoutSet!.order > maxOrder) {
-                        maxOrder = workoutSet.order;
-                      }
-                    });
-                    set.order = maxOrder + 1;
-                    trainersService.getWorkoutSetsReference(workout).doc(set.uid).set(set.toJson()).then((value) => print('OK'));
-                  },
-                  builder: (context, candidateData, rejectedData) {
-                    return StreamBuilder<bool>(
-                      stream: subjectDrag.stream,
-                      builder: (context, snapshot) {
-                        Color color = Colors.transparent;
-                        if (snapshot.hasData && snapshot.data!) {
-                          color = Colors.amber;
+          child: Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+            color: Colors.tealAccent,
+            elevation: 5,
+            child: StreamBuilder<List<WorkoutSetDto?>>(
+              stream: trainersService.listenToWorkoutStepDto(workout),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  List<WorkoutSetDto?> listWorkoutSetDto = snapshot.data!;
+                  return DragTarget<Exercice>(
+                    onWillAccept: (exerciceToAccept) => (exerciceToAccept is Exercice),
+                    onAccept: (exerciceDragged) {
+                      WorkoutSet set = WorkoutSet(uidExercice: exerciceDragged.uid);
+                      set.uid = trainersService.getWorkoutSetsReference(workout).doc().id;
+                      int maxOrder = 0;
+                      listWorkoutSetDto.forEach((workoutSet) {
+                        if (workoutSet!.order > maxOrder) {
+                          maxOrder = workoutSet.order;
                         }
-                        return Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                              border: Border.all(style: BorderStyle.solid, color: color, width: 4)),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text('Faites glisser ici les exercices du workout.'),
-                              Expanded(
-                                  child: ListView.separated(
-                                separatorBuilder: (context, index) => Divider(height: 2),
-                                itemCount: listWorkoutSetDto.length,
-                                itemBuilder: (context, index) => getListTile(listWorkoutSetDto.elementAt(index)!, listWorkoutSetDto),
-                              )),
-                            ],
-                          ),
-                        );
-                      },
-                    );
-                  },
-                );
-              } else {
-                return Text('Aucun set trouvé pour ce workout.');
-              }
-            },
+                      });
+                      set.order = maxOrder + 1;
+                      trainersService.getWorkoutSetsReference(workout).doc(set.uid).set(set.toJson()).then((value) => print('OK'));
+                    },
+                    builder: (context, candidateData, rejectedData) {
+                      Color color = Colors.transparent;
+                      if (candidateData.isNotEmpty) {
+                        color = Colors.amber;
+                      }
+                      return Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            border: Border.all(style: BorderStyle.solid, color: color, width: 4)),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('Glisser ici les exercices du workout.', style: TextStyle(fontStyle: FontStyle.italic),),
+                            ),
+                            Expanded(
+                                child: ListView.separated(
+                              separatorBuilder: (context, index) => Divider(height: 2),
+                              itemCount: listWorkoutSetDto.length,
+                              itemBuilder: (context, index) => getListTile(listWorkoutSetDto.elementAt(index)!, listWorkoutSetDto),
+                            )),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  return Text('Aucun set trouvé pour ce workout.');
+                }
+              },
+            ),
           ),
         ),
         Expanded(

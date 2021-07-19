@@ -31,14 +31,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: appTitle,
         theme: ThemeData(
+            inputDecorationTheme: InputDecorationTheme(border: OutlineInputBorder(borderRadius: BorderRadius.circular(5))),
             primarySwatch: Colors.amber,
             floatingActionButtonTheme: FloatingActionButtonThemeData(foregroundColor: Colors.white),
             appBarTheme: AppBarTheme(
               iconTheme: IconThemeData(color: Colors.amber, size: 30),
               backgroundColor: Colors.black87,
-              toolbarHeight: 80,
+              toolbarHeight: 50,
               centerTitle: true,
-              titleTextStyle: GoogleFonts.alfaSlabOne(color: Colors.amber, fontSize: 35),
             )),
         routes: {
           '/add_workout': (context) => WorkoutUpdatePage(

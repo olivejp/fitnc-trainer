@@ -42,14 +42,14 @@ class WorkoutFormBuilder {
               ),
             ),
             DropdownButtonFormField<String>(
-              decoration: InputDecoration(helperText: 'Type d\'entrainement'),
+                decoration: InputDecoration(helperText: 'Type d\'entrainement'),
                 icon: Icon(Icons.timer),
                 onChanged: (String? value) => bloc.setTimerType(value),
                 value: bloc.getWorkout()?.timerType,
                 items: [
                   DropdownMenuItem(
                     child: Text(
-                      'Aucun type de timer',
+                      'Aucun type d\'entraînement',
                       style: TextStyle(fontStyle: FontStyle.italic),
                     ),
                     value: null,
@@ -66,6 +66,10 @@ class WorkoutFormBuilder {
                     child: Text('For Time'),
                     value: 'For Time',
                   ),
+                  DropdownMenuItem(
+                    child: Text('Circuit'),
+                    value: 'CIRCUIT',
+                  ),
                 ]),
             Padding(
               padding: const EdgeInsets.only(top: 20),
@@ -75,7 +79,7 @@ class WorkoutFormBuilder {
                 minLines: 5,
                 maxLines: 20,
                 onChanged: (value) => bloc.setDescription(value),
-                decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Description (optionel)'),
+                decoration: InputDecoration(helperText: 'Description (optionel)'),
               ),
             ),
           ],

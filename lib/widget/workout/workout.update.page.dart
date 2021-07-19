@@ -90,7 +90,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                       items: [
                         DropdownMenuItem(
                           child: Text(
-                            'Aucun type de timer',
+                            'Aucun type d\'entraînement',
                             style: TextStyle(fontStyle: FontStyle.italic),
                           ),
                           value: null,
@@ -107,6 +107,10 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                           child: Text('For Time'),
                           value: 'For Time',
                         ),
+                        DropdownMenuItem(
+                          child: Text('Circuit'),
+                          value: 'CIRCUIT',
+                        ),
                       ]),
                   Padding(
                     padding: const EdgeInsets.only(top: 20),
@@ -116,12 +120,12 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                       minLines: 5,
                       maxLines: 20,
                       onChanged: (value) => bloc.setDescription(value),
-                      decoration: InputDecoration(border: OutlineInputBorder(), alignLabelWithHint: true, helperText: 'Instructions (optionel)'),
+                      decoration: InputDecoration(helperText: 'Instructions (optionel)'),
                     ),
                   ),
                   LimitedBox(
                     maxWidth: 1200,
-                    maxHeight: 500,
+                    maxHeight: 600,
                     child: Row(
                       children: [
                         Expanded(
@@ -207,7 +211,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                             initialValue: null,
                             autofocus: true,
                             onChanged: (value) => widget.bloc.setConsigne(value),
-                            decoration: InputDecoration(helperText: 'Consigne - optionel', border: OutlineInputBorder()),
+                            decoration: InputDecoration(helperText: 'Consigne - optionel'),
                           ),
                         )
                       ],
