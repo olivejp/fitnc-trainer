@@ -9,11 +9,14 @@ class WorkoutSet {
   String? uidExercice;
   String? consigne;
   int order;
-  late List<Line> lines;
 
-  WorkoutSet({this.uidExercice = '', this.consigne = '', this.order = 0}) {
-    this.lines = [];
-  }
+  String? sets; // REPS_WEIGHT, REPS_ONLY , TIME
+  String? reps; // REPS_WEIGHT, REPS_ONLY
+  String? weight; // REPS_WEIGHT
+  String? restTime; // REPS_WEIGHT, REPS_ONLY
+  String? time; // TIME
+
+  WorkoutSet({this.uidExercice = '', this.consigne = '', this.order = 0});
 
   factory WorkoutSet.fromJson(Map<String, dynamic> data) => _$WorkoutSetFromJson(data);
 

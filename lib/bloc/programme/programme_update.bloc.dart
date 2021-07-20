@@ -103,7 +103,7 @@ class ProgrammeUpdateBloc {
 
   String getUrl() {
     String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    return 'trainers/${trainerUid}/programme/${programme.uid}/$pathProgrammeMainImage';
+    return 'trainers/$trainerUid/programme/${programme.uid}/$pathProgrammeMainImage';
   }
 
   Future<void> sendToFireStore(CollectionReference<Object?> collectionReference) {

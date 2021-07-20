@@ -98,7 +98,7 @@ class WorkoutUpdateBloc {
 
   String getUrl() {
     String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    return 'trainers/${trainerUid}/exercices/${_workout.uid}/$pathWorkoutMainImage';
+    return 'trainers/$trainerUid/exercices/${_workout.uid}/$pathWorkoutMainImage';
   }
 
   Future<void> updateWorkout() async {

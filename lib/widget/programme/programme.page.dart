@@ -3,7 +3,6 @@ import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/bloc/programme/programme_update.bloc.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/widget/programme/programme.update.page.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -129,7 +128,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
             return InkWell(
               splashColor: Color(Colors.amber.value),
               hoverColor: Color(Colors.amber.value),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(5),
               onTap: () => goToUpdatePage(context, programme),
               child: getGridCard(programme),
             );
@@ -167,7 +166,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
     }
     return Card(
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

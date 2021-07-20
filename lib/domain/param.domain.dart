@@ -8,8 +8,9 @@ class Param {
   String? nom;
   String? libelle;
   String? valeur;
+  int? order;
 
-  Param();
+  Param({this.uid, this.nom, this.libelle, this.valeur, this.order});
 
   factory Param.fromJson(Map<String, dynamic> data) =>
       _$ParamFromJson(data);

@@ -99,7 +99,7 @@ class MyHomePage extends StatelessWidget {
   Widget getDrawer(BoxConstraints constraints) {
     double maxWidth = 200;
     bool isExpanded = true;
-    if (constraints.maxWidth < 900) {
+    if (constraints.maxWidth <= 1024) {
       maxWidth = 60;
       isExpanded = false;
     }

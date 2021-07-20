@@ -43,7 +43,7 @@ class WorkoutFormBuilder {
             ),
             DropdownButtonFormField<String>(
                 decoration: InputDecoration(helperText: 'Type d\'entrainement'),
-                icon: Icon(Icons.timer),
+                icon: Icon(Icons.arrow_downward),
                 onChanged: (String? value) => bloc.setTimerType(value),
                 value: bloc.getWorkout()?.timerType,
                 items: [
