@@ -24,17 +24,17 @@ class WorkoutUpdateBloc {
   final GlobalKey<FormFieldState> consigneKey = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> dropdownKey = GlobalKey<FormFieldState>();
 
-  StoragePair? storagePair;
+  StorageFile? storageFile;
   late Workout _workout;
   Line line = Line();
   WorkoutSet set = WorkoutSet();
   Exercice? exerciceSelected;
 
-  BehaviorSubject<StoragePair?> subjectStoragePair = BehaviorSubject<StoragePair?>();
+  BehaviorSubject<StorageFile?> subjectStorageFile = BehaviorSubject<StorageFile?>();
   BehaviorSubject<String?> subjectTypeExercice = BehaviorSubject<String?>();
   BehaviorSubject<List<Line>?> subjectListRepsWeight = BehaviorSubject<List<Line>?>();
 
-  Stream<StoragePair?> get obsStoragePair => subjectStoragePair.stream;
+  Stream<StorageFile?> get obsStorageFile => subjectStorageFile.stream;
 
   Stream<String?> get obsTypeExercice => subjectTypeExercice.stream;
 
@@ -50,22 +50,36 @@ class WorkoutUpdateBloc {
   }
 
   void init(Workout? workout) {
-    storagePair = StoragePair();
-    subjectStoragePair.sink.add(null);
+    storageFile = StorageFile();
+    subjectStorageFile.sink.add(null);
 
     if (workout != null) {
       _workout = workout;
       if (_workout.imageUrl != null && _workout.imageUrl!.isNotEmpty) {
         firestorageService.getRemoteImageToUint8List(_workout.imageUrl!).then((bytes) {
-          storagePair!.fileName = basename(_workout.imageUrl!);
-          storagePair!.fileBytes = bytes;
-          subjectStoragePair.sink.add(storagePair);
+          storageFile!.fileName = basename(_workout.imageUrl!);
+          storageFile!.fileBytes = bytes;
+          subjectStorageFile.sink.add(storageFile);
         });
       }
     } else {
       _workout = Workout();
-      subjectStoragePair.sink.add(null);
+      subjectStorageFile.sink.add(null);
     }
+  }
+
+  Future<StorageFile?> getFutureStorageFile() {
+    Completer<StorageFile?> completer = Completer();
+    if (_workout.imageUrl != null) {
+      firestorageService.getRemoteImageToUint8List(_workout.imageUrl!).then((bytes) {
+        storageFile!.fileName = basename(_workout.imageUrl!);
+        storageFile!.fileBytes = bytes;
+        completer.complete(storageFile);
+      });
+    } else {
+      completer.complete(null);
+    }
+    return completer.future;
   }
 
   Stream<List<Exercice?>> getStreamExercice() {
@@ -90,7 +104,7 @@ class WorkoutUpdateBloc {
     _workout.uid = collectionReference.doc().id; // Récupération d'une nouvelle ID.
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
-    if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
+    if (storageFile != null && storageFile!.fileBytes != null && storageFile!.fileName != null) {
       await sendToStorage();
     }
     return sendToFireStore(collectionReference);
@@ -105,12 +119,12 @@ class WorkoutUpdateBloc {
     CollectionReference<Object?> collectionReference = trainersService.getWorkoutReference();
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
-    if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
+    if (storageFile != null && storageFile!.fileBytes != null && storageFile!.fileName != null) {
       await deleteWorkoutMainImage(_workout);
       await sendToStorage();
     }
 
-    if (storagePair == null || storagePair?.fileName == null || storagePair?.fileBytes == null) {
+    if (storageFile == null || storageFile?.fileName == null || storageFile?.fileBytes == null) {
       await deleteWorkoutMainImage(_workout);
       _workout.imageUrl = null;
     }
@@ -126,8 +140,8 @@ class WorkoutUpdateBloc {
 
   Future<void> sendToStorage() async {
     String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    if (trainerUid != null && storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
-      _workout.imageUrl = await firestorageService.sendToStorageAndGetReference('${getUrl()}/${storagePair!.fileName}', storagePair!.fileBytes!);
+    if (trainerUid != null && storageFile != null && storageFile!.fileBytes != null && storageFile!.fileName != null) {
+      _workout.imageUrl = await firestorageService.sendToStorageAndGetReference('${getUrl()}/${storageFile!.fileName}', storageFile!.fileBytes!);
     }
   }
 
@@ -159,9 +173,9 @@ class WorkoutUpdateBloc {
     _workout.timerType = value;
   }
 
-  setStoragePair(StoragePair? storagePair) {
-    this.storagePair = storagePair;
-    this.subjectStoragePair.sink.add(this.storagePair);
+  setStorageFile(StorageFile? storagePair) {
+    this.storageFile = storagePair;
+    this.subjectStorageFile.sink.add(this.storageFile);
   }
 
   void setRepsWeightType(String type) {

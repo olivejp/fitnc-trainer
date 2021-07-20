@@ -58,10 +58,10 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        StorageStreamImageWidget(
-                          onSaved: (storagePair) => bloc.setStoragePair(storagePair),
-                          streamInitialStoragePair: bloc.obsStoragePair,
-                          onDeleted: (storagePair) => bloc.setStoragePair(null),
+                        StorageFutureImageWidget(
+                          onSaved: (file) => bloc.setStorageFile(file),
+                          futureInitialStorageFile: bloc.getFutureStorageFile(),
+                          onDeleted: (file) => bloc.setStorageFile(null),
                         ),
                         Expanded(
                           child: Padding(

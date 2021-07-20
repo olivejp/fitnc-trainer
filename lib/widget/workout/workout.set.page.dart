@@ -43,6 +43,7 @@ class WorkoutSetPage extends StatelessWidget {
                       flex: 1,
                       child: TextFormField(
                         decoration: InputDecoration(
+                          border: UnderlineInputBorder(),
                           prefixIcon: Icon(Icons.search),
                           hintText: 'Recherche...',
                         ),

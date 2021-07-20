@@ -17,10 +17,10 @@ class WorkoutFormBuilder {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  StorageStreamImageWidget(
-                    onSaved: (storagePair) => bloc.setStoragePair(storagePair),
-                    streamInitialStoragePair: bloc.obsStoragePair,
-                    onDeleted: (storagePair) => bloc.setStoragePair(null),
+                  StorageFutureImageWidget(
+                    onSaved: (storagePair) => bloc.setStorageFile(storagePair),
+                    onDeleted: (storagePair) => bloc.setStorageFile(null),
+                    futureInitialStorageFile: bloc.getFutureStorageFile(),
                   ),
                   Expanded(
                     child: Padding(

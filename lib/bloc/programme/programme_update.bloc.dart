@@ -17,9 +17,9 @@ class ProgrammeUpdateBloc {
   ParamService paramService = ParamService.getInstance();
 
   late Programme programme;
-  StoragePair? storagePair;
+  StorageFile? storagePair;
 
-  BehaviorSubject<StoragePair?> subjectStoragePair = BehaviorSubject<StoragePair?>();
+  BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
   BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject();
   BehaviorSubject<String?> _streamSelectedYoutubeUrl = BehaviorSubject();
 
@@ -27,7 +27,7 @@ class ProgrammeUpdateBloc {
 
   Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl.stream;
 
-  Stream<StoragePair?> get obsStoragePair => subjectStoragePair.stream;
+  Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
 
   static ProgrammeUpdateBloc? _instance;
   final String pathProgrammeMainImage = 'mainImage';
@@ -42,7 +42,7 @@ class ProgrammeUpdateBloc {
   }
 
   void init(Programme? programmeEntered) {
-    storagePair = StoragePair();
+    storagePair = StorageFile();
     subjectStoragePair.sink.add(null);
 
     if (programmeEntered != null) {
@@ -149,7 +149,7 @@ class ProgrammeUpdateBloc {
     programme.description = value;
   }
 
-  setStoragePair(StoragePair? storagePair) {
+  setStoragePair(StorageFile? storagePair) {
     this.storagePair = storagePair;
     this.subjectStoragePair.sink.add(this.storagePair);
   }

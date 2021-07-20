@@ -23,7 +23,7 @@ class ExerciceFormBuilder {
                 children: [
                   StorageStreamImageWidget(
                     onSaved: (storagePair) => bloc.setStoragePair(storagePair),
-                    streamInitialStoragePair: bloc.obsStoragePair,
+                    streamInitialStorageFile: bloc.obsStoragePair,
                     onDeleted: (storagePair) => bloc.setStoragePair(null),
                   ),
                   Expanded(

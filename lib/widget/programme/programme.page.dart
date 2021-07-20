@@ -65,6 +65,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
                     flex: 1,
                     child: TextFormField(
                       decoration: InputDecoration(
+                        border: UnderlineInputBorder(),
                         prefixIcon: Icon(Icons.search),
                         hintText: 'Recherche...',
                       ),

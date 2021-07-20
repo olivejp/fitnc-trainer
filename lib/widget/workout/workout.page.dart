@@ -64,6 +64,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                     flex: 1,
                     child: TextFormField(
                       decoration: InputDecoration(
+                        border: UnderlineInputBorder(),
                         prefixIcon: Icon(Icons.search),
                         hintText: 'Recherche...',
                       ),

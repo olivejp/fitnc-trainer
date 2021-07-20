@@ -16,9 +16,9 @@ class ExerciceUpdateBloc {
   TrainersService trainersService = TrainersService.getInstance();
   ParamService paramService = ParamService.getInstance();
   late Exercice exercice;
-  StoragePair? storagePair;
+  StorageFile? storagePair;
 
-  BehaviorSubject<StoragePair?> subjectStoragePair = BehaviorSubject<StoragePair?>();
+  BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
   BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject();
   BehaviorSubject<String?> _streamSelectedYoutubeUrl = BehaviorSubject();
 
@@ -26,7 +26,7 @@ class ExerciceUpdateBloc {
 
   Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl.stream;
 
-  Stream<StoragePair?> get obsStoragePair => subjectStoragePair.stream;
+  Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
 
   static ExerciceUpdateBloc? _instance;
   final String pathExerciceMainImage = 'mainImage';
@@ -41,7 +41,7 @@ class ExerciceUpdateBloc {
   }
 
   void init(Exercice? exerciceEntered) {
-    storagePair = StoragePair();
+    storagePair = StorageFile();
     subjectStoragePair.sink.add(null);
 
     if (exerciceEntered != null) {
@@ -163,7 +163,7 @@ class ExerciceUpdateBloc {
     _streamSelectedYoutubeUrl.sink.add(value);
   }
 
-  setStoragePair(StoragePair? storagePair) {
+  setStoragePair(StorageFile? storagePair) {
     this.storagePair = storagePair;
     this.subjectStoragePair.sink.add(this.storagePair);
   }
