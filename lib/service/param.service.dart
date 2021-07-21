@@ -19,17 +19,61 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
     return _instance!;
   }
 
-  Future<List<Param>> getListParam(String paramName) {
-    return findAllSpecific(this.collectionReference.doc(paramName).collection('values'));
+  Stream<List<Param>> listenListParam(String paramName) {
+    return this
+        .collectionReference
+        .doc(paramName)
+        .collection('values')
+        .orderBy('order')
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs.map((e) => Param.fromJson(e.data())).toList());
   }
 
-  Future<List<DropdownMenuItem<dynamic>>> getParamAsDropdown(String paramName, bool onlyName) async {
-    return (await getListParam(paramName))
-        .map((param) => DropdownMenuItem(
-              child: getRowFromParam(param, onlyName),
-              value: param.valeur,
-            ))
+  Future<List<Param>> getListParam(String paramName) {
+    return this
+        .collectionReference
+        .doc(paramName)
+        .collection('values')
+        .orderBy('order')
+        .get()
+        .then((querySnapshot) => querySnapshot.docs.map((e) => Param.fromJson(e.data())).toList());
+  }
+
+  DropdownMenuItem<String?> mapParamToDropdownItem(Param param, bool onlyName) {
+    return DropdownMenuItem<String?>(
+      child: getRowFromParam(param, onlyName),
+      value: param.valeur,
+    );
+  }
+
+  List<DropdownMenuItem<String?>> getParamAsDropdown(List<Param> params, bool onlyName, bool insertNull, String? nullElement)  {
+    List<DropdownMenuItem<String?>> list = params
+        .map((param) => mapParamToDropdownItem(param, onlyName))
         .toList();
+
+    if (insertNull) {
+      list.add(DropdownMenuItem<String?>(
+        child: nullElement != null ? Text(nullElement) : Text(''),
+        value: null,
+      ));
+    }
+
+    return list;
+  }
+
+  Future<List<DropdownMenuItem<String?>>> getFutureParamAsDropdown(String paramName, bool onlyName, bool insertNull, String? nullElement) async {
+    List<DropdownMenuItem<String?>> list = (await getListParam(paramName))
+        .map((param) => mapParamToDropdownItem(param, onlyName))
+        .toList();
+
+    if (insertNull) {
+      list.add(DropdownMenuItem<String?>(
+        child: nullElement != null ? Text(nullElement) : Text(''),
+        value: null,
+      ));
+    }
+
+    return list;
   }
 
   Widget getRowFromParam(Param param, bool onlyName) {

@@ -56,6 +56,7 @@ class ExercicePage extends StatelessWidget {
                     flex: 1,
                     child: TextFormField(
                       decoration: InputDecoration(
+                        border: UnderlineInputBorder(),
                         prefixIcon: Icon(Icons.search),
                         hintText: 'Recherche...',
                       ),
@@ -120,7 +121,7 @@ class ExercicePage extends StatelessWidget {
             return InkWell(
               splashColor: Colors.amber,
               hoverColor: Colors.amber,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(5),
               onTap: () => goToUpdatePage(context, exercice),
               child: getGridCard(context, exercice),
             );
@@ -163,7 +164,7 @@ class ExercicePage extends StatelessWidget {
     }
     return Card(
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

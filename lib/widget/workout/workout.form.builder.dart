@@ -17,10 +17,10 @@ class WorkoutFormBuilder {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  StorageStreamImageWidget(
-                    onSaved: (storagePair) => bloc.setStoragePair(storagePair),
-                    streamInitialStoragePair: bloc.obsStoragePair,
-                    onDeleted: (storagePair) => bloc.setStoragePair(null),
+                  StorageFutureImageWidget(
+                    onSaved: (storagePair) => bloc.setStorageFile(storagePair),
+                    onDeleted: (storagePair) => bloc.setStorageFile(null),
+                    futureInitialStorageFile: bloc.getFutureStorageFile(),
                   ),
                   Expanded(
                     child: Padding(
@@ -43,7 +43,7 @@ class WorkoutFormBuilder {
             ),
             DropdownButtonFormField<String>(
                 decoration: InputDecoration(helperText: 'Type d\'entrainement'),
-                icon: Icon(Icons.timer),
+                icon: Icon(Icons.arrow_downward),
                 onChanged: (String? value) => bloc.setTimerType(value),
                 value: bloc.getWorkout()?.timerType,
                 items: [

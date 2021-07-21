@@ -1,6 +1,4 @@
-import 'package:fitnc_trainer/domain/line.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 class WorkoutSetDto {
   String? uid;
@@ -12,13 +10,23 @@ class WorkoutSetDto {
   String? nameExercice;
   String? imageUrlExercice;
 
-  List<Line> lines = [];
+  String? sets; // REPS_WEIGHT, REPS_ONLY , TIME
+  String? reps; // REPS_WEIGHT, REPS_ONLY
+  String? weight; // REPS_WEIGHT
+  String? restTime; // REPS_WEIGHT, REPS_ONLY
+  String? time; // TIME
+
+  WorkoutSetDto.empty();
 
   WorkoutSetDto(WorkoutSet workoutSet) {
     this.uid = workoutSet.uid;
     this.uidExercice = workoutSet.uidExercice;
     this.consigne = workoutSet.consigne;
     this.order = workoutSet.order;
-    this.lines = workoutSet.lines;
+    this.sets = workoutSet.sets;
+    this.reps = workoutSet.reps;
+    this.weight = workoutSet.weight;
+    this.restTime = workoutSet.restTime;
+    this.time = workoutSet.time;
   }
 }

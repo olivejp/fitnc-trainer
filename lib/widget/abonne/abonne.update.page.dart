@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:fitnc_trainer/bloc/abonne/abonne_update.bloc.dart';
 import 'package:fitnc_trainer/domain/abonne.domain.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -165,7 +164,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                               DateTime today = DateTime.now();
                               try {
                                 time = DateFormat('dd/MM/yyyy').parseStrict(value);
-                              } on Exception catch (e) {
+                              } on Exception {
                                 return 'Date incorrecte. Format accepté dd/mm/aaaa.';
                               }
                               if (time.isAfter(today)) {

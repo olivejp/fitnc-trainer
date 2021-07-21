@@ -101,7 +101,7 @@ class _AbonnePageState extends State<AbonnePage> {
             return InkWell(
               splashColor: Color(Colors.amber.value),
               hoverColor: Color(Colors.amber.value),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(5),
               onTap: () => Navigator.push(
                   context,
                   PageTransition(
@@ -113,7 +113,7 @@ class _AbonnePageState extends State<AbonnePage> {
                       ))),
               child: Card(
                 clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

@@ -22,19 +22,17 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool showPassword = true;
 
   _LoginPageState();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color(Colors.black87.value),
+        backgroundColor: Colors.black87,
         body: Stack(children: [
           Container(
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("images/background.jpg"),
-                    fit: BoxFit.cover)),
+            decoration: BoxDecoration(image: DecorationImage(image: AssetImage("images/background.jpg"), fit: BoxFit.cover)),
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -42,16 +40,14 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Text(
                 'Fitness Nc',
-                style: GoogleFonts.alfaSlabOne(
-                    color: Color(Colors.amber.value), fontSize: 50),
+                style: GoogleFonts.alfaSlabOne(color: Colors.amber, fontSize: 50),
               ),
               Center(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: 500),
                   child: Card(
-                    color: Color(Colors.white70.value),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
+                    color: Colors.white70,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Form(
@@ -60,12 +56,9 @@ class _LoginPageState extends State<LoginPage> {
                           children: [
                             TextFormField(
                               style: GoogleFonts.roboto(fontSize: 20),
-                              decoration: InputDecoration(
-                                  hintText: 'Email',
-                                  hintStyle: GoogleFonts.roboto(fontSize: 20)),
+                              decoration: InputDecoration(hintText: 'Email', hintStyle: GoogleFonts.roboto(fontSize: 20)),
                               enableSuggestions: true,
-                              onChanged: (value) =>
-                                  widget.bloc.changeEmail(value),
+                              onChanged: (value) => widget.bloc.changeEmail(value),
                               onFieldSubmitted: (value) => onPressedEnter(),
                               validator: (String? value) {
                                 if (value == null || value.isEmpty) {
@@ -81,31 +74,30 @@ class _LoginPageState extends State<LoginPage> {
                               textInputAction: TextInputAction.done,
                             ),
                             TextFormField(
-                                style: GoogleFonts.roboto(fontSize: 20),
-                                obscureText: true,
-                                enableSuggestions: false,
-                                autocorrect: false,
-                                decoration: InputDecoration(
-                                    hintText: 'Mot de passe',
-                                    hintStyle:
-                                        GoogleFonts.roboto(fontSize: 20)),
-                                onChanged: (value) =>
-                                    widget.bloc.changePassword(value),
-                                onFieldSubmitted: (value) => onPressedEnter()),
+                              style: GoogleFonts.roboto(fontSize: 20),
+                              obscureText: this.showPassword,
+                              enableSuggestions: false,
+                              autocorrect: false,
+                              decoration: InputDecoration(
+                                  hintText: 'Mot de passe',
+                                  hintStyle: GoogleFonts.roboto(fontSize: 20),
+                                  suffixIcon: IconButton(
+                                      onPressed: () => setState(() => this.showPassword = !this.showPassword), icon: Icon(Icons.remove_red_eye))),
+                              onChanged: (value) => widget.bloc.changePassword(value),
+                              onFieldSubmitted: (value) => onPressedEnter(),
+                            ),
                             FloatingActionButton.extended(
                               onPressed: onPressedEnter,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
                               label: Text(
                                 'Se connecter',
-                                style: GoogleFonts.roboto(
-                                    color: Color(Colors.white.value),
-                                    fontSize: 15),
+                                style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
                               ),
                             ),
                             StreamBuilder<String?>(
                               stream: widget.bloc.errorsObservable,
                               builder: (context, snapshot) {
-                                if (snapshot.hasData &&
-                                    snapshot.data?.isNotEmpty == true) {
+                                if (snapshot.hasData && snapshot.data?.isNotEmpty == true) {
                                   return Text(snapshot.data!);
                                 } else {
                                   return Text("");

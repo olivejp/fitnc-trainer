@@ -58,10 +58,10 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        StorageStreamImageWidget(
-                          onSaved: (storagePair) => bloc.setStoragePair(storagePair),
-                          streamInitialStoragePair: bloc.obsStoragePair,
-                          onDeleted: (storagePair) => bloc.setStoragePair(null),
+                        StorageFutureImageWidget(
+                          onSaved: (file) => bloc.setStorageFile(file),
+                          futureInitialStorageFile: bloc.getFutureStorageFile(),
+                          onDeleted: (file) => bloc.setStorageFile(null),
                         ),
                         Expanded(
                           child: Padding(
@@ -84,7 +84,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                             padding: const EdgeInsets.only(left : 20),
                             child: DropdownButtonFormField<String>(
                                 decoration: InputDecoration(helperText: 'Type d\'entrainement', constraints: BoxConstraints(maxHeight: 72)),
-                                icon: Icon(Icons.timer),
+                                icon: Icon(Icons.arrow_downward),
                                 onChanged: (String? value) => bloc.setTimerType(value),
                                 value: bloc.getWorkout()?.timerType,
                                 items: [
@@ -173,88 +173,6 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                 style: TextStyle(color: (Colors.amber)),
               )
             ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget getSecondPanel() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              shadowColor: Colors.black,
-              clipBehavior: Clip.antiAlias,
-              color: Color(Colors.white.value).withOpacity(0.85),
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        StreamDropdownButton<Exercice>(
-                          dropdownKey: widget.bloc.dropdownKey,
-                          onChanged: (exerciceSelected) => widget.bloc.setExercice(exerciceSelected),
-                          icon: Icon(Icons.arrow_downward),
-                          initialValue: null,
-                          stream: widget.bloc.trainersService.getExerciceStreamDropdownMenuItem(),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15),
-                          child: TextFormField(
-                            key: widget.bloc.consigneKey,
-                            minLines: 5,
-                            maxLines: 20,
-                            initialValue: null,
-                            autofocus: true,
-                            onChanged: (value) => widget.bloc.setConsigne(value),
-                            decoration: InputDecoration(helperText: 'Consigne - optionel'),
-                          ),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              shadowColor: Colors.black,
-              clipBehavior: Clip.antiAlias,
-              color: Color(Colors.white.value).withOpacity(0.85),
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              child: StreamBuilder<List<WorkoutSet?>>(
-                stream: widget.bloc.listenToWorkoutStep(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
-                    List<WorkoutSet?> listSet = snapshot.data!;
-                    return Column(
-                      children: listSet
-                          .map((set) => ListTile(
-                                title: Text(set!.uidExercice!),
-                              ))
-                          .toList(),
-                    );
-                  } else {
-                    return Container();
-                  }
-                },
-              ),
-            ),
           ),
         ),
       ],
