@@ -12,20 +12,21 @@ import 'package:intl/intl.dart';
 import 'package:loading_animations/loading_animations.dart';
 
 class WorkoutSetPage extends StatelessWidget {
+  WorkoutSetPage({Key? key, required this.workout}) : super(key: key) {
+    bloc.init(workout);
+  }
+
   final TrainersService trainersService = TrainersService.getInstance();
   final WorkoutSetPageBloc bloc = WorkoutSetPageBloc.getInstance();
   final Workout workout;
-  static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
-  WorkoutSetPage({Key? key, required this.workout}) : super(key: key) {
-    bloc.init(this.workout);
-  }
+  static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        WorkoutSetLeftPanel(workout: this.workout),
+        WorkoutSetLeftPanel(workout: workout),
         Expanded(
           child: Column(
             children: [
@@ -33,7 +34,7 @@ class WorkoutSetPage extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 15, right: 15),
                 child: Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                         flex: 3,
                         child: Text(
                           'Exercices',
@@ -42,7 +43,7 @@ class WorkoutSetPage extends StatelessWidget {
                     Expanded(
                       flex: 1,
                       child: TextFormField(
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           border: UnderlineInputBorder(),
                           prefixIcon: Icon(Icons.search),
                           hintText: 'Recherche...',
@@ -134,6 +135,7 @@ class WorkoutSetPage extends StatelessWidget {
       child: Card(
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+        elevation: 2,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -149,14 +151,13 @@ class WorkoutSetPage extends StatelessWidget {
                     maxLines: 2,
                     textAlign: TextAlign.left,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 12),
+                    style: const TextStyle(fontSize: 12),
                   ),
                 ),
               ),
             ),
           ],
         ),
-        elevation: 2,
       ),
     );
   }

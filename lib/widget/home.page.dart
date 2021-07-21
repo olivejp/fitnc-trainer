@@ -12,18 +12,20 @@ import 'programme/programme.page.dart';
 import 'workout/workout.page.dart';
 
 class MyHomePage extends StatelessWidget {
-  static final int PAGE_WORKOUT = 0;
-  static final int PAGE_EXERCICE = 1;
-  static final int PAGE_CALENDAR = 2;
-  static final int PAGE_PROGRAMME = 3;
-  final MyHomePageBloc bloc = MyHomePageBloc.getInstance();
-  final String title;
-
   MyHomePage(this.title);
+
+  final MyHomePageBloc bloc = MyHomePageBloc.getInstance();
+
+  static const int pageWorkout = 0;
+  static const int pageExercice = 1;
+  static const int pageCalendar = 2;
+  static const int pageProgramme = 3;
+
+  final String title;
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       return Scaffold(
         appBar: AppBar(
           title: Wrap(
@@ -36,7 +38,7 @@ class MyHomePage extends StatelessWidget {
                 size: 20,
               ),
               Text(
-                this.title,
+                title,
                 style: GoogleFonts.alfaSlabOne(color: Color(Colors.amber.value), fontSize: 20),
               ),
             ],
@@ -44,10 +46,10 @@ class MyHomePage extends StatelessWidget {
           actions: [
             StreamBuilder<bool>(
                 stream: bloc.currentDisplayObs,
-                builder: (context, snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
                   return Switch(
                     value: snapshot.hasData ? snapshot.data! : false,
-                    onChanged: (value) => bloc.toggleDisplay(),
+                    onChanged: (bool value) => bloc.toggleDisplay(),
                   );
                 }),
             IconButton(
@@ -72,24 +74,24 @@ class MyHomePage extends StatelessWidget {
 
   Widget getMainPage() {
     return GenericContainerWidget(
-      opacity: 0.8,
+      opacity: 0.5,
       child: StreamBuilder<int>(
           stream: bloc.currentPageObs,
-          builder: (context, snapshot) {
+          builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
             if (snapshot.hasData) {
-              if (snapshot.data == PAGE_PROGRAMME) {
+              if (snapshot.data == pageProgramme) {
                 return ProgrammePage();
               }
-              if (snapshot.data == PAGE_WORKOUT) {
+              if (snapshot.data == pageWorkout) {
                 return WorkoutPage();
               }
-              if (snapshot.data == PAGE_EXERCICE) {
+              if (snapshot.data == pageExercice) {
                 return ExercicePage();
               }
-              if (snapshot.data == PAGE_CALENDAR) {
+              if (snapshot.data == pageCalendar) {
                 return CalendarPage();
               }
-              return Text('Aie');
+              throw 'Aucune page trouvée pour l\'index ${snapshot.data}';
             }
             return Container();
           }),
@@ -130,28 +132,28 @@ class MyHomePage extends StatelessWidget {
                             child: Column(
                               children: [
                                 ListTile(
-                                  onTap: () => bloc.changePage(PAGE_PROGRAMME),
+                                  onTap: () => bloc.changePage(pageProgramme),
                                   title: Text('Programme'),
                                   leading: Icon(Icons.account_tree),
-                                  selected: snapshot.data == PAGE_PROGRAMME,
+                                  selected: snapshot.data == pageProgramme,
                                 ),
                                 ListTile(
-                                  onTap: () => bloc.changePage(PAGE_WORKOUT),
+                                  onTap: () => bloc.changePage(pageWorkout),
                                   title: Text('Workout'),
                                   leading: Icon(Icons.sports_volleyball),
-                                  selected: snapshot.data == PAGE_WORKOUT,
+                                  selected: snapshot.data == pageWorkout,
                                 ),
                                 ListTile(
-                                  onTap: () => bloc.changePage(PAGE_EXERCICE),
+                                  onTap: () => bloc.changePage(pageExercice),
                                   title: Text('Exercice'),
                                   leading: Icon(Icons.sports_handball),
-                                  selected: snapshot.data == PAGE_EXERCICE,
+                                  selected: snapshot.data == pageExercice,
                                 ),
                                 ListTile(
-                                  onTap: () => bloc.changePage(PAGE_CALENDAR),
+                                  onTap: () => bloc.changePage(pageCalendar),
                                   title: Text('Calendrier'),
                                   leading: Icon(Icons.calendar_today_rounded),
-                                  selected: snapshot.data == PAGE_CALENDAR,
+                                  selected: snapshot.data == pageCalendar,
                                 ),
                               ],
                             ),
@@ -162,9 +164,7 @@ class MyHomePage extends StatelessWidget {
                           child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Divider(
-                            height: 2.0,
-                          ),
+                          Divider(height: 2.0),
                           ListTile(
                             onTap: () => bloc.logout(),
                             minVerticalPadding: 20,
@@ -177,7 +177,7 @@ class MyHomePage extends StatelessWidget {
                   );
                 } else {
                   return IconTheme(
-                    data: IconThemeData(color: Colors.amber, size: 25),
+                    data: const IconThemeData(color: Colors.amber, size: 25),
                     child: Column(
                       children: [
                         Flexible(
@@ -186,19 +186,19 @@ class MyHomePage extends StatelessWidget {
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: IconButton(onPressed: () => bloc.changePage(PAGE_PROGRAMME), icon: Icon(Icons.account_tree)),
+                                  child: IconButton(onPressed: () => bloc.changePage(pageProgramme), icon: Icon(Icons.account_tree)),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: IconButton(onPressed: () => bloc.changePage(PAGE_WORKOUT), icon: Icon(Icons.sports_volleyball)),
+                                  child: IconButton(onPressed: () => bloc.changePage(pageWorkout), icon: Icon(Icons.sports_volleyball)),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: IconButton(onPressed: () => bloc.changePage(PAGE_EXERCICE), icon: Icon(Icons.sports_handball)),
+                                  child: IconButton(onPressed: () => bloc.changePage(pageExercice), icon: Icon(Icons.sports_handball)),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: IconButton(onPressed: () => bloc.changePage(PAGE_CALENDAR), icon: Icon(Icons.calendar_today_rounded)),
+                                  child: IconButton(onPressed: () => bloc.changePage(pageCalendar), icon: Icon(Icons.calendar_today_rounded)),
                                 ),
                               ],
                             )),

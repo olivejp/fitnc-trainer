@@ -11,7 +11,6 @@ import 'package:fitnc_trainer/domain/workout_set.dto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-
 class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
   static TrainersService? _instance;
 
@@ -21,10 +20,13 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
   }
 
   static TrainersService getInstance() {
-    if (_instance == null) {
-      _instance = TrainersService._();
-    }
+    _instance ??= TrainersService._();
     return _instance!;
+  }
+
+  @override
+  Trainers mapSnapshotToModel(DocumentSnapshot snapshot) {
+    return Trainers.fromJson(snapshot.data() as Map<String, dynamic>);
   }
 
   DocumentReference getCurrentTrainerRef() {
@@ -45,38 +47,6 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
 
   CollectionReference getProgrammeReference() {
     return getCurrentTrainerRef().collection('programme');
-  }
-
-  CollectionReference getWorkoutSetsReference(Workout workout) {
-    return getWorkoutReference().doc(workout.uid).collection('sets');
-  }
-
-  Stream<List<WorkoutSet?>> listenToWorkoutStep(Workout workout) {
-    return getWorkoutSetsReference(workout)
-        .orderBy('order')
-        .snapshots()
-        .map((QuerySnapshot event) => event.docs.map((doc) => WorkoutSet.fromJson(doc.data() as Map<String, dynamic>)).toList());
-  }
-
-  Stream<List<WorkoutSetDto?>> listenToWorkoutStepDto(Workout workout) {
-    return getWorkoutSetsReference(workout)
-        .orderBy('order')
-        .snapshots()
-        .map((event) =>
-            event.docs.map((doc) => WorkoutSet.fromJson(doc.data() as Map<String, dynamic>)).map((workoutSet) => mapToDto(workoutSet)).toList())
-        .asyncMap((futures) => Future.wait(futures));
-  }
-
-  Future<WorkoutSetDto> mapToDto(WorkoutSet workoutSet) async {
-    WorkoutSetDto dto = WorkoutSetDto(workoutSet);
-    if (workoutSet.uidExercice != null) {
-      DocumentSnapshot documentSnapshot = await getExerciceReference().doc(workoutSet.uidExercice).get();
-      Exercice exercice = Exercice.fromJson(documentSnapshot.data() as Map<String, dynamic>);
-      dto.imageUrlExercice = exercice.imageUrl;
-      dto.nameExercice = exercice.name;
-      dto.typeExercice = exercice.typeExercice;
-    }
-    return dto;
   }
 
   Stream<List<Workout?>> listenToWorkout() {
@@ -126,10 +96,5 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
                 value: exercice,
               );
             }).toList());
-  }
-
-  @override
-  Trainers mapSnapshotToModel(DocumentSnapshot snapshot) {
-    return Trainers.fromJson(snapshot.data() as Map<String, dynamic>);
   }
 }

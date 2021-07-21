@@ -14,13 +14,13 @@ import 'package:intl/intl.dart';
 import 'package:loading_animations/loading_animations.dart';
 
 class WorkoutSetLeftPanel extends StatelessWidget {
+  WorkoutSetLeftPanel({Key? key, required this.workout}) : super(key: key) {
+    bloc.init(workout);
+  }
+
+  static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
   final WorkoutSetPageBloc bloc = WorkoutSetPageBloc.getInstance();
   final Workout workout;
-  static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
-
-  WorkoutSetLeftPanel({Key? key, required this.workout}) : super(key: key) {
-    bloc.init(this.workout);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,38 @@ class WorkoutSetLeftPanel extends StatelessWidget {
           stream: bloc.obsListWorkoutSet,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              List<WorkoutSetDto?> listWorkoutSetDto = snapshot.data!;
+              final List<WorkoutSetDto?> listWorkoutSetDto = snapshot.data!;
+              final Widget liste = ListView.separated(
+                separatorBuilder: (context, index) => const Divider(height: 2),
+                itemCount: listWorkoutSetDto.length,
+                itemBuilder: (context, index) => getListTile(listWorkoutSetDto.elementAt(index)!, listWorkoutSetDto),
+              );
+              final Widget mainColumn = Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Glisser ici les exercices du workout.',
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        ),
+                        TextButton(
+                            onPressed: () => print('hello'),
+                            child: Container(
+                                decoration: BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(5)),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(5.0),
+                                  child: Text('Ajouter repos', style: TextStyle(color: Colors.white)),
+                                )))
+                      ],
+                    ),
+                  ),
+                  Expanded(child: liste),
+                ],
+              );
               return DragTarget<Exercice>(
                 onWillAccept: (exerciceToAccept) => (exerciceToAccept is Exercice),
                 onAccept: (exerciceDragged) => bloc.addWorkoutSet(exerciceDragged),
@@ -42,39 +73,8 @@ class WorkoutSetLeftPanel extends StatelessWidget {
                     color = Colors.amber;
                   }
                   return Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(10)), border: Border.all(style: BorderStyle.solid, color: color, width: 4)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Glisser ici les exercices du workout.',
-                                style: TextStyle(fontStyle: FontStyle.italic),
-                              ),
-                              TextButton(
-                                  onPressed: () => print('hello'),
-                                  child: Container(
-                                      decoration: BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(5)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(5.0),
-                                        child: Text('Ajouter repos', style: TextStyle(color: Colors.white)),
-                                      )))
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                            child: ListView.separated(
-                          separatorBuilder: (context, index) => Divider(height: 2),
-                          itemCount: listWorkoutSetDto.length,
-                          itemBuilder: (context, index) => getListTile(listWorkoutSetDto.elementAt(index)!, listWorkoutSetDto),
-                        )),
-                      ],
-                    ),
+                    decoration: BoxDecoration(borderRadius: const BorderRadius.all(Radius.circular(10)), border: Border.all(color: color, width: 4)),
+                    child: mainColumn,
                   );
                 },
               );
@@ -104,19 +104,19 @@ class WorkoutSetLeftPanel extends StatelessWidget {
             child: TextFormField(
               key: repsKey,
               initialValue: dto.reps,
-              buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
+              buildCounter: (BuildContext context, {required int currentLength, required bool isFocused, int? maxLength}) => null,
               maxLength: 3,
               maxLines: 1,
               textAlignVertical: TextAlignVertical.bottom,
-              style: TextStyle(fontSize: 15),
-              onChanged: (value) => bloc.setReps(dto, value),
-              decoration: InputDecoration(
+              style: const TextStyle(fontSize: 15),
+              onChanged: (String value) => bloc.setReps(dto, value),
+              decoration: const InputDecoration(
                 hintText: 'Reps',
                 hintStyle: TextStyle(fontSize: 12),
               ),
             ),
           ),
-          LimitedBox(
+          const LimitedBox(
             maxHeight: 25,
             maxWidth: 70,
             child: Text(' x '),
@@ -127,11 +127,10 @@ class WorkoutSetLeftPanel extends StatelessWidget {
             child: TextFormField(
               key: weighKey,
               initialValue: dto.weight,
-              maxLines: 1,
               textAlignVertical: TextAlignVertical.bottom,
-              style: TextStyle(fontSize: 15),
-              onChanged: (value) => bloc.setWeight(dto, value),
-              decoration: InputDecoration(
+              style: const TextStyle(fontSize: 15),
+              onChanged: (String value) => bloc.setWeight(dto, value),
+              decoration: const InputDecoration(
                 hintText: 'Weight',
                 hintStyle: TextStyle(fontSize: 12),
               ),
@@ -148,9 +147,11 @@ class WorkoutSetLeftPanel extends StatelessWidget {
               child: TextFormField(
                 key: repsOnlyKey,
                 maxLength: 3,
+                initialValue: dto.reps,
+                onChanged: (value) => bloc.setReps(dto, value),
                 textAlignVertical: TextAlignVertical.bottom,
-                style: TextStyle(fontSize: 15),
-                decoration: InputDecoration(
+                style: const TextStyle(fontSize: 15),
+                decoration: const InputDecoration(
                   hintText: 'Reps',
                   hintStyle: TextStyle(fontSize: 12),
                 ),
@@ -167,14 +168,14 @@ class WorkoutSetLeftPanel extends StatelessWidget {
               maxWidth: 150,
               child: ParamDropdownButton(
                 key: timeKey,
-                icon: Icon(
+                icon: const Icon(
                   Icons.arrow_downward,
                   size: 12,
                 ),
                 onlyValue: true,
-                decoration: InputDecoration(contentPadding: EdgeInsets.all(10)),
-                style: TextStyle(fontSize: 12),
-                hint: Text('Temps', style: TextStyle(fontSize: 10)),
+                decoration: const InputDecoration(contentPadding: EdgeInsets.all(10)),
+                style: const TextStyle(fontSize: 12),
+                hint: const Text('Temps', style: TextStyle(fontSize: 10)),
                 paramName: 'combo_time',
                 initialValue: dto.time,
                 onChanged: (value) => bloc.setTime(dto, value),
@@ -197,11 +198,10 @@ class WorkoutSetLeftPanel extends StatelessWidget {
             initialValue: dto.sets,
             buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
             maxLength: 3,
-            maxLines: 1,
             textAlignVertical: TextAlignVertical.bottom,
-            style: TextStyle(fontSize: 15),
+            style: const TextStyle(fontSize: 15),
             onChanged: (value) => bloc.setSets(dto, value),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Sets',
               hintStyle: TextStyle(fontSize: 12),
             ),
@@ -213,16 +213,16 @@ class WorkoutSetLeftPanel extends StatelessWidget {
           maxWidth: 150,
           child: TimerDropdownButton(
             key: restTimeKey,
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_downward,
               size: 12,
             ),
             onlyName: true,
             insertNull: true,
             nullElement: 'Aucun repos',
-            decoration: InputDecoration(contentPadding: EdgeInsets.all(10)),
-            style: TextStyle(fontSize: 12),
-            hint: Text('Repos', style: TextStyle(fontSize: 10)),
+            decoration: const InputDecoration(contentPadding: EdgeInsets.all(10)),
+            style: const TextStyle(fontSize: 12),
+            hint: const Text('Repos', style: TextStyle(fontSize: 10)),
             initialValue: dto.restTime,
             onChanged: (value) => bloc.setRestTime(dto, value),
           ),
@@ -232,44 +232,40 @@ class WorkoutSetLeftPanel extends StatelessWidget {
   }
 
   Widget getListTile(WorkoutSetDto dto, List<WorkoutSetDto?> listWorkout) {
+    final Widget upWidget = ListTile(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      title: DottedBorder(
+        color: Colors.amber,
+        strokeWidth: 1,
+        radius: const Radius.circular(5),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Icon(
+                Icons.arrow_circle_down,
+                color: Colors.amber.shade300,
+              ),
+              Center(child: Text('Déplacer ici', style: TextStyle(color: Colors.amber.shade300))),
+            ],
+          ),
+        ),
+      ),
+    );
     return DragTarget<WorkoutSetDto>(
-      onWillAccept: (data) => (data is WorkoutSetDto && data.uid != dto.uid),
+      onWillAccept: (data) => data is WorkoutSetDto && data.uid != dto.uid,
       onAccept: (data) => bloc.switchOrder(data, dto.order),
       builder: (context, candidateData, rejectedData) {
-        Widget upWidget = ListTile(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          title: DottedBorder(
-            color: Colors.amber,
-            strokeWidth: 1,
-            radius: Radius.circular(5),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Icon(
-                    Icons.arrow_circle_down,
-                    color: Colors.amber.shade300,
-                  ),
-                  Center(
-                      child: Text(
-                    'Déplacer ici',
-                    style: TextStyle(color: Colors.amber.shade300),
-                  )),
-                ],
-              ),
-            ),
-          ),
-        );
         Widget tile = ListTile(
           leading: Draggable<WorkoutSetDto>(
-            child: Icon(Icons.view_headline),
             data: dto,
             feedback: SizedBox(
-              child: Text(dto.nameExercice!),
               width: 200,
               height: 100,
+              child: Text(dto.nameExercice!),
             ),
+            child: const Icon(Icons.view_headline),
           ),
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,7 +277,10 @@ class WorkoutSetLeftPanel extends StatelessWidget {
               ),
             ],
           ),
-          trailing: IconButton(onPressed: () => bloc.deleteWorkoutSet(dto), icon: Icon(Icons.delete)),
+          trailing: IconButton(
+            onPressed: () => bloc.deleteWorkoutSet(dto),
+            icon: const Icon(Icons.delete),
+          ),
         );
         if (candidateData.isNotEmpty) {
           return Column(

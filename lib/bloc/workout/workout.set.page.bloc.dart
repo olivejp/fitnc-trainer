@@ -1,10 +1,11 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.dto.dart';
-import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/service/workout_set.service.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -14,132 +15,137 @@ class WorkoutSetPageBloc {
   static WorkoutSetPageBloc? _instance;
 
   static WorkoutSetPageBloc getInstance() {
-    if (_instance == null) {
-      _instance = WorkoutSetPageBloc._();
-    }
+    _instance ??= WorkoutSetPageBloc._();
     return _instance!;
   }
 
   Workout? _workout;
-  TrainersService trainersService = TrainersService.getInstance();
 
-  BehaviorSubject<List<WorkoutSetDto>> subjectListSet = BehaviorSubject<List<WorkoutSetDto>>();
+  final List<WorkoutSetDto> listDtos = <WorkoutSetDto>[];
+  final WorkoutSetService workoutSetService = WorkoutSetService.getInstance();
+  final BehaviorSubject<List<WorkoutSetDto>> subjectListDtos = BehaviorSubject<List<WorkoutSetDto>>();
 
-  Stream<List<WorkoutSetDto>> get obsListWorkoutSet => subjectListSet.stream;
+  Stream<List<WorkoutSetDto>> get obsListWorkoutSet => subjectListDtos.stream;
 
   void init(Workout workout) {
     if (_workout == null || (_workout != null && _workout!.uid != workout.uid)) {
       _workout = workout;
-      trainersService
+      workoutSetService
           .getWorkoutSetsReference(_workout!)
           .orderBy('order')
           .get()
-          .then((querySnapshot) => querySnapshot.docs
-              .map((docSnapshot) => WorkoutSet.fromJson(docSnapshot.data() as Map<String, dynamic>))
-              .map((workoutSet) => trainersService.mapToDto(workoutSet))
+          .then((QuerySnapshot<Object?> querySnapshot) => querySnapshot.docs
+              .map((QueryDocumentSnapshot<Object?> docSnapshot) => WorkoutSet.fromJson(docSnapshot.data() as Map<String, dynamic>))
+              .map((WorkoutSet workoutSet) => workoutSetService.mapToDto(workoutSet))
               .toList())
-          .then((remoteListFuture) => Future.wait(remoteListFuture))
-          .then((remoteList) => subjectListSet.sink.add(remoteList));
+          .then((List<Future<WorkoutSetDto>> remoteListFuture) => Future.wait(remoteListFuture))
+          .then((List<WorkoutSetDto> remoteList) {
+        listDtos.clear();
+        listDtos.addAll(remoteList);
+        subjectListDtos.sink.add(listDtos);
+      });
     }
   }
 
   int getMaxOrder(List<WorkoutSetDto>? listWorkoutSetDto) {
     int maxOrder = 0;
     if (listWorkoutSetDto != null) {
-      listWorkoutSetDto.forEach((workoutSet) {
-        if (workoutSet.order > maxOrder) {
-          maxOrder = workoutSet.order;
+      for (final WorkoutSetDto dto in listWorkoutSetDto) {
+        if (dto.order > maxOrder) {
+          maxOrder = dto.order;
         }
-      });
+      }
     }
     return maxOrder + 1;
   }
 
   void deleteWorkoutSet(WorkoutSetDto dto) {
-    List<WorkoutSetDto> listDtos = [];
-    if (this.subjectListSet.hasValue) {
-      listDtos = this.subjectListSet.valueOrNull!;
-      listDtos.remove(dto);
-      deleteFromFireStore(dto);
-    }
-    this.subjectListSet.sink.add(listDtos);
+    listDtos.remove(dto);
+    deleteFromFireStore(dto);
+    subjectListDtos.sink.add(listDtos);
+  }
+
+  DocumentReference getSetRef(WorkoutSetDto dto) {
+    return workoutSetService.getWorkoutSetsReference(_workout!).doc(dto.uid);
   }
 
   void addWorkoutSet(Exercice exerciceDragged) {
-    List<WorkoutSetDto> listDtos = [];
-    if (this.subjectListSet.hasValue) {
-      listDtos = this.subjectListSet.valueOrNull!;
-    }
-
-    WorkoutSetDto dto = WorkoutSetDto.empty();
-    dto.uid = trainersService.getWorkoutSetsReference(_workout!).doc().id;
+    final WorkoutSetDto dto = WorkoutSetDto.empty();
+    dto.uid = workoutSetService.getWorkoutSetsReference(_workout!).doc().id;
     dto.uidExercice = exerciceDragged.uid;
     dto.typeExercice = exerciceDragged.typeExercice;
     dto.nameExercice = exerciceDragged.name;
     dto.imageUrlExercice = exerciceDragged.imageUrl;
     dto.order = getMaxOrder(listDtos);
     listDtos.add(dto);
-    this.subjectListSet.sink.add(listDtos);
-  }
+    subjectListDtos.sink.add(listDtos);
 
-  void saveToFireStore(WorkoutSet set) {
-    set.uid = trainersService.getWorkoutSetsReference(_workout!).doc().id;
-    set.order = getMaxOrder(subjectListSet.valueOrNull);
-    trainersService.getWorkoutSetsReference(_workout!).doc(set.uid).set(set.toJson()).then((value) => print('OK'));
+    getSetRef(dto)
+        .set(WorkoutSet.fromJson(dto.toJson()).toJson())
+        .then((_) => showToast('Set ajouté.', duration: const Duration(seconds: 2)))
+        .catchError((_) => showToast('Une erreur est survenue lors de l\'enregistrement du set.', duration: const Duration(seconds: 2)));
   }
 
   void deleteFromFireStore(WorkoutSetDto dto) {
-    trainersService
-        .getWorkoutSetsReference(_workout!)
-        .doc(dto.uid)
+    getSetRef(dto)
         .delete()
-        .then((value) => showToast('WorkoutSet supprimé.', duration: Duration(seconds: 2)))
-        .catchError((onError) => showToast('Erreur lors de la suppression du Set.', duration: Duration(seconds: 2)));
+        .then((_) => showToast('Set supprimé.', duration: const Duration(seconds: 2)))
+        .catchError((Object onError) => showToast('Erreur lors de la suppression du Set.', duration: const Duration(seconds: 2)));
   }
 
   void switchOrder(WorkoutSetDto dto, int newOrder) {
-    List<WorkoutSetDto>? dtos = this.subjectListSet.valueOrNull;
-    List<WorkoutSetDto>? dtosFiltered = [];
-    bool isDescente = dto.order < newOrder;
-    if (isDescente) {
-      newOrder = newOrder - 1;
-    }
+    final bool isDescente = dto.order < newOrder;
 
-    if (dtos != null && dtos.isNotEmpty) {
-      dtosFiltered = dtos.where((element) => element.uid != dto.uid).map((element) {
-        if (isDescente && element.order > dto.order && element.order <= newOrder) {
-          element.order = element.order - 1;
+    final WriteBatch batch = FirebaseFirestore.instance.batch();
+    if (listDtos.isNotEmpty) {
+      listDtos.where((WorkoutSetDto e) => e.uid != dto.uid).forEach((WorkoutSetDto e) {
+        if (isDescente && e.order > dto.order && e.order <= newOrder - 1) {
+          e.order = e.order - 1;
+          batch.update(getSetRef(e), {'order': e.order});
         }
-        if (!isDescente && element.order < dto.order && element.order >= newOrder) {
-          element.order = element.order + 1;
+        if (!isDescente && e.order < dto.order && e.order >= newOrder) {
+          e.order = e.order + 1;
+          batch.update(getSetRef(e), {'order': e.order});
         }
-        return element;
-      }).toList();
+      });
 
-      dto.order = newOrder;
-      dtosFiltered.add(dto);
+      dto.order = newOrder - 1;
+      batch.update(getSetRef(dto), {'order': dto.order});
     }
-    dtosFiltered.sort((a, b) => a.order.compareTo(b.order));
-    subjectListSet.sink.add(dtosFiltered);
+    listDtos.sort((WorkoutSetDto a, WorkoutSetDto b) => a.order.compareTo(b.order));
+    subjectListDtos.sink.add(listDtos);
+    batch.commit();
+  }
+
+  void updateDto(WorkoutSetDto dto, Map<String, dynamic> values) {
+    getSetRef(dto)
+        .update(values)
+        .then((_) => print('Set mis à jour'))
+        .catchError((Object onError) => showToast('Erreur lors de la mise à jour du Set.', duration: const Duration(seconds: 2)));
   }
 
   void setReps(WorkoutSetDto dto, String value) {
     dto.reps = value;
+    updateDto(dto, {'reps': value});
   }
 
   void setWeight(WorkoutSetDto dto, String value) {
     dto.weight = value;
+    updateDto(dto, {'weight': value});
   }
 
-  setRestTime(WorkoutSetDto dto, String? value) {
+  void setRestTime(WorkoutSetDto dto, String? value) {
     dto.restTime = value;
+    updateDto(dto, {'restTime': value});
   }
 
-  setTime(WorkoutSetDto dto, String? value) {
+  void setTime(WorkoutSetDto dto, String? value) {
     dto.time = value;
+    updateDto(dto, {'time': value});
   }
 
-  setSets(WorkoutSetDto dto, String value) {
+  void setSets(WorkoutSetDto dto, String value) {
     dto.sets = value;
+    updateDto(dto, {'sets': value});
   }
 }

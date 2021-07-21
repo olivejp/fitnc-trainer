@@ -1,8 +1,5 @@
 import 'package:fitnc_trainer/bloc/workout/workout_update.bloc.dart';
-import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
-import 'package:fitnc_trainer/domain/workout_set.domain.dart';
-import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.page.dart';
@@ -10,34 +7,33 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutUpdatePage extends StatefulWidget {
-  final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
-  final Workout workout;
-
   WorkoutUpdatePage({Key? key, required this.workout}) : super(key: key) {
     bloc.init(workout);
   }
 
+  final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
+  final Workout workout;
+
   @override
   _WorkoutUpdatePageState createState() {
-    return new _WorkoutUpdatePageState();
+    return _WorkoutUpdatePageState();
   }
 }
 
 class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   _WorkoutUpdatePageState();
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    WorkoutUpdateBloc bloc = widget.bloc;
+    final WorkoutUpdateBloc bloc = widget.bloc;
     return Scaffold(
-        backgroundColor: Colors.transparent,
         floatingActionButton: ButtonBar(children: [
           FloatingActionButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Icon(Icons.clear),
             tooltip: 'Annuler',
+            child: const Icon(Icons.clear),
           ),
           FloatingActionButton(
             onPressed: () {
@@ -45,7 +41,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                 bloc.saveWorkout().then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
               }
             },
-            child: Icon(Icons.check),
+            child: const Icon(Icons.check),
           ),
         ]),
         body: GenericUpdateWidget(
@@ -81,35 +77,35 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                         ),
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.only(left : 20),
+                            padding: const EdgeInsets.only(left: 20),
                             child: DropdownButtonFormField<String>(
-                                decoration: InputDecoration(helperText: 'Type d\'entrainement', constraints: BoxConstraints(maxHeight: 72)),
-                                icon: Icon(Icons.arrow_downward),
+                                decoration: const InputDecoration(helperText: 'Type d\'entrainement', constraints: BoxConstraints(maxHeight: 72)),
+                                icon: const Icon(Icons.arrow_downward),
                                 onChanged: (String? value) => bloc.setTimerType(value),
                                 value: bloc.getWorkout()?.timerType,
                                 items: [
-                                  DropdownMenuItem(
+                                  const DropdownMenuItem(
+                                    value: null,
                                     child: Text(
                                       'Aucun type d\'entraînement',
                                       style: TextStyle(fontStyle: FontStyle.italic),
                                     ),
-                                    value: null,
                                   ),
-                                  DropdownMenuItem(
-                                    child: Text('AMRAP'),
+                                  const DropdownMenuItem(
                                     value: 'AMRAP',
+                                    child: Text('AMRAP'),
                                   ),
-                                  DropdownMenuItem(
-                                    child: Text('EMOM'),
+                                  const DropdownMenuItem(
                                     value: 'EMOM',
+                                    child: Text('EMOM'),
                                   ),
-                                  DropdownMenuItem(
-                                    child: Text('For Time'),
+                                  const DropdownMenuItem(
                                     value: 'For Time',
+                                    child: Text('For Time'),
                                   ),
-                                  DropdownMenuItem(
-                                    child: Text('Circuit'),
+                                  const DropdownMenuItem(
                                     value: 'CIRCUIT',
+                                    child: Text('Circuit'),
                                   ),
                                 ]),
                           ),
@@ -134,88 +130,11 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: WorkoutSetPage(
-                            workout: widget.workout,
-                          ),
+                          child: WorkoutSetPage(workout: widget.workout),
                         ),
                       ],
                     ),
                   )
                 ]))));
-  }
-
-  TabBar getTabBar() {
-    return TabBar(
-      tabs: [
-        Tab(
-          child: Column(
-            children: [
-              Icon(
-                Icons.file_copy,
-                color: Color(Colors.amber.value),
-              ),
-              Text(
-                'Description',
-                style: TextStyle(color: Colors.amber),
-              )
-            ],
-          ),
-        ),
-        Tab(
-          child: Column(
-            children: [
-              Icon(
-                Icons.sports_volleyball,
-                color: Colors.amber,
-              ),
-              Text(
-                'Exercices',
-                style: TextStyle(color: (Colors.amber)),
-              )
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Row getTimeDisplay() {
-    return Row(
-      children: [
-        Expanded(
-          child: TextFormField(
-              initialValue: '',
-              autofocus: true,
-              onChanged: (value) => print(value),
-              decoration: InputDecoration(helperText: 'Temps'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Merci de renseigner le temps.';
-                }
-                return null;
-              }),
-        ),
-      ],
-    );
-  }
-
-  Row getRepsOnlyDisplay() {
-    return Row(
-      children: [
-        Expanded(
-          child: TextFormField(
-              initialValue: '',
-              autofocus: true,
-              onChanged: (value) => print(value),
-              decoration: InputDecoration(helperText: 'Reps'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Merci de renseigner le nombre de répétition.';
-                }
-                return null;
-              }),
-        ),
-      ],
-    );
   }
 }

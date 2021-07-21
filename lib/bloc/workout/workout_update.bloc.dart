@@ -9,6 +9,7 @@ import 'package:fitnc_trainer/domain/line.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/service/workout_set.service.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -17,6 +18,7 @@ import 'package:rxdart/rxdart.dart';
 class WorkoutUpdateBloc {
   FirestorageService firestorageService = FirestorageService.getInstance();
   TrainersService trainersService = TrainersService.getInstance();
+  WorkoutSetService workoutSetService = WorkoutSetService.getInstance();
 
   static WorkoutUpdateBloc? _instance;
   final String pathWorkoutMainImage = 'mainImage';
@@ -201,6 +203,6 @@ class WorkoutUpdateBloc {
   }
 
   Stream<List<WorkoutSet?>> listenToWorkoutStep() {
-    return this.trainersService.listenToWorkoutStep(_workout);
+    return workoutSetService.listenToWorkoutStep(_workout);
   }
 }
