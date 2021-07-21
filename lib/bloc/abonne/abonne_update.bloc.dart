@@ -155,7 +155,7 @@ class AbonneUpdateBloc {
     return http.readBytes(Uri.parse(imageUrl));
   }
 
-  changeDateNaissance(dynamic value) {
+  changeDateNaissance(String? value) {
     abonne.dateNaissance = value;
   }
 

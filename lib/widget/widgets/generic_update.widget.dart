@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class GenericUpdateWidget extends StatelessWidget {
   final Widget child;
   final double maximumWidth;
-  final opacity;
+  final double opacity;
 
   GenericUpdateWidget({required this.child, this.maximumWidth = 800, this.opacity=0.8});
 

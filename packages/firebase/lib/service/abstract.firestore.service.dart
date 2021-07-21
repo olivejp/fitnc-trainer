@@ -16,7 +16,7 @@ abstract class AbstractFirestoreService<T> {
         .get()
         .then((DocumentSnapshot snapshot) =>
             completer.complete(mapSnapshotToModel(snapshot)))
-        .catchError((error) => completer.completeError(error));
+        .catchError((Object error) => completer.completeError(error));
     return completer.future;
   }
 

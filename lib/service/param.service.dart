@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase/service/abstract.absolute-firestore.service.dart';
 import 'package:fitnc_trainer/domain/param.domain.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'firestore/abstract.absolute-firestore.service.dart';
 
 class ParamService extends AbstractAbsoluteFirestoreService<Param> {
   static ParamService? _instance;
@@ -46,10 +45,8 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
     );
   }
 
-  List<DropdownMenuItem<String?>> getParamAsDropdown(List<Param> params, bool onlyName, bool insertNull, String? nullElement)  {
-    List<DropdownMenuItem<String?>> list = params
-        .map((param) => mapParamToDropdownItem(param, onlyName))
-        .toList();
+  List<DropdownMenuItem<String?>> getParamAsDropdown(List<Param> params, bool onlyName, bool insertNull, String? nullElement) {
+    List<DropdownMenuItem<String?>> list = params.map((param) => mapParamToDropdownItem(param, onlyName)).toList();
 
     if (insertNull) {
       list.add(DropdownMenuItem<String?>(
@@ -62,9 +59,7 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
   }
 
   Future<List<DropdownMenuItem<String?>>> getFutureParamAsDropdown(String paramName, bool onlyName, bool insertNull, String? nullElement) async {
-    List<DropdownMenuItem<String?>> list = (await getListParam(paramName))
-        .map((param) => mapParamToDropdownItem(param, onlyName))
-        .toList();
+    List<DropdownMenuItem<String?>> list = (await getListParam(paramName)).map((param) => mapParamToDropdownItem(param, onlyName)).toList();
 
     if (insertNull) {
       list.add(DropdownMenuItem<String?>(

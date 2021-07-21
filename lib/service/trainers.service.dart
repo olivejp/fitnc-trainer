@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase/service/abstract.absolute-firestore.service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/domain/abonne.domain.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
@@ -10,7 +11,6 @@ import 'package:fitnc_trainer/domain/workout_set.dto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'firestore/abstract.absolute-firestore.service.dart';
 
 class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
   static TrainersService? _instance;

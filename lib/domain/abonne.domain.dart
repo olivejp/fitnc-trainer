@@ -8,7 +8,7 @@ class Abonne {
   String? nom;
   String? prenom;
   String? sexe;
-  dynamic dateNaissance;
+  String? dateNaissance;
   int? telephone1;
   int? telephone2;
   String? email;

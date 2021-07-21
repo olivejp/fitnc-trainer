@@ -12,7 +12,7 @@ Abonne _$AbonneFromJson(Map<String, dynamic> json) {
     ..nom = json['nom'] as String?
     ..prenom = json['prenom'] as String?
     ..sexe = json['sexe'] as String?
-    ..dateNaissance = json['dateNaissance']
+    ..dateNaissance = json['dateNaissance'] as String?
     ..telephone1 = json['telephone1'] as int?
     ..telephone2 = json['telephone2'] as int?
     ..email = json['email'] as String?

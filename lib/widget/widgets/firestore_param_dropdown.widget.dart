@@ -9,7 +9,7 @@ class TimerDropdownButton extends StatelessWidget {
   final TimerService timerService = TimerService.getInstance();
   final TextStyle? style;
   final InputDecoration? decoration;
-  final dynamic initialValue;
+  final String? initialValue;
   final void Function(String? onChangedValue) onChanged;
   final Icon? icon;
   final Widget? hint;
@@ -52,7 +52,7 @@ class ParamDropdownButton extends StatelessWidget {
   final TextStyle? style;
   final InputDecoration? decoration;
   final String paramName;
-  final dynamic initialValue;
+  final String? initialValue;
   final void Function(String? onChangedValue) onChanged;
   final Icon? icon;
   final Widget? hint;
@@ -91,7 +91,7 @@ class ParamDropdownButton extends StatelessWidget {
 class FutureDropdownButton extends StatelessWidget {
   final Key? key;
   final TextStyle? style;
-  final dynamic initialValue;
+  final String? initialValue;
   final InputDecoration? decoration;
   final void Function(String? onChangedValue) onChanged;
   final Icon? icon;
@@ -126,7 +126,7 @@ class FutureDropdownButton extends StatelessWidget {
 class StreamDropdownButton extends StatelessWidget {
   final Key? key;
   final TextStyle? style;
-  final dynamic initialValue;
+  final String? initialValue;
   final InputDecoration? decoration;
   final void Function(String? onChangedValue) onChanged;
   final Icon? icon;

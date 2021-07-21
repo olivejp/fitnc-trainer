@@ -5,32 +5,30 @@ import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:rxdart/rxdart.dart';
 
 class AuthParam {
+  AuthParam({this.email = '', this.password = ''});
+
   String email;
   String password;
-
-  AuthParam({this.email = '', this.password = ''});
 }
 
 class LoginBloc {
-  final AuthService authService = AuthService.getInstance();
-
-  AuthParam _authParam = AuthParam();
-  BehaviorSubject<String?>? _streamError;
-
-  Stream<String?>? get errorsObservable => _streamError?.stream;
+  LoginBloc._() {
+    _streamError = BehaviorSubject<String?>.seeded(null);
+  }
 
   static LoginBloc? _instance;
 
-  LoginBloc._() {
-    _streamError = BehaviorSubject.seeded(null);
-  }
-
   static LoginBloc getInstance() {
-    if (_instance == null) {
-      _instance = LoginBloc._();
-    }
+    _instance ??= LoginBloc._();
     return _instance!;
   }
+
+  final AuthService authService = AuthService.getInstance();
+
+  final AuthParam _authParam = AuthParam();
+  BehaviorSubject<String?>? _streamError;
+
+  Stream<String?>? get errorsObservable => _streamError?.stream;
 
   Future<bool> isConnected() {
     Completer<bool> completer = Completer();
@@ -40,10 +38,7 @@ class LoginBloc {
 
   Future<bool> disconnect() {
     Completer<bool> completer = Completer<bool>();
-    FirebaseAuth.instance
-        .signOut()
-        .then((value) => completer.complete(true))
-        .catchError((error) => completer.completeError(false));
+    FirebaseAuth.instance.signOut().then((value) => completer.complete(true)).catchError((error) => completer.completeError(false));
     return completer.future;
   }
 
@@ -65,7 +60,6 @@ class LoginBloc {
 
   Future<UserCredential> login() {
     print('test');
-    return FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _authParam.email, password: _authParam.password);
+    return FirebaseAuth.instance.signInWithEmailAndPassword(email: _authParam.email, password: _authParam.password);
   }
 }
