@@ -53,12 +53,15 @@ class _LoginPageState extends State<LoginPage> {
                       child: Form(
                         key: _formKey,
                         child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          alignment: WrapAlignment.center,
+                          runSpacing: 20,
                           children: [
                             TextFormField(
                               style: GoogleFonts.roboto(fontSize: 20),
                               decoration: InputDecoration(hintText: 'Email', hintStyle: GoogleFonts.roboto(fontSize: 20)),
                               enableSuggestions: true,
-                              onChanged: (value) => widget.bloc.changeEmail(value),
+                              onChanged: (value) => widget.bloc.email = value,
                               onFieldSubmitted: (value) => onPressedEnter(),
                               validator: (String? value) {
                                 if (value == null || value.isEmpty) {
@@ -75,15 +78,15 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             TextFormField(
                               style: GoogleFonts.roboto(fontSize: 20),
-                              obscureText: this.showPassword,
+                              obscureText: showPassword,
                               enableSuggestions: false,
                               autocorrect: false,
                               decoration: InputDecoration(
                                   hintText: 'Mot de passe',
                                   hintStyle: GoogleFonts.roboto(fontSize: 20),
                                   suffixIcon: IconButton(
-                                      onPressed: () => setState(() => this.showPassword = !this.showPassword), icon: Icon(Icons.remove_red_eye))),
-                              onChanged: (value) => widget.bloc.changePassword(value),
+                                      onPressed: () => setState(() => showPassword = !showPassword), icon: Icon(Icons.remove_red_eye))),
+                              onChanged: (value) => widget.bloc.password = value,
                               onFieldSubmitted: (value) => onPressedEnter(),
                             ),
                             FloatingActionButton.extended(
@@ -100,14 +103,11 @@ class _LoginPageState extends State<LoginPage> {
                                 if (snapshot.hasData && snapshot.data?.isNotEmpty == true) {
                                   return Text(snapshot.data!);
                                 } else {
-                                  return Text("");
+                                  return const Text('');
                                 }
                               },
                             ),
                           ],
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          alignment: WrapAlignment.center,
-                          runSpacing: 20,
                         ),
                       ),
                     ),

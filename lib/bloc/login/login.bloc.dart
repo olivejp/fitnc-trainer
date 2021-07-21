@@ -31,35 +31,44 @@ class LoginBloc {
   Stream<String?>? get errorsObservable => _streamError?.stream;
 
   Future<bool> isConnected() {
-    Completer<bool> completer = Completer();
+    final Completer<bool> completer = Completer<bool>();
     completer.complete(FirebaseAuth.instance.currentUser != null);
     return completer.future;
   }
 
   Future<bool> disconnect() {
-    Completer<bool> completer = Completer<bool>();
-    FirebaseAuth.instance.signOut().then((value) => completer.complete(true)).catchError((error) => completer.completeError(false));
+    final Completer<bool> completer = Completer<bool>();
+    FirebaseAuth.instance.signOut()
+        .then((_) => completer.complete(true))
+        .catchError((Object error) => completer.completeError(false));
     return completer.future;
   }
 
-  setError(String error) {
+  void setError(String error) {
     _streamError?.sink.add(error);
   }
 
-  cleanError() {
+  void cleanError() {
     _streamError?.sink.add("");
   }
 
-  changeEmail(String value) {
+  set email(String value) {
     _authParam.email = value;
   }
 
-  changePassword(String value) {
+  String get email {
+    return _authParam.email;
+  }
+
+  set password(String value) {
     _authParam.password = value;
   }
 
+  String get password {
+    return _authParam.password;
+  }
+
   Future<UserCredential> login() {
-    print('test');
     return FirebaseAuth.instance.signInWithEmailAndPassword(email: _authParam.email, password: _authParam.password);
   }
 }
