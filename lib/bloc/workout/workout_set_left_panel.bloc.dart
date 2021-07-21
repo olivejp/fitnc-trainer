@@ -9,13 +9,13 @@ import 'package:fitnc_trainer/service/workout_set.service.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
 
-class WorkoutSetPageBloc {
-  WorkoutSetPageBloc._();
+class WorkoutSetLeftPanelBloc {
+  WorkoutSetLeftPanelBloc._();
 
-  static WorkoutSetPageBloc? _instance;
+  static WorkoutSetLeftPanelBloc? _instance;
 
-  static WorkoutSetPageBloc getInstance() {
-    _instance ??= WorkoutSetPageBloc._();
+  static WorkoutSetLeftPanelBloc getInstance() {
+    _instance ??= WorkoutSetLeftPanelBloc._();
     return _instance!;
   }
 
@@ -94,30 +94,40 @@ class WorkoutSetPageBloc {
   }
 
   void switchOrder(WorkoutSetDto dto, int newOrder) {
-    final bool isDescente = dto.order < newOrder;
-
+    int order = newOrder;
+    final bool isDescente = dto.order < order;
+    if (isDescente) {
+      order = order - 1;
+    }
     final WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    // Mise à jour des DTO suivants pour les décaler tous.
     if (listDtos.isNotEmpty) {
       listDtos.where((WorkoutSetDto e) => e.uid != dto.uid).forEach((WorkoutSetDto e) {
-        if (isDescente && e.order > dto.order && e.order <= newOrder - 1) {
+        if (isDescente && e.order > dto.order && e.order <= order) {
           e.order = e.order - 1;
           batch.update(getSetRef(e), {'order': e.order});
         }
-        if (!isDescente && e.order < dto.order && e.order >= newOrder) {
+        if (!isDescente && e.order < dto.order && e.order >= order) {
           e.order = e.order + 1;
           batch.update(getSetRef(e), {'order': e.order});
         }
       });
-
-      dto.order = newOrder - 1;
-      batch.update(getSetRef(dto), {'order': dto.order});
     }
+
+    // Mise à jour du DTO reçu avec son nouvel ordre d'affichage.
+    dto.order = order;
+    batch.update(getSetRef(dto), {'order': dto.order});
+
+    // Trie de la liste locale
     listDtos.sort((WorkoutSetDto a, WorkoutSetDto b) => a.order.compareTo(b.order));
     subjectListDtos.sink.add(listDtos);
+
+    // Commit du batch pour envoyer toutes les modifications sur Firestore.
     batch.commit();
   }
 
-  void updateDto(WorkoutSetDto dto, Map<String, dynamic> values) {
+  void updateFirestoreSet(WorkoutSetDto dto, Map<String, dynamic> values) {
     getSetRef(dto)
         .update(values)
         .then((_) => print('Set mis à jour'))
@@ -126,26 +136,26 @@ class WorkoutSetPageBloc {
 
   void setReps(WorkoutSetDto dto, String value) {
     dto.reps = value;
-    updateDto(dto, {'reps': value});
+    updateFirestoreSet(dto, {'reps': value});
   }
 
   void setWeight(WorkoutSetDto dto, String value) {
     dto.weight = value;
-    updateDto(dto, {'weight': value});
+    updateFirestoreSet(dto, {'weight': value});
   }
 
   void setRestTime(WorkoutSetDto dto, String? value) {
     dto.restTime = value;
-    updateDto(dto, {'restTime': value});
+    updateFirestoreSet(dto, {'restTime': value});
   }
 
   void setTime(WorkoutSetDto dto, String? value) {
     dto.time = value;
-    updateDto(dto, {'time': value});
+    updateFirestoreSet(dto, {'time': value});
   }
 
   void setSets(WorkoutSetDto dto, String value) {
     dto.sets = value;
-    updateDto(dto, {'sets': value});
+    updateFirestoreSet(dto, {'sets': value});
   }
 }

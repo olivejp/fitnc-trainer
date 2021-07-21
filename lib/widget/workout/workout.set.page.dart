@@ -1,4 +1,3 @@
-import 'package:fitnc_trainer/bloc/workout/workout.set.page.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
@@ -12,12 +11,9 @@ import 'package:intl/intl.dart';
 import 'package:loading_animations/loading_animations.dart';
 
 class WorkoutSetPage extends StatelessWidget {
-  WorkoutSetPage({Key? key, required this.workout}) : super(key: key) {
-    bloc.init(workout);
-  }
+  WorkoutSetPage({Key? key, required this.workout}) : super(key: key);
 
   final TrainersService trainersService = TrainersService.getInstance();
-  final WorkoutSetPageBloc bloc = WorkoutSetPageBloc.getInstance();
   final Workout workout;
 
   static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');

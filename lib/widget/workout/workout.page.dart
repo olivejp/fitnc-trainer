@@ -37,6 +37,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         floatingActionButton: FloatingActionButton.extended(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
           onPressed: () => WorkoutCreatePage.showCreate(context),
           label: Text(
             'Créer un workout',
@@ -56,7 +57,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 children: [
                   Expanded(
                       flex: 3,
-                      child: Text(
+                      child: SelectableText(
                         'Workouts',
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                       )),

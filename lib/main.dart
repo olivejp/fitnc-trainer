@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
           title: appTitle,
           theme: ThemeData(
+              fixTextFieldOutlineLabel: true,
               inputDecorationTheme: InputDecorationTheme(border: OutlineInputBorder(borderRadius: BorderRadius.circular(5))),
               primarySwatch: Colors.amber,
               floatingActionButtonTheme: FloatingActionButtonThemeData(foregroundColor: Colors.white),

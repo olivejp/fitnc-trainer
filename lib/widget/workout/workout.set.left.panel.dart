@@ -1,9 +1,8 @@
 import 'package:dotted_border/dotted_border.dart';
-import 'package:fitnc_trainer/bloc/workout/workout.set.page.bloc.dart';
+import 'package:fitnc_trainer/bloc/workout/workout_set_left_panel.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.dto.dart';
-import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +18,7 @@ class WorkoutSetLeftPanel extends StatelessWidget {
   }
 
   static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
-  final WorkoutSetPageBloc bloc = WorkoutSetPageBloc.getInstance();
+  final WorkoutSetLeftPanelBloc bloc = WorkoutSetLeftPanelBloc.getInstance();
   final Workout workout;
 
   @override
@@ -257,7 +256,8 @@ class WorkoutSetLeftPanel extends StatelessWidget {
       onWillAccept: (data) => data is WorkoutSetDto && data.uid != dto.uid,
       onAccept: (data) => bloc.switchOrder(data, dto.order),
       builder: (context, candidateData, rejectedData) {
-        Widget tile = ListTile(
+        final Widget tile = ListTile(
+          dense: true,
           leading: Draggable<WorkoutSetDto>(
             data: dto,
             feedback: SizedBox(
@@ -270,7 +270,7 @@ class WorkoutSetLeftPanel extends StatelessWidget {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(dto.nameExercice!),
+              Text(dto.nameExercice!, style: TextStyle(fontSize: 14),),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: mapWorkoutSetDto(dto),
@@ -278,6 +278,7 @@ class WorkoutSetLeftPanel extends StatelessWidget {
             ],
           ),
           trailing: IconButton(
+            tooltip: 'Supprimer l\'exercice',
             onPressed: () => bloc.deleteWorkoutSet(dto),
             icon: const Icon(Icons.delete),
           ),
