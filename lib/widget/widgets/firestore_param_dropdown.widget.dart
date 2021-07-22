@@ -77,13 +77,13 @@ class ParamDropdownButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureDropdownButton(
-      style: this.style,
-      decoration: this.decoration,
-      initialValue: this.initialValue,
-      future: this.paramService.getFutureParamAsDropdown(this.paramName, this.onlyValue, this.insertNull, this.nullElement),
-      onChanged: this.onChanged,
-      icon: this.icon,
-      hint: this.hint,
+      style: style,
+      decoration: decoration,
+      initialValue: initialValue,
+      future: paramService.getFutureParamAsDropdown(paramName, onlyValue, insertNull, nullElement),
+      onChanged: onChanged,
+      icon: icon,
+      hint: hint,
     );
   }
 }
@@ -104,21 +104,30 @@ class FutureDropdownButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<DropdownMenuItem<String?>>>(
-        future: this.future,
+        future: future,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return DropdownButtonFormField<String?>(
               style: style,
-              key: this.key,
-              icon: this.icon,
-              onChanged: this.onChanged,
+              key: key,
+              icon: icon,
+              onChanged: onChanged,
               value: initialValue,
               items: snapshot.data,
-              hint: this.hint,
+              hint: hint,
               decoration: decoration,
             );
           }
-          return Container();
+          return DropdownButtonFormField<String?>(
+            style: style,
+            key: key,
+            icon: icon,
+            onChanged: onChanged,
+            value: initialValue,
+            items: [],
+            hint: hint,
+            decoration: decoration,
+          );
         });
   }
 }
