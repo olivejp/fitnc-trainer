@@ -3,8 +3,9 @@ import 'package:fitnc_trainer/service/timer.service.dart';
 import 'package:flutter/material.dart';
 
 class TimerDropdownButton extends StatelessWidget {
-  static const Icon DEFAULT_ICON = Icon(Icons.arrow_downward);
+  static const Icon defaultIcon = Icon(Icons.arrow_downward);
 
+  @override
   final Key? key;
   final TimerService timerService = TimerService.getInstance();
   final TextStyle? style;
@@ -23,7 +24,7 @@ class TimerDropdownButton extends StatelessWidget {
     this.decoration,
     required this.initialValue,
     required this.onChanged,
-    this.icon = DEFAULT_ICON,
+    this.icon = defaultIcon,
     this.onlyName = false,
     this.hint,
     this.insertNull = false,
@@ -34,11 +35,11 @@ class TimerDropdownButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String?>(
       style: style,
-      icon: this.icon,
-      onChanged: this.onChanged,
+      icon: icon,
+      onChanged: onChanged,
       value: initialValue,
       items: timerService.getDropdownMenuItem(onlyName, insertNull, nullElement),
-      hint: this.hint,
+      hint: hint,
       decoration: decoration,
     );
   }

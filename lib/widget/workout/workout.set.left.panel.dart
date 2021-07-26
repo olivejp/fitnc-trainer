@@ -78,7 +78,7 @@ class WorkoutSetLeftPanel extends StatelessWidget {
                 },
               );
             } else {
-              return LoadingFlipping.circle();
+              return LoadingRotating.square(backgroundColor: Theme.of(context).primaryColor,);
             }
           },
         ),
@@ -165,19 +165,19 @@ class WorkoutSetLeftPanel extends StatelessWidget {
             LimitedBox(
               maxHeight: 25,
               maxWidth: 150,
-              child: ParamDropdownButton(
+              child: TimerDropdownButton(
                 key: timeKey,
                 icon: const Icon(
                   Icons.arrow_downward,
                   size: 12,
                 ),
-                onlyValue: true,
+                onlyName: true,
+                insertNull: false,
                 decoration: const InputDecoration(contentPadding: EdgeInsets.all(10)),
                 style: const TextStyle(fontSize: 12),
                 hint: const Text('Temps', style: TextStyle(fontSize: 10)),
-                paramName: 'combo_time',
                 initialValue: dto.time,
-                onChanged: (value) => bloc.setTime(dto, value),
+                onChanged: (String? value) => bloc.setTime(dto, value),
               ),
             ),
           ],
@@ -195,11 +195,11 @@ class WorkoutSetLeftPanel extends StatelessWidget {
           child: TextFormField(
             key: setsKey,
             initialValue: dto.sets,
-            buildCounter: (context, {required currentLength, required isFocused, maxLength}) => null,
+            buildCounter: (BuildContext context, {required currentLength, required isFocused, int? maxLength}) => null,
             maxLength: 3,
             textAlignVertical: TextAlignVertical.bottom,
             style: const TextStyle(fontSize: 15),
-            onChanged: (value) => bloc.setSets(dto, value),
+            onChanged: (String value) => bloc.setSets(dto, value),
             decoration: const InputDecoration(
               hintText: 'Sets',
               hintStyle: TextStyle(fontSize: 12),
@@ -223,7 +223,7 @@ class WorkoutSetLeftPanel extends StatelessWidget {
             style: const TextStyle(fontSize: 12),
             hint: const Text('Repos', style: TextStyle(fontSize: 10)),
             initialValue: dto.restTime,
-            onChanged: (value) => bloc.setRestTime(dto, value),
+            onChanged: (String? value) => bloc.setRestTime(dto, value),
           ),
         )
       ],
@@ -258,6 +258,7 @@ class WorkoutSetLeftPanel extends StatelessWidget {
       builder: (context, candidateData, rejectedData) {
         final Widget tile = ListTile(
           dense: true,
+          minLeadingWidth: 20,
           leading: Draggable<WorkoutSetDto>(
             data: dto,
             feedback: SizedBox(
@@ -280,7 +281,7 @@ class WorkoutSetLeftPanel extends StatelessWidget {
           trailing: IconButton(
             tooltip: 'Supprimer l\'exercice',
             onPressed: () => bloc.deleteWorkoutSet(dto),
-            icon: const Icon(Icons.delete),
+            icon: const Icon(Icons.delete,  color: Colors.grey,),
           ),
         );
         if (candidateData.isNotEmpty) {

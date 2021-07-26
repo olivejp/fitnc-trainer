@@ -4,12 +4,15 @@ part 'trainers.domain.g.dart';
 
 @JsonSerializable()
 class Trainers {
-  String uid;
-  String email;
-
-  Trainers({this.uid = '', this.email = ''});
+  Trainers({this.uid = '', this.email = '', this.nom = '', this.prenom = '', this.telephone = ''});
 
   factory Trainers.fromJson(Map<String, dynamic> data) => _$TrainersFromJson(data);
+
+  String uid;
+  String email;
+  String nom;
+  String prenom;
+  String? telephone;
 
   Map<String, dynamic> toJson() => _$TrainersToJson(this);
 }

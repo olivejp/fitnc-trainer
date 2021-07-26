@@ -117,7 +117,7 @@ class WorkoutSetPage extends StatelessWidget {
           if (loadingProgress == null) {
             return child;
           }
-          return LoadingBouncingGrid.circle();
+          return LoadingRotating.square(backgroundColor: Theme.of(context).primaryColor,);
         },
       );
     } else {

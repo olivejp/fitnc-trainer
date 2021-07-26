@@ -38,6 +38,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         floatingActionButton: FloatingActionButton.extended(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
           onPressed: () => ProgrammeCreatePage.showCreate(context),
           label: Text(
             'Créer un programme',
@@ -242,7 +243,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
       },
       icon: Icon(
         Icons.delete,
-        color: Color(Colors.amber.value),
+        color: Colors.grey,
         size: 24,
       ),
     );

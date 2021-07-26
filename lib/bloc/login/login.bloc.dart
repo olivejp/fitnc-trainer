@@ -49,7 +49,7 @@ class LoginBloc {
   }
 
   void cleanError() {
-    _streamError?.sink.add("");
+    _streamError?.sink.add('');
   }
 
   set email(String value) {
@@ -70,5 +70,9 @@ class LoginBloc {
 
   Future<UserCredential> login() {
     return FirebaseAuth.instance.signInWithEmailAndPassword(email: _authParam.email, password: _authParam.password);
+  }
+
+  Future<UserCredential> signUp() {
+    return FirebaseAuth.instance.createUserWithEmailAndPassword(email: _authParam.email, password: _authParam.password);
   }
 }

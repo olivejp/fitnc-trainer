@@ -198,7 +198,7 @@ class _AbonnePageState extends State<AbonnePage> {
       },
       icon: Icon(
         Icons.delete,
-        color: Color(Colors.amber.value),
+        color: Colors.grey,
         size: 24,
       ),
     );

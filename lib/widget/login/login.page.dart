@@ -16,107 +16,150 @@ class LoginPage extends StatefulWidget {
 
   @override
   _LoginPageState createState() {
-    return new _LoginPageState();
+    return _LoginPageState();
   }
 }
 
 class _LoginPageState extends State<LoginPage> {
+  _LoginPageState();
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool showPassword = true;
-
-  _LoginPageState();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.black87,
         body: Stack(children: [
-          Container(
-            decoration: BoxDecoration(image: DecorationImage(image: AssetImage("images/background.jpg"), fit: BoxFit.cover)),
+      Container(
+        decoration: const BoxDecoration(image: DecorationImage(image: AssetImage('images/background.jpg'), fit: BoxFit.cover)),
+      ),
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Fitness Nc',
+            style: GoogleFonts.alfaSlabOne(color: Colors.amber, fontSize: 50),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Fitness Nc',
-                style: GoogleFonts.alfaSlabOne(color: Colors.amber, fontSize: 50),
-              ),
-              Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: 500),
-                  child: Card(
-                    color: Colors.white70,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Form(
-                        key: _formKey,
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          alignment: WrapAlignment.center,
-                          runSpacing: 20,
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Card(
+                color: Colors.white70,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            style: GoogleFonts.roboto(fontSize: 20),
+                            decoration: InputDecoration(hintText: 'Email', hintStyle: GoogleFonts.roboto(fontSize: 20)),
+                            onChanged: (String value) => widget.bloc.email = value,
+                            onFieldSubmitted: (String value) => onPressedEnter(),
+                            validator: (String? value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Merci de renseigner votre adresse email.';
+                              }
+                              if (!RegExp(
+                                      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+                                  .hasMatch(value)) {
+                                return "L'adresse mail n'est pas formatée correctement'.";
+                              }
+                              return null;
+                            },
+                            textInputAction: TextInputAction.done,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            style: GoogleFonts.roboto(fontSize: 20),
+                            obscureText: showPassword,
+                            enableSuggestions: false,
+                            autocorrect: false,
+                            decoration: InputDecoration(
+                                hintText: 'Mot de passe',
+                                hintStyle: GoogleFonts.roboto(fontSize: 20),
+                                suffixIcon:
+                                    IconButton(onPressed: () => setState(() => showPassword = !showPassword), icon: Icon(Icons.remove_red_eye))),
+                            onChanged: (value) => widget.bloc.password = value,
+                            onFieldSubmitted: (value) => onPressedEnter(),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: FloatingActionButton.extended(
+                            onPressed: onPressedEnter,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                            label: Text(
+                              'Se connecter',
+                              style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
+                            ),
+                          ),
+                        ),
+                        Wrap(
                           children: [
-                            TextFormField(
-                              style: GoogleFonts.roboto(fontSize: 20),
-                              decoration: InputDecoration(hintText: 'Email', hintStyle: GoogleFonts.roboto(fontSize: 20)),
-                              enableSuggestions: true,
-                              onChanged: (value) => widget.bloc.email = value,
-                              onFieldSubmitted: (value) => onPressedEnter(),
-                              validator: (String? value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Merci de renseigner votre adresse email.';
-                                }
-                                if (!RegExp(
-                                        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-                                    .hasMatch(value)) {
-                                  return "L'adresse mail n'est pas formattée correctement'.";
-                                }
-                                return null;
-                              },
-                              textInputAction: TextInputAction.done,
-                            ),
-                            TextFormField(
-                              style: GoogleFonts.roboto(fontSize: 20),
-                              obscureText: showPassword,
-                              enableSuggestions: false,
-                              autocorrect: false,
-                              decoration: InputDecoration(
-                                  hintText: 'Mot de passe',
-                                  hintStyle: GoogleFonts.roboto(fontSize: 20),
-                                  suffixIcon: IconButton(
-                                      onPressed: () => setState(() => showPassword = !showPassword), icon: Icon(Icons.remove_red_eye))),
-                              onChanged: (value) => widget.bloc.password = value,
-                              onFieldSubmitted: (value) => onPressedEnter(),
-                            ),
-                            FloatingActionButton.extended(
-                              onPressed: onPressedEnter,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                              label: Text(
-                                'Se connecter',
-                                style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
-                              ),
-                            ),
-                            StreamBuilder<String?>(
-                              stream: widget.bloc.errorsObservable,
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData && snapshot.data?.isNotEmpty == true) {
-                                  return Text(snapshot.data!);
-                                } else {
-                                  return const Text('');
-                                }
-                              },
-                            ),
+                            TextButton(
+                                onPressed: () => Navigator.pushNamed(context, '/sign_up'),
+                                child: Text(
+                                  'Créer un compte',
+                                  style: TextStyle(color: Colors.black87),
+                                )),
+                            TextButton(onPressed: () => print('hello'), child: Text('Mot de passe oublié', style: TextStyle(color: Colors.black87))),
                           ],
                         ),
-                      ),
+                        StreamBuilder<String?>(
+                          stream: widget.bloc.errorsObservable,
+                          builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+                            if (snapshot.hasData && snapshot.data?.isNotEmpty == true) {
+                              return Text(snapshot.data!);
+                            } else {
+                              return const Text('');
+                            }
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        ]));
+        ],
+      ),
+      Positioned.directional(
+        bottom: 0,
+        start: 0,
+        end: 0,
+        textDirection: TextDirection.ltr,
+        child: BottomAppBar(
+          color: Colors.transparent,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: 50, minHeight: 50),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                    onPressed: () => print('hello'),
+                    child: Text(
+                      'Copyrigth @Deveo.nc',
+                      style: TextStyle(color: Colors.white),
+                    )),
+                TextButton(
+                    onPressed: () => print('hello'),
+                    child: Text(
+                      'Conditions d\'utilisation',
+                      style: TextStyle(color: Colors.white),
+                    )),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ]));
   }
 
   void onPressedEnter() {

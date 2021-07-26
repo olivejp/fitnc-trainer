@@ -17,11 +17,12 @@ import 'package:page_transition/page_transition.dart';
 import 'exercice.create.page.dart';
 
 class ExercicePage extends StatelessWidget {
+  ExercicePage({Key? key}) : super(key: key);
+
   final MyHomePageBloc homePageBloc = MyHomePageBloc.getInstance();
   final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.getInstance();
-  static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
-  ExercicePage({Key? key}) : super(key: key);
+  static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +30,15 @@ class ExercicePage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         floatingActionButton: FloatingActionButton.extended(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
           onPressed: () => ExerciceCreatePage.showCreate(context),
           label: Text(
             'Créer un exercice',
             style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
           ),
-          icon: Icon(
+          icon: const Icon(
             Icons.add,
-            color: Color(Colors.white.value),
+            color: Colors.white,
             size: 20.0,
           ),
         ),
@@ -46,7 +48,7 @@ class ExercicePage extends StatelessWidget {
               padding: const EdgeInsets.only(left: 15, right: 15),
               child: Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                       flex: 3,
                       child: Text(
                         'Exercices',
@@ -55,7 +57,7 @@ class ExercicePage extends StatelessWidget {
                   Expanded(
                     flex: 1,
                     child: TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: UnderlineInputBorder(),
                         prefixIcon: Icon(Icons.search),
                         hintText: 'Recherche...',
@@ -69,14 +71,14 @@ class ExercicePage extends StatelessWidget {
             Expanded(
               child: StreamBuilder<List<Exercice?>>(
                 stream: bloc.getStreamExercice(),
-                builder: (context, snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<List<Exercice?>> snapshot) {
                   if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
-                    return Center(child: Text('Aucun exercice trouvé.'));
+                    return const Center(child: Text('Aucun exercice trouvé.'));
                   } else {
-                    List<Exercice?> listExercice = snapshot.data!;
+                    final List<Exercice?> listExercice = snapshot.data!;
                     return StreamBuilder<bool>(
                         stream: homePageBloc.currentDisplayObs,
-                        builder: (context, snapshot) {
+                        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
                           if (snapshot.hasData) {
                             if (snapshot.data != null && snapshot.data == true) {
                               return getListView(listExercice);
@@ -116,11 +118,11 @@ class ExercicePage extends StatelessWidget {
         mainAxisSpacing: 10.0,
         crossAxisSpacing: 10.0,
         crossAxisCount: nbColumns,
-        children: listExercice.map((exercice) {
+        children: listExercice.map((Exercice? exercice) {
           if (exercice != null) {
             return InkWell(
-              splashColor: Colors.amber,
-              hoverColor: Colors.amber,
+              splashColor: Theme.of(context).primaryColor,
+              hoverColor: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(5),
               onTap: () => goToUpdatePage(context, exercice),
               child: getGridCard(context, exercice),
@@ -150,11 +152,11 @@ class ExercicePage extends StatelessWidget {
       firstChild = Image.network(
         exercice.imageUrl!,
         fit: BoxFit.cover,
-        loadingBuilder: (context, child, loadingProgress) {
+        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
           if (loadingProgress == null) {
             return child;
           }
-          return LoadingBouncingGrid.circle();
+          return Center(child: LoadingRotating.square(backgroundColor: Theme.of(context).primaryColor,));
         },
       );
     } else {
@@ -165,6 +167,7 @@ class ExercicePage extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      elevation: 2,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -191,7 +194,6 @@ class ExercicePage extends StatelessWidget {
           ),
         ],
       ),
-      elevation: 2,
     );
   }
 
@@ -199,10 +201,10 @@ class ExercicePage extends StatelessWidget {
     return ListView.separated(
         separatorBuilder: (context, index) => Divider(height: 2.0),
         itemCount: listExercice.length,
-        itemBuilder: (context, index) {
+        itemBuilder: (BuildContext context, int index) {
           Exercice exercice = listExercice[index] as Exercice;
-          Widget leading = (exercice.imageUrl != null) ? CircleAvatar(foregroundImage: NetworkImage(exercice.imageUrl!)) : CircleAvatar();
-          Widget subtitle = exercice.createDate != null
+          final Widget leading = (exercice.imageUrl != null) ? CircleAvatar(foregroundImage: NetworkImage(exercice.imageUrl!)) : const CircleAvatar();
+          final Widget subtitle = exercice.createDate != null
               ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((exercice.createDate as Timestamp).millisecondsSinceEpoch)))
               : Container();
 
@@ -222,8 +224,8 @@ class ExercicePage extends StatelessWidget {
       onPressed: () {
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Êtes-vous sûr de vouloir supprimer cet exercice?'),
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Êtes-vous sûr de vouloir supprimer cet exercice?'),
             actions: [
               TextButton(onPressed: () => deleteExercice(exercice, context), child: Text('Oui')),
               TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler'))
@@ -231,9 +233,9 @@ class ExercicePage extends StatelessWidget {
           ),
         );
       },
-      icon: Icon(
+      icon: const Icon(
         Icons.delete,
-        color: Color(Colors.amber.value),
+        color: Colors.grey,
         size: 24,
       ),
     );

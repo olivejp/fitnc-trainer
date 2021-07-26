@@ -80,7 +80,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                       onPressed: () => deletePhoto(),
                       icon: Icon(
                         Icons.delete,
-                        color: Color(Colors.amber.value),
+                        color: Colors.grey,
                       )),
                 ],
               ),

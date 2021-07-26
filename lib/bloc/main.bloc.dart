@@ -3,16 +3,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:fitnc_trainer/service/auth.service.dart';
 
 class MainBloc {
-  static MainBloc? _instance;
-
-  final AuthService authService = AuthService.getInstance();
-
   MainBloc._();
 
+  static MainBloc? _instance;
+  final AuthService authService = AuthService.getInstance();
+
   static MainBloc getInstance() {
-    if (_instance == null) {
-      _instance = MainBloc._();
-    }
+    _instance ??= MainBloc._();
     return _instance!;
   }
 

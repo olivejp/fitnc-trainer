@@ -15,21 +15,21 @@ import 'package:loading_animations/loading_animations.dart';
 import 'package:page_transition/page_transition.dart';
 
 class WorkoutPage extends StatefulWidget {
+  WorkoutPage({Key? key}) : super(key: key);
+
   final MyHomePageBloc homePageBloc = MyHomePageBloc.getInstance();
   final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
 
-  WorkoutPage({Key? key}) : super(key: key);
-
   @override
   _WorkoutPageState createState() {
-    return new _WorkoutPageState();
+    return _WorkoutPageState();
   }
 }
 
 class _WorkoutPageState extends State<WorkoutPage> {
-  DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
-
   _WorkoutPageState();
+
+  DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
               padding: const EdgeInsets.only(left: 15, right: 15),
               child: Row(
                 children: [
-                  Expanded(
+                  const Expanded(
                       flex: 3,
                       child: SelectableText(
                         'Workouts',
@@ -64,7 +64,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                   Expanded(
                     flex: 1,
                     child: TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: UnderlineInputBorder(),
                         prefixIcon: Icon(Icons.search),
                         hintText: 'Recherche...',
@@ -78,15 +78,15 @@ class _WorkoutPageState extends State<WorkoutPage> {
             Expanded(
               child: StreamBuilder<List<Workout?>>(
                 stream: widget.bloc.getStreamWorkout(),
-                builder: (context, snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<List<Workout?>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.active) {
                     if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
-                      return Center(child: Text('Aucun workout trouvé.'));
+                      return const Center(child: Text('Aucun workout trouvé.'));
                     } else {
-                      List<Workout?> listWorkout = snapshot.data!;
+                      final List<Workout?> listWorkout = snapshot.data!;
                       return StreamBuilder<bool>(
                           stream: widget.homePageBloc.currentDisplayObs,
-                          builder: (context, snapshot) {
+                          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
                             if (snapshot.hasData) {
                               if (snapshot.data != null && snapshot.data == true) {
                                 return getListView(listWorkout);
@@ -98,7 +98,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
                           });
                     }
                   }
-                  return LoadingBouncingGrid.circle();
+                  return LoadingRotating.square(
+                    backgroundColor: Theme.of(context).primaryColor,
+                  );
                 },
               ),
             ),
@@ -109,7 +111,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
   }
 
   Widget getGridView(List<Workout?> listWorkout) {
-    return LayoutBuilder(builder: (context, constraints) {
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       int nbColumns = 1;
       if (constraints.maxWidth > 1200) {
         nbColumns = 6;
@@ -127,7 +129,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
         mainAxisSpacing: 10.0,
         crossAxisSpacing: 10.0,
         crossAxisCount: nbColumns,
-        children: listWorkout.map((workout) {
+        children: listWorkout.map((Workout? workout) {
           if (workout != null) {
             return InkWell(
                 splashColor: Color(Colors.amber.value),
@@ -151,58 +153,57 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   Card getGridCard(Workout workout) {
     Widget firstChild;
-    if (workout.imageUrl != null) {
+    if (workout.imageUrl?.isNotEmpty == true) {
       firstChild = Image.network(
         workout.imageUrl!,
         fit: BoxFit.cover,
-        loadingBuilder: (context, child, loadingProgress) {
+        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
           if (loadingProgress == null) {
             return child;
           }
-          return LoadingFadingLine.circle(
-            backgroundColor: Colors.amber,
-            borderColor: Colors.amberAccent,
-          );
+          return Center(
+              child: LoadingRotating.square(
+            backgroundColor: Theme.of(context).primaryColor,
+          ));
         },
       );
     } else {
-      firstChild = Container(decoration: BoxDecoration(color: Color(Colors.amber.value)));
+      firstChild = Container(decoration: const BoxDecoration(color: Colors.amber));
     }
     return Card(
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      elevation: 2,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(flex: 3, child: firstChild),
           Expanded(
+            flex: 1,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
-                  child: Text(workout.name, style: TextStyle(fontSize: 15)),
+                  child: Text(workout.name, style: const TextStyle(fontSize: 15)),
                 ),
                 getDeleteButton(context, workout)
               ],
             ),
-            flex: 1,
           ),
         ],
       ),
-      elevation: 2,
     );
   }
 
   ListView getListView(List<Workout?> listWorkout) {
     return ListView.separated(
-        separatorBuilder: (context, index) => Divider(height: 2.0),
+        separatorBuilder: (BuildContext context, int index) => const Divider(height: 2.0),
         itemCount: listWorkout.length,
-        itemBuilder: (context, index) {
-          Workout workout = listWorkout[index] as Workout;
-          Widget leading = (workout.imageUrl != null) ? CircleAvatar(foregroundImage: NetworkImage(workout.imageUrl!)) : CircleAvatar();
-          Widget subtitle = workout.createDate != null
+        itemBuilder: (BuildContext context, int index) {
+          final Workout workout = listWorkout[index] as Workout;
+          final Widget leading = (workout.imageUrl != null) ? CircleAvatar(foregroundImage: NetworkImage(workout.imageUrl!)) : const CircleAvatar();
+          final Widget subtitle = workout.createDate != null
               ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((workout.createDate as Timestamp).millisecondsSinceEpoch)))
               : Container();
 
@@ -231,16 +232,16 @@ class _WorkoutPageState extends State<WorkoutPage> {
       onPressed: () {
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Etes vous sûr de vouloir supprimer ce workout?'),
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Etes vous sûr de vouloir supprimer ce workout?'),
             actions: [
-              TextButton(onPressed: () => deleteWorkout(workout, context), child: Text('Oui')),
-              TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler'))
+              TextButton(onPressed: () => deleteWorkout(workout, context), child: const Text('Oui')),
+              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
             ],
           ),
         );
       },
-      icon: Icon(Icons.delete, color: Colors.amber, size: 24),
+      icon: const Icon(Icons.delete,  color: Colors.grey, size: 24),
     );
   }
 

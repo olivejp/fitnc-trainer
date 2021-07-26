@@ -52,7 +52,7 @@ class ExerciceFormBuilder {
                   hint: Text('Type d\'exercice', style: TextStyle(fontStyle: FontStyle.italic)),
                   paramName: 'type_exercice',
                   initialValue: bloc.exercice.typeExercice,
-                  onChanged: (onChangedValue) => bloc.exercice.typeExercice = onChangedValue,
+                  onChanged: (String? onChangedValue) => bloc.exercice.typeExercice = onChangedValue,
                 ))
               ],
             ),

@@ -5,53 +5,49 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ParamService extends AbstractAbsoluteFirestoreService<Param> {
-  static ParamService? _instance;
 
   ParamService._() : super(collectionReference: FirebaseFirestore.instance.collection('params')) {
     _instance = this;
   }
 
+  static ParamService? _instance;
+
   static ParamService getInstance() {
-    if (_instance == null) {
-      _instance = ParamService._();
-    }
+    _instance ??= ParamService._();
     return _instance!;
   }
 
   Stream<List<Param>> listenListParam(String paramName) {
-    return this
-        .collectionReference
+    return collectionReference
         .doc(paramName)
         .collection('values')
         .orderBy('order')
         .snapshots()
-        .map((querySnapshot) => querySnapshot.docs.map((e) => Param.fromJson(e.data())).toList());
+        .map((QuerySnapshot<Map<String, dynamic>> querySnapshot) => querySnapshot.docs.map((e) => Param.fromJson(e.data())).toList());
   }
 
   Future<List<Param>> getListParam(String paramName) {
-    return this
-        .collectionReference
+    return collectionReference
         .doc(paramName)
         .collection('values')
         .orderBy('order')
         .get()
-        .then((querySnapshot) => querySnapshot.docs.map((e) => Param.fromJson(e.data())).toList());
+        .then((QuerySnapshot<Map<String, dynamic>> querySnapshot) => querySnapshot.docs.map((e) => Param.fromJson(e.data())).toList());
   }
 
   DropdownMenuItem<String?> mapParamToDropdownItem(Param param, bool onlyName) {
     return DropdownMenuItem<String?>(
-      child: getRowFromParam(param, onlyName),
       value: param.valeur,
+      child: getRowFromParam(param, onlyName),
     );
   }
 
   List<DropdownMenuItem<String?>> getParamAsDropdown(List<Param> params, bool onlyName, bool insertNull, String? nullElement) {
-    List<DropdownMenuItem<String?>> list = params.map((param) => mapParamToDropdownItem(param, onlyName)).toList();
+    final List<DropdownMenuItem<String?>> list = params.map((param) => mapParamToDropdownItem(param, onlyName)).toList();
 
     if (insertNull) {
       list.add(DropdownMenuItem<String?>(
-        child: nullElement != null ? Text(nullElement) : Text(''),
-        value: null,
+        child: nullElement != null ? Text(nullElement) : const Text(''),
       ));
     }
 
@@ -59,12 +55,11 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
   }
 
   Future<List<DropdownMenuItem<String?>>> getFutureParamAsDropdown(String paramName, bool onlyName, bool insertNull, String? nullElement) async {
-    List<DropdownMenuItem<String?>> list = (await getListParam(paramName)).map((param) => mapParamToDropdownItem(param, onlyName)).toList();
+    final List<DropdownMenuItem<String?>> list = (await getListParam(paramName)).map((param) => mapParamToDropdownItem(param, onlyName)).toList();
 
     if (insertNull) {
       list.add(DropdownMenuItem<String?>(
-        child: nullElement != null ? Text(nullElement) : Text(''),
-        value: null,
+        child: nullElement != null ? Text(nullElement) : const Text(''),
       ));
     }
 
@@ -76,7 +71,7 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
       return Text(param.nom!);
     } else {
       return Row(children: [
-        Text(param.nom! + '  -  '),
+        Text('${param.nom!}  -  '),
         Text(
           param.libelle!,
           style: TextStyle(fontStyle: FontStyle.italic, color: Color(Colors.grey.value)),
