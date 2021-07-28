@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../bottom.widget.dart';
+
 typedef CallbackUserCredential = void Function(UserCredential userCredential);
 
 class LoginPage extends StatefulWidget {
@@ -130,35 +132,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ],
       ),
-      Positioned.directional(
-        bottom: 0,
-        start: 0,
-        end: 0,
-        textDirection: TextDirection.ltr,
-        child: BottomAppBar(
-          color: Colors.transparent,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(maxHeight: 50, minHeight: 50),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                    onPressed: () => print('hello'),
-                    child: Text(
-                      'Copyrigth @Deveo.nc',
-                      style: TextStyle(color: Colors.white),
-                    )),
-                TextButton(
-                    onPressed: () => print('hello'),
-                    child: Text(
-                      'Conditions d\'utilisation',
-                      style: TextStyle(color: Colors.white),
-                    )),
-              ],
-            ),
-          ),
-        ),
-      ),
+      BottomCu(),
     ]));
   }
 
@@ -175,3 +149,5 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 }
+
+

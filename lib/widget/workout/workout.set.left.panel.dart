@@ -24,9 +24,8 @@ class WorkoutSetLeftPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-        elevation: 10,
+      child: Container(
+        decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.grey), borderRadius: BorderRadius.all(Radius.circular(5))),
         child: StreamBuilder<List<WorkoutSetDto>>(
           stream: bloc.obsListWorkoutSet,
           builder: (context, snapshot) {

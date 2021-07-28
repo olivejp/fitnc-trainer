@@ -45,7 +45,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           ),
         ]),
         body: GenericUpdateWidget(
-            maximumWidth: 1680,
+            maximumWidth: 2000,
             child: Form(
                 key: _formKey,
                 child: Column(children: [
@@ -125,7 +125,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                     ),
                   ),
                   LimitedBox(
-                    maxWidth: 1200,
+                    maxWidth: 2000,
                     maxHeight: 600,
                     child: Row(
                       children: [
