@@ -132,8 +132,8 @@ class _WorkoutPageState extends State<WorkoutPage> {
         children: listWorkout.map((Workout? workout) {
           if (workout != null) {
             return InkWell(
-                splashColor: Color(Colors.amber.value),
-                hoverColor: Color(Colors.amber.value),
+                splashColor: Theme.of(context).primaryColor,
+                hoverColor: Theme.of(context).primaryColor,
                 borderRadius: BorderRadius.circular(5),
                 onTap: () => Navigator.push(
                     context,

@@ -161,7 +161,7 @@ class ExercicePage extends StatelessWidget {
       );
     } else {
       firstChild = Container(
-        decoration: BoxDecoration(color: Color(Colors.amber.value)),
+        decoration: BoxDecoration(color: Theme.of(context).primaryColor),
       );
     }
     return Card(

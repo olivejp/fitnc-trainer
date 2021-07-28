@@ -11,7 +11,7 @@ class ExerciceFormBuilder {
     VideoPlayerController? _videoController;
     YoutubePlayerController? _youtubeController;
     return ConstrainedBox(
-      constraints: BoxConstraints(minWidth: 800),
+      constraints: const BoxConstraints(minWidth: 800),
       child: Form(
         key: _formKey,
         child: Column(
@@ -22,9 +22,9 @@ class ExerciceFormBuilder {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   StorageStreamImageWidget(
-                    onSaved: (storagePair) => bloc.setStoragePair(storagePair),
+                    onSaved: (StorageFile? storagePair) => bloc.setStoragePair(storagePair),
                     streamInitialStorageFile: bloc.obsStoragePair,
-                    onDeleted: (storagePair) => bloc.setStoragePair(null),
+                    onDeleted: (StorageFile? storagePair) => bloc.setStoragePair(null),
                   ),
                   Expanded(
                     child: Padding(

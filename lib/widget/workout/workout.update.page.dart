@@ -79,7 +79,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                           child: Padding(
                             padding: const EdgeInsets.only(left: 20),
                             child: DropdownButtonFormField<String>(
-                                decoration: const InputDecoration(helperText: 'Type d\'entrainement', constraints: BoxConstraints(maxHeight: 72)),
+                                decoration: const InputDecoration(helperText: "Type d'entrainement", constraints: BoxConstraints(maxHeight: 72)),
                                 icon: const Icon(Icons.arrow_downward),
                                 onChanged: (String? value) => bloc.setTimerType(value),
                                 value: bloc.getWorkout()?.timerType,
@@ -120,8 +120,8 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                       maxLength: 2000,
                       minLines: 5,
                       maxLines: 20,
-                      onChanged: (value) => bloc.setDescription(value),
-                      decoration: InputDecoration(helperText: 'Instructions (optionel)'),
+                      onChanged: (String value) => bloc.setDescription(value),
+                      decoration: const InputDecoration(helperText: 'Instructions (optionel)'),
                     ),
                   ),
                   LimitedBox(

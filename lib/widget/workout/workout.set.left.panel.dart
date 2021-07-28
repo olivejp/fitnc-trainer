@@ -35,7 +35,7 @@ class WorkoutSetLeftPanel extends StatelessWidget {
               final Widget liste = ListView.separated(
                 separatorBuilder: (context, index) => const Divider(height: 2),
                 itemCount: listWorkoutSetDto.length,
-                itemBuilder: (context, index) => getListTile(listWorkoutSetDto.elementAt(index)!, listWorkoutSetDto),
+                itemBuilder: (context, index) => getListTile(context, listWorkoutSetDto.elementAt(index)!, listWorkoutSetDto),
               );
               final Widget mainColumn = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,7 +52,7 @@ class WorkoutSetLeftPanel extends StatelessWidget {
                         TextButton(
                             onPressed: () => print('hello'),
                             child: Container(
-                                decoration: BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(5)),
+                                decoration: BoxDecoration(color: Theme.of(context).primaryColor, borderRadius: BorderRadius.circular(5)),
                                 child: const Padding(
                                   padding: EdgeInsets.all(5.0),
                                   child: Text('Ajouter repos', style: TextStyle(color: Colors.white)),
@@ -69,7 +69,7 @@ class WorkoutSetLeftPanel extends StatelessWidget {
                 builder: (context, candidateData, rejectedData) {
                   Color color = Colors.transparent;
                   if (candidateData.isNotEmpty) {
-                    color = Colors.amber;
+                    color = Theme.of(context).primaryColor;
                   }
                   return Container(
                     decoration: BoxDecoration(borderRadius: const BorderRadius.all(Radius.circular(10)), border: Border.all(color: color, width: 4)),
@@ -230,11 +230,11 @@ class WorkoutSetLeftPanel extends StatelessWidget {
     );
   }
 
-  Widget getListTile(WorkoutSetDto dto, List<WorkoutSetDto?> listWorkout) {
+  Widget getListTile(BuildContext context,WorkoutSetDto dto, List<WorkoutSetDto?> listWorkout) {
     final Widget upWidget = ListTile(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       title: DottedBorder(
-        color: Colors.amber,
+        color: Theme.of(context).primaryColor,
         strokeWidth: 1,
         radius: const Radius.circular(5),
         child: Padding(
@@ -244,9 +244,9 @@ class WorkoutSetLeftPanel extends StatelessWidget {
             children: [
               Icon(
                 Icons.arrow_circle_down,
-                color: Colors.amber.shade300,
+                color: Theme.of(context).primaryColor,
               ),
-              Center(child: Text('Déplacer ici', style: TextStyle(color: Colors.amber.shade300))),
+              Center(child: Text('Déplacer ici', style: TextStyle(color: Theme.of(context).primaryColor))),
             ],
           ),
         ),

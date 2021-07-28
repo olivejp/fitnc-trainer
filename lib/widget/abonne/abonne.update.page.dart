@@ -70,7 +70,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                               ),
                               radius: 50,
                               foregroundImage: provider,
-                              backgroundColor: Color(Colors.amber.value)),
+                              backgroundColor: Theme.of(context).primaryColor),
                           onTap: callPhotoPicker,
                           borderRadius: BorderRadius.all(Radius.circular(50)),
                         );

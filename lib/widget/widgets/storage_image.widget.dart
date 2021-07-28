@@ -55,7 +55,7 @@ class StorageImageWidget extends StatelessWidget {
                     ),
                     radius: 50,
                     foregroundImage: provider,
-                    backgroundColor: Colors.amber);
+                    backgroundColor: Theme.of(context).primaryColor);
               }),
           onTap: () => onTap(),
           borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -154,7 +154,7 @@ class StorageFutureImageWidget extends StatelessWidget {
                     ),
                     radius: 50,
                     foregroundImage: provider,
-                    backgroundColor: Color(Colors.amber.value));
+                    backgroundColor: Theme.of(context).primaryColor);
               }),
           onTap: () => onTap(),
           borderRadius: BorderRadius.all(Radius.circular(50)),
@@ -171,7 +171,7 @@ class StorageFutureImageWidget extends StatelessWidget {
             },
             icon: Icon(
               Icons.delete,
-              color: Color(Colors.amber.value),
+              color: Colors.amber,
             )),
       ],
     );
@@ -258,7 +258,7 @@ class StorageStreamImageWidget extends StatelessWidget {
                 if (snapshot.hasData && snapshot.data != null && snapshot.data!.fileBytes != null) {
                   provider = MemoryImage(snapshot.data!.fileBytes!);
                 }
-                return CircleAvatar(radius: radius, foregroundImage: provider, backgroundColor: Color(Colors.amber.value), child: icon);
+                return CircleAvatar(radius: radius, foregroundImage: provider, backgroundColor: Theme.of(context).primaryColor, child: icon);
               }),
         ),
         IconButton(
@@ -273,7 +273,7 @@ class StorageStreamImageWidget extends StatelessWidget {
             },
             icon: Icon(
               Icons.delete,
-              color: Color(Colors.amber.value),
+              color: Colors.amber,
             )),
       ],
     );

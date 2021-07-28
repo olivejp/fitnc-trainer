@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           Text(
             'Fitness Nc',
-            style: GoogleFonts.alfaSlabOne(color: Colors.amber, fontSize: 50),
+            style: GoogleFonts.alfaSlabOne(color: Theme.of(context).primaryColor, fontSize: 50),
           ),
           Center(
             child: ConstrainedBox(

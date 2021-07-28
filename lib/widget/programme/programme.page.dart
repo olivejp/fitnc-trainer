@@ -128,8 +128,8 @@ class _ProgrammePageState extends State<ProgrammePage> {
         children: listProgramme.map((programme) {
           if (programme != null) {
             return InkWell(
-              splashColor: Color(Colors.amber.value),
-              hoverColor: Color(Colors.amber.value),
+              splashColor: Theme.of(context).primaryColor,
+              hoverColor: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(5),
               onTap: () => goToUpdatePage(context, programme),
               child: getGridCard(programme),
@@ -163,7 +163,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
       );
     } else {
       firstChild = Container(
-        decoration: BoxDecoration(color: Color(Colors.amber.value)),
+        decoration: BoxDecoration(color: Theme.of(context).primaryColor),
       );
     }
     return Card(

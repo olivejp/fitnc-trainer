@@ -34,12 +34,12 @@ class MyHomePage extends StatelessWidget {
             children: [
               Icon(
                 Icons.sports_volleyball,
-                color: Color(Colors.amber.value),
+                color: Theme.of(context).primaryColor,
                 size: 20,
               ),
               Text(
                 title,
-                style: GoogleFonts.alfaSlabOne(color: Color(Colors.amber.value), fontSize: 20),
+                style: GoogleFonts.alfaSlabOne(color: Theme.of(context).primaryColor, fontSize: 20),
               ),
             ],
           ),
@@ -58,7 +58,7 @@ class MyHomePage extends StatelessWidget {
                 icon: Icon(
                   Icons.person,
                   size: 30,
-                  color: Color(Colors.amber.value),
+                  color: Theme.of(context).primaryColor,
                 )),
           ],
         ),

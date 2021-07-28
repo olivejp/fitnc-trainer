@@ -6,21 +6,21 @@ import 'package:flutter/material.dart';
 class ProgrammeFormBuilder {
   static Widget getForm(GlobalKey<FormState> _formKey, ProgrammeUpdateBloc bloc) {
     return ConstrainedBox(
-      constraints: BoxConstraints(minWidth: 800),
+      constraints: const BoxConstraints(minWidth: 800),
       child: Form(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.only(bottom: 30.0),
+              padding: const EdgeInsets.only(bottom: 20.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   StorageStreamImageWidget(
-                    onSaved: (storagePair) => bloc.setStoragePair(storagePair),
+                    onSaved: (StorageFile? storagePair) => bloc.setStoragePair(storagePair),
                     streamInitialStorageFile: bloc.obsStoragePair,
-                    onDeleted: (storagePair) => bloc.setStoragePair(null),
+                    onDeleted: (StorageFile? storagePair) => bloc.setStoragePair(null),
                   ),
                   Expanded(
                     child: Padding(
@@ -28,9 +28,9 @@ class ProgrammeFormBuilder {
                       child: TextFormField(
                           initialValue: bloc.programme.name,
                           autofocus: true,
-                          onChanged: (value) => bloc.setName(value),
-                          decoration: InputDecoration(helperText: 'Nom'),
-                          validator: (value) {
+                          onChanged: (String value) => bloc.setName(value),
+                          decoration: const InputDecoration(helperText: 'Nom'),
+                          validator: (String? value) {
                             if (value == null || value.isEmpty) {
                               return 'Merci de renseigner le nom du programme.';
                             }
@@ -41,16 +41,13 @@ class ProgrammeFormBuilder {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: TextFormField(
-                initialValue: bloc.programme.description,
-                maxLength: 2000,
-                minLines: 5,
-                maxLines: 20,
-                onChanged: (value) => bloc.setDescription(value),
-                decoration: InputDecoration(helperText: 'Description (optionel)'),
-              ),
+            TextFormField(
+              initialValue: bloc.programme.description,
+              maxLength: 2000,
+              minLines: 5,
+              maxLines: 20,
+              onChanged: (String value) => bloc.setDescription(value),
+              decoration: const InputDecoration(helperText: 'Description (optionel)'),
             ),
           ],
         ),

@@ -95,8 +95,8 @@ class WorkoutSetPage extends StatelessWidget {
             feedback: gridCard,
             data: exercice,
             child: InkWell(
-              splashColor: Colors.amber,
-              hoverColor: Colors.amber,
+              splashColor: Theme.of(context).primaryColor,
+              hoverColor: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(5),
               onTap: () => print('Hello'),
               child: gridCard,
@@ -122,7 +122,7 @@ class WorkoutSetPage extends StatelessWidget {
       );
     } else {
       firstChild = Container(
-        decoration: BoxDecoration(color: Color(Colors.amber.value)),
+        decoration: BoxDecoration(color: Theme.of(context).primaryColor),
       );
     }
     return LimitedBox(

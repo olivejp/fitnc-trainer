@@ -79,7 +79,7 @@ class _AbonnePageState extends State<AbonnePage> {
               ? CircleAvatar(foregroundImage: NetworkImage(abonne!.imageUrl!))
               : Icon(
                   Icons.sports_volleyball,
-                  color: Colors.amber,
+                  color: Theme.of(context).primaryColor,
                 );
 
           Widget dateNaissance = abonne?.dateNaissance != null
@@ -99,8 +99,8 @@ class _AbonnePageState extends State<AbonnePage> {
 
           if (abonne != null) {
             return InkWell(
-              splashColor: Color(Colors.amber.value),
-              hoverColor: Color(Colors.amber.value),
+              splashColor: Theme.of(context).primaryColor,
+              hoverColor: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(5),
               onTap: () => Navigator.push(
                   context,
