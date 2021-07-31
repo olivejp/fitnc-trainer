@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase/service/firestorage.service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
+import 'package:fitnc_trainer/domain/workout.domain.dart';
+import 'package:fitnc_trainer/domain/workout_schedule.dto.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
@@ -12,32 +15,33 @@ import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ProgrammeUpdateBloc {
-  FirestorageService firestorageService = FirestorageService.getInstance();
-  TrainersService trainersService = TrainersService.getInstance();
-  ParamService paramService = ParamService.getInstance();
-
-  late Programme programme;
-  StorageFile? storagePair;
-
-  BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
-  BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject();
-  BehaviorSubject<String?> _streamSelectedYoutubeUrl = BehaviorSubject();
-
-  Stream<String?>? get selectedVideoUrlObs => _streamSelectedVideoUrl.stream;
-
-  Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl.stream;
-
-  Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
-
-  static ProgrammeUpdateBloc? _instance;
-  final String pathProgrammeMainImage = 'mainImage';
 
   ProgrammeUpdateBloc._();
 
+  FirestorageService firestorageService = FirestorageService.getInstance();
+  TrainersService trainersService = TrainersService.getInstance();
+
+  ParamService paramService = ParamService.getInstance();
+  late Programme programme;
+
+  StorageFile? storagePair;
+
+  BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
+  final BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject<String?>();
+  final BehaviorSubject<String?> _streamSelectedYoutubeUrl = BehaviorSubject<String?>();
+  final BehaviorSubject<List<WorkoutScheduleDto>> _streamWorkoutScheduleDto = BehaviorSubject<List<WorkoutScheduleDto>>();
+
+  Stream<String?>? get selectedVideoUrlObs => _streamSelectedVideoUrl.stream;
+  Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl.stream;
+  Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
+  Stream<List<WorkoutScheduleDto>> get workoutScheduleObs => _streamWorkoutScheduleDto.stream;
+
+  static ProgrammeUpdateBloc? _instance;
+
+  final String pathProgrammeMainImage = 'mainImage';
+
   static ProgrammeUpdateBloc getInstance() {
-    if (_instance == null) {
-      _instance = ProgrammeUpdateBloc._();
-    }
+    _instance ??= ProgrammeUpdateBloc._();
     return _instance!;
   }
 
@@ -48,8 +52,9 @@ class ProgrammeUpdateBloc {
     if (programmeEntered != null) {
       programme = programmeEntered;
 
+      // Recherche de l'image
       if (programme.imageUrl != null && programme.imageUrl!.isNotEmpty) {
-        firestorageService.getRemoteImageToUint8List(programme.imageUrl!).then((bytes) {
+        firestorageService.getRemoteImageToUint8List(programme.imageUrl!).then((Uint8List bytes) {
           storagePair!.fileName = basename(programme.imageUrl!);
           storagePair!.fileBytes = bytes;
           subjectStoragePair.sink.add(storagePair);
@@ -74,9 +79,11 @@ class ProgrammeUpdateBloc {
   }
 
   Future<void> createProgramme() async {
-    CollectionReference<Object?> collectionReference = trainersService.getProgrammeReference();
+    final CollectionReference<Object?> collectionReference = trainersService.getProgrammeReference();
 
-    programme.uid = collectionReference.doc().id; // Récupération d'une nouvelle ID.
+    programme.uid = collectionReference
+        .doc()
+        .id; // Récupération d'une nouvelle ID.
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
@@ -141,16 +148,23 @@ class ProgrammeUpdateBloc {
     }
   }
 
-  setName(String value) {
+  set name(String value) {
     programme.name = value;
   }
 
-  setDescription(String value) {
+  String get name => programme.name;
+
+  set description(String? value) {
     programme.description = value;
   }
 
-  setStoragePair(StorageFile? storagePair) {
-    this.storagePair = storagePair;
-    this.subjectStoragePair.sink.add(this.storagePair);
+  String? get description => programme.description;
+
+
+  void setStoragePair(StorageFile? storagePair) {
+    storagePair = storagePair;
+    subjectStoragePair.sink.add(this.storagePair);
   }
+
+  addWorkoutSchedule(Workout workout) {}
 }

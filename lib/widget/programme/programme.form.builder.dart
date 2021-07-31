@@ -11,12 +11,12 @@ class ProgrammeFormBuilder {
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+          children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(bottom: 20.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
+                children: <Widget>[
                   StorageStreamImageWidget(
                     onSaved: (StorageFile? storagePair) => bloc.setStoragePair(storagePair),
                     streamInitialStorageFile: bloc.obsStoragePair,
@@ -28,7 +28,7 @@ class ProgrammeFormBuilder {
                       child: TextFormField(
                           initialValue: bloc.programme.name,
                           autofocus: true,
-                          onChanged: (String value) => bloc.setName(value),
+                          onChanged: (String value) => bloc.name = value,
                           decoration: const InputDecoration(helperText: 'Nom'),
                           validator: (String? value) {
                             if (value == null || value.isEmpty) {
@@ -46,7 +46,7 @@ class ProgrammeFormBuilder {
               maxLength: 2000,
               minLines: 5,
               maxLines: 20,
-              onChanged: (String value) => bloc.setDescription(value),
+              onChanged: (String? value) => bloc.description = value,
               decoration: const InputDecoration(helperText: 'Description (optionel)'),
             ),
           ],

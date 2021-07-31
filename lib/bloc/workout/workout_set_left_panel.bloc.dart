@@ -88,7 +88,7 @@ class WorkoutSetLeftPanelBloc {
     getSetRef(dto)
         .set(WorkoutSet.fromJson(dto.toJson()).toJson())
         .then((_) => showToast('Set ajouté.', duration: const Duration(seconds: 2)))
-        .catchError((_) => showToast('Une erreur est survenue lors de l\'enregistrement du set.', duration: const Duration(seconds: 2)));
+        .catchError((_) => showToast("Une erreur est survenue lors de l'enregistrement du set.", duration: const Duration(seconds: 2)));
   }
 
   void deleteFromFireStore(WorkoutSetDto dto) {
