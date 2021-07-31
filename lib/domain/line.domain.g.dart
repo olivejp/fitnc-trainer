@@ -7,18 +7,18 @@ part of 'line.domain.dart';
 // **************************************************************************
 
 Line _$LineFromJson(Map<String, dynamic> json) {
-  return Line(
-    reps: json['reps'] as String?,
-    weight: json['weight'] as String?,
-    order: json['order'] as int?,
-    type: json['type'] as String?,
-  )..repos = json['repos'] as String?;
+  return Line()
+    ..reps = json['reps'] as String?
+    ..weight = json['weight'] as String?
+    ..restTime = json['restTime'] as String?
+    ..time = json['time'] as String?
+    ..order = json['order'] as int?;
 }
 
 Map<String, dynamic> _$LineToJson(Line instance) => <String, dynamic>{
       'reps': instance.reps,
       'weight': instance.weight,
-      'repos': instance.repos,
-      'type': instance.type,
+      'restTime': instance.restTime,
+      'time': instance.time,
       'order': instance.order,
     };

@@ -15,11 +15,9 @@ WorkoutSetDto _$WorkoutSetDtoFromJson(Map<String, dynamic> json) {
     ..typeExercice = json['typeExercice'] as String?
     ..nameExercice = json['nameExercice'] as String?
     ..imageUrlExercice = json['imageUrlExercice'] as String?
-    ..sets = json['sets'] as String?
-    ..reps = json['reps'] as String?
-    ..weight = json['weight'] as String?
-    ..restTime = json['restTime'] as String?
-    ..time = json['time'] as String?;
+    ..lines = (json['lines'] as List<dynamic>)
+        .map((e) => Line.fromJson(e as Map<String, dynamic>))
+        .toList();
 }
 
 Map<String, dynamic> _$WorkoutSetDtoToJson(WorkoutSetDto instance) =>
@@ -31,9 +29,5 @@ Map<String, dynamic> _$WorkoutSetDtoToJson(WorkoutSetDto instance) =>
       'typeExercice': instance.typeExercice,
       'nameExercice': instance.nameExercice,
       'imageUrlExercice': instance.imageUrlExercice,
-      'sets': instance.sets,
-      'reps': instance.reps,
-      'weight': instance.weight,
-      'restTime': instance.restTime,
-      'time': instance.time,
+      'lines': instance.lines.map((e) => e.toJson()).toList(),
     };

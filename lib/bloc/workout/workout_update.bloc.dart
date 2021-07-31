@@ -28,7 +28,6 @@ class WorkoutUpdateBloc {
 
   StorageFile? storageFile;
   late Workout _workout;
-  Line line = Line();
   WorkoutSet set = WorkoutSet();
   Exercice? exerciceSelected;
 
@@ -176,30 +175,18 @@ class WorkoutUpdateBloc {
   }
 
   setStorageFile(StorageFile? storagePair) {
-    this.storageFile = storagePair;
-    this.subjectStorageFile.sink.add(this.storageFile);
-  }
-
-  void setRepsWeightType(String type) {
-    this.line.type = type;
-  }
-
-  void setRepsWeightReps(String value) {
-    this.line.reps = value;
-  }
-
-  void setRepsWeightWeight(String value) {
-    this.line.weight = value;
+    storageFile = storagePair;
+    subjectStorageFile.sink.add(storageFile);
   }
 
   setExercice(Exercice? exerciceSelected) {
-    this.exerciceSelected = exerciceSelected;
-    this.set.uidExercice = this.exerciceSelected?.uid;
-    this.subjectTypeExercice.sink.add(this.exerciceSelected?.typeExercice);
+    exerciceSelected = exerciceSelected;
+    set.uidExercice = this.exerciceSelected?.uid;
+    subjectTypeExercice.sink.add(this.exerciceSelected?.typeExercice);
   }
 
   setConsigne(String? consigne) {
-    this.set.consigne = consigne;
+    set.consigne = consigne;
   }
 
   Stream<List<WorkoutSet?>> listenToWorkoutStep() {

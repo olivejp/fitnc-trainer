@@ -53,6 +53,8 @@ class WorkoutSetService {
 
   Future<WorkoutSetDto> mapToDto(WorkoutSet workoutSet) async {
     WorkoutSetDto dto = WorkoutSetDto.fromSet(workoutSet);
+
+    // Recherche des infos de l'exercice
     if (workoutSet.uidExercice != null) {
       final DocumentSnapshot documentSnapshot = await trainersService.getExerciceReference().doc(workoutSet.uidExercice).get();
       final Exercice exercice = Exercice.fromJson(documentSnapshot.data() as Map<String, dynamic>);

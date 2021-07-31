@@ -14,12 +14,7 @@ class WorkoutSet {
   String? uidExercice;
   String? consigne;
   int order;
-
-  String? sets; // REPS_WEIGHT, REPS_ONLY , TIME
-  String? reps; // REPS_WEIGHT, REPS_ONLY
-  String? weight; // REPS_WEIGHT
-  String? restTime; // REPS_WEIGHT, REPS_ONLY
-  String? time; // TIME
+  List<Line>? lines;
 
   Map<String, dynamic> toJson() => _$WorkoutSetToJson(this);
 }

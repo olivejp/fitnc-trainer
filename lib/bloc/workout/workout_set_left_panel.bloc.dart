@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
+import 'package:fitnc_trainer/domain/line.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.dto.dart';
@@ -26,25 +27,29 @@ class WorkoutSetLeftPanelBloc {
   final BehaviorSubject<List<WorkoutSetDto>> subjectListDtos = BehaviorSubject<List<WorkoutSetDto>>();
 
   Stream<List<WorkoutSetDto>> get obsListWorkoutSet => subjectListDtos.stream;
+  Timer? _debounce;
 
   void init(Workout workout) {
     if (_workout == null || (_workout != null && _workout!.uid != workout.uid)) {
       _workout = workout;
-      workoutSetService
-          .getWorkoutSetsReference(_workout!)
-          .orderBy('order')
-          .get()
-          .then((QuerySnapshot<Object?> querySnapshot) => querySnapshot.docs
-              .map((QueryDocumentSnapshot<Object?> docSnapshot) => WorkoutSet.fromJson(docSnapshot.data() as Map<String, dynamic>))
-              .map((WorkoutSet workoutSet) => workoutSetService.mapToDto(workoutSet))
-              .toList())
-          .then((List<Future<WorkoutSetDto>> remoteListFuture) => Future.wait(remoteListFuture))
-          .then((List<WorkoutSetDto> remoteList) {
+      getWorkoutSetDto().then((List<WorkoutSetDto> remoteList) {
         listDtos.clear();
         listDtos.addAll(remoteList);
         subjectListDtos.sink.add(listDtos);
       });
     }
+  }
+
+  Future<List<WorkoutSetDto>> getWorkoutSetDto() {
+    return workoutSetService
+        .getWorkoutSetsReference(_workout!)
+        .orderBy('order')
+        .get()
+        .then((QuerySnapshot<Object?> querySnapshot) => querySnapshot.docs
+            .map((QueryDocumentSnapshot<Object?> docSnapshot) => WorkoutSet.fromJson(docSnapshot.data() as Map<String, dynamic>))
+            .map((WorkoutSet workoutSet) => workoutSetService.mapToDto(workoutSet))
+            .toList())
+        .then((List<Future<WorkoutSetDto>> remoteListFuture) => Future.wait(remoteListFuture));
   }
 
   int getMaxOrder(List<WorkoutSetDto>? listWorkoutSetDto) {
@@ -134,28 +139,42 @@ class WorkoutSetLeftPanelBloc {
         .catchError((Object onError) => showToast('Erreur lors de la mise à jour du Set.', duration: const Duration(seconds: 2)));
   }
 
-  void setReps(WorkoutSetDto dto, String value) {
-    dto.reps = value;
-    updateFirestoreSet(dto, {'reps': value});
+  void updateWorkoutSet(WorkoutSetDto dto) {
+    getSetRef(dto)
+        .set(dto.toJson())
+        .then((_) => showToast('Set mis à jour', duration: Duration(seconds: 2)))
+        .catchError((Object onError) => showToast('Erreur lors de la mise à jour du Set.', duration: const Duration(seconds: 2)));
   }
 
-  void setWeight(WorkoutSetDto dto, String value) {
-    dto.weight = value;
-    updateFirestoreSet(dto, {'weight': value});
+  void setReps(WorkoutSetDto dto, Line line, String value) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      line.reps = value;
+      updateWorkoutSet(dto);
+    });
   }
 
-  void setRestTime(WorkoutSetDto dto, String? value) {
-    dto.restTime = value;
-    updateFirestoreSet(dto, {'restTime': value});
+  void setWeight(WorkoutSetDto dto, Line line, String value) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      line.weight = value;
+      updateWorkoutSet(dto);
+    });
   }
 
-  void setTime(WorkoutSetDto dto, String? value) {
-    dto.time = value;
-    updateFirestoreSet(dto, {'time': value});
+  void setRestTime(WorkoutSetDto dto, Line line, String? value) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      line.restTime = value;
+      updateWorkoutSet(dto);
+    });
   }
 
-  void setSets(WorkoutSetDto dto, String value) {
-    dto.sets = value;
-    updateFirestoreSet(dto, {'sets': value});
+  void setTime(WorkoutSetDto dto, Line line, String? value) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      line.time = value;
+      updateWorkoutSet(dto);
+    });
   }
 }

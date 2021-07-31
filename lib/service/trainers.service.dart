@@ -85,7 +85,7 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
     return getProgrammeReference()
         .orderBy('createDate')
         .snapshots()
-        .map((QuerySnapshot event) => event.docs.map((doc) => Programme.fromJson(doc.data() as Map<String, dynamic>)).toList());
+        .map((QuerySnapshot event) => event.docs.map((QueryDocumentSnapshot doc) => Programme.fromJson(doc.data() as Map<String, dynamic>)).toList());
   }
 
   Stream<List<DropdownMenuItem<Exercice>>> getExerciceStreamDropdownMenuItem() {
@@ -93,9 +93,10 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
         .orderBy('name')
         .snapshots()
         .map((QuerySnapshot querysnapshot) => querysnapshot.docs.map((QueryDocumentSnapshot queryDocSnapshot) {
-              Exercice exercice = Exercice.fromJson(queryDocSnapshot.data() as Map<String, dynamic>);
-              ImageProvider? provider = exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null;
-              return DropdownMenuItem(
+              final Exercice exercice = Exercice.fromJson(queryDocSnapshot.data() as Map<String, dynamic>);
+              final ImageProvider? provider = exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null;
+              return DropdownMenuItem<Exercice>(
+                value: exercice,
                 child: Row(children: [
                   CircleAvatar(
                     foregroundImage: provider,
@@ -105,7 +106,6 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
                     child: Text(exercice.name),
                   ),
                 ]),
-                value: exercice,
               );
             }).toList());
   }

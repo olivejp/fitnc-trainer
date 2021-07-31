@@ -4,15 +4,16 @@ part 'line.domain.g.dart';
 
 @JsonSerializable()
 class Line {
-  String? reps;
-  String? weight;
-  String? repos;
-  String? type;
-  int? order;
 
-  Line({this.reps = '', this.weight = '', this.order = 0, this.type = ''});
+  Line();
 
   factory Line.fromJson(Map<String, dynamic> data) => _$LineFromJson(data);
+
+  String? reps;
+  String? weight;
+  String? restTime;
+  String? time;
+  int? order;
 
   Map<String, dynamic> toJson() => _$LineToJson(this);
 }
