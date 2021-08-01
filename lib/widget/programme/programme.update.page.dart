@@ -1,14 +1,15 @@
 import 'package:fitnc_trainer/bloc/programme/programme_update.bloc.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
-import 'package:fitnc_trainer/domain/workout_schedule.domain.dart';
 import 'package:fitnc_trainer/domain/workout_schedule.dto.dart';
-import 'package:fitnc_trainer/widget/programme/programme.form.builder.dart';
+import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animations/loading_animations.dart';
 
 class ProgrammeUpdatePage extends StatefulWidget {
@@ -71,17 +72,38 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.only(left: 20),
-                            child: TextFormField(
-                                initialValue: widget.bloc.programme.name,
-                                autofocus: true,
-                                onChanged: (String value) => widget.bloc.name = value,
-                                decoration: const InputDecoration(helperText: 'Nom'),
-                                validator: (String? value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Merci de renseigner le nom du programme.';
-                                  }
-                                  return null;
-                                }),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                      initialValue: widget.bloc.programme.name,
+                                      autofocus: true,
+                                      onChanged: (String value) => widget.bloc.name = value,
+                                      decoration: const InputDecoration(helperText: 'Nom'),
+                                      validator: (String? value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Merci de renseigner le nom du programme.';
+                                        }
+                                        return null;
+                                      }),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 8,
+                                    ),
+                                    child: ParamDropdownButton(
+                                        paramName: 'number_weeks',
+                                        decoration: const InputDecoration(
+                                          hintText: 'Nombre de semaine',
+                                          helperText: 'Nombre de semaine',
+                                        ),
+                                        initialValue: widget.bloc.programme.numberWeeks,
+                                        onChanged: (String? value) => widget.bloc.numberWeeks = value),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -92,15 +114,15 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
                     maxLength: 2000,
                     minLines: 5,
                     maxLines: 20,
-                    onChanged: (String value) => widget.bloc.description  = value,
+                    onChanged: (String value) => widget.bloc.description = value,
                     decoration: const InputDecoration(helperText: 'Description (optionel)'),
                   ),
                   ConstrainedBox(
                     constraints: const BoxConstraints(minHeight: 100, maxHeight: 600),
                     child: Row(
                       children: [
-                        Expanded(child: ProgrammeRightPanel()),
-                        Expanded(child: ProgrammeLeftPanel()),
+                        Expanded(child: WorkoutSchedulePanel()),
+                        Expanded(child: WorkoutChoicePanel()),
                       ],
                     ),
                   )
@@ -112,7 +134,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
   }
 }
 
-class ProgrammeLeftPanel extends StatelessWidget {
+class WorkoutChoicePanel extends StatelessWidget {
   static final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.getInstance();
 
   @override
@@ -147,8 +169,9 @@ class ProgrammeLeftPanel extends StatelessWidget {
   }
 }
 
-class ProgrammeRightPanel extends StatelessWidget {
+class WorkoutSchedulePanel extends StatelessWidget {
   static final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.getInstance();
+  static final TextStyle columnTextStyle = GoogleFonts.roboto(fontSize: 10, fontWeight: FontWeight.bold);
 
   @override
   Widget build(BuildContext context) {
@@ -157,26 +180,102 @@ class ProgrammeRightPanel extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
         if (snapshot.hasData) {
           final List<WorkoutScheduleDto> listWorkout = snapshot.data!;
-          return DragTarget<Workout>(
-            onWillAccept: (Workout? data) => data is Workout,
-            onAccept: (Workout workout) => bloc.addWorkoutSchedule(workout),
-            builder: (BuildContext context, List<Workout?> candidateData, List rejectedData) {
-              return ListView.separated(
-                itemCount: listWorkout.length,
-                separatorBuilder: (BuildContext context, int index) => const Divider(height: 2),
-                itemBuilder: (BuildContext context, int index) {
-                  final WorkoutScheduleDto workout = listWorkout.elementAt(index);
-                  return ListTile(
-                    title: Text(workout.nameWorkout!),
-                  );
-                },
-              );
-            },
+          return SingleChildScrollView(
+            child: DataTable(
+              columns: <DataColumn>[
+                const DataColumn(label: Text(''), numeric: true),
+                const DataColumn(
+                    label: Text(
+                      'L',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+                const DataColumn(
+                    label: Text(
+                      'M',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+                const DataColumn(
+                    label: Text(
+                      'M',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+                const DataColumn(
+                    label: Text(
+                      'J',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+                const DataColumn(
+                    label: Text(
+                      'V',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+                const DataColumn(
+                    label: Text(
+                      'S',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+                const DataColumn(
+                    label: Text(
+                      'D',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+              ],
+              dataTextStyle: GoogleFonts.roboto(fontSize: 10, color: Colors.grey),
+              rows: getListDataRows(20, listWorkout),
+            ),
           );
         } else {
           return LoadingBouncingGrid.circle();
         }
       },
     );
+  }
+
+  DataCell getDataCell(int dayIndex, List<WorkoutScheduleDto> listAppointment) {
+    final List<WorkoutScheduleDto> list = listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
+    if (list.isNotEmpty) {
+      final WorkoutScheduleDto dto = list.first;
+      return DataCell(Text(dto.nameWorkout!));
+    } else {
+      return DataCell(Row(
+        children: <Widget>[
+          Expanded(
+              child: DragTarget<Workout>(
+            onWillAccept: (Object? data) => data is Workout,
+            onAccept: (Workout data) => bloc.addWorkoutSchedule(data, dayIndex),
+            builder: (BuildContext context, List<Object?> candidateData, List<dynamic> rejectedData) {
+              const Widget child = Text('---');
+              if (candidateData.isNotEmpty) {
+                return Container(
+                  decoration: BoxDecoration(border: Border.all(color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
+                  child: child,
+                );
+              } else {
+                return child;
+              }
+            },
+          ))
+        ],
+      ));
+    }
+  }
+
+  DataRow getDataRow(int weekIndex, List<WorkoutScheduleDto> listAppointment) {
+    final List<DataCell> list = <DataCell>[];
+    final int index = weekIndex + 1;
+    list.add(DataCell(Text('$index')));
+    for (int i = 0; i < 7; i++) {
+      final int dayIndex = (7 * weekIndex) + i;
+      list.add(getDataCell(dayIndex, listAppointment));
+    }
+    return DataRow(cells: list);
+  }
+
+  List<DataRow> getListDataRows(int numberWeeks, List<WorkoutScheduleDto> listAppointment) {
+    final List<DataRow> list = <DataRow>[];
+    for (int i = 0; i < numberWeeks; i++) {
+      list.add(getDataRow(i, listAppointment));
+    }
+    return list;
   }
 }

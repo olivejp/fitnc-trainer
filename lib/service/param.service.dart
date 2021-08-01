@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ParamService extends AbstractAbsoluteFirestoreService<Param> {
-
   ParamService._() : super(collectionReference: FirebaseFirestore.instance.collection('params')) {
     _instance = this;
   }
@@ -23,7 +22,14 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
         .collection('values')
         .orderBy('order')
         .snapshots()
-        .map((QuerySnapshot<Map<String, dynamic>> querySnapshot) => querySnapshot.docs.map((e) => Param.fromJson(e.data())).toList());
+        .map((QuerySnapshot<Map<String, dynamic>> querySnapshot) => querySnapshot.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> e) {
+              try {
+                return Param.fromJson(e.data());
+              } catch (e) {
+                print(e);
+                throw Exception('Mal barrée');
+              }
+            }).toList());
   }
 
   Future<List<Param>> getListParam(String paramName) {
@@ -32,7 +38,14 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
         .collection('values')
         .orderBy('order')
         .get()
-        .then((QuerySnapshot<Map<String, dynamic>> querySnapshot) => querySnapshot.docs.map((e) => Param.fromJson(e.data())).toList());
+        .then((QuerySnapshot<Map<String, dynamic>> querySnapshot) => querySnapshot.docs.map((e) {
+              try {
+                return Param.fromJson(e.data());
+              } catch (e) {
+                print("Erreur : ${e}");
+                throw Exception('Mal barrée');
+              }
+            }).toList());
   }
 
   DropdownMenuItem<String?> mapParamToDropdownItem(Param param, bool onlyName) {

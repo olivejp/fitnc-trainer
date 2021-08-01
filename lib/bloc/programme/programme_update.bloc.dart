@@ -7,24 +7,28 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
+import 'package:fitnc_trainer/domain/workout_schedule.domain.dart';
 import 'package:fitnc_trainer/domain/workout_schedule.dto.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ProgrammeUpdateBloc {
-
   ProgrammeUpdateBloc._();
+
+  static ProgrammeUpdateBloc? _instance;
+
+  static ProgrammeUpdateBloc getInstance() {
+    _instance ??= ProgrammeUpdateBloc._();
+    return _instance!;
+  }
 
   FirestorageService firestorageService = FirestorageService.getInstance();
   TrainersService trainersService = TrainersService.getInstance();
-
   ParamService paramService = ParamService.getInstance();
-  late Programme programme;
-
-  StorageFile? storagePair;
 
   BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
   final BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject<String?>();
@@ -32,18 +36,18 @@ class ProgrammeUpdateBloc {
   final BehaviorSubject<List<WorkoutScheduleDto>> _streamWorkoutScheduleDto = BehaviorSubject<List<WorkoutScheduleDto>>();
 
   Stream<String?>? get selectedVideoUrlObs => _streamSelectedVideoUrl.stream;
+
   Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl.stream;
+
   Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
+
   Stream<List<WorkoutScheduleDto>> get workoutScheduleObs => _streamWorkoutScheduleDto.stream;
 
-  static ProgrammeUpdateBloc? _instance;
-
   final String pathProgrammeMainImage = 'mainImage';
+  final List<WorkoutScheduleDto> listDtos = <WorkoutScheduleDto>[];
+  late Programme programme;
 
-  static ProgrammeUpdateBloc getInstance() {
-    _instance ??= ProgrammeUpdateBloc._();
-    return _instance!;
-  }
+  StorageFile? storagePair;
 
   void init(Programme? programmeEntered) {
     storagePair = StorageFile();
@@ -60,6 +64,24 @@ class ProgrammeUpdateBloc {
           subjectStoragePair.sink.add(storagePair);
         });
       }
+
+      // On récupère une fois la liste des WorkoutScheduleDto
+      trainersService
+          .getProgrammeReference()
+          .doc(programmeEntered.uid)
+          .collection('workouts')
+          .orderBy('dateSchedule')
+          .get()
+          .then((QuerySnapshot<Map<String, dynamic>> event) => event.docs
+              .map((QueryDocumentSnapshot<Map<String, dynamic>> e) => WorkoutSchedule.fromJson(e.data()))
+              .map((WorkoutSchedule e) => mapToFutureWorkoutScheduleDto(e))
+              .toList())
+          .then((List<Future<WorkoutScheduleDto>> event) => Future.wait(event))
+          .then((List<WorkoutScheduleDto> remoteList) {
+        listDtos.clear();
+        listDtos.addAll(remoteList);
+        _streamWorkoutScheduleDto.sink.add(listDtos);
+      });
     } else {
       programme = Programme();
       subjectStoragePair.sink.add(null);
@@ -81,9 +103,7 @@ class ProgrammeUpdateBloc {
   Future<void> createProgramme() async {
     final CollectionReference<Object?> collectionReference = trainersService.getProgrammeReference();
 
-    programme.uid = collectionReference
-        .doc()
-        .id; // Récupération d'une nouvelle ID.
+    programme.uid = collectionReference.doc().id; // Récupération d'une nouvelle ID.
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
@@ -136,12 +156,12 @@ class ProgrammeUpdateBloc {
   }
 
   Future<void> deleteProgrammeMainImage(Programme programme) {
-    String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
+    final String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
     if (trainerUid != null) {
       return FirebaseStorage.instance
           .ref(getUrl())
           .listAll()
-          .then((value) => value.items.forEach((element) => element.delete()))
+          .then((ListResult value) => value.items.forEach((Reference element) => element.delete()))
           .catchError((error) => print(error));
     } else {
       return Future.error('Aucun compte trainer connecté');
@@ -152,6 +172,10 @@ class ProgrammeUpdateBloc {
     programme.name = value;
   }
 
+  set numberWeeks(String? value) {
+    programme.numberWeeks = value;
+  }
+
   String get name => programme.name;
 
   set description(String? value) {
@@ -160,11 +184,54 @@ class ProgrammeUpdateBloc {
 
   String? get description => programme.description;
 
-
   void setStoragePair(StorageFile? storagePair) {
-    storagePair = storagePair;
+    this.storagePair = storagePair;
     subjectStoragePair.sink.add(this.storagePair);
   }
 
-  addWorkoutSchedule(Workout workout) {}
+  void addWorkoutSchedule(Workout workout, int dayIndex) {
+    final WorkoutScheduleDto dto = WorkoutScheduleDto.empty();
+    dto.uid = trainersService.getProgrammeReference().doc(programme.uid).collection('workouts').doc().id;
+    dto.uidWorkout = workout.uid;
+    dto.nameWorkout = workout.name;
+    dto.dateSchedule = dayIndex;
+    listDtos.add(dto);
+    _streamWorkoutScheduleDto.sink.add(listDtos);
+
+    trainersService
+        .getProgrammeReference()
+        .doc(programme.uid)
+        .collection('workouts')
+        .doc(dto.uid)
+        .set(dto.toJson())
+        .then((_) => showToast('Workout ajouté au programme.', duration: const Duration(seconds: 2)))
+        .catchError(
+            (_) => showToast("Une erreur est survenue lors de l'enregistrement du workout au programme.", duration: const Duration(seconds: 2)));
+  }
+
+  Future<WorkoutScheduleDto> mapToFutureWorkoutScheduleDto(WorkoutSchedule e) {
+    return trainersService
+        .getWorkoutReference()
+        .doc(e.uidWorkout)
+        .get()
+        .then((DocumentSnapshot<Object?> value) => Workout.fromJson(value.data() as Map<String, dynamic>))
+        .then((Workout value) {
+      final WorkoutScheduleDto dto = WorkoutScheduleDto.fromSchedule(e);
+      dto.nameWorkout = value.name;
+      return dto;
+    });
+  }
+
+  void deleteWorkoutSchedule(WorkoutScheduleDto workout) {
+    listDtos.remove(workout);
+    _streamWorkoutScheduleDto.sink.add(listDtos);
+
+    trainersService
+        .getProgrammeReference()
+        .doc(programme.uid)
+        .collection('workouts')
+        .doc(workout.uid)
+        .delete()
+        .then((value) => showToast('Workout correctement supprimé.'));
+  }
 }

@@ -32,17 +32,15 @@ class TimerService {
 
   TimerService._() {
     _instance = this;
-    this.timerArray.sort((a, b) => a.order!.compareTo(b.order!));
+    timerArray.sort((a, b) => a.order!.compareTo(b.order!));
   }
 
   static TimerService getInstance() {
-    if (_instance == null) {
-      _instance = TimerService._();
-    }
+    _instance ??= TimerService._();
     return _instance!;
   }
 
   List<DropdownMenuItem<String?>> getDropdownMenuItem(bool onlyName, bool insertNull, String? nullElement) {
-    return this.paramService.getParamAsDropdown(this.timerArray, onlyName, insertNull, nullElement);
+    return paramService.getParamAsDropdown(this.timerArray, onlyName, insertNull, nullElement);
   }
 }

@@ -55,9 +55,11 @@ dependencies:
   page_transition: ^2.0.2
   flutter_native_splash: ^1.2.0
   dotted_border: ^2.0.0
+  time_planner: ^0.0.3
 
   firebase:
     path: ./packages/firebase
+  syncfusion_flutter_calendar: ^19.2.49
 dev_dependencies:
   build_runner: ^2.0.5
   json_serializable: ^4.1.3

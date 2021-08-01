@@ -1,4 +1,5 @@
 import 'package:fitnc_trainer/bloc/programme/programme_update.bloc.dart';
+import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,17 +26,33 @@ class ProgrammeFormBuilder {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.only(left: 20),
-                      child: TextFormField(
-                          initialValue: bloc.programme.name,
-                          autofocus: true,
-                          onChanged: (String value) => bloc.name = value,
-                          decoration: const InputDecoration(helperText: 'Nom'),
-                          validator: (String? value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Merci de renseigner le nom du programme.';
-                            }
-                            return null;
-                          }),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                                initialValue: bloc.programme.name,
+                                autofocus: true,
+                                onChanged: (String value) => bloc.name = value,
+                                decoration: const InputDecoration(helperText: 'Nom'),
+                                validator: (String? value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Merci de renseigner le nom du programme.';
+                                  }
+                                  return null;
+                                }),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left:8.0),
+                              child: ParamDropdownButton(
+                                  paramName: 'number_weeks',
+                                  initialValue: bloc.programme.numberWeeks,
+                                  decoration: const InputDecoration(hintText: 'Nombre de semaine', helperText: 'Nombre de semaine', ),
+                                  onChanged: (String? value) => bloc.numberWeeks = value),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ],

@@ -30,9 +30,11 @@ class WorkoutSetLeftPanelBloc {
   Timer? _debounce;
 
   void init(Workout workout) {
+    listDtos.clear();
+    subjectListDtos.sink.add(listDtos);
     if (_workout == null || (_workout != null && _workout!.uid != workout.uid)) {
       _workout = workout;
-      getWorkoutSetDto().then((List<WorkoutSetDto> remoteList) {
+      getWorkoutSetDto(_workout!).then((List<WorkoutSetDto> remoteList) {
         listDtos.clear();
         listDtos.addAll(remoteList);
         subjectListDtos.sink.add(listDtos);
@@ -40,9 +42,9 @@ class WorkoutSetLeftPanelBloc {
     }
   }
 
-  Future<List<WorkoutSetDto>> getWorkoutSetDto() {
+  Future<List<WorkoutSetDto>> getWorkoutSetDto(Workout workout) {
     return workoutSetService
-        .getWorkoutSetsReference(_workout!)
+        .getWorkoutSetsReference(workout)
         .orderBy('order')
         .get()
         .then((QuerySnapshot<Object?> querySnapshot) => querySnapshot.docs

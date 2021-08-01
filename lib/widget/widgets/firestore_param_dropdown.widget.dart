@@ -106,7 +106,7 @@ class FutureDropdownButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder<List<DropdownMenuItem<String?>>>(
         future: future,
-        builder: (context, snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<DropdownMenuItem<String?>>> snapshot) {
           if (snapshot.hasData) {
             return DropdownButtonFormField<String?>(
               style: style,

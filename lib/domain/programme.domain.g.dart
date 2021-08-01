@@ -12,7 +12,9 @@ Programme _$ProgrammeFromJson(Map<String, dynamic> json) {
     name: json['name'] as String,
     description: json['description'] as String?,
     createDate: json['createDate'],
-  )..imageUrl = json['imageUrl'] as String?;
+  )
+    ..imageUrl = json['imageUrl'] as String?
+    ..numberWeeks = json['numberWeeks'] as String?;
 }
 
 Map<String, dynamic> _$ProgrammeToJson(Programme instance) => <String, dynamic>{
@@ -21,4 +23,5 @@ Map<String, dynamic> _$ProgrammeToJson(Programme instance) => <String, dynamic>{
       'description': instance.description,
       'imageUrl': instance.imageUrl,
       'createDate': instance.createDate,
+      'numberWeeks': instance.numberWeeks,
     };

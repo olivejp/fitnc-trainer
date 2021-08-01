@@ -10,14 +10,14 @@ WorkoutScheduleDto _$WorkoutScheduleDtoFromJson(Map<String, dynamic> json) {
   return WorkoutScheduleDto()
     ..uid = json['uid'] as String?
     ..uidWorkout = json['uidWorkout'] as String?
-    ..nameWorkout = json['nameWorkout'] as String?
-    ..dateSchedule = json['dateSchedule'];
+    ..dateSchedule = json['dateSchedule']
+    ..nameWorkout = json['nameWorkout'] as String?;
 }
 
 Map<String, dynamic> _$WorkoutScheduleDtoToJson(WorkoutScheduleDto instance) =>
     <String, dynamic>{
       'uid': instance.uid,
       'uidWorkout': instance.uidWorkout,
-      'nameWorkout': instance.nameWorkout,
       'dateSchedule': instance.dateSchedule,
+      'nameWorkout': instance.nameWorkout,
     };
