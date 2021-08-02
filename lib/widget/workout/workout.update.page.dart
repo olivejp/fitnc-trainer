@@ -28,8 +28,32 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
   @override
   Widget build(BuildContext context) {
     final WorkoutUpdateBloc bloc = widget.bloc;
+    final List<DropdownMenuItem<String>> typesWorkout = <DropdownMenuItem<String>>[
+      const DropdownMenuItem<String>(
+        child: Text(
+          "Aucun type d'entraînement",
+          style: TextStyle(fontStyle: FontStyle.italic),
+        ),
+      ),
+      const DropdownMenuItem<String>(
+        value: 'AMRAP',
+        child: Text('AMRAP'),
+      ),
+      const DropdownMenuItem<String>(
+        value: 'EMOM',
+        child: Text('EMOM'),
+      ),
+      const DropdownMenuItem<String>(
+        value: 'For Time',
+        child: Text('For Time'),
+      ),
+      const DropdownMenuItem<String>(
+        value: 'CIRCUIT',
+        child: Text('Circuit'),
+      ),
+    ];
     return Scaffold(
-        floatingActionButton: ButtonBar(children: [
+        floatingActionButton: ButtonBar(children: <Widget>[
           FloatingActionButton(
             onPressed: () => Navigator.of(context).pop(),
             tooltip: 'Annuler',
@@ -55,7 +79,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         StorageFutureImageWidget(
-                          onSaved: (file) => bloc.setStorageFile(file),
+                          onSaved: (StorageFile? file) => bloc.setStorageFile(file),
                           futureInitialStorageFile: bloc.getFutureStorageFile(),
                           onDeleted: (file) => bloc.setStorageFile(null),
                         ),
@@ -65,9 +89,9 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                             child: TextFormField(
                                 initialValue: bloc.getWorkout()?.name,
                                 autofocus: true,
-                                onChanged: (value) => bloc.setName(value),
-                                decoration: InputDecoration(helperText: 'Nom du workout'),
-                                validator: (value) {
+                                onChanged: (String value) => bloc.setName(value),
+                                decoration: const InputDecoration(helperText: 'Nom du workout'),
+                                validator: (String? value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Le nom du workout est obligatoire.';
                                   }
@@ -83,52 +107,25 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                                 icon: const Icon(Icons.arrow_downward),
                                 onChanged: (String? value) => bloc.setTimerType(value),
                                 value: bloc.getWorkout()?.timerType,
-                                items: [
-                                  const DropdownMenuItem(
-                                    value: null,
-                                    child: Text(
-                                      'Aucun type d\'entraînement',
-                                      style: TextStyle(fontStyle: FontStyle.italic),
-                                    ),
-                                  ),
-                                  const DropdownMenuItem(
-                                    value: 'AMRAP',
-                                    child: Text('AMRAP'),
-                                  ),
-                                  const DropdownMenuItem(
-                                    value: 'EMOM',
-                                    child: Text('EMOM'),
-                                  ),
-                                  const DropdownMenuItem(
-                                    value: 'For Time',
-                                    child: Text('For Time'),
-                                  ),
-                                  const DropdownMenuItem(
-                                    value: 'CIRCUIT',
-                                    child: Text('Circuit'),
-                                  ),
-                                ]),
+                                items: typesWorkout),
                           ),
                         )
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 0),
-                    child: TextFormField(
-                      initialValue: bloc.getWorkout()?.description,
-                      maxLength: 2000,
-                      minLines: 5,
-                      maxLines: 20,
-                      onChanged: (String value) => bloc.setDescription(value),
-                      decoration: const InputDecoration(helperText: 'Instructions (optionel)'),
-                    ),
+                  TextFormField(
+                    initialValue: bloc.getWorkout()?.description,
+                    maxLength: 2000,
+                    minLines: 5,
+                    maxLines: 20,
+                    onChanged: (String value) => bloc.setDescription(value),
+                    decoration: const InputDecoration(helperText: 'Instructions (optionel)'),
                   ),
                   LimitedBox(
                     maxWidth: 2000,
                     maxHeight: 600,
                     child: Row(
-                      children: [
+                      children: <Widget>[
                         Expanded(
                           child: WorkoutSetPage(workout: widget.workout),
                         ),
