@@ -6,6 +6,7 @@ import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dar
 import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
@@ -47,7 +48,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
               }
             },
             tooltip: 'Valider',
-            child: Icon(Icons.check),
+            child: const Icon(Icons.check),
           )
         ]),
         body: GenericUpdateWidget(
@@ -117,14 +118,10 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
                     onChanged: (String value) => widget.bloc.description = value,
                     decoration: const InputDecoration(helperText: 'Description (optionel)'),
                   ),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: 100, maxHeight: 600),
-                    child: Row(
-                      children: [
-                        Expanded(child: WorkoutSchedulePanel()),
-                        Expanded(child: WorkoutChoicePanel()),
-                      ],
-                    ),
+                  Row(
+                    children: [
+                      Expanded(child: WorkoutSchedulePanel()),
+                    ],
                   )
                 ],
               ),
@@ -175,106 +172,144 @@ class WorkoutSchedulePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<WorkoutScheduleDto>>(
-      stream: bloc.workoutScheduleObs,
-      builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
-        if (snapshot.hasData) {
-          final List<WorkoutScheduleDto> listWorkout = snapshot.data!;
-          return SingleChildScrollView(
-            child: DataTable(
-              columns: <DataColumn>[
-                const DataColumn(label: Text(''), numeric: true),
-                const DataColumn(
-                    label: Text(
-                      'L',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                    )),
-                const DataColumn(
-                    label: Text(
-                      'M',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                    )),
-                const DataColumn(
-                    label: Text(
-                      'M',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                    )),
-                const DataColumn(
-                    label: Text(
-                      'J',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                    )),
-                const DataColumn(
-                    label: Text(
-                      'V',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                    )),
-                const DataColumn(
-                    label: Text(
-                      'S',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                    )),
-                const DataColumn(
-                    label: Text(
-                      'D',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                    )),
-              ],
-              dataTextStyle: GoogleFonts.roboto(fontSize: 10, color: Colors.grey),
-              rows: getListDataRows(20, listWorkout),
-            ),
-          );
-        } else {
-          return LoadingBouncingGrid.circle();
-        }
-      },
+    final List<DataColumn> listHeadersColumn = <DataColumn>[
+      const DataColumn(label: Text(''), numeric: true),
+      const DataColumn(
+          label: Text(
+        'Lundi',
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+      )),
+      const DataColumn(
+          label: Text(
+        'Mardi',
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+      )),
+      const DataColumn(
+          label: Text(
+        'Mercredi',
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+      )),
+      const DataColumn(
+          label: Text(
+        'Jeudi',
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+      )),
+      const DataColumn(
+          label: Text(
+        'Vendredi',
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+      )),
+      const DataColumn(
+          label: Text(
+        'Samedi',
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+      )),
+      const DataColumn(
+          label: Text(
+        'Dimanche',
+        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+      )),
+    ];
+
+    final Widget titlePlannification = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: const <Widget>[
+        Padding(
+          padding: EdgeInsets.all(15.0),
+          child: Text('Plannification'),
+        ),
+      ],
     );
+
+    return FutureBuilder<List<DropdownMenuItem<Workout>>>(
+        future: bloc.getWorkoutDropdownItems(),
+        builder: (BuildContext context, AsyncSnapshot<List<DropdownMenuItem<Workout>>> snapshot) {
+          if (snapshot.hasData) {
+            List<DropdownMenuItem<Workout>> listAvailableWorkout = snapshot.data!;
+            return StreamBuilder<List<WorkoutScheduleDto>>(
+              stream: bloc.workoutScheduleObs,
+              builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
+                if (snapshot.hasData) {
+                  final List<WorkoutScheduleDto> listScheduledWorkouts = snapshot.data!;
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 20, bottom: 100),
+                    child: Container(
+                      decoration: BoxDecoration(border: Border.all(color: Colors.grey), borderRadius: BorderRadius.circular(5)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          titlePlannification,
+                          SingleChildScrollView(
+                            child: DataTable(
+                              columns: listHeadersColumn,
+                              dataTextStyle: GoogleFonts.roboto(fontSize: 10, color: Colors.grey),
+                              rows: getListDataRows(context, 8, listScheduledWorkouts, listAvailableWorkout),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                } else {
+                  return LoadingBouncingGrid.circle();
+                }
+              },
+            );
+          } else {
+            return LoadingBouncingGrid.circle();
+          }
+        });
   }
 
-  DataCell getDataCell(int dayIndex, List<WorkoutScheduleDto> listAppointment) {
+  DataCell getDataCell(
+      BuildContext context, int dayIndex, List<WorkoutScheduleDto> listAppointment, List<DropdownMenuItem<Workout>> listAvailableWorkout) {
     final List<WorkoutScheduleDto> list = listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
+
+    void onDataCellTap() {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Card(
+              child: DropdownButtonFormField<Workout>(
+                items: listAvailableWorkout,
+                onChanged: (Workout? value) {
+                  if (value != null) {
+                    bloc.addWorkoutSchedule(value, dayIndex);
+                  }
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          );
+        },
+      );
+    }
+
     if (list.isNotEmpty) {
-      final WorkoutScheduleDto dto = list.first;
-      return DataCell(Text(dto.nameWorkout!));
+      return DataCell(Column(children: list.map((e) => Text(e.nameWorkout!)).toList()), showEditIcon: true, onTap: onDataCellTap);
     } else {
-      return DataCell(Row(
-        children: <Widget>[
-          Expanded(
-              child: DragTarget<Workout>(
-            onWillAccept: (Object? data) => data is Workout,
-            onAccept: (Workout data) => bloc.addWorkoutSchedule(data, dayIndex),
-            builder: (BuildContext context, List<Object?> candidateData, List<dynamic> rejectedData) {
-              const Widget child = Text('---');
-              if (candidateData.isNotEmpty) {
-                return Container(
-                  decoration: BoxDecoration(border: Border.all(color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
-                  child: child,
-                );
-              } else {
-                return child;
-              }
-            },
-          ))
-        ],
-      ));
+      return DataCell(Text(''), showEditIcon: true, onTap: onDataCellTap);
     }
   }
 
-  DataRow getDataRow(int weekIndex, List<WorkoutScheduleDto> listAppointment) {
+  DataRow getDataRow(
+      BuildContext context, int weekIndex, List<WorkoutScheduleDto> listAppointment, List<DropdownMenuItem<Workout>> listAvailableWorkout) {
     final List<DataCell> list = <DataCell>[];
     final int index = weekIndex + 1;
     list.add(DataCell(Text('$index')));
     for (int i = 0; i < 7; i++) {
       final int dayIndex = (7 * weekIndex) + i;
-      list.add(getDataCell(dayIndex, listAppointment));
+      list.add(getDataCell(context, dayIndex, listAppointment, listAvailableWorkout));
     }
     return DataRow(cells: list);
   }
 
-  List<DataRow> getListDataRows(int numberWeeks, List<WorkoutScheduleDto> listAppointment) {
+  List<DataRow> getListDataRows(
+      BuildContext context, int numberWeeks, List<WorkoutScheduleDto> listAppointment, List<DropdownMenuItem<Workout>> listAvailableWorkout) {
     final List<DataRow> list = <DataRow>[];
     for (int i = 0; i < numberWeeks; i++) {
-      list.add(getDataRow(i, listAppointment));
+      list.add(getDataRow(context, i, listAppointment, listAvailableWorkout));
     }
     return list;
   }

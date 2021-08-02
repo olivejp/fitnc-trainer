@@ -12,6 +12,7 @@ import 'package:fitnc_trainer/domain/workout_schedule.dto.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
+import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
@@ -233,5 +234,13 @@ class ProgrammeUpdateBloc {
         .doc(workout.uid)
         .delete()
         .then((value) => showToast('Workout correctement supprimé.'));
+  }
+
+  Future<List<DropdownMenuItem<Workout>>> getWorkoutDropdownItems() async {
+    QuerySnapshot<Object?> query = await trainersService.getWorkoutReference().get();
+    return query.docs
+        .map((e) => Workout.fromJson(e.data() as Map<String, dynamic>))
+        .map((Workout workout) => DropdownMenuItem<Workout>(value: workout, child: Text(workout.name)))
+        .toList();
   }
 }
