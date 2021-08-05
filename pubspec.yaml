@@ -60,6 +60,8 @@ dependencies:
   firebase:
     path: ./packages/firebase
   syncfusion_flutter_calendar: ^19.2.49
+  syncfusion_flutter_datagrid: ^19.2.49-beta
+  animations: ^2.0.1
 dev_dependencies:
   build_runner: ^2.0.5
   json_serializable: ^4.1.3

@@ -20,6 +20,7 @@ class WorkoutScheduleDto {
   dynamic dateSchedule;
 
   String? nameWorkout;
+  String? imageUrlWorkout;
 
   Map<String, dynamic> toJson() => _$WorkoutScheduleDtoToJson(this);
 }

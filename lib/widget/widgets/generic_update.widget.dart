@@ -24,12 +24,10 @@ class GenericUpdateWidget extends StatelessWidget {
                 children: [
                   ConstrainedBox(
                     constraints: BoxConstraints.expand(width: limit),
-                    child: Container(
-                        decoration: BoxDecoration(color: Color(Colors.white.withOpacity(opacity).value)),
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-                          child: SingleChildScrollView(child: child),
-                        )),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+                      child: SingleChildScrollView(child: child),
+                    ),
                   ),
                 ],
               ),

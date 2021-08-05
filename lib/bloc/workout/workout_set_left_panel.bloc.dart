@@ -32,14 +32,11 @@ class WorkoutSetLeftPanelBloc {
   void init(Workout workout) {
     listDtos.clear();
     subjectListDtos.sink.add(listDtos);
-    if (_workout == null || (_workout != null && _workout!.uid != workout.uid)) {
-      _workout = workout;
-      getWorkoutSetDto(_workout!).then((List<WorkoutSetDto> remoteList) {
-        listDtos.clear();
-        listDtos.addAll(remoteList);
-        subjectListDtos.sink.add(listDtos);
-      });
-    }
+    _workout = workout;
+    getWorkoutSetDto(_workout!).then((List<WorkoutSetDto> remoteList) {
+      listDtos.addAll(remoteList);
+      subjectListDtos.sink.add(listDtos);
+    });
   }
 
   Future<List<WorkoutSetDto>> getWorkoutSetDto(Workout workout) {

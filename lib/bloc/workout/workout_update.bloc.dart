@@ -44,9 +44,7 @@ class WorkoutUpdateBloc {
   WorkoutUpdateBloc._();
 
   static WorkoutUpdateBloc getInstance() {
-    if (_instance == null) {
-      _instance = WorkoutUpdateBloc._();
-    }
+    _instance ??= WorkoutUpdateBloc._();
     return _instance!;
   }
 

@@ -219,6 +219,7 @@ class ProgrammeUpdateBloc {
         .then((Workout value) {
       final WorkoutScheduleDto dto = WorkoutScheduleDto.fromSchedule(e);
       dto.nameWorkout = value.name;
+      dto.imageUrlWorkout = value.imageUrl;
       return dto;
     });
   }
