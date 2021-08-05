@@ -1,3 +1,5 @@
+import 'dart:js';
+
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.page.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
@@ -15,11 +17,6 @@ class MyHomePage extends StatelessWidget {
   MyHomePage(this.title);
 
   final MyHomePageBloc bloc = MyHomePageBloc.getInstance();
-
-  static const int pageWorkout = 0;
-  static const int pageExercice = 1;
-  static const int pageCalendar = 2;
-  static const int pageProgramme = 3;
 
   final String title;
 
@@ -61,12 +58,18 @@ class MyHomePage extends StatelessWidget {
       ],
     );
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+      bool isExpanded = true;
+      if (constraints.maxWidth <= 1024) {
+        isExpanded = false;
+      }
       return Scaffold(
         body: Row(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            getDrawer(constraints),
-            Expanded(child: getMainPage(),),
+          children: <Widget>[
+            Drawer(isExpanded: isExpanded, bloc: bloc),
+            Expanded(
+              child: getMainPage(),
+            ),
           ],
         ),
       );
@@ -77,20 +80,20 @@ class MyHomePage extends StatelessWidget {
   Widget getMainPage() {
     return GenericContainerWidget(
       opacity: 0.5,
-      child: StreamBuilder<int>(
+      child: StreamBuilder<Pages>(
           stream: bloc.currentPageObs,
-          builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+          builder: (BuildContext context, AsyncSnapshot<Pages> snapshot) {
             if (snapshot.hasData) {
-              if (snapshot.data == pageProgramme) {
+              if (snapshot.data == Pages.pageProgramme) {
                 return ProgrammePage();
               }
-              if (snapshot.data == pageWorkout) {
+              if (snapshot.data == Pages.pageWorkout) {
                 return WorkoutPage();
               }
-              if (snapshot.data == pageExercice) {
+              if (snapshot.data == Pages.pageExercice) {
                 return ExercicePage();
               }
-              if (snapshot.data == pageCalendar) {
+              if (snapshot.data == Pages.pageCalendar) {
                 return CalendarPage();
               }
               throw "Aucune page trouvée pour l'index ${snapshot.data}";
@@ -99,257 +102,102 @@ class MyHomePage extends StatelessWidget {
           }),
     );
   }
+}
 
-  /// Retourn un widget correspondant au Drawer.
-  Widget getDrawer(BoxConstraints constraints) {
-    double maxWidth = 200;
-    bool isExpanded = true;
-    if (constraints.maxWidth <= 1024) {
-      maxWidth = 80;
-      isExpanded = false;
-    }
+class Drawer extends StatefulWidget {
+  final bool isExpanded;
+  final MyHomePageBloc bloc;
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xff385c79),
-      ),
+  const Drawer({required this.isExpanded, required this.bloc});
+
+  @override
+  State<Drawer> createState() => _DrawerState();
+}
+
+class _DrawerState extends State<Drawer> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+
+  @override
+  void initState() {
+    _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 150));
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const BoxDecoration decoration = BoxDecoration(color: Color(0xff385c79));
+    const Duration duration = Duration(milliseconds: 300);
+    const Widget textProgramme = Text('Programme', overflow: TextOverflow.clip);
+    const Widget textWorkout = Text('Workout', overflow: TextOverflow.clip);
+    const Widget textExercice = Text('Exercice', overflow: TextOverflow.clip);
+    const Widget textCalendrier = Text('Calendrier', overflow: TextOverflow.clip);
+    const Widget textDisconnect = Text('Se déconnecter', overflow: TextOverflow.clip);
+
+    return AnimatedContainer(
+      width: widget.isExpanded ? 200 : 80,
+      decoration: decoration,
+      duration: duration,
       child: ListTileTheme(
         iconColor: Colors.white,
         textColor: Colors.white,
-        child: StreamBuilder<int>(
-            stream: bloc.currentPageObs,
-            builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-              return AnimatedCrossFade(
-                crossFadeState: isExpanded ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-                duration: const Duration(milliseconds: 200),
-                firstChild: SizedBox(
-                  width: maxWidth,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: ListTileTheme(
-                          minVerticalPadding: 15,
-                          iconColor: Colors.white,
-                          textColor: Colors.white,
-                          child: IconTheme(
-                            data: const IconThemeData(size: 18),
-                            child: Column(
-                              children: [
-                                ListTile(
-                                  onTap: () => bloc.changePage(pageProgramme),
-                                  title: Text('Programme'),
-                                  leading: Icon(Icons.account_tree),
-                                  selected: snapshot.data == pageProgramme,
-                                ),
-                                ListTile(
-                                  onTap: () => bloc.changePage(pageWorkout),
-                                  title: Text('Workout'),
-                                  leading: Icon(Icons.sports_volleyball),
-                                  selected: snapshot.data == pageWorkout,
-                                ),
-                                ListTile(
-                                  onTap: () => bloc.changePage(pageExercice),
-                                  title: Text('Exercice'),
-                                  leading: Icon(Icons.sports_handball),
-                                  selected: snapshot.data == pageExercice,
-                                ),
-                                ListTile(
-                                  onTap: () => bloc.changePage(pageCalendar),
-                                  title: Text('Calendrier'),
-                                  leading: Icon(Icons.calendar_today_rounded),
-                                  selected: snapshot.data == pageCalendar,
-                                ),
-                              ],
+        child: StreamBuilder<Pages>(
+            stream: widget.bloc.currentPageObs,
+            builder: (BuildContext context, AsyncSnapshot<Pages> snapshot) {
+              return Column(
+                children: <Widget>[
+                  Flexible(
+                    child: ListTileTheme(
+                      minVerticalPadding: 15,
+                      iconColor: Colors.white,
+                      textColor: Colors.white,
+                      child: IconTheme(
+                        data: const IconThemeData(size: 25),
+                        child: Column(
+                          children: <Widget>[
+                            ListTile(
+                              onTap: () => widget.bloc.changePage(Pages.pageProgramme),
+                              title: textProgramme,
+                              leading: const Icon(Icons.account_tree),
+                              selected: snapshot.data == Pages.pageProgramme,
                             ),
-                          ),
+                            ListTile(
+                              onTap: () => widget.bloc.changePage(Pages.pageWorkout),
+                              title: textWorkout,
+                              leading: const Icon(Icons.sports_volleyball),
+                              selected: snapshot.data == Pages.pageWorkout,
+                            ),
+                            ListTile(
+                              onTap: () => widget.bloc.changePage(Pages.pageExercice),
+                              title: textExercice,
+                              leading: const Icon(Icons.sports_handball),
+                              selected: snapshot.data == Pages.pageExercice,
+                            ),
+                            ListTile(
+                              onTap: () => widget.bloc.changePage(Pages.pageCalendar),
+                              title: textCalendrier,
+                              leading: const Icon(Icons.calendar_today_rounded),
+                              selected: snapshot.data == Pages.pageCalendar,
+                            ),
+                          ],
                         ),
                       ),
-                      Flexible(
-                          child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Divider(height: 2.0),
-                          ListTile(
-                            onTap: () => bloc.logout(),
-                            minVerticalPadding: 20,
-                            title: Text('Se déconnecter'),
-                            leading: Icon(Icons.do_disturb_outlined),
-                          ),
-                        ],
-                      ))
-                    ],
-                  ),
-                ),
-                secondChild: SizedBox(
-                  width: maxWidth,
-                  child: IconTheme(
-                    data: const IconThemeData(color: Colors.white, size: 25),
-                    child: Column(
-                        mainAxisSize : MainAxisSize.min,
-                      children: <Widget>[
-                        Flexible(
-                            flex: 1,
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: IconButton(
-                                    onPressed: () => bloc.changePage(pageProgramme),
-                                    icon: Icon(Icons.account_tree),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: IconButton(
-                                    onPressed: () => bloc.changePage(pageWorkout),
-                                    icon: Icon(Icons.sports_volleyball),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: IconButton(
-                                    onPressed: () => bloc.changePage(pageExercice),
-                                    icon: Icon(Icons.sports_handball),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: IconButton(
-                                    onPressed: () => bloc.changePage(pageCalendar),
-                                    icon: Icon(Icons.calendar_today_rounded),
-                                  ),
-                                ),
-                              ],
-                            )),
-                        Flexible(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                child: IconButton(onPressed: () => bloc.logout(), icon: Icon(Icons.do_disturb_outlined)),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
                     ),
                   ),
-                ),
+                  Flexible(
+                      child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      const Divider(height: 2.0),
+                      ListTile(
+                        onTap: () => widget.bloc.logout(),
+                        minVerticalPadding: 20,
+                        title: textDisconnect,
+                        leading: const Icon(Icons.do_disturb_outlined),
+                      ),
+                    ],
+                  ))
+                ],
               );
-              // if (isExpanded) {
-              //   return Column(
-              //     children: [
-              //       Flexible(
-              //         flex: 1,
-              //         child: ListTileTheme(
-              //           minVerticalPadding: 15,
-              //           iconColor: Colors.white,
-              //           textColor: Colors.white,
-              //           child: IconTheme(
-              //             data: const IconThemeData(size: 18),
-              //             child: Column(
-              //               children: [
-              //                 ListTile(
-              //                   onTap: () => bloc.changePage(pageProgramme),
-              //                   title: Text('Programme'),
-              //                   leading: Icon(Icons.account_tree),
-              //                   selected: snapshot.data == pageProgramme,
-              //                 ),
-              //                 ListTile(
-              //                   onTap: () => bloc.changePage(pageWorkout),
-              //                   title: Text('Workout'),
-              //                   leading: Icon(Icons.sports_volleyball),
-              //                   selected: snapshot.data == pageWorkout,
-              //                 ),
-              //                 ListTile(
-              //                   onTap: () => bloc.changePage(pageExercice),
-              //                   title: Text('Exercice'),
-              //                   leading: Icon(Icons.sports_handball),
-              //                   selected: snapshot.data == pageExercice,
-              //                 ),
-              //                 ListTile(
-              //                   onTap: () => bloc.changePage(pageCalendar),
-              //                   title: Text('Calendrier'),
-              //                   leading: Icon(Icons.calendar_today_rounded),
-              //                   selected: snapshot.data == pageCalendar,
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //       Flexible(
-              //           child: Column(
-              //         mainAxisAlignment: MainAxisAlignment.end,
-              //         children: [
-              //           Divider(height: 2.0),
-              //           ListTile(
-              //             onTap: () => bloc.logout(),
-              //             minVerticalPadding: 20,
-              //             title: Text('Se déconnecter'),
-              //             leading: Icon(Icons.do_disturb_outlined),
-              //           ),
-              //         ],
-              //       ))
-              //     ],
-              //   );
-              // } else {
-              //   return IconTheme(
-              //     data: const IconThemeData(color: Colors.white, size: 25),
-              //     child: Column(
-              //       children: <Widget>[
-              //         Flexible(
-              //             flex: 1,
-              //             child: Column(
-              //               children: [
-              //                 Padding(
-              //                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-              //                   child: IconButton(
-              //                     onPressed: () => bloc.changePage(pageProgramme),
-              //                     icon: Icon(Icons.account_tree),
-              //                   ),
-              //                 ),
-              //                 Padding(
-              //                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-              //                   child: IconButton(
-              //                     onPressed: () => bloc.changePage(pageWorkout),
-              //                     icon: Icon(Icons.sports_volleyball),
-              //                   ),
-              //                 ),
-              //                 Padding(
-              //                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-              //                   child: IconButton(
-              //                     onPressed: () => bloc.changePage(pageExercice),
-              //                     icon: Icon(Icons.sports_handball),
-              //                   ),
-              //                 ),
-              //                 Padding(
-              //                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-              //                   child: IconButton(
-              //                     onPressed: () => bloc.changePage(pageCalendar),
-              //                     icon: Icon(Icons.calendar_today_rounded),
-              //                   ),
-              //                 ),
-              //               ],
-              //             )),
-              //         Flexible(
-              //           child: Column(
-              //             mainAxisAlignment: MainAxisAlignment.end,
-              //             children: [
-              //               Padding(
-              //                 padding: const EdgeInsets.symmetric(vertical: 8.0),
-              //                 child: IconButton(onPressed: () => bloc.logout(), icon: Icon(Icons.do_disturb_outlined)),
-              //               ),
-              //             ],
-              //           ),
-              //         )
-              //       ],
-              //     ),
-              //   );
-              // }
             }),
       ),
     );

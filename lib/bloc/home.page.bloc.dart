@@ -1,32 +1,33 @@
 import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:rxdart/rxdart.dart';
 
+enum Pages { pageWorkout, pageExercice, pageCalendar, pageProgramme }
+
 class MyHomePageBloc {
   static MyHomePageBloc? _instance;
 
   final AuthService authService = AuthService.getInstance();
 
-  int _currentPage = 0;
+  Pages _currentPage = Pages.pageProgramme;
   bool _currentDisplay = false;
-  late BehaviorSubject<int> _streamCurrentPage;
+  late BehaviorSubject<Pages> _streamCurrentPage;
   late BehaviorSubject<bool> _streamDisplayList;
 
-  Stream<int> get currentPageObs => _streamCurrentPage.stream;
+  Stream<Pages> get currentPageObs => _streamCurrentPage.stream;
+
   Stream<bool> get currentDisplayObs => _streamDisplayList.stream;
 
   MyHomePageBloc._() {
-    _streamCurrentPage = BehaviorSubject.seeded(0);
+    _streamCurrentPage = BehaviorSubject.seeded(Pages.pageProgramme);
     _streamDisplayList = BehaviorSubject.seeded(_currentDisplay);
   }
 
   static MyHomePageBloc getInstance() {
-    if (_instance == null) {
-      _instance = MyHomePageBloc._();
-    }
+    _instance ??= MyHomePageBloc._();
     return _instance!;
   }
 
-  changePage(int newPage) {
+  changePage(Pages newPage) {
     _currentPage = newPage;
     _streamCurrentPage.sink.add(_currentPage);
   }
