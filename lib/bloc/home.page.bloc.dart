@@ -12,6 +12,10 @@ class MyHomePageBloc {
   bool _currentDisplay = false;
   late BehaviorSubject<Pages> _streamCurrentPage;
   late BehaviorSubject<bool> _streamDisplayList;
+  late BehaviorSubject<bool> _streamIsExpanded;
+  bool _isExpanded = false;
+
+  Stream<bool> get currentIsExpanded => _streamIsExpanded.stream;
 
   Stream<Pages> get currentPageObs => _streamCurrentPage.stream;
 
@@ -20,7 +24,15 @@ class MyHomePageBloc {
   MyHomePageBloc._() {
     _streamCurrentPage = BehaviorSubject.seeded(Pages.pageProgramme);
     _streamDisplayList = BehaviorSubject.seeded(_currentDisplay);
+    _streamIsExpanded = BehaviorSubject.seeded(_isExpanded);
   }
+
+  set isExpanded(bool isExpanded) {
+    _isExpanded = isExpanded;
+    _streamIsExpanded.sink.add(isExpanded);
+  }
+
+  bool get isExpanded => _isExpanded;
 
   static MyHomePageBloc getInstance() {
     _instance ??= MyHomePageBloc._();

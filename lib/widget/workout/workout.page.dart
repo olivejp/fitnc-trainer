@@ -28,7 +28,24 @@ class WorkoutPage extends StatefulWidget {
   }
 }
 
-class _WorkoutPageState extends State<WorkoutPage> {
+class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: Duration(seconds: 3));
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   _WorkoutPageState();
 
   DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
@@ -62,9 +79,13 @@ class _WorkoutPageState extends State<WorkoutPage> {
                     children: [
                       Expanded(
                           flex: 3,
-                          child: SelectableText(
-                            'Workouts',
-                            style: GoogleFonts.roboto(fontSize: 35, color: Colors.black, fontWeight: FontWeight.bold),
+                          child: SizeTransition(
+                            axis: Axis.horizontal,
+                            sizeFactor: _animation,
+                            child: SelectableText(
+                              'Workouts',
+                              style: GoogleFonts.roboto(fontSize: 35, color: Colors.black, fontWeight: FontWeight.bold),
+                            ),
                           )),
                       Expanded(
                         flex: 1,
