@@ -28,7 +28,7 @@ abstract class AbstractFitnessStorageBloc<T extends AbstractFitnessStorageDomain
   /// Envoi le document dans Firebase Storage.
   Future<void> createStorage(T domain) async {
     if (domain.storageFile != null && domain.storageFile!.fileBytes != null && domain.storageFile!.fileName != null) {
-      await _sendToStorage(domain);
+      domain.imageUrl = await _sendToStorage(domain);
     }
   }
 
@@ -61,7 +61,7 @@ abstract class AbstractFitnessStorageBloc<T extends AbstractFitnessStorageDomain
     if (user != null && domain.storageFile != null && domain.storageFile!.fileBytes != null && domain.storageFile!.fileName != null) {
       final String url = getUrl(user, domain);
       return firestorageService.sendToStorageAndGetReference(
-          '$url/${domain.storageFile!.fileName}/$pathWorkoutMainImage', domain.storageFile!.fileBytes!);
+          '$url/$pathWorkoutMainImage/${domain.storageFile!.fileName}', domain.storageFile!.fileBytes!);
     }
     throw Exception('Envoi sur le storage échoué.');
   }
@@ -69,7 +69,7 @@ abstract class AbstractFitnessStorageBloc<T extends AbstractFitnessStorageDomain
   /// Permet de récupérer le StorageFile à partir du Domain.
   Future<StorageFile?> getFutureStorageFile(T domain) {
     final Completer<StorageFile?> completer = Completer<StorageFile?>();
-    if (domain.imageUrl != null) {
+    if (domain.imageUrl != null && domain.imageUrl!.isNotEmpty) {
       firestorageService.getRemoteImageToUint8List(domain.imageUrl!).then((Uint8List bytes) {
         domain.storageFile!.fileName = basename(domain.imageUrl!);
         domain.storageFile!.fileBytes = bytes;
@@ -82,10 +82,20 @@ abstract class AbstractFitnessStorageBloc<T extends AbstractFitnessStorageDomain
   }
 }
 
+abstract class AbstractCrudBloc<T> {
+  Future<void> save(T domain);
+
+  Future<void> create(T domain);
+
+  Future<void> update(T domain);
+
+  Future<void> delete(T domain);
+}
+
 ///
 /// Classe Bloc pour implémenter les méthodes de base du CRUD
 ///
-abstract class AbstractFitnessCrudBloc<T extends AbstractFitnessDomain> {
+abstract class AbstractFitnessCrudBloc<T extends AbstractFitnessDomain> implements AbstractCrudBloc<T> {
   /// Méthode abstraite qui retournera la collectionReference.
   CollectionReference<Object?> getCollectionReference();
 
@@ -93,6 +103,7 @@ abstract class AbstractFitnessCrudBloc<T extends AbstractFitnessDomain> {
   Widget openUpdate(BuildContext context, T domain);
 
   /// Méthode de sauvegarde l'entité passée.
+  @override
   Future<void> save(T domain) {
     if (domain.uid != null && domain.uid?.isNotEmpty == true) {
       return update(domain);
@@ -101,16 +112,19 @@ abstract class AbstractFitnessCrudBloc<T extends AbstractFitnessDomain> {
     }
   }
 
+  @override
   Future<void> create(T domain) async {
     domain.createDate = FieldValue.serverTimestamp();
-    domain.uid = getCollectionReference().doc().id;
+    domain.uid ??= getCollectionReference().doc().id;
     return sendToFireStore(domain);
   }
 
+  @override
   Future<void> update(T domain) async {
     return sendToFireStore(domain);
   }
 
+  @override
   Future<void> delete(T domain) {
     return getCollectionReference().doc(domain.uid).delete().then((_) {});
   }
@@ -167,7 +181,7 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
                 builder: (BuildContext context) => AlertDialog(
                   title: const Text('Êtes-vous sûr de vouloir supprimer cet exercice ?'),
                   actions: <Widget>[
-                    TextButton(onPressed: () => bloc.delete(domain), child: const Text('Oui')),
+                    TextButton(onPressed: () => bloc.delete(domain).then((_) => Navigator.pop(context)), child: const Text('Oui')),
                     TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
                   ],
                 ),

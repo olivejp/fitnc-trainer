@@ -1,35 +1,33 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase/service/firestorage.service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/widget/exercice/exercice.update.page.dart';
+import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
-import 'package:path/path.dart';
+import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ExerciceUpdateBloc {
-
+class ExerciceUpdateBloc with AbstractFitnessCrudBloc<Exercice>, AbstractFitnessStorageBloc<Exercice> {
   ExerciceUpdateBloc._();
 
   factory ExerciceUpdateBloc.instance() {
     _instance ??= ExerciceUpdateBloc._();
     return _instance!;
   }
+
   static ExerciceUpdateBloc? _instance;
 
-  FirestorageService firestorageService = FirestorageService.instance();
   TrainersService trainersService = TrainersService.getInstance();
   ParamService paramService = ParamService.getInstance();
-  late Exercice exercice;
-  StorageFile? storagePair;
+  Exercice? exercice;
 
-  BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
-  BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject();
-  BehaviorSubject<String?> _streamSelectedYoutubeUrl = BehaviorSubject();
+  final BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
+  final BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject<String?>();
+  final BehaviorSubject<String?> _streamSelectedYoutubeUrl = BehaviorSubject<String?>();
 
   Stream<String?>? get selectedVideoUrlObs => _streamSelectedVideoUrl.stream;
 
@@ -37,90 +35,39 @@ class ExerciceUpdateBloc {
 
   Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
 
-  final String pathExerciceMainImage = 'mainImage';
-
   void init(Exercice? exerciceEntered) {
-    storagePair = StorageFile();
     subjectStoragePair.sink.add(null);
 
     if (exerciceEntered != null) {
       exercice = exerciceEntered;
+      exerciceEntered.storageFile = StorageFile();
+      getFutureStorageFile(exercice!).then((StorageFile? value) => subjectStoragePair.sink.add(value));
 
-      if (exercice.imageUrl != null && exercice.imageUrl!.isNotEmpty) {
-        firestorageService.getRemoteImageToUint8List(exercice.imageUrl!).then((bytes) {
-          storagePair!.fileName = basename(exercice.imageUrl!);
-          storagePair!.fileBytes = bytes;
-          subjectStoragePair.sink.add(storagePair);
-        });
+      if (exercice!.videoUrl != null) {
+        videoUrl = exercice!.videoUrl;
       }
-
-      if (exercice.videoUrl != null) {
-        setVideoUrl(exercice.videoUrl!);
-      }
-      setYoutubeUrl(exercice.youtubeUrl);
+      youtubeUrl = exercice!.youtubeUrl;
     } else {
       exercice = Exercice();
       subjectStoragePair.sink.add(null);
     }
   }
 
-  Exercice? getExercice() {
-    return exercice;
-  }
-
-  Future<void> saveExercice() {
-    if (exercice.uid != null && exercice.uid?.isNotEmpty == true) {
-      return updateExercice();
-    } else {
-      return createExercice();
+  Future<void> saveExercice() async {
+    if (exercice != null) {
+      if (exercice!.uid != null) {
+        return eraseAndReplaceStorage(exercice!).then((_) => save(exercice!));
+      } else {
+        exercice!.uid = getCollectionReference().doc().id;
+        return createStorage(exercice!).then((_) => create(exercice!));
+      }
     }
+    return;
   }
 
-  Future<void> createExercice() async {
-    CollectionReference<Object?> collectionReference = trainersService.getExerciceReference();
-
-    exercice.uid = collectionReference.doc().id; // Récupération d'une nouvelle ID.
-
-    // Si un fichier est présent, on tente de l'envoyer sur le Storage.
-    if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
-      await sendToStorage();
-    }
-    return sendToFireStore(collectionReference);
-  }
-
-  Future<void> updateExercice() async {
-    CollectionReference<Object?> collectionReference = trainersService.getExerciceReference();
-
-    // Si un fichier est présent, on tente de l'envoyer sur le Storage.
-    if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
-      await deleteExerciceMainImage(exercice);
-      await sendToStorage();
-    }
-
-    if (storagePair == null || storagePair?.fileName == null || storagePair?.fileBytes == null) {
-      await deleteExerciceMainImage(exercice);
-      exercice.imageUrl = null;
-    }
-    return sendToFireStore(collectionReference);
-  }
-
-  String getUrl() {
-    String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    return 'trainers/$trainerUid/exercices/${exercice.uid}/$pathExerciceMainImage';
-  }
-
-  Future<void> sendToFireStore(CollectionReference<Object?> collectionReference) {
-    exercice.createDate = FieldValue.serverTimestamp();
-    return collectionReference.doc(exercice.uid).set(exercice.toJson()).then((value) {
-      exercice = Exercice();
-    });
-  }
-
-  Future<void> sendToStorage() async {
-    String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    if (trainerUid != null && storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
-      exercice.imageUrl = await firestorageService.sendToStorageAndGetReference('${getUrl()}/${storagePair!.fileName}', storagePair!.fileBytes!);
-    }
+  @override
+  String getUrl(User user, Exercice exercice) {
+    return 'trainers/${user.uid}/exercices/${exercice.uid}';
   }
 
   Stream<List<Exercice>> getStreamExercice() {
@@ -128,42 +75,53 @@ class ExerciceUpdateBloc {
   }
 
   Future<void> deleteExercice(Exercice exercice) {
-    return trainersService.getExerciceReference().doc(exercice.uid).delete().then((value) => deleteExerciceMainImage(exercice));
+    return trainersService.getExerciceReference().doc(exercice.uid).delete().then((_) => deleteAllFiles(exercice));
   }
 
-  Future<void> deleteExerciceMainImage(Exercice exercice) {
-    String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    if (trainerUid != null) {
-      return FirebaseStorage.instance
-          .ref(getUrl())
-          .listAll()
-          .then((value) => value.items.forEach((element) => element.delete()))
-          .catchError((error) => print(error));
-    } else {
-      return Future.error('Aucun compte trainer connecté');
-    }
+  set typeExercice(String? value) {
+    exercice?.typeExercice = value;
   }
 
-  setName(String value) {
-    exercice.name = value;
+  String? get typeExercice => exercice?.typeExercice;
+
+  set name(String? value) {
+    exercice?.name = value;
   }
 
-  setDescription(String value) {
-    exercice.description = value;
+  String? get name => exercice?.name;
+
+  set description(String? value) {
+    exercice?.description = value;
   }
 
-  setVideoUrl(String value) {
-    exercice.videoUrl = value;
+  String? get description => exercice?.description;
+
+  set videoUrl(String? value) {
+    exercice?.videoUrl = value;
     _streamSelectedVideoUrl.sink.add(value);
   }
 
-  setYoutubeUrl(String? value) {
-    exercice.youtubeUrl = value;
+  String? get videoUrl => exercice?.videoUrl;
+
+  set youtubeUrl(String? value) {
+    exercice?.youtubeUrl = value;
     _streamSelectedYoutubeUrl.sink.add(value);
   }
 
-  setStoragePair(StorageFile? storagePair) {
-    this.storagePair = storagePair;
-    this.subjectStoragePair.sink.add(this.storagePair);
+  String? get youtubeUrl => exercice?.youtubeUrl;
+
+  void setStoragePair(StorageFile? storageFile) {
+    exercice?.storageFile = storageFile;
+    subjectStoragePair.sink.add(exercice?.storageFile);
+  }
+
+  @override
+  CollectionReference<Object?> getCollectionReference() {
+    return trainersService.getExerciceReference();
+  }
+
+  @override
+  Widget openUpdate(BuildContext context, Exercice exercice) {
+    return ExerciceUpdatePage(exercice: exercice);
   }
 }

@@ -15,12 +15,12 @@ class ExerciceFormBuilder {
       child: Form(
         key: _formKey,
         child: Column(
-          children: [
+          children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(bottom: 30.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
+                children: <Widget>[
                   StorageStreamImageWidget(
                     onSaved: (StorageFile? storagePair) => bloc.setStoragePair(storagePair),
                     streamInitialStorageFile: bloc.obsStoragePair,
@@ -30,11 +30,11 @@ class ExerciceFormBuilder {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 20),
                       child: TextFormField(
-                          initialValue: bloc.exercice.name,
+                          initialValue: bloc.name,
                           autofocus: true,
-                          onChanged: (value) => bloc.setName(value),
-                          decoration: InputDecoration(helperText: 'Nom'),
-                          validator: (value) {
+                          onChanged: (String value) => bloc.name = value,
+                          decoration: const InputDecoration(helperText: 'Nom'),
+                          validator: (String? value) {
                             if (value == null || value.isEmpty) {
                               return 'Merci de renseigner le nom du exercice.';
                             }
@@ -46,45 +46,45 @@ class ExerciceFormBuilder {
               ),
             ),
             Row(
-              children: [
+              children: <Widget>[
                 Expanded(
                     child: ParamDropdownButton(
-                  hint: Text('Type d\'exercice', style: TextStyle(fontStyle: FontStyle.italic)),
+                  hint: const Text("Type d'exercice", style: TextStyle(fontStyle: FontStyle.italic)),
                   paramName: 'type_exercice',
-                  initialValue: bloc.exercice.typeExercice,
-                  onChanged: (String? onChangedValue) => bloc.exercice.typeExercice = onChangedValue,
+                  initialValue: bloc.typeExercice,
+                  onChanged: (String? onChangedValue) => bloc.typeExercice = onChangedValue,
                 ))
               ],
             ),
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: TextFormField(
-                initialValue: bloc.exercice.description,
+                initialValue: bloc.description,
                 maxLength: 2000,
                 minLines: 5,
                 maxLines: 20,
-                onChanged: (value) => bloc.setDescription(value),
-                decoration: InputDecoration(helperText: 'Description (optionel)'),
+                onChanged: (String value) => bloc.description = value,
+                decoration: const InputDecoration(helperText: 'Description (optionel)'),
               ),
             ),
             Row(
-              children: [
+              children: <Widget>[
                 Expanded(
                   child: TextFormField(
-                    initialValue: bloc.exercice.videoUrl,
-                    onChanged: (value) => bloc.setVideoUrl(value),
-                    decoration: InputDecoration(helperText: 'URL de la vidéo - Exemple : https://myStorage.com/squat_video.mp4'),
+                    initialValue: bloc.videoUrl,
+                    onChanged: (String value) => bloc.videoUrl = value,
+                    decoration: const InputDecoration(helperText: 'URL de la vidéo - Exemple : https://myStorage.com/squat_video.mp4'),
                   ),
                 )
               ],
             ),
             Row(
-              children: [
+              children: <Widget>[
                 Expanded(
                   child: TextFormField(
-                    initialValue: bloc.exercice.youtubeUrl,
-                    onChanged: (value) => bloc.setYoutubeUrl(value),
-                    decoration: InputDecoration(helperText: 'Identifiant vidéo Youtube - Exemple : v-7oKGvVADk'),
+                    initialValue: bloc.youtubeUrl,
+                    onChanged: (String value) => bloc.youtubeUrl = value,
+                    decoration: const InputDecoration(helperText: 'Identifiant vidéo Youtube - Exemple : v-7oKGvVADk'),
                   ),
                 )
               ],
@@ -101,14 +101,14 @@ class ExerciceFormBuilder {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: <Widget>[
                 StreamBuilder<String?>(
                   stream: bloc.selectedVideoUrlObs,
-                  builder: (context, snapshot) {
+                  builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
                     if (snapshot.hasData) {
                       _videoController = VideoPlayerController.network(snapshot.data!);
-                      return FutureBuilder(
-                        builder: (context, snapshot) {
+                      return FutureBuilder<Object?>(
+                        builder: (BuildContext context, AsyncSnapshot<Object?> snapshot) {
                           if (_videoController?.value.isInitialized == true) {
                             return LimitedBox(
                               maxWidth: 500,
@@ -132,16 +132,15 @@ class ExerciceFormBuilder {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: <Widget>[
                 StreamBuilder<String?>(
                   stream: bloc.selectedYoutubeUrlObs,
-                  builder: (context, snapshot) {
+                  builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
                     if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
                       _youtubeController = YoutubePlayerController(
                         initialVideoId: snapshot.data!,
-                        params: YoutubePlayerParams(
+                        params: const YoutubePlayerParams(
                           autoPlay: false,
-                          showControls: true,
                           showFullscreenButton: true,
                         ),
                       );
@@ -150,7 +149,6 @@ class ExerciceFormBuilder {
                         maxWidth: 500,
                         child: YoutubePlayerIFrame(
                           controller: _youtubeController,
-                          aspectRatio: 16 / 9,
                         ),
                       );
                     } else {

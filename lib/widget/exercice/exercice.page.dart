@@ -76,7 +76,10 @@ class ExercicePage extends StatelessWidget {
                     return const Center(child: Text('Aucun exercice trouvé.'));
                   } else {
                     final List<Exercice> listExercice = snapshot.data!;
-                    return getGridView(listExercice);
+                    return FitnessGridView<Exercice>(
+                      domains: listExercice,
+                      bloc: bloc,
+                    );
                   }
                 },
               ),
@@ -84,84 +87,6 @@ class ExercicePage extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget getGridView(List<Exercice> listExercice) {
-    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      int nbColumns = 1;
-      if (constraints.maxWidth > 1200) {
-        nbColumns = 6;
-      } else if (constraints.maxWidth > 1000) {
-        nbColumns = 4;
-      } else if (constraints.maxWidth > 800) {
-        nbColumns = 3;
-      } else if (constraints.maxWidth > 600) {
-        nbColumns = 2;
-      }
-
-      return GridView.count(
-        childAspectRatio: 13 / 9,
-        padding: const EdgeInsets.all(10.0),
-        mainAxisSpacing: 10.0,
-        crossAxisSpacing: 10.0,
-        crossAxisCount: nbColumns,
-        children: listExercice.map((Exercice exercice) => ExerciceGridCard(
-          exercice: exercice,
-          bloc: bloc,
-        )).toList(),
-      );
-    });
-  }
-
-  static Future<dynamic> goToUpdatePage(BuildContext context, Exercice exercice) {
-    return Navigator.push(
-        context,
-        PageTransition(
-          duration: Duration.zero,
-          reverseDuration: Duration.zero,
-          type: PageTransitionType.fade,
-          child: ExerciceUpdatePage(exercice: exercice),
-        ));
-  }
-
-  void deleteExercice(Exercice exercice, BuildContext context) {
-    bloc.deleteExercice(exercice).then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
-  }
-}
-
-class ExerciceGridCard extends StatelessWidget {
-  const ExerciceGridCard({Key? key, required this.exercice, required this.bloc}) : super(key: key);
-
-  final Exercice exercice;
-  final ExerciceUpdateBloc bloc;
-
-  @override
-  Widget build(BuildContext context) {
-    return FitnessGridCard<Exercice>(
-      domain: exercice,
-      onTap: (Exercice domain) {
-        Navigator.push(
-            context,
-            PageTransition(
-              duration: Duration.zero,
-              reverseDuration: Duration.zero,
-              type: PageTransitionType.fade,
-              child: ExerciceUpdatePage(exercice: exercice),
-            ));
-      },
-      onDelete: (Exercice domain) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) => AlertDialog(
-            title: const Text('Êtes-vous sûr de vouloir supprimer cet exercice?'),
-            actions: <Widget>[
-              TextButton(onPressed: () => bloc.deleteExercice(exercice), child: Text('Oui')),
-              TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler'))
-            ],
-          ),
-        );
-      },
     );
   }
 }

@@ -17,7 +17,7 @@ class FirestorageService {
   static FirestorageService? _instance;
 
   Future<String> sendToStorageAndGetReference(String url, Uint8List fileByte) async {
-    final SettableMetadata metadata = SettableMetadata(cacheControl: 'max-age=36000');
+    final SettableMetadata metadata = SettableMetadata(cacheControl: 'max-age=36000', contentType: 'image/jpeg');
     return await FirebaseStorage.instance.ref(url).putData(fileByte, metadata).then((ref) => ref.ref.getDownloadURL());
   }
 
