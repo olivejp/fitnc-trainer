@@ -7,7 +7,7 @@ import 'exercice.form.builder.dart';
 
 class ExerciceCreatePage {
   static showCreate(BuildContext context) {
-    ExerciceUpdateBloc bloc = ExerciceUpdateBloc.getInstance();
+    ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
     bloc.init(null);
     GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     showDialog(

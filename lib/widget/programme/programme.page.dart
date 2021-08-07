@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/bloc/programme/programme_update.bloc.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
+import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/programme/programme.update.page.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,22 +15,12 @@ import 'package:page_transition/page_transition.dart';
 
 import 'programme.create.page.dart';
 
-class ProgrammePage extends StatefulWidget {
-  final MyHomePageBloc homePageBloc = MyHomePageBloc.getInstance();
-  final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.getInstance();
-
+class ProgrammePage extends StatelessWidget {
   ProgrammePage({Key? key}) : super(key: key);
 
-  @override
-  _ProgrammePageState createState() {
-    return new _ProgrammePageState();
-  }
-}
-
-class _ProgrammePageState extends State<ProgrammePage> {
-  DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
-
-  _ProgrammePageState();
+  final MyHomePageBloc homePageBloc = MyHomePageBloc.instance();
+  final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.getInstance();
+  final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
   @override
   Widget build(BuildContext context) {
@@ -51,21 +41,20 @@ class _ProgrammePageState extends State<ProgrammePage> {
           ),
         ),
         body: Column(
-          children: [
+          children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(left: 15, right: 15),
               child: Row(
-                children: [
+                children: <Widget>[
                   Expanded(
                       flex: 3,
                       child: Text(
-                        'Programmes',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                        'Programme',
+                        style: Theme.of(context).textTheme.headline1,
                       )),
                   Expanded(
-                    flex: 1,
                     child: TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: UnderlineInputBorder(),
                         prefixIcon: Icon(Icons.search),
                         hintText: 'Recherche...',
@@ -77,25 +66,17 @@ class _ProgrammePageState extends State<ProgrammePage> {
               ),
             ),
             Expanded(
-              child: StreamBuilder<List<Programme?>>(
-                stream: widget.bloc.getStreamProgramme(),
-                builder: (context, snapshot) {
+              child: StreamBuilder<List<Programme>>(
+                stream: bloc.getStreamProgramme(),
+                builder: (BuildContext context, AsyncSnapshot<List<Programme>> snapshot) {
                   if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
-                    return Center(child: Text('Aucun programme trouvé.'));
+                    return const Center(child: Text('Aucun programme trouvé.'));
                   } else {
-                    List<Programme?> listProgramme = snapshot.data!;
-                    return StreamBuilder<bool>(
-                        stream: widget.homePageBloc.currentDisplayObs,
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            if (snapshot.data != null && snapshot.data == true) {
-                              return getListView(listProgramme);
-                            } else {
-                              return getGridView(listProgramme);
-                            }
-                          }
-                          return Container();
-                        });
+                    final List<Programme> programmes = snapshot.data!;
+                    return ProgrammeGridView(
+                      programmes: programmes,
+                      bloc: bloc,
+                    );
                   }
                 },
               ),
@@ -105,9 +86,17 @@ class _ProgrammePageState extends State<ProgrammePage> {
       ),
     );
   }
+}
 
-  Widget getGridView(List<Programme?> listProgramme) {
-    return LayoutBuilder(builder: (context, constraints) {
+class ProgrammeGridView extends StatelessWidget {
+  const ProgrammeGridView({Key? key, required this.programmes, required this.bloc}) : super(key: key);
+
+  final List<Programme> programmes;
+  final ProgrammeUpdateBloc bloc;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       int nbColumns = 1;
       if (constraints.maxWidth > 1200) {
         nbColumns = 6;
@@ -125,131 +114,45 @@ class _ProgrammePageState extends State<ProgrammePage> {
         mainAxisSpacing: 10.0,
         crossAxisSpacing: 10.0,
         crossAxisCount: nbColumns,
-        children: listProgramme.map((programme) {
-          if (programme != null) {
-            return InkWell(
-              splashColor: Theme.of(context).primaryColor,
-              hoverColor: Theme.of(context).primaryColor,
-              borderRadius: BorderRadius.circular(5),
-              onTap: () => goToUpdatePage(context, programme),
-              child: getGridCard(programme),
-            );
-          } else {
-            return Container();
-          }
+        children: programmes.map((Programme programme) {
+          return ProgrammeGridCard(programme: programme, bloc: bloc);
         }).toList(),
       );
     });
   }
+}
 
-  Future<dynamic> goToUpdatePage(BuildContext context, Programme programme) {
-    return Navigator.push(
-        context,
-        PageTransition(
-            child: ProgrammeUpdatePage(
-              programme: programme,
-            ),
-            reverseDuration: Duration.zero,
-            type: PageTransitionType.fade,
-            duration: Duration.zero));
-  }
+class ProgrammeGridCard extends StatelessWidget {
+  const ProgrammeGridCard({Key? key, required this.programme, required this.bloc}) : super(key: key);
 
-  Card getGridCard(Programme programme) {
-    Widget firstChild;
-    if (programme.imageUrl != null) {
-      firstChild = Image.network(
-        programme.imageUrl!,
-        fit: BoxFit.cover,
-      );
-    } else {
-      firstChild = Container(
-        decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-      );
-    }
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(flex: 3, child: firstChild),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Text(
-                    programme.name,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
-                ),
-                getDeleteButton(context, programme)
+  final Programme programme;
+  final ProgrammeUpdateBloc bloc;
+
+  @override
+  Widget build(BuildContext context) {
+    return FitnessGridCard<Programme>(
+        domain: programme,
+        onTap: (Programme programme) {
+          Navigator.push(
+              context,
+              PageTransition(
+                duration: Duration.zero,
+                reverseDuration: Duration.zero,
+                type: PageTransitionType.fade,
+                child: ProgrammeUpdatePage(programme: programme),
+              ));
+        },
+        onDelete: (Programme programme) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              title: const Text('Etes vous sûr de vouloir supprimer ce programme ?'),
+              actions: <Widget>[
+                TextButton(onPressed: () => bloc.deleteProgramme(programme).then((_) => Navigator.pop(context)), child: const Text('Oui')),
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
               ],
             ),
-            flex: 1,
-          ),
-        ],
-      ),
-      elevation: 2,
-    );
-  }
-
-  ListView getListView(List<Programme?> listProgramme) {
-    return ListView.separated(
-        separatorBuilder: (context, index) => Divider(
-              height: 2.0,
-            ),
-        itemCount: listProgramme.length,
-        itemBuilder: (context, index) {
-          Programme programme = listProgramme[index] as Programme;
-          Widget leading = (programme.imageUrl != null) ? CircleAvatar(foregroundImage: NetworkImage(programme.imageUrl!)) : CircleAvatar();
-
-          Widget subtitle = programme.createDate != null
-              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((programme.createDate as Timestamp).millisecondsSinceEpoch)))
-              : Container();
-
-          return ListTile(
-            contentPadding: const EdgeInsets.all(20.0),
-            leading: leading,
-            title: Text(programme.name),
-            subtitle: subtitle,
-            trailing: Wrap(
-              children: [getDeleteButton(context, programme)],
-            ),
-            onTap: () => goToUpdatePage(context, programme),
           );
         });
-  }
-
-  IconButton getDeleteButton(BuildContext context, Programme programme) {
-    return IconButton(
-      tooltip: 'Supprimer',
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Êtes-vous sûr de vouloir supprimer cet programme?'),
-            actions: [
-              TextButton(onPressed: () => deleteProgramme(programme, context), child: Text('Oui')),
-              TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler'))
-            ],
-          ),
-        );
-      },
-      icon: Icon(
-        Icons.delete,
-        color: Colors.grey,
-        size: 24,
-      ),
-    );
-  }
-
-  void deleteProgramme(Programme programme, BuildContext context) {
-    widget.bloc.deleteProgramme(programme).then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
   }
 }

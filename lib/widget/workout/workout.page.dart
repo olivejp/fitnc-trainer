@@ -1,8 +1,9 @@
-import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/bloc/workout/workout_update.bloc.dart';
+import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
+import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:fitnc_trainer/widget/workout/workout.create.page.dart';
 import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
@@ -19,7 +20,7 @@ import 'package:page_transition/page_transition.dart';
 class WorkoutPage extends StatefulWidget {
   WorkoutPage({Key? key}) : super(key: key);
 
-  final MyHomePageBloc homePageBloc = MyHomePageBloc.getInstance();
+  final MyHomePageBloc homePageBloc = MyHomePageBloc.instance();
   final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
 
   @override
@@ -29,14 +30,14 @@ class WorkoutPage extends StatefulWidget {
 }
 
 class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStateMixin {
+  _WorkoutPageState();
+
   late AnimationController _controller;
-  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: Duration(seconds: 3));
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 5));
     _controller.forward();
   }
 
@@ -45,8 +46,6 @@ class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStat
     _controller.dispose();
     super.dispose();
   }
-
-  _WorkoutPageState();
 
   DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
@@ -79,16 +78,14 @@ class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStat
                     children: [
                       Expanded(
                           flex: 3,
-                          child: SizeTransition(
-                            axis: Axis.horizontal,
-                            sizeFactor: _animation,
-                            child: SelectableText(
-                              'Workouts',
-                              style: GoogleFonts.roboto(fontSize: 35, color: Colors.black, fontWeight: FontWeight.bold),
-                            ),
+                          child: SelectableText(
+                            'Workout',
+                            style: Theme
+                                .of(context)
+                                .textTheme
+                                .headline1,
                           )),
                       Expanded(
-                        flex: 1,
                         child: TextFormField(
                           decoration: const InputDecoration(
                             border: UnderlineInputBorder(),
@@ -105,20 +102,24 @@ class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStat
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 60),
-                  child: StreamBuilder<List<Workout?>>(
+                  child: StreamBuilder<List<Workout>>(
                     stream: widget.bloc.getStreamWorkout(),
-                    builder: (BuildContext context, AsyncSnapshot<List<Workout?>> snapshot) {
+                    builder: (BuildContext context, AsyncSnapshot<List<Workout>> snapshot) {
                       if (snapshot.connectionState == ConnectionState.active) {
                         if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
                           return const Center(child: Text('Aucun workout trouvé.'));
                         } else {
-                          final List<Workout?> listWorkout = snapshot.data!;
+                          final List<Workout> listWorkout = snapshot.data!;
                           return StreamBuilder<bool>(
                               stream: widget.homePageBloc.currentDisplayObs,
                               builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
                                 if (snapshot.hasData) {
                                   if (snapshot.data != null && snapshot.data == true) {
-                                    return getListView(listWorkout, widget.bloc);
+                                    return WorkoutListView(
+                                      listWorkout: listWorkout,
+                                      bloc: widget.bloc,
+                                      dateFormat: dateFormat,
+                                    );
                                   } else {
                                     return WorkoutGridView(
                                       listWorkout: listWorkout,
@@ -131,7 +132,9 @@ class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStat
                         }
                       }
                       return LoadingRotating.square(
-                        backgroundColor: Theme.of(context).primaryColor,
+                        backgroundColor: Theme
+                            .of(context)
+                            .primaryColor,
                       );
                     },
                   ),
@@ -143,13 +146,22 @@ class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStat
       ),
     );
   }
+}
 
-  ListView getListView(List<Workout?> listWorkout, WorkoutUpdateBloc bloc) {
+class WorkoutListView extends StatelessWidget {
+  const WorkoutListView({Key? key, required this.listWorkout, required this.bloc, required this.dateFormat}) : super(key: key);
+
+  final List<Workout> listWorkout;
+  final WorkoutUpdateBloc bloc;
+  final DateFormat dateFormat;
+
+  @override
+  Widget build(BuildContext context) {
     return ListView.separated(
         separatorBuilder: (BuildContext context, int index) => const Divider(height: 2.0),
         itemCount: listWorkout.length,
         itemBuilder: (BuildContext context, int index) {
-          final Workout workout = listWorkout[index] as Workout;
+          final Workout workout = listWorkout[index];
           final Widget leading = (workout.imageUrl != null) ? CircleAvatar(foregroundImage: NetworkImage(workout.imageUrl!)) : const CircleAvatar();
           final Widget subtitle = workout.createDate != null
               ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((workout.createDate as Timestamp).millisecondsSinceEpoch)))
@@ -158,7 +170,7 @@ class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStat
           return ListTile(
             contentPadding: const EdgeInsets.all(20.0),
             leading: leading,
-            title: Text(workout.name),
+            title: Text(workout.name!),
             subtitle: subtitle,
             trailing: Wrap(children: [
               WorkoutDeleteButton(
@@ -193,15 +205,14 @@ class WorkoutDeleteButton extends StatelessWidget {
       onPressed: () {
         showDialog(
           context: context,
-          builder: (BuildContext context) => AlertDialog(
-            title: const Text('Etes vous sûr de vouloir supprimer ce workout?'),
-            actions: <Widget>[
-              TextButton(
-                  onPressed: () => bloc.deleteWorkout(workout).then((_) => Navigator.pop(context)),
-                  child: const Text('Oui')),
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
-            ],
-          ),
+          builder: (BuildContext context) =>
+              AlertDialog(
+                title: const Text('Etes vous sûr de vouloir supprimer ce workout?'),
+                actions: <Widget>[
+                  TextButton(onPressed: () => bloc.delete(workout).then((_) => Navigator.pop(context)), child: const Text('Oui')),
+                  TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
+                ],
+              ),
         );
       },
       icon: const Icon(Icons.delete, color: Colors.grey, size: 24),
@@ -217,56 +228,31 @@ class WorkoutGridCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget firstChild;
-    if (workout.imageUrl?.isNotEmpty == true) {
-      firstChild = Ink.image(
-        image: NetworkImage(
-          workout.imageUrl!,
-        ),
-        fit: BoxFit.cover,
-      );
-    } else {
-      firstChild = Container(decoration: const BoxDecoration(color: Colors.amber));
-    }
-
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      elevation: 2,
-      child: InkWell(
-        splashColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(5),
-        onTap: () => Navigator.push(
+    return FitnessGridCard<Workout>(
+      domain: workout,
+      onTap: (Workout domain) {
+        Navigator.push(
             context,
             PageTransition(
               duration: Duration.zero,
               reverseDuration: Duration.zero,
               type: PageTransitionType.fade,
               child: WorkoutUpdatePage(workout: workout),
-            )),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Expanded(flex: 3, child: firstChild),
-            Expanded(
-              flex: 1,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Text(workout.name, style: const TextStyle(fontSize: 15)),
-                  ),
-                  WorkoutDeleteButton(
-                    workout: workout,
-                    bloc: bloc,
-                  )
+            ));
+      },
+      onDelete: (Workout domain) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) =>
+              AlertDialog(
+                title: const Text('Etes vous sûr de vouloir supprimer ce workout?'),
+                actions: <Widget>[
+                  TextButton(onPressed: () => bloc.delete(workout).then((_) => Navigator.pop(context)), child: const Text('Oui')),
+                  TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 }

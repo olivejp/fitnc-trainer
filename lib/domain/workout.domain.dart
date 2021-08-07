@@ -1,20 +1,17 @@
+import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'workout.domain.g.dart';
 
 @JsonSerializable()
-class Workout {
-  String? uid;
-  String name;
+class Workout extends AbstractFitnessStorageDomain {
+  Workout();
+
+  factory Workout.fromJson(Map<String, dynamic> data) => _$WorkoutFromJson(data);
+
   String? description;
-  String? imageUrl;
-  dynamic createDate;
   String? timerType;
 
-  Workout({this.uid, this.name = '', this.description = '', this.createDate = 0});
-
-  factory Workout.fromJson(Map<String, dynamic> data) =>
-      _$WorkoutFromJson(data);
-
+  @override
   Map<String, dynamic> toJson() => _$WorkoutToJson(this);
 }

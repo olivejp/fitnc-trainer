@@ -7,13 +7,12 @@ part of 'exercice.domain.dart';
 // **************************************************************************
 
 Exercice _$ExerciceFromJson(Map<String, dynamic> json) {
-  return Exercice(
-    uid: json['uid'] as String?,
-    name: json['name'] as String,
-    description: json['description'] as String?,
-    createDate: json['createDate'],
-  )
+  return Exercice()
+    ..uid = json['uid'] as String?
+    ..name = json['name'] as String?
     ..imageUrl = json['imageUrl'] as String?
+    ..createDate = json['createDate']
+    ..description = json['description'] as String?
     ..typeExercice = json['typeExercice'] as String?
     ..videoUrl = json['videoUrl'] as String?
     ..youtubeUrl = json['youtubeUrl'] as String?;
@@ -22,10 +21,10 @@ Exercice _$ExerciceFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$ExerciceToJson(Exercice instance) => <String, dynamic>{
       'uid': instance.uid,
       'name': instance.name,
-      'description': instance.description,
       'imageUrl': instance.imageUrl,
+      'createDate': instance.createDate,
+      'description': instance.description,
       'typeExercice': instance.typeExercice,
       'videoUrl': instance.videoUrl,
       'youtubeUrl': instance.youtubeUrl,
-      'createDate': instance.createDate,
     };

@@ -12,7 +12,16 @@ import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ExerciceUpdateBloc {
-  FirestorageService firestorageService = FirestorageService.getInstance();
+
+  ExerciceUpdateBloc._();
+
+  factory ExerciceUpdateBloc.instance() {
+    _instance ??= ExerciceUpdateBloc._();
+    return _instance!;
+  }
+  static ExerciceUpdateBloc? _instance;
+
+  FirestorageService firestorageService = FirestorageService.instance();
   TrainersService trainersService = TrainersService.getInstance();
   ParamService paramService = ParamService.getInstance();
   late Exercice exercice;
@@ -28,17 +37,7 @@ class ExerciceUpdateBloc {
 
   Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
 
-  static ExerciceUpdateBloc? _instance;
   final String pathExerciceMainImage = 'mainImage';
-
-  ExerciceUpdateBloc._();
-
-  static ExerciceUpdateBloc getInstance() {
-    if (_instance == null) {
-      _instance = ExerciceUpdateBloc._();
-    }
-    return _instance!;
-  }
 
   void init(Exercice? exerciceEntered) {
     storagePair = StorageFile();
@@ -124,7 +123,7 @@ class ExerciceUpdateBloc {
     }
   }
 
-  Stream<List<Exercice?>> getStreamExercice() {
+  Stream<List<Exercice>> getStreamExercice() {
     return trainersService.listenToExercice();
   }
 

@@ -11,21 +11,21 @@ import 'package:page_transition/page_transition.dart';
 import 'abonne.update.page.dart';
 
 class AbonnePage extends StatefulWidget {
-  final MyHomePageBloc homePageBloc = MyHomePageBloc.getInstance();
+  final MyHomePageBloc homePageBloc = MyHomePageBloc.instance();
   final AbonneUpdateBloc bloc = AbonneUpdateBloc.getInstance();
 
   AbonnePage({Key? key}) : super(key: key);
 
   @override
   _AbonnePageState createState() {
-    return new _AbonnePageState();
+    return _AbonnePageState();
   }
 }
 
 class _AbonnePageState extends State<AbonnePage> {
-  DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
-
   _AbonnePageState();
+
+  DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
   @override
   Widget build(BuildContext context) {

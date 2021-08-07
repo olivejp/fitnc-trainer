@@ -27,7 +27,7 @@ class ProgrammeUpdateBloc {
     return _instance!;
   }
 
-  FirestorageService firestorageService = FirestorageService.getInstance();
+  FirestorageService firestorageService = FirestorageService.instance();
   TrainersService trainersService = TrainersService.getInstance();
   ParamService paramService = ParamService.getInstance();
 
@@ -148,7 +148,7 @@ class ProgrammeUpdateBloc {
     }
   }
 
-  Stream<List<Programme?>> getStreamProgramme() {
+  Stream<List<Programme>> getStreamProgramme() {
     return trainersService.listenToProgramme();
   }
 
@@ -177,7 +177,7 @@ class ProgrammeUpdateBloc {
     programme.numberWeeks = value;
   }
 
-  String get name => programme.name;
+  String get name => programme.name!;
 
   set description(String? value) {
     programme.description = value;
@@ -241,7 +241,7 @@ class ProgrammeUpdateBloc {
     QuerySnapshot<Object?> query = await trainersService.getWorkoutReference().get();
     return query.docs
         .map((e) => Workout.fromJson(e.data() as Map<String, dynamic>))
-        .map((Workout workout) => DropdownMenuItem<Workout>(value: workout, child: Text(workout.name)))
+        .map((Workout workout) => DropdownMenuItem<Workout>(value: workout, child: Text(workout.name!)))
         .toList();
   }
 }

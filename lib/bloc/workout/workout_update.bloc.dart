@@ -4,19 +4,22 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase/service/firestorage.service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/line.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/service/workout_set.service.dart';
+import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
+import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
-class WorkoutUpdateBloc {
-  FirestorageService firestorageService = FirestorageService.getInstance();
+class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> {
+  FirestorageService firestorageService = FirestorageService.instance();
   TrainersService trainersService = TrainersService.getInstance();
   WorkoutSetService workoutSetService = WorkoutSetService.getInstance();
 
@@ -46,6 +49,16 @@ class WorkoutUpdateBloc {
   static WorkoutUpdateBloc getInstance() {
     _instance ??= WorkoutUpdateBloc._();
     return _instance!;
+  }
+
+  @override
+  CollectionReference<Object?> getCollectionReference() {
+    return trainersService.getWorkoutReference();
+  }
+
+  @override
+  Widget openUpdate(BuildContext context, Workout workout) {
+    return WorkoutUpdatePage(workout: workout);
   }
 
   void init(Workout? workout) {
@@ -106,7 +119,7 @@ class WorkoutUpdateBloc {
     if (storageFile != null && storageFile!.fileBytes != null && storageFile!.fileName != null) {
       await sendToStorage();
     }
-    return sendToFireStore(collectionReference);
+    return sendToFireStore(_workout);
   }
 
   String getUrl() {
@@ -115,8 +128,6 @@ class WorkoutUpdateBloc {
   }
 
   Future<void> updateWorkout() async {
-    CollectionReference<Object?> collectionReference = trainersService.getWorkoutReference();
-
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (storageFile != null && storageFile!.fileBytes != null && storageFile!.fileName != null) {
       await deleteWorkoutMainImage(_workout);
@@ -127,14 +138,7 @@ class WorkoutUpdateBloc {
       await deleteWorkoutMainImage(_workout);
       _workout.imageUrl = null;
     }
-    return sendToFireStore(collectionReference);
-  }
-
-  Future<void> sendToFireStore(CollectionReference<Object?> collectionReference) {
-    _workout.createDate = FieldValue.serverTimestamp();
-    return collectionReference.doc(_workout.uid).set(_workout.toJson()).then((value) {
-      _workout = Workout();
-    });
+    return sendToFireStore(_workout);
   }
 
   Future<void> sendToStorage() async {
@@ -144,12 +148,12 @@ class WorkoutUpdateBloc {
     }
   }
 
-  Stream<List<Workout?>> getStreamWorkout() {
+  Stream<List<Workout>> getStreamWorkout() {
     return trainersService.listenToWorkout();
   }
 
   Future<void> deleteWorkout(Workout workout) {
-    return trainersService.getWorkoutReference().doc(workout.uid).delete().then((value) => deleteWorkoutMainImage(workout));
+    return delete(workout).then((_) => deleteWorkoutMainImage(workout));
   }
 
   Future<void> deleteWorkoutMainImage(Workout workout) {

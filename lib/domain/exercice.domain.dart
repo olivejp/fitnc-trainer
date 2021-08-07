@@ -1,22 +1,20 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'abstract.domain.dart';
+
 part 'exercice.domain.g.dart';
 
 @JsonSerializable()
-class Exercice {
-  String? uid;
-  String name;
+class Exercice extends AbstractFitnessStorageDomain {
+  Exercice() : super();
+
+  factory Exercice.fromJson(Map<String, dynamic> data) => _$ExerciceFromJson(data);
+
   String? description;
-  String? imageUrl;
   String? typeExercice;
   String? videoUrl;
   String? youtubeUrl;
-  dynamic createDate;
 
-  Exercice({this.uid, this.name = '', this.description = '', this.createDate = 0});
-
-  factory Exercice.fromJson(Map<String, dynamic> data) =>
-      _$ExerciceFromJson(data);
-
+  @override
   Map<String, dynamic> toJson() => _$ExerciceToJson(this);
 }

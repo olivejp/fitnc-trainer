@@ -148,12 +148,12 @@ class WorkoutChoicePanel extends StatelessWidget {
                   feedback: SizedBox(
                     width: 200,
                     height: 100,
-                    child: Text(list[index]!.name),
+                    child: Text(list[index]!.name!),
                   ),
                   data: list[index],
                   child: const Icon(Icons.view_headline),
                 ),
-                title: Text(list[index]!.name),
+                title: Text(list[index]!.name!),
               );
             },
           );

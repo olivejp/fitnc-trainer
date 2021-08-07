@@ -14,7 +14,7 @@ class StorageFile {
 
 class StorageImageWidget extends StatelessWidget {
   static const List<String> DEFAULT_ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif'];
-  final FirestorageService firestorageService = FirestorageService.getInstance();
+  final FirestorageService firestorageService = FirestorageService.instance();
   final BehaviorSubject<StorageFile?> _streamSelectedImage = BehaviorSubject();
   final StorageFile _storagePair = StorageFile();
 
@@ -96,7 +96,7 @@ class StorageImageWidget extends StatelessWidget {
 
 class StorageFutureImageWidget extends StatelessWidget {
   static const List<String> DEFAULT_ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif'];
-  final FirestorageService firestorageService = FirestorageService.getInstance();
+  final FirestorageService firestorageService = FirestorageService.instance();
   final BehaviorSubject<StorageFile?> _streamSelectedImage = BehaviorSubject();
   final StorageFile _storagePair = StorageFile();
 
@@ -209,7 +209,7 @@ class StorageStreamImageWidget extends StatelessWidget {
   );
   static const List<String> defaultAllowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
 
-  final FirestorageService firestorageService = FirestorageService.getInstance();
+  final FirestorageService firestorageService = FirestorageService.instance();
   final BehaviorSubject<StorageFile?> _streamSelectedImage = BehaviorSubject<StorageFile?>();
 
   final StorageFile _storagePair = StorageFile();

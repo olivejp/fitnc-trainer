@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class ExerciceUpdatePage extends StatefulWidget {
-  final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.getInstance();
+  final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
 
   ExerciceUpdatePage({Key? key, Exercice? exercice}) : super(key: key) {
     bloc.init(exercice);

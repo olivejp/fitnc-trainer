@@ -7,21 +7,20 @@ part of 'programme.domain.dart';
 // **************************************************************************
 
 Programme _$ProgrammeFromJson(Map<String, dynamic> json) {
-  return Programme(
-    uid: json['uid'] as String?,
-    name: json['name'] as String,
-    description: json['description'] as String?,
-    createDate: json['createDate'],
-  )
+  return Programme()
+    ..uid = json['uid'] as String?
+    ..name = json['name'] as String?
     ..imageUrl = json['imageUrl'] as String?
+    ..createDate = json['createDate']
+    ..description = json['description'] as String?
     ..numberWeeks = json['numberWeeks'] as String?;
 }
 
 Map<String, dynamic> _$ProgrammeToJson(Programme instance) => <String, dynamic>{
       'uid': instance.uid,
       'name': instance.name,
-      'description': instance.description,
       'imageUrl': instance.imageUrl,
       'createDate': instance.createDate,
+      'description': instance.description,
       'numberWeeks': instance.numberWeeks,
     };

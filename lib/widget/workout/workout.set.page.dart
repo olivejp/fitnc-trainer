@@ -143,7 +143,7 @@ class WorkoutSetPage extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 10),
                 child: Center(
                   child: Text(
-                    exercice.name,
+                    exercice.name!,
                     maxLines: 2,
                     textAlign: TextAlign.left,
                     overflow: TextOverflow.ellipsis,

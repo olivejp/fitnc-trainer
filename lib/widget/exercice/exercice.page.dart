@@ -3,6 +3,7 @@ import 'package:fitnc_trainer/bloc/exercice/exercice_update.bloc.dart';
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.update.page.dart';
+import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +20,8 @@ import 'exercice.create.page.dart';
 class ExercicePage extends StatelessWidget {
   ExercicePage({Key? key}) : super(key: key);
 
-  final MyHomePageBloc homePageBloc = MyHomePageBloc.getInstance();
-  final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.getInstance();
+  final MyHomePageBloc homePageBloc = MyHomePageBloc.instance();
+  final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
 
   static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
@@ -48,14 +49,13 @@ class ExercicePage extends StatelessWidget {
               padding: const EdgeInsets.only(left: 15, right: 15),
               child: Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                       flex: 3,
-                      child: Text(
-                        'Exercices',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                      child: SelectableText(
+                        'Exercice',
+                        style: Theme.of(context).textTheme.headline1,
                       )),
                   Expanded(
-                    flex: 1,
                     child: TextFormField(
                       decoration: const InputDecoration(
                         border: UnderlineInputBorder(),
@@ -69,26 +69,14 @@ class ExercicePage extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: StreamBuilder<List<Exercice?>>(
+              child: StreamBuilder<List<Exercice>>(
                 stream: bloc.getStreamExercice(),
-                builder: (BuildContext context, AsyncSnapshot<List<Exercice?>> snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<List<Exercice>> snapshot) {
                   if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
                     return const Center(child: Text('Aucun exercice trouvé.'));
                   } else {
-                    final List<Exercice?> listExercice = snapshot.data!;
-                    return StreamBuilder<bool>(
-                        stream: homePageBloc.currentDisplayObs,
-                        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                          if (snapshot.hasData) {
-                            if (snapshot.data != null && snapshot.data == true) {
-                              return getListView(listExercice);
-                            } else {
-                              return getGridView(listExercice);
-                            }
-                          }
-                          return Container();
-                        });
-                    // return getListView(snapshot.data);
+                    final List<Exercice> listExercice = snapshot.data!;
+                    return getGridView(listExercice);
                   }
                 },
               ),
@@ -99,8 +87,8 @@ class ExercicePage extends StatelessWidget {
     );
   }
 
-  Widget getGridView(List<Exercice?> listExercice) {
-    return LayoutBuilder(builder: (context, constraints) {
+  Widget getGridView(List<Exercice> listExercice) {
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       int nbColumns = 1;
       if (constraints.maxWidth > 1200) {
         nbColumns = 6;
@@ -118,19 +106,10 @@ class ExercicePage extends StatelessWidget {
         mainAxisSpacing: 10.0,
         crossAxisSpacing: 10.0,
         crossAxisCount: nbColumns,
-        children: listExercice.map((Exercice? exercice) {
-          if (exercice != null) {
-            return InkWell(
-              splashColor: Theme.of(context).primaryColor,
-              hoverColor: Theme.of(context).primaryColor,
-              borderRadius: BorderRadius.circular(5),
-              onTap: () => goToUpdatePage(context, exercice),
-              child: getGridCard(context, exercice),
-            );
-          } else {
-            return Container();
-          }
-        }).toList(),
+        children: listExercice.map((Exercice exercice) => ExerciceGridCard(
+          exercice: exercice,
+          bloc: bloc,
+        )).toList(),
       );
     });
   }
@@ -146,102 +125,43 @@ class ExercicePage extends StatelessWidget {
         ));
   }
 
-  Card getGridCard(BuildContext context, Exercice exercice) {
-    Widget firstChild;
-    if (exercice.imageUrl != null) {
-      firstChild = Image.network(
-        exercice.imageUrl!,
-        fit: BoxFit.cover,
-        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-          if (loadingProgress == null) {
-            return child;
-          }
-          return Center(child: LoadingRotating.square(backgroundColor: Theme.of(context).primaryColor,));
-        },
-      );
-    } else {
-      firstChild = Container(
-        decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-      );
-    }
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      elevation: 2,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(flex: 3, child: firstChild),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Text(
-                    exercice.name,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 15,
-                    ),
-                  ),
-                ),
-                getDeleteButton(context, exercice),
-              ],
-            ),
-            flex: 1,
-          ),
-        ],
-      ),
-    );
+  void deleteExercice(Exercice exercice, BuildContext context) {
+    bloc.deleteExercice(exercice).then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
   }
+}
 
-  ListView getListView(List<Exercice?> listExercice) {
-    return ListView.separated(
-        separatorBuilder: (context, index) => Divider(height: 2.0),
-        itemCount: listExercice.length,
-        itemBuilder: (BuildContext context, int index) {
-          Exercice exercice = listExercice[index] as Exercice;
-          final Widget leading = (exercice.imageUrl != null) ? CircleAvatar(foregroundImage: NetworkImage(exercice.imageUrl!)) : const CircleAvatar();
-          final Widget subtitle = exercice.createDate != null
-              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((exercice.createDate as Timestamp).millisecondsSinceEpoch)))
-              : Container();
+class ExerciceGridCard extends StatelessWidget {
+  const ExerciceGridCard({Key? key, required this.exercice, required this.bloc}) : super(key: key);
 
-          return ListTile(
-              contentPadding: const EdgeInsets.all(20.0),
-              leading: leading,
-              title: Text(exercice.name),
-              subtitle: subtitle,
-              trailing: Wrap(children: [getDeleteButton(context, exercice)]),
-              onTap: () => goToUpdatePage(context, exercice));
-        });
-  }
+  final Exercice exercice;
+  final ExerciceUpdateBloc bloc;
 
-  IconButton getDeleteButton(BuildContext context, Exercice exercice) {
-    return IconButton(
-      tooltip: 'Supprimer',
-      onPressed: () {
+  @override
+  Widget build(BuildContext context) {
+    return FitnessGridCard<Exercice>(
+      domain: exercice,
+      onTap: (Exercice domain) {
+        Navigator.push(
+            context,
+            PageTransition(
+              duration: Duration.zero,
+              reverseDuration: Duration.zero,
+              type: PageTransitionType.fade,
+              child: ExerciceUpdatePage(exercice: exercice),
+            ));
+      },
+      onDelete: (Exercice domain) {
         showDialog(
           context: context,
           builder: (BuildContext context) => AlertDialog(
             title: const Text('Êtes-vous sûr de vouloir supprimer cet exercice?'),
-            actions: [
-              TextButton(onPressed: () => deleteExercice(exercice, context), child: Text('Oui')),
+            actions: <Widget>[
+              TextButton(onPressed: () => bloc.deleteExercice(exercice), child: Text('Oui')),
               TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler'))
             ],
           ),
         );
       },
-      icon: const Icon(
-        Icons.delete,
-        color: Colors.grey,
-        size: 24,
-      ),
     );
-  }
-
-  void deleteExercice(Exercice exercice, BuildContext context) {
-    bloc.deleteExercice(exercice).then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
   }
 }
