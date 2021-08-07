@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.update.page.dart';
-import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ExerciceUpdateBloc with AbstractFitnessCrudBloc<Exercice>, AbstractFitnessStorageBloc<Exercice> {
+class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with AbstractFitnessStorageBloc<Exercice> {
   ExerciceUpdateBloc._();
 
   factory ExerciceUpdateBloc.instance() {
@@ -35,12 +35,27 @@ class ExerciceUpdateBloc with AbstractFitnessCrudBloc<Exercice>, AbstractFitness
 
   Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
 
+  @override
+  CollectionReference<Object?> getCollectionReference() {
+    return trainersService.getExerciceReference();
+  }
+
+  @override
+  Widget openUpdate(BuildContext context, Exercice exercice) {
+    return ExerciceUpdatePage(exercice: exercice);
+  }
+
+  @override
+  String getUrl(User user, Exercice exercice) {
+    return 'trainers/${user.uid}/exercices/${exercice.uid}';
+  }
+
   void init(Exercice? exerciceEntered) {
     subjectStoragePair.sink.add(null);
 
     if (exerciceEntered != null) {
       exercice = exerciceEntered;
-      exerciceEntered.storageFile = StorageFile();
+      exercice!.storageFile = StorageFile();
       getFutureStorageFile(exercice!).then((StorageFile? value) => subjectStoragePair.sink.add(value));
 
       if (exercice!.videoUrl != null) {
@@ -63,11 +78,6 @@ class ExerciceUpdateBloc with AbstractFitnessCrudBloc<Exercice>, AbstractFitness
       }
     }
     return;
-  }
-
-  @override
-  String getUrl(User user, Exercice exercice) {
-    return 'trainers/${user.uid}/exercices/${exercice.uid}';
   }
 
   Stream<List<Exercice>> getStreamExercice() {
@@ -113,15 +123,5 @@ class ExerciceUpdateBloc with AbstractFitnessCrudBloc<Exercice>, AbstractFitness
   void setStoragePair(StorageFile? storageFile) {
     exercice?.storageFile = storageFile;
     subjectStoragePair.sink.add(exercice?.storageFile);
-  }
-
-  @override
-  CollectionReference<Object?> getCollectionReference() {
-    return trainersService.getExerciceReference();
-  }
-
-  @override
-  Widget openUpdate(BuildContext context, Exercice exercice) {
-    return ExerciceUpdatePage(exercice: exercice);
   }
 }

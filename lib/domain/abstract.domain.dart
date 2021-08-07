@@ -1,8 +1,8 @@
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-abstract class AbstractFitnessDomain {
-  AbstractFitnessDomain();
+abstract class AbstractFirebaseDomain {
+  AbstractFirebaseDomain();
 
   String? uid;
   String? name;
@@ -12,7 +12,7 @@ abstract class AbstractFitnessDomain {
   Map<String, dynamic> toJson();
 }
 
-abstract class AbstractFitnessStorageDomain extends AbstractFitnessDomain {
+abstract class AbstractFitnessStorageDomain extends AbstractFirebaseDomain {
   AbstractFitnessStorageDomain();
 
   String? imageUrl;

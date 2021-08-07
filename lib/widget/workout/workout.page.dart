@@ -21,7 +21,7 @@ class WorkoutPage extends StatefulWidget {
   WorkoutPage({Key? key}) : super(key: key);
 
   final MyHomePageBloc homePageBloc = MyHomePageBloc.instance();
-  final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
+  final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.instance();
 
   @override
   _WorkoutPageState createState() {

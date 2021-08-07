@@ -6,21 +6,21 @@ import 'package:flutter/material.dart';
 class WorkoutFormBuilder {
   static Widget getForm(GlobalKey<FormState> _formKey, WorkoutUpdateBloc bloc) {
     return ConstrainedBox(
-      constraints: BoxConstraints(minWidth: 800),
+      constraints: const BoxConstraints(minWidth: 800),
       child: Form(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
+          children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(bottom: 20.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
+                children: <Widget>[
                   StorageFutureImageWidget(
-                    onSaved: (storagePair) => bloc.setStorageFile(storagePair),
-                    onDeleted: (storagePair) => bloc.setStorageFile(null),
-                    futureInitialStorageFile: bloc.getFutureStorageFile(),
+                    onSaved: (StorageFile? storagePair) => bloc.storageFile = storagePair,
+                    onDeleted: (StorageFile? storagePair) => bloc.storageFile = null,
+                    futureInitialStorageFile: bloc.getStorageFile(),
                   ),
                   Expanded(
                     child: Padding(
@@ -28,9 +28,9 @@ class WorkoutFormBuilder {
                       child: TextFormField(
                           initialValue: bloc.getWorkout()?.name,
                           autofocus: true,
-                          onChanged: (value) => bloc.setName(value),
-                          decoration: InputDecoration(helperText: 'Nom du workout'),
-                          validator: (value) {
+                          onChanged: (String value) => bloc.setName(value),
+                          decoration: const InputDecoration(helperText: 'Nom du workout'),
+                          validator: (String? value) {
                             if (value == null || value.isEmpty) {
                               return 'Le nom du workout est obligatoire.';
                             }
@@ -42,11 +42,11 @@ class WorkoutFormBuilder {
               ),
             ),
             DropdownButtonFormField<String>(
-                decoration: InputDecoration(helperText: 'Type d\'entrainement'),
-                icon: Icon(Icons.arrow_downward),
+                decoration: const InputDecoration(helperText: 'Type d\'entrainement'),
+                icon: const Icon(Icons.arrow_downward),
                 onChanged: (String? value) => bloc.setTimerType(value),
                 value: bloc.getWorkout()?.timerType,
-                items: [
+                items: <DropdownMenuItem<String>>[
                   DropdownMenuItem(
                     child: Text(
                       'Aucun type d\'entraînement',
@@ -78,8 +78,8 @@ class WorkoutFormBuilder {
                 maxLength: 2000,
                 minLines: 5,
                 maxLines: 20,
-                onChanged: (value) => bloc.setDescription(value),
-                decoration: InputDecoration(helperText: 'Description (optionel)'),
+                onChanged: (String value) => bloc.setDescription(value),
+                decoration: const InputDecoration(helperText: 'Description (optionel)'),
               ),
             ),
           ],

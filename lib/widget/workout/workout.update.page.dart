@@ -11,7 +11,7 @@ class WorkoutUpdatePage extends StatefulWidget {
     bloc.init(workout);
   }
 
-  final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
+  final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.instance();
   final Workout workout;
 
   @override
@@ -79,9 +79,9 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         StorageFutureImageWidget(
-                          onSaved: (StorageFile? file) => bloc.setStorageFile(file),
-                          futureInitialStorageFile: bloc.getFutureStorageFile(),
-                          onDeleted: (file) => bloc.setStorageFile(null),
+                          onSaved: (StorageFile? file) => bloc.storageFile = file,
+                          onDeleted: (_) => bloc.storageFile = null,
+                          futureInitialStorageFile: bloc.getStorageFile(),
                         ),
                         Expanded(
                           child: Padding(

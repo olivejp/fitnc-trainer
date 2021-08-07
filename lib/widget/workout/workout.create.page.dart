@@ -6,7 +6,7 @@ import 'workout.form.builder.dart';
 
 class WorkoutCreatePage {
   static showCreate(BuildContext context) {
-    WorkoutUpdateBloc bloc = WorkoutUpdateBloc.getInstance();
+    WorkoutUpdateBloc bloc = WorkoutUpdateBloc.instance();
     bloc.init(null);
     GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     showDialog(

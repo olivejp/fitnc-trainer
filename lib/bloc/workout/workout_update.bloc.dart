@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase/service/firestorage.service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
 import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/line.domain.dart';
@@ -18,18 +19,22 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
-class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> {
-  FirestorageService firestorageService = FirestorageService.instance();
-  TrainersService trainersService = TrainersService.getInstance();
-  WorkoutSetService workoutSetService = WorkoutSetService.getInstance();
+class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with AbstractFitnessStorageBloc<Workout> {
+  WorkoutUpdateBloc._();
+
+  factory WorkoutUpdateBloc.instance() {
+    _instance ??= WorkoutUpdateBloc._();
+    return _instance!;
+  }
 
   static WorkoutUpdateBloc? _instance;
-  final String pathWorkoutMainImage = 'mainImage';
+
+  TrainersService trainersService = TrainersService.getInstance();
+  WorkoutSetService workoutSetService = WorkoutSetService.getInstance();
 
   final GlobalKey<FormFieldState> consigneKey = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> dropdownKey = GlobalKey<FormFieldState>();
 
-  StorageFile? storageFile;
   late Workout _workout;
   WorkoutSet set = WorkoutSet();
   Exercice? exerciceSelected;
@@ -44,11 +49,9 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> {
 
   Stream<List<Line>?> get obsLines => subjectListRepsWeight.stream;
 
-  WorkoutUpdateBloc._();
-
-  static WorkoutUpdateBloc getInstance() {
-    _instance ??= WorkoutUpdateBloc._();
-    return _instance!;
+  @override
+  String getUrl(User user, Workout workout) {
+    return 'trainers/${user.uid}/exercices/${workout.uid}/$pathWorkoutMainImage';
   }
 
   @override
@@ -62,40 +65,16 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> {
   }
 
   void init(Workout? workout) {
-    storageFile = StorageFile();
     subjectStorageFile.sink.add(null);
 
     if (workout != null) {
       _workout = workout;
-      if (_workout.imageUrl != null && _workout.imageUrl!.isNotEmpty) {
-        firestorageService.getRemoteImageToUint8List(_workout.imageUrl!).then((bytes) {
-          storageFile!.fileName = basename(_workout.imageUrl!);
-          storageFile!.fileBytes = bytes;
-          subjectStorageFile.sink.add(storageFile);
-        });
-      }
+      _workout.storageFile = StorageFile();
+      getFutureStorageFile(_workout).then((StorageFile? value) => subjectStorageFile.sink.add(value));
     } else {
       _workout = Workout();
       subjectStorageFile.sink.add(null);
     }
-  }
-
-  Future<StorageFile?> getFutureStorageFile() {
-    Completer<StorageFile?> completer = Completer();
-    if (_workout.imageUrl != null) {
-      firestorageService.getRemoteImageToUint8List(_workout.imageUrl!).then((bytes) {
-        storageFile!.fileName = basename(_workout.imageUrl!);
-        storageFile!.fileBytes = bytes;
-        completer.complete(storageFile);
-      });
-    } else {
-      completer.complete(null);
-    }
-    return completer.future;
-  }
-
-  Stream<List<Exercice?>> getStreamExercice() {
-    return trainersService.listenToExercice();
   }
 
   Workout? getWorkout() {
@@ -103,49 +82,16 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> {
   }
 
   Future<void> saveWorkout() {
-    if (_workout.uid != null && _workout.uid?.isNotEmpty == true) {
-      return updateWorkout();
+    if (_workout.uid != null) {
+      return eraseAndReplaceStorage(_workout).then((_) => save(_workout));
     } else {
-      return createWorkout();
+      _workout.uid = getCollectionReference().doc().id;
+      return createStorage(_workout).then((_) => create(_workout));
     }
   }
 
-  Future<void> createWorkout() async {
-    CollectionReference<Object?> collectionReference = trainersService.getWorkoutReference();
-
-    _workout.uid = collectionReference.doc().id; // Récupération d'une nouvelle ID.
-
-    // Si un fichier est présent, on tente de l'envoyer sur le Storage.
-    if (storageFile != null && storageFile!.fileBytes != null && storageFile!.fileName != null) {
-      await sendToStorage();
-    }
-    return sendToFireStore(_workout);
-  }
-
-  String getUrl() {
-    String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    return 'trainers/$trainerUid/exercices/${_workout.uid}/$pathWorkoutMainImage';
-  }
-
-  Future<void> updateWorkout() async {
-    // Si un fichier est présent, on tente de l'envoyer sur le Storage.
-    if (storageFile != null && storageFile!.fileBytes != null && storageFile!.fileName != null) {
-      await deleteWorkoutMainImage(_workout);
-      await sendToStorage();
-    }
-
-    if (storageFile == null || storageFile?.fileName == null || storageFile?.fileBytes == null) {
-      await deleteWorkoutMainImage(_workout);
-      _workout.imageUrl = null;
-    }
-    return sendToFireStore(_workout);
-  }
-
-  Future<void> sendToStorage() async {
-    String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    if (trainerUid != null && storageFile != null && storageFile!.fileBytes != null && storageFile!.fileName != null) {
-      _workout.imageUrl = await firestorageService.sendToStorageAndGetReference('${getUrl()}/${storageFile!.fileName}', storageFile!.fileBytes!);
-    }
+  Stream<List<WorkoutSet?>> listenToWorkoutStep() {
+    return workoutSetService.listenToWorkoutStep(_workout);
   }
 
   Stream<List<Workout>> getStreamWorkout() {
@@ -176,13 +122,15 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> {
     _workout.timerType = value;
   }
 
-  setStorageFile(StorageFile? storagePair) {
-    storageFile = storagePair;
-    subjectStorageFile.sink.add(storageFile);
+  set storageFile(StorageFile? storagePair) {
+    _workout.storageFile = storagePair;
+    subjectStorageFile.sink.add(_workout.storageFile);
   }
 
+  StorageFile? get storageFile => _workout.storageFile;
+
   setExercice(Exercice? exerciceSelected) {
-    exerciceSelected = exerciceSelected;
+    this.exerciceSelected = exerciceSelected;
     set.uidExercice = this.exerciceSelected?.uid;
     subjectTypeExercice.sink.add(this.exerciceSelected?.typeExercice);
   }
@@ -191,7 +139,7 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> {
     set.consigne = consigne;
   }
 
-  Stream<List<WorkoutSet?>> listenToWorkoutStep() {
-    return workoutSetService.listenToWorkoutStep(_workout);
+  Future<StorageFile?> getStorageFile() {
+    return getFutureStorageFile(_workout);
   }
 }
