@@ -1,16 +1,14 @@
-
 import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase/service/firestorage.service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
-
 
 ///
 /// Interface de haut niveau pour les opérations CRUD
@@ -24,7 +22,6 @@ abstract class AbstractCrudBloc<T> {
 
   Future<void> delete(T domain);
 }
-
 
 ///
 /// Classe abstraite dont on doit étendre pour récupérer les méthodes par défaut pour le CRUD Firebase.
@@ -66,12 +63,10 @@ abstract class AbstractFirebaseCrudBloc<T extends AbstractFirebaseDomain> implem
   }
 }
 
-
 ///
 /// Mixins Bloc pour implémenter les méthodes de base pour le Firebase storage.
 ///
 abstract class AbstractFitnessStorageBloc<T extends AbstractFitnessStorageDomain> {
-  final FirestorageService firestorageService = FirestorageService.instance();
   final String pathWorkoutMainImage = 'mainImage';
 
   void setStorageFile(T domain, StorageFile? value) {
@@ -116,8 +111,7 @@ abstract class AbstractFitnessStorageBloc<T extends AbstractFitnessStorageDomain
     final User? user = FirebaseAuth.instance.currentUser;
     if (user != null && domain.storageFile != null && domain.storageFile!.fileBytes != null && domain.storageFile!.fileName != null) {
       final String url = getUrl(user, domain);
-      return firestorageService.sendToStorageAndGetReference(
-          '$url/$pathWorkoutMainImage/${domain.storageFile!.fileName}', domain.storageFile!.fileBytes!);
+      return _sendToStorageAndGetReference(url: '$url/$pathWorkoutMainImage/${domain.storageFile!.fileName}', bytes: domain.storageFile!.fileBytes!);
     }
     throw Exception('Envoi sur le storage échoué.');
   }
@@ -126,7 +120,7 @@ abstract class AbstractFitnessStorageBloc<T extends AbstractFitnessStorageDomain
   Future<StorageFile?> getFutureStorageFile(T domain) {
     final Completer<StorageFile?> completer = Completer<StorageFile?>();
     if (domain.imageUrl != null && domain.imageUrl!.isNotEmpty) {
-      firestorageService.getRemoteImageToUint8List(domain.imageUrl!).then((Uint8List bytes) {
+      _getRemoteImageToUint8List(domain.imageUrl!).then((Uint8List bytes) {
         domain.storageFile!.fileName = basename(domain.imageUrl!);
         domain.storageFile!.fileBytes = bytes;
         completer.complete(domain.storageFile);
@@ -136,15 +130,21 @@ abstract class AbstractFitnessStorageBloc<T extends AbstractFitnessStorageDomain
     }
     return completer.future;
   }
-}
 
+  Future<String> _sendToStorageAndGetReference({required String url, required Uint8List bytes, String? contentType}) async {
+    final SettableMetadata metadata = SettableMetadata(cacheControl: 'max-age=36000', contentType: contentType);
+    return FirebaseStorage.instance.ref(url).putData(bytes, metadata).then((ref) => ref.ref.getDownloadURL());
+  }
+
+  Future<Uint8List> _getRemoteImageToUint8List(String imageUrl) async {
+    return http.readBytes(Uri.parse(imageUrl));
+  }
+}
 
 ///
 /// Classe Bloc spécifique à l'application Fitness NC pour implémenter les méthodes de base du CRUD
 ///
 abstract class AbstractFitnessCrudBloc<T extends AbstractFirebaseDomain> extends AbstractFirebaseCrudBloc<T> {
-
   /// Méthode abstraite qui retournera le widget à ouvrir pour une mise à jour.
   Widget openUpdate(BuildContext context, T domain);
-
 }
