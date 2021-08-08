@@ -18,7 +18,7 @@ import 'programme.create.page.dart';
 class ProgrammePage extends StatelessWidget {
   ProgrammePage({Key? key}) : super(key: key);
 
-  final MyHomePageBloc homePageBloc = MyHomePageBloc.instance();
+  final HomePageBloc homePageBloc = HomePageBloc.instance();
   final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.getInstance();
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 

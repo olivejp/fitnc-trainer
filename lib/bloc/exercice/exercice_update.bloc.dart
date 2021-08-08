@@ -46,7 +46,7 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with Abstract
   }
 
   @override
-  String getUrl(User user, Exercice exercice) {
+  String getStorageRef(User user, Exercice exercice) {
     return 'trainers/${user.uid}/exercices/${exercice.uid}';
   }
 

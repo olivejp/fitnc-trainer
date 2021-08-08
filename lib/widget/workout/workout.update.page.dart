@@ -62,7 +62,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           FloatingActionButton(
             onPressed: () {
               if (_formKey.currentState?.validate() == true) {
-                bloc.saveWorkout().then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
+                bloc.saveWorkout().then((_) => Navigator.pop(context));
               }
             },
             child: const Icon(Icons.check),
@@ -72,12 +72,12 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
             maximumWidth: 2000,
             child: Form(
                 key: _formKey,
-                child: Column(children: [
+                child: Column(children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(bottom: 20.0),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
+                      children: <Widget>[
                         StorageFutureImageWidget(
                           onSaved: (StorageFile? file) => bloc.storageFile = file,
                           onDeleted: (_) => bloc.storageFile = null,
@@ -89,7 +89,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                             child: TextFormField(
                                 initialValue: bloc.getWorkout()?.name,
                                 autofocus: true,
-                                onChanged: (String value) => bloc.setName(value),
+                                onChanged: (String value) => bloc.name = value,
                                 decoration: const InputDecoration(helperText: 'Nom du workout'),
                                 validator: (String? value) {
                                   if (value == null || value.isEmpty) {
@@ -105,7 +105,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                             child: DropdownButtonFormField<String>(
                                 decoration: const InputDecoration(helperText: "Type d'entrainement", constraints: BoxConstraints(maxHeight: 72)),
                                 icon: const Icon(Icons.arrow_downward),
-                                onChanged: (String? value) => bloc.setTimerType(value),
+                                onChanged: (String? value) => bloc.timerType = value,
                                 value: bloc.getWorkout()?.timerType,
                                 items: typesWorkout),
                           ),
@@ -118,7 +118,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                     maxLength: 2000,
                     minLines: 5,
                     maxLines: 20,
-                    onChanged: (String value) => bloc.setDescription(value),
+                    onChanged: (String value) => bloc.description = value,
                     decoration: const InputDecoration(helperText: 'Instructions (optionel)'),
                   ),
                   LimitedBox(

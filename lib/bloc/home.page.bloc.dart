@@ -1,19 +1,19 @@
 import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:rxdart/rxdart.dart';
 
-class MyHomePageBloc {
-  factory MyHomePageBloc.instance() {
-    _instance ??= MyHomePageBloc._();
+class HomePageBloc {
+  factory HomePageBloc.instance() {
+    _instance ??= HomePageBloc._();
     return _instance!;
   }
 
-  MyHomePageBloc._() {
+  HomePageBloc._() {
     _streamCurrentPage = BehaviorSubject<int>.seeded(_currentPage);
     _streamDisplayList = BehaviorSubject<bool>.seeded(_currentDisplay);
     _streamIsExpanded = BehaviorSubject<bool>.seeded(_isExpanded);
   }
 
-  static MyHomePageBloc? _instance;
+  static HomePageBloc? _instance;
 
   final AuthService authService = AuthService.getInstance();
 

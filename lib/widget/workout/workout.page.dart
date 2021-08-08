@@ -20,7 +20,7 @@ import 'package:page_transition/page_transition.dart';
 class WorkoutPage extends StatefulWidget {
   WorkoutPage({Key? key}) : super(key: key);
 
-  final MyHomePageBloc homePageBloc = MyHomePageBloc.instance();
+  final HomePageBloc homePageBloc = HomePageBloc.instance();
   final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.instance();
 
   @override

@@ -28,7 +28,7 @@ class WorkoutFormBuilder {
                       child: TextFormField(
                           initialValue: bloc.getWorkout()?.name,
                           autofocus: true,
-                          onChanged: (String value) => bloc.setName(value),
+                          onChanged: (String value) => bloc.name = value,
                           decoration: const InputDecoration(helperText: 'Nom du workout'),
                           validator: (String? value) {
                             if (value == null || value.isEmpty) {
@@ -44,7 +44,7 @@ class WorkoutFormBuilder {
             DropdownButtonFormField<String>(
                 decoration: const InputDecoration(helperText: 'Type d\'entrainement'),
                 icon: const Icon(Icons.arrow_downward),
-                onChanged: (String? value) => bloc.setTimerType(value),
+                onChanged: (String? value) => bloc.timerType = value,
                 value: bloc.getWorkout()?.timerType,
                 items: <DropdownMenuItem<String>>[
                   DropdownMenuItem(
@@ -78,7 +78,7 @@ class WorkoutFormBuilder {
                 maxLength: 2000,
                 minLines: 5,
                 maxLines: 20,
-                onChanged: (String value) => bloc.setDescription(value),
+                onChanged: (String value) => bloc.description = value,
                 decoration: const InputDecoration(helperText: 'Description (optionel)'),
               ),
             ),

@@ -44,12 +44,12 @@ abstract class AbstractFirebaseCrudBloc<T extends AbstractFirebaseDomain> implem
   Future<void> create(T domain) async {
     domain.createDate = FieldValue.serverTimestamp();
     domain.uid ??= getCollectionReference().doc().id;
-    return sendToFireStore(domain);
+    return _sendToFireStore(domain);
   }
 
   @override
   Future<void> update(T domain) async {
-    return sendToFireStore(domain);
+    return _sendToFireStore(domain);
   }
 
   @override
@@ -57,26 +57,25 @@ abstract class AbstractFirebaseCrudBloc<T extends AbstractFirebaseDomain> implem
     return getCollectionReference().doc(domain.uid).delete().then((_) {});
   }
 
-  Future<void> sendToFireStore(T domain) {
+  Future<void> _sendToFireStore(T domain) {
     domain.updateDate = FieldValue.serverTimestamp();
     return getCollectionReference().doc(domain.uid).set(domain.toJson()).then((_) {});
   }
 }
 
 ///
-/// Mixins Bloc pour implémenter les méthodes de base pour le Firebase storage.
+/// Mixin Bloc pour implémenter les méthodes de base pour le Firebase storage.
 ///
 abstract class AbstractFitnessStorageBloc<T extends AbstractFitnessStorageDomain> {
-  final String pathWorkoutMainImage = 'mainImage';
-
-  void setStorageFile(T domain, StorageFile? value) {
-    domain.storageFile = value;
-  }
 
   /// Méthode abstraite
-  String getUrl(User user, T domain);
+  /// Permet de spécifier l'emplacement où sera stocké le fichier dans Firebase Storage.
+  /// Cette url sera complétée avec le nom du fichier, ex:
+  /// Pour un document nommé : myPicture.jpg
+  /// Si getStorageRef renvoie : 'myStorage/123/pictures'  alors le document sera positionné à 'myStorage/123/pictures/myPictre.jpg'
+  String getStorageRef(User user, T domain);
 
-  /// Envoi le document dans Firebase Storage.
+  /// Méthode pour envoyer le document dans Firebase Storage.
   Future<void> createStorage(T domain) async {
     if (domain.storageFile != null && domain.storageFile!.fileBytes != null && domain.storageFile!.fileName != null) {
       domain.imageUrl = await _sendToStorage(domain);
@@ -97,7 +96,7 @@ abstract class AbstractFitnessStorageBloc<T extends AbstractFitnessStorageDomain
     if (user == null) {
       throw Exception('Utilisateur non connecté');
     }
-    return FirebaseStorage.instance.ref(getUrl(user, domain)).listAll().then((ListResult value) {
+    return FirebaseStorage.instance.ref(getStorageRef(user, domain)).listAll().then((ListResult value) {
       final List<Future<void>> listFuture = <Future<void>>[];
       for (final Reference ref in value.items) {
         listFuture.add(ref.delete());
@@ -110,8 +109,8 @@ abstract class AbstractFitnessStorageBloc<T extends AbstractFitnessStorageDomain
   Future<String> _sendToStorage(T domain) async {
     final User? user = FirebaseAuth.instance.currentUser;
     if (user != null && domain.storageFile != null && domain.storageFile!.fileBytes != null && domain.storageFile!.fileName != null) {
-      final String url = getUrl(user, domain);
-      return _sendToStorageAndGetReference(url: '$url/$pathWorkoutMainImage/${domain.storageFile!.fileName}', bytes: domain.storageFile!.fileBytes!);
+      final String url = getStorageRef(user, domain);
+      return _sendToStorageAndGetReference(url: '$url/${domain.storageFile!.fileName}', bytes: domain.storageFile!.fileBytes!);
     }
     throw Exception('Envoi sur le storage échoué.');
   }
@@ -131,12 +130,12 @@ abstract class AbstractFitnessStorageBloc<T extends AbstractFitnessStorageDomain
     return completer.future;
   }
 
-  Future<String> _sendToStorageAndGetReference({required String url, required Uint8List bytes, String? contentType}) async {
+  Future<String> _sendToStorageAndGetReference({required String url, required Uint8List bytes, String? contentType}) {
     final SettableMetadata metadata = SettableMetadata(cacheControl: 'max-age=36000', contentType: contentType);
-    return FirebaseStorage.instance.ref(url).putData(bytes, metadata).then((ref) => ref.ref.getDownloadURL());
+    return FirebaseStorage.instance.ref(url).putData(bytes, metadata).then((TaskSnapshot ref) => ref.ref.getDownloadURL());
   }
 
-  Future<Uint8List> _getRemoteImageToUint8List(String imageUrl) async {
+  Future<Uint8List> _getRemoteImageToUint8List(String imageUrl) {
     return http.readBytes(Uri.parse(imageUrl));
   }
 }

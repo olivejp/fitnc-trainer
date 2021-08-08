@@ -11,7 +11,7 @@ import 'package:page_transition/page_transition.dart';
 import 'abonne.update.page.dart';
 
 class AbonnePage extends StatefulWidget {
-  final MyHomePageBloc homePageBloc = MyHomePageBloc.instance();
+  final HomePageBloc homePageBloc = HomePageBloc.instance();
   final AbonneUpdateBloc bloc = AbonneUpdateBloc.getInstance();
 
   AbonnePage({Key? key}) : super(key: key);

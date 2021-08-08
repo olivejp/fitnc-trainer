@@ -34,6 +34,7 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with AbstractFi
 
   final GlobalKey<FormFieldState> consigneKey = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> dropdownKey = GlobalKey<FormFieldState>();
+  final String pathWorkoutMainImage = 'mainImage';
 
   late Workout _workout;
   WorkoutSet set = WorkoutSet();
@@ -50,8 +51,8 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with AbstractFi
   Stream<List<Line>?> get obsLines => subjectListRepsWeight.stream;
 
   @override
-  String getUrl(User user, Workout workout) {
-    return 'trainers/${user.uid}/exercices/${workout.uid}/$pathWorkoutMainImage';
+  String getStorageRef(User user, Workout workout) {
+    return 'trainers/${user.uid}/workouts/${workout.uid}/$pathWorkoutMainImage';
   }
 
   @override
@@ -90,37 +91,27 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with AbstractFi
     }
   }
 
-  Stream<List<WorkoutSet?>> listenToWorkoutStep() {
-    return workoutSetService.listenToWorkoutStep(_workout);
-  }
-
   Stream<List<Workout>> getStreamWorkout() {
     return trainersService.listenToWorkout();
   }
 
-  Future<void> deleteWorkout(Workout workout) {
-    return delete(workout).then((_) => deleteWorkoutMainImage(workout));
-  }
-
-  Future<void> deleteWorkoutMainImage(Workout workout) {
-    return FirebaseStorage.instance
-        .ref('${workout.uid}/$pathWorkoutMainImage')
-        .listAll()
-        .then((value) => value.items.forEach((element) => element.delete()))
-        .catchError((error) => print(error));
-  }
-
-  setName(String value) {
+  set name(String? value) {
     _workout.name = value;
   }
 
-  setDescription(String value) {
+  String? get name => _workout.name;
+
+  set description(String? value) {
     _workout.description = value;
   }
 
-  setTimerType(String? value) {
+  String? get description => _workout.description;
+
+  set timerType(String? value) {
     _workout.timerType = value;
   }
+
+  String? get timerType => _workout.timerType;
 
   set storageFile(StorageFile? storagePair) {
     _workout.storageFile = storagePair;
@@ -129,14 +120,10 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with AbstractFi
 
   StorageFile? get storageFile => _workout.storageFile;
 
-  setExercice(Exercice? exerciceSelected) {
+  void setExercice(Exercice? exerciceSelected) {
     this.exerciceSelected = exerciceSelected;
     set.uidExercice = this.exerciceSelected?.uid;
     subjectTypeExercice.sink.add(this.exerciceSelected?.typeExercice);
-  }
-
-  setConsigne(String? consigne) {
-    set.consigne = consigne;
   }
 
   Future<StorageFile?> getStorageFile() {

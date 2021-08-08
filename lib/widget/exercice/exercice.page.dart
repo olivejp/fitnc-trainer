@@ -20,7 +20,7 @@ import 'exercice.create.page.dart';
 class ExercicePage extends StatelessWidget {
   ExercicePage({Key? key}) : super(key: key);
 
-  final MyHomePageBloc homePageBloc = MyHomePageBloc.instance();
+  final HomePageBloc homePageBloc = HomePageBloc.instance();
   final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
 
   static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');

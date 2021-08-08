@@ -23,7 +23,7 @@ class Destination {
 class MyHomePage extends StatelessWidget {
   MyHomePage(this.title);
 
-  final MyHomePageBloc bloc = MyHomePageBloc.instance();
+  final HomePageBloc bloc = HomePageBloc.instance();
   final String title;
   final List<Destination> destinations = <Destination>[
     Destination(icon: const Icon(Icons.account_tree_outlined), pageName: 'Programme', index: 0, page: ProgrammePage()),
@@ -42,7 +42,7 @@ class MyHomePage extends StatelessWidget {
         body: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Drawer(bloc: bloc, destinations: destinations),
+            FitnessDrawer(bloc: bloc, destinations: destinations),
             Expanded(
               child: GenericContainerWidget(
                 opacity: 0.5,
@@ -66,17 +66,17 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-class Drawer extends StatefulWidget {
-  const Drawer({required this.bloc, required this.destinations});
+class FitnessDrawer extends StatefulWidget {
+  const FitnessDrawer({required this.bloc, required this.destinations});
 
-  final MyHomePageBloc bloc;
+  final HomePageBloc bloc;
   final List<Destination> destinations;
 
   @override
-  State<Drawer> createState() => _DrawerState();
+  State<FitnessDrawer> createState() => _FitnessDrawerState();
 }
 
-class _DrawerState extends State<Drawer> with SingleTickerProviderStateMixin {
+class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProviderStateMixin {
   late ValueNotifier<bool> _vnIsExtended;
   late ValueNotifier<int> _vnSelectedIndex;
   late AnimationController _iconAnimation;
@@ -109,7 +109,6 @@ class _DrawerState extends State<Drawer> with SingleTickerProviderStateMixin {
           valueListenable: _vnIsExtended,
           builder: (BuildContext context, bool isExtended, Widget? child) {
             return NavigationRail(
-                backgroundColor: const Color(0xff385c79),
                 extended: isExtended,
                 selectedIndex: _vnSelectedIndex.value,
                 leading: Row(
