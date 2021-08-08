@@ -52,6 +52,8 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with Abstract
 
   void init(Exercice? exerciceEntered) {
     subjectStoragePair.sink.add(null);
+    videoUrl = null;
+    youtubeUrl = null;
 
     if (exerciceEntered != null) {
       exercice = exerciceEntered;

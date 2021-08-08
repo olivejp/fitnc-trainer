@@ -51,14 +51,6 @@ class WorkoutSetLeftPanel extends StatelessWidget {
                           'Glisser ici les exercices du workout.',
                           style: TextStyle(fontStyle: FontStyle.italic),
                         ),
-                        TextButton(
-                            onPressed: () => print('hello'),
-                            child: Container(
-                                decoration: BoxDecoration(color: Theme.of(context).primaryColor, borderRadius: BorderRadius.circular(5)),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(5.0),
-                                  child: Text('Ajouter repos', style: TextStyle(color: Colors.white)),
-                                )))
                       ],
                     ),
                   ),
