@@ -92,7 +92,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                       child: Padding(
                         padding: const EdgeInsets.only(right: 5),
                         child: DropdownButtonFormField<String>(
-                            decoration: InputDecoration(helperText: 'Genre'),
+                            decoration: InputDecoration(labelText: 'Genre'),
                             icon: Icon(Icons.transgender_rounded),
                             onChanged: (String? value) => widget.bloc.abonne.sexe = value,
                             value: widget.bloc.abonne.sexe,
@@ -122,7 +122,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                             initialValue: widget.bloc.abonne.nom,
                             autofocus: true,
                             onChanged: (value) => widget.bloc.abonne.nom = value,
-                            decoration: InputDecoration(helperText: 'Nom'),
+                            decoration: InputDecoration(labelText: 'Nom'),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Merci de renseigner le nom du abonne.';
@@ -140,7 +140,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                             autovalidateMode: AutovalidateMode.onUserInteraction,
                             initialValue: widget.bloc.abonne.prenom,
                             onChanged: (value) => widget.bloc.changePrenom(value),
-                            decoration: InputDecoration(helperText: 'Prénom'),
+                            decoration: InputDecoration(labelText: 'Prénom'),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Merci de renseigner le prénom de l\'abonné.';
@@ -173,7 +173,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                               return null;
                             }
                           },
-                          decoration: InputDecoration(suffixIcon: Icon(Icons.event_note), hintText: 'dd/mm/aaaa', helperText: 'Date de naissance'),
+                          decoration: InputDecoration(suffixIcon: Icon(Icons.event_note), hintText: 'dd/mm/aaaa', labelText: 'Date de naissance'),
                         ),
                       ),
                     ),
@@ -190,7 +190,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                           initialValue: widget.bloc.abonne.email,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           onChanged: widget.bloc.changeEmail,
-                          decoration: InputDecoration(helperText: 'Email'),
+                          decoration: InputDecoration(labelText: 'Email'),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Merci de renseigner l\'email de l\abonné.';
@@ -210,7 +210,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                         initialValue: (widget.bloc.abonne.telephone1) != null ? widget.bloc.abonne.telephone1.toString() : '',
                         onChanged: (value) => widget.bloc.abonne.telephone1 = int.tryParse(value),
-                        decoration: InputDecoration(helperText: 'Téléphone fixe'),
+                        decoration: InputDecoration(labelText: 'Téléphone fixe'),
                       ),
                     ),
                   ),
@@ -224,7 +224,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                         initialValue: (widget.bloc.abonne.telephone2) != null ? widget.bloc.abonne.telephone2.toString() : '',
                         onChanged: (value) => widget.bloc.abonne.telephone2 = int.tryParse(value),
-                        decoration: InputDecoration(helperText: 'Téléphone mobile'),
+                        decoration: InputDecoration(labelText: 'Téléphone mobile'),
                       ),
                     ),
                   ),
@@ -235,19 +235,19 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                   maxLength: 50,
                   initialValue: widget.bloc.abonne.adresse1,
                   onChanged: (value) => widget.bloc.abonne.adresse1 = value,
-                  decoration: InputDecoration(alignLabelWithHint: true, helperText: 'Adresse ligne 1'),
+                  decoration: InputDecoration(alignLabelWithHint: true, labelText: 'Adresse ligne 1'),
                 ),
                 TextFormField(
                   maxLength: 50,
                   initialValue: widget.bloc.abonne.adresse2,
                   onChanged: (value) => widget.bloc.abonne.adresse2 = value,
-                  decoration: InputDecoration(alignLabelWithHint: true, helperText: 'Adresse ligne 2'),
+                  decoration: InputDecoration(alignLabelWithHint: true, labelText: 'Adresse ligne 2'),
                 ),
                 TextFormField(
                   maxLength: 50,
                   initialValue: widget.bloc.abonne.adresse3,
                   onChanged: (value) => widget.bloc.abonne.adresse3 = value,
-                  decoration: InputDecoration(alignLabelWithHint: true, helperText: 'Adresse ligne 3'),
+                  decoration: InputDecoration(alignLabelWithHint: true, labelText: 'Adresse ligne 3'),
                 ),
               ]),
             ],

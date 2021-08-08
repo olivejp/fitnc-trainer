@@ -33,7 +33,7 @@ class ExerciceFormBuilder {
                           initialValue: bloc.name,
                           autofocus: true,
                           onChanged: (String value) => bloc.name = value,
-                          decoration: const InputDecoration(helperText: 'Nom'),
+                          decoration: const InputDecoration(labelText: 'Nom'),
                           validator: (String? value) {
                             if (value == null || value.isEmpty) {
                               return 'Merci de renseigner le nom du exercice.';
@@ -64,30 +64,35 @@ class ExerciceFormBuilder {
                 minLines: 5,
                 maxLines: 20,
                 onChanged: (String value) => bloc.description = value,
-                decoration: const InputDecoration(helperText: 'Description (optionel)'),
+                decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
               ),
             ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextFormField(
-                    initialValue: bloc.videoUrl,
-                    onChanged: (String value) => bloc.videoUrl = value,
-                    decoration: const InputDecoration(helperText: 'URL de la vidéo - Exemple : https://myStorage.com/squat_video.mp4'),
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 5),
+                      child: TextFormField(
+                        initialValue: bloc.videoUrl,
+                        onChanged: (String value) => bloc.videoUrl = value,
+                        decoration: const InputDecoration(hintText: 'Exemple : https://myStorage.com/squat_video.mp4', labelText: 'URL vidéo'),
+                      ),
+                    ),
                   ),
-                )
-              ],
-            ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextFormField(
-                    initialValue: bloc.youtubeUrl,
-                    onChanged: (String value) => bloc.youtubeUrl = value,
-                    decoration: const InputDecoration(helperText: 'Identifiant vidéo Youtube - Exemple : v-7oKGvVADk'),
-                  ),
-                )
-              ],
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 5),
+                      child: TextFormField(
+                        initialValue: bloc.youtubeUrl,
+                        onChanged: (String value) => bloc.youtubeUrl = value,
+                        decoration: const InputDecoration(hintText: 'Identifiant vidéo Youtube', labelText: 'Youtube'),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
             Row(
               children: [

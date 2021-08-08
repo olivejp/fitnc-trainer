@@ -64,7 +64,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(right: 5),
                                     child: TextFormField(
-                                        decoration: const InputDecoration(hintText: '*Nom'),
+                                        decoration: const InputDecoration(labelText: 'Nom', helperText: 'Champ obligatoire'),
                                         onChanged: (String value) => widget.bloc.nom = value,
                                         validator: (String? value) {
                                           if (value == null || value.isEmpty) {
@@ -77,7 +77,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 5),
                                     child: TextFormField(
-                                        decoration: const InputDecoration(hintText: '*Prénom'),
+                                        decoration: const InputDecoration(labelText: 'Prénom', helperText: 'Champ obligatoire'),
                                         onChanged: (String value) => widget.bloc.prenom = value,
                                         validator: (String? value) {
                                           if (value == null || value.isEmpty) {
@@ -92,7 +92,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextFormField(
-                              decoration: const InputDecoration(suffixIcon: Icon(Icons.email), hintText: '*Email'),
+                              decoration: const InputDecoration(suffixIcon: Icon(Icons.email), labelText: 'Email', helperText: 'Champ obligatoire'),
                               onChanged: (String value) => widget.bloc.email = value,
                               validator: (String? value) {
                                 if (value == null || value.isEmpty) {
@@ -111,7 +111,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             padding: const EdgeInsets.all(8.0),
                             child: TextFormField(
                               onChanged: (String value) => widget.bloc.telephone = value,
-                              decoration: const InputDecoration(suffixIcon: Icon(Icons.phone_android), hintText: 'Téléphone'),
+                              decoration: const InputDecoration(suffixIcon: Icon(Icons.phone_android), labelText: 'Téléphone'),
                             ),
                           ),
                           Padding(
@@ -124,7 +124,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                       onChanged: (String value) => widget.bloc.password = value,
                                       obscureText: snapshot.data!,
                                       decoration: InputDecoration(
-                                          hintText: 'Mot de passe',
+                                          labelText: 'Mot de passe',
                                           suffixIcon: IconButton(
                                               onPressed: () => {
                                                     if (subjPasswordObscure.hasValue)
@@ -151,7 +151,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                       onChanged: (String value) => widget.bloc.passwordCheck = value,
                                       obscureText: snapshot.data!,
                                       decoration: InputDecoration(
-                                          hintText: 'Retaper votre mot de passe',
+                                          labelText: 'Retaper votre mot de passe',
                                           suffixIcon: IconButton(
                                               onPressed: () => {
                                                     if (subjPasswordCheckObscure.hasValue)

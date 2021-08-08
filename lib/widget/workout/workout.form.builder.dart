@@ -29,7 +29,7 @@ class WorkoutFormBuilder {
                           initialValue: bloc.getWorkout()?.name,
                           autofocus: true,
                           onChanged: (String value) => bloc.name = value,
-                          decoration: const InputDecoration(helperText: 'Nom du workout'),
+                          decoration: const InputDecoration(labelText: 'Nom du workout'),
                           validator: (String? value) {
                             if (value == null || value.isEmpty) {
                               return 'Le nom du workout est obligatoire.';
@@ -42,7 +42,13 @@ class WorkoutFormBuilder {
               ),
             ),
             DropdownButtonFormField<String>(
-                decoration: const InputDecoration(helperText: 'Type d\'entrainement'),
+                decoration: const InputDecoration(labelText: 'Type d\'entrainement', hintText: 'Type d\'entrainement'),
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return "Le type d'entrainement est obligatoire.";
+                  }
+                  return null;
+                },
                 icon: const Icon(Icons.arrow_downward),
                 onChanged: (String? value) => bloc.timerType = value,
                 value: bloc.getWorkout()?.timerType,
@@ -52,7 +58,7 @@ class WorkoutFormBuilder {
                       'Aucun type d\'entraînement',
                       style: TextStyle(fontStyle: FontStyle.italic),
                     ),
-                    value: null,
+                    value: 'none',
                   ),
                   DropdownMenuItem(
                     child: Text('AMRAP'),
@@ -79,7 +85,7 @@ class WorkoutFormBuilder {
                 minLines: 5,
                 maxLines: 20,
                 onChanged: (String value) => bloc.description = value,
-                decoration: const InputDecoration(helperText: 'Description (optionel)'),
+                decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
               ),
             ),
           ],

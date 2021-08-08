@@ -30,6 +30,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
     final WorkoutUpdateBloc bloc = widget.bloc;
     final List<DropdownMenuItem<String>> typesWorkout = <DropdownMenuItem<String>>[
       const DropdownMenuItem<String>(
+        value:'none',
         child: Text(
           "Aucun type d'entraînement",
           style: TextStyle(fontStyle: FontStyle.italic),
@@ -90,7 +91,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                                 initialValue: bloc.getWorkout()?.name,
                                 autofocus: true,
                                 onChanged: (String value) => bloc.name = value,
-                                decoration: const InputDecoration(helperText: 'Nom du workout'),
+                                decoration: const InputDecoration(labelText: 'Nom du workout'),
                                 validator: (String? value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Le nom du workout est obligatoire.';
@@ -103,7 +104,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                           child: Padding(
                             padding: const EdgeInsets.only(left: 20),
                             child: DropdownButtonFormField<String>(
-                                decoration: const InputDecoration(helperText: "Type d'entrainement", constraints: BoxConstraints(maxHeight: 72)),
+                                decoration: const InputDecoration(hintText: "Type d'entrainement",labelText: "Type d'entrainement", constraints: BoxConstraints(maxHeight: 72)),
                                 icon: const Icon(Icons.arrow_downward),
                                 onChanged: (String? value) => bloc.timerType = value,
                                 value: bloc.getWorkout()?.timerType,
@@ -119,7 +120,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                     minLines: 5,
                     maxLines: 20,
                     onChanged: (String value) => bloc.description = value,
-                    decoration: const InputDecoration(helperText: 'Instructions (optionel)'),
+                    decoration: const InputDecoration(labelText: 'Instructions', hintText: 'Optionnel'),
                   ),
                   LimitedBox(
                     maxWidth: 2000,

@@ -80,7 +80,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
                                     initialValue: widget.bloc.programme.name,
                                     autofocus: true,
                                     onChanged: (String value) => widget.bloc.name = value,
-                                    decoration: const InputDecoration(helperText: 'Nom'),
+                                    decoration: const InputDecoration(labelText: 'Nom'),
                                     validator: (String? value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Merci de renseigner le nom du programme.';
@@ -96,8 +96,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
                                   child: ParamDropdownButton(
                                       paramName: 'number_weeks',
                                       decoration: const InputDecoration(
-                                        hintText: 'Nombre de semaine',
-                                        helperText: 'Nombre de semaine',
+                                        labelText: 'Nombre de semaine',
                                       ),
                                       initialValue: widget.bloc.programme.numberWeeks,
                                       onChanged: (String? value) => widget.bloc.numberWeeks = value),
@@ -116,7 +115,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
                   minLines: 5,
                   maxLines: 20,
                   onChanged: (String value) => widget.bloc.description = value,
-                  decoration: const InputDecoration(helperText: 'Description (optionel)'),
+                  decoration: const InputDecoration(labelText: 'Description',helperText: 'Optionel'),
                 ),
                 SizedBox(
                   height: 800,

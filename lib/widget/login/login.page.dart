@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
                           padding: const EdgeInsets.all(8.0),
                           child: TextFormField(
                             style: GoogleFonts.roboto(fontSize: 20),
-                            decoration: InputDecoration(hintText: 'Email', hintStyle: GoogleFonts.roboto(fontSize: 20)),
+                            decoration: InputDecoration(labelText: 'Email', hintStyle: GoogleFonts.roboto(fontSize: 20)),
                             onChanged: (String value) => widget.bloc.email = value,
                             onFieldSubmitted: (String value) => onPressedEnter(),
                             validator: (String? value) {
@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                             enableSuggestions: false,
                             autocorrect: false,
                             decoration: InputDecoration(
-                                hintText: 'Mot de passe',
+                                labelText: 'Mot de passe',
                                 hintStyle: GoogleFonts.roboto(fontSize: 20),
                                 suffixIcon:
                                     IconButton(onPressed: () => setState(() => showPassword = !showPassword), icon: Icon(Icons.remove_red_eye))),
