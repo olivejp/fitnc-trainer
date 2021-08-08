@@ -1,30 +1,44 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase/service/firestorage.service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_schedule.domain.dart';
 import 'package:fitnc_trainer/domain/workout_schedule.dto.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/widget/programme/programme.update.page.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ProgrammeUpdateBloc {
+class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with AbstractFitnessStorageBloc<Programme> {
   ProgrammeUpdateBloc._();
+
+  factory ProgrammeUpdateBloc.instance() {
+    _instance ??= ProgrammeUpdateBloc._();
+    return _instance!;
+  }
 
   static ProgrammeUpdateBloc? _instance;
 
-  static ProgrammeUpdateBloc getInstance() {
-    _instance ??= ProgrammeUpdateBloc._();
-    return _instance!;
+  @override
+  CollectionReference<Object?> getCollectionReference() {
+    return trainersService.getProgrammeReference();
+  }
+
+  @override
+  String getStorageRef(User user, Programme programme) {
+    return 'trainers/${user.uid}/programmes/${programme.uid}';
+  }
+
+  @override
+  Widget openUpdate(BuildContext context, Programme programme) {
+    return ProgrammeUpdatePage(programme: programme);
   }
 
   FirestorageService firestorageService = FirestorageService.instance();
@@ -48,23 +62,13 @@ class ProgrammeUpdateBloc {
   final List<WorkoutScheduleDto> listDtos = <WorkoutScheduleDto>[];
   late Programme programme;
 
-  StorageFile? storagePair;
-
   void init(Programme? programmeEntered) {
-    storagePair = StorageFile();
     subjectStoragePair.sink.add(null);
 
     if (programmeEntered != null) {
       programme = programmeEntered;
-
-      // Recherche de l'image
-      if (programme.imageUrl != null && programme.imageUrl!.isNotEmpty) {
-        firestorageService.getRemoteImageToUint8List(programme.imageUrl!).then((Uint8List bytes) {
-          storagePair!.fileName = basename(programme.imageUrl!);
-          storagePair!.fileBytes = bytes;
-          subjectStoragePair.sink.add(storagePair);
-        });
-      }
+      programme.storageFile = StorageFile();
+      getFutureStorageFile(programme).then((StorageFile? storageFile) => subjectStoragePair.sink.add(storageFile));
 
       // On récupère une fois la liste des WorkoutScheduleDto
       trainersService
@@ -89,62 +93,12 @@ class ProgrammeUpdateBloc {
     }
   }
 
-  Programme? getProgramme() {
-    return programme;
-  }
-
   Future<void> saveProgramme() {
-    if (programme.uid != null && programme.uid?.isNotEmpty == true) {
-      return updateProgramme();
+    if (programme.uid != null) {
+      return eraseAndReplaceStorage(programme).then((_) => save(programme));
     } else {
-      return createProgramme();
-    }
-  }
-
-  Future<void> createProgramme() async {
-    final CollectionReference<Object?> collectionReference = trainersService.getProgrammeReference();
-
-    programme.uid = collectionReference.doc().id; // Récupération d'une nouvelle ID.
-
-    // Si un fichier est présent, on tente de l'envoyer sur le Storage.
-    if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
-      await sendToStorage();
-    }
-    return sendToFireStore(collectionReference);
-  }
-
-  Future<void> updateProgramme() async {
-    CollectionReference<Object?> collectionReference = trainersService.getProgrammeReference();
-
-    // Si un fichier est présent, on tente de l'envoyer sur le Storage.
-    if (storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
-      await deleteProgrammeMainImage(programme);
-      await sendToStorage();
-    }
-
-    if (storagePair == null || storagePair?.fileName == null || storagePair?.fileBytes == null) {
-      await deleteProgrammeMainImage(programme);
-      programme.imageUrl = null;
-    }
-    return sendToFireStore(collectionReference);
-  }
-
-  String getUrl() {
-    String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    return 'trainers/$trainerUid/programme/${programme.uid}/$pathProgrammeMainImage';
-  }
-
-  Future<void> sendToFireStore(CollectionReference<Object?> collectionReference) {
-    programme.createDate = FieldValue.serverTimestamp();
-    return collectionReference.doc(programme.uid).set(programme.toJson()).then((value) {
-      programme = Programme();
-    });
-  }
-
-  Future<void> sendToStorage() async {
-    String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    if (trainerUid != null && storagePair != null && storagePair!.fileBytes != null && storagePair!.fileName != null) {
-      programme.imageUrl = await firestorageService.sendToStorageAndGetReference('${getUrl()}/${storagePair!.fileName}', storagePair!.fileBytes!);
+      programme.uid = getCollectionReference().doc().id;
+      return createStorage(programme).then((_) => create(programme));
     }
   }
 
@@ -153,20 +107,7 @@ class ProgrammeUpdateBloc {
   }
 
   Future<void> deleteProgramme(Programme programme) {
-    return trainersService.getProgrammeReference().doc(programme.uid).delete().then((value) => deleteProgrammeMainImage(programme));
-  }
-
-  Future<void> deleteProgrammeMainImage(Programme programme) {
-    final String? trainerUid = FirebaseAuth.instance.currentUser?.uid;
-    if (trainerUid != null) {
-      return FirebaseStorage.instance
-          .ref(getUrl())
-          .listAll()
-          .then((ListResult value) => value.items.forEach((Reference element) => element.delete()))
-          .catchError((error) => print(error));
-    } else {
-      return Future.error('Aucun compte trainer connecté');
-    }
+    return trainersService.getProgrammeReference().doc(programme.uid).delete().then((_) => deleteAllFiles(programme));
   }
 
   set name(String value) {
@@ -186,8 +127,8 @@ class ProgrammeUpdateBloc {
   String? get description => programme.description;
 
   void setStoragePair(StorageFile? storagePair) {
-    this.storagePair = storagePair;
-    subjectStoragePair.sink.add(this.storagePair);
+    programme.storageFile = storagePair;
+    subjectStoragePair.sink.add(programme.storageFile);
   }
 
   void addWorkoutSchedule(Workout workout, int dayIndex) {

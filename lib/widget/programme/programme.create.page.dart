@@ -7,7 +7,7 @@ import 'programme.form.builder.dart';
 
 class ProgrammeCreatePage {
   static showCreate(BuildContext context) {
-    ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.getInstance();
+    ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.instance();
     bloc.init(null);
     GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     showDialog(

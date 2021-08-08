@@ -21,7 +21,7 @@ class ProgrammeUpdatePage extends StatefulWidget {
     bloc.init(programme);
   }
 
-  final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.getInstance();
+  final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.instance();
 
   @override
   _ProgrammeUpdatePageState createState() {
@@ -130,7 +130,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
 }
 
 class WorkoutChoicePanel extends StatelessWidget {
-  static final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.getInstance();
+  static final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.instance();
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +165,7 @@ class WorkoutChoicePanel extends StatelessWidget {
 }
 
 class WorkoutSchedulePanel extends StatelessWidget {
-  static final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.getInstance();
+  static final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.instance();
   static final TextStyle columnTextStyle = GoogleFonts.roboto(fontSize: 10, fontWeight: FontWeight.bold);
   static final List<String> columnNames = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
