@@ -136,6 +136,7 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with Abstra
     dto.uid = trainersService.getProgrammeReference().doc(programme.uid).collection('workouts').doc().id;
     dto.uidWorkout = workout.uid;
     dto.nameWorkout = workout.name;
+    dto.imageUrlWorkout = workout.imageUrl;
     dto.dateSchedule = dayIndex;
     listDtos.add(dto);
     _streamWorkoutScheduleDto.sink.add(listDtos);

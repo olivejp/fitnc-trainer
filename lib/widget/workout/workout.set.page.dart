@@ -89,7 +89,7 @@ class WorkoutSetPage extends StatelessWidget {
         mainAxisSpacing: 10.0,
         crossAxisSpacing: 10.0,
         crossAxisCount: nbColumns,
-        children: listExercice.where((exercice) => exercice != null).map((exercice) {
+        children: listExercice.where((Exercice? exercice) => exercice != null).map((Exercice? exercice) {
           Widget gridCard = getGridCard(context, exercice!);
           return Draggable<Exercice>(
             feedback: gridCard,

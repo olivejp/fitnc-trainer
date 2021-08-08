@@ -143,17 +143,35 @@ class WorkoutChoicePanel extends StatelessWidget {
             separatorBuilder: (BuildContext context, int index) => const Divider(height: 2.0),
             itemCount: list.length,
             itemBuilder: (BuildContext context, int index) {
+              final Workout? workout = list.elementAt(index);
               return ListTile(
                 leading: Draggable<Workout>(
                   feedback: SizedBox(
                     width: 200,
-                    height: 100,
-                    child: Text(list[index]!.name!),
+                    height: 50,
+                    child: Card(
+                        child: ListTile(
+                      title: Text(list[index]!.name!),
+                      leading: (workout?.imageUrl != null)
+                          ? CircleAvatar(backgroundImage: NetworkImage(workout!.imageUrl!), radius: 10)
+                          : CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
+                    )),
                   ),
                   data: list[index],
                   child: const Icon(Icons.view_headline),
                 ),
-                title: Text(list[index]!.name!),
+                title: Row(
+                  children: <Widget>[
+                    if (workout?.imageUrl != null)
+                      CircleAvatar(backgroundImage: NetworkImage(workout!.imageUrl!), radius: 10)
+                    else
+                      CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: Text(list[index]!.name!),
+                    ),
+                  ],
+                ),
               );
             },
           );
@@ -167,7 +185,7 @@ class WorkoutChoicePanel extends StatelessWidget {
 class WorkoutSchedulePanel extends StatelessWidget {
   static final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.instance();
   static final TextStyle columnTextStyle = GoogleFonts.roboto(fontSize: 10, fontWeight: FontWeight.bold);
-  static final List<String> columnNames = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+  static final List<String> columnNames = <String>['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
   @override
   Widget build(BuildContext context) {
@@ -177,9 +195,29 @@ class WorkoutSchedulePanel extends StatelessWidget {
             label: Center(
                 child: Text(
               columnName,
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.headline3,
             ))))
         .toList();
+
+    /// Méthode permettant d'afficher l'affectation des Workouts à une date.
+    void popupDayDetails(sf.DataGridCellTapDetails details, List<WorkoutScheduleDto> listAppointment) {
+      final int columnIndex = details.rowColumnIndex.columnIndex;
+      final int rowIndex = details.rowColumnIndex.rowIndex;
+      final int dayIndex = ((rowIndex - 1) * 7) + columnIndex + 1;
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          final List<WorkoutScheduleDto> list = listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
+          return AlertDialog(
+            title: Text('Jour $dayIndex'),
+            actions: <Widget>[
+              TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Sortir')),
+            ],
+            content: PopupDayDetail(bloc: bloc, dayIndex: dayIndex, list: list),
+          );
+        },
+      );
+    }
 
     return FutureBuilder<List<DropdownMenuItem<Workout>>>(
         future: bloc.getWorkoutDropdownItems(),
@@ -197,6 +235,7 @@ class WorkoutSchedulePanel extends StatelessWidget {
                       decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
                       padding: const EdgeInsets.all(1),
                       child: sf.SfDataGrid(
+                        onCellTap: (sf.DataGridCellTapDetails details) => popupDayDetails(details, listScheduledWorkouts),
                         highlightRowOnHover: false,
                         headerGridLinesVisibility: GridLinesVisibility.both,
                         columnWidthMode: ColumnWidthMode.fill,
@@ -230,6 +269,91 @@ class WorkoutSchedulePanel extends StatelessWidget {
   }
 }
 
+class PopupDayDetail extends StatelessWidget {
+  const PopupDayDetail({
+    Key? key,
+    required this.bloc,
+    required this.dayIndex,
+    required this.list,
+  }) : super(key: key);
+
+  final ProgrammeUpdateBloc bloc;
+  final int dayIndex;
+  final List<WorkoutScheduleDto> list;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 800,
+      width: 600,
+      child: Column(
+        children: <Widget>[
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: DragTarget<Workout>(
+                  onAccept: (Workout workout) => bloc.addWorkoutSchedule(workout, dayIndex - 1),
+                  onWillAccept: (Workout? data) => data is Workout,
+                  builder: (BuildContext context, List<Workout?> candidateData, List<Object?> rejectedData) {
+                    return Container(
+                      decoration:
+                          BoxDecoration(border: Border.all(width: 1, color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
+                      child: Column(
+                        children: <Widget>[
+                          const Text('Glisser ici les workout de la journée.'),
+                          StreamBuilder<List<WorkoutScheduleDto>>(
+                              initialData: list,
+                              stream: bloc.workoutScheduleObs,
+                              builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
+                                if (snapshot.hasData) {
+                                  final List<WorkoutScheduleDto> listWorkout =
+                                      snapshot.data!.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex - 1).toList();
+                                  return ListView.separated(
+                                    shrinkWrap: true,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      final WorkoutScheduleDto dto = listWorkout.elementAt(index);
+                                      return ListTile(
+                                        leading: (dto.imageUrlWorkout != null)
+                                            ? CircleAvatar(backgroundImage: NetworkImage(dto.imageUrlWorkout!), radius: 10)
+                                            : CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
+                                        title: Text(dto.nameWorkout!),
+                                        trailing: IconButton(
+                                          onPressed: () => bloc.deleteWorkoutSchedule(dto),
+                                          icon: const Icon(Icons.close),
+                                        ),
+                                      );
+                                    },
+                                    separatorBuilder: (BuildContext context, int index) => const Divider(height: 2.0),
+                                    itemCount: listWorkout.length,
+                                  );
+                                } else {
+                                  return LoadingBouncingGrid.circle();
+                                }
+                              }),
+                        ],
+                      ),
+                    );
+                  }),
+            ),
+          ),
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                  decoration:
+                      BoxDecoration(border: Border.all(width: 1, color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
+                  child: WorkoutChoicePanel()),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+///
+/// Data d'une cellule
+/// Une cellule a toujours un dayIndex mais aussi une liste des Workout à effectuer pour ce jour.
 class DataCellData {
   DataCellData({required this.list, required this.dayIndex});
 
@@ -237,6 +361,9 @@ class DataCellData {
   int dayIndex;
 }
 
+///
+/// DataSource du GridData
+///
 class WorkoutDataSource extends sf.DataGridSource {
   WorkoutDataSource(
       {required this.bloc,
@@ -256,12 +383,14 @@ class WorkoutDataSource extends sf.DataGridSource {
   List<DataGridRow> _workoutData = <DataGridRow>[];
   List<String> columnNames;
 
+  /// Méthode pour générer une DataCell.
   sf.DataGridCell<DataCellData> getDataCell(String columnName, int dayIndex, List<WorkoutScheduleDto> listAppointment) {
     final List<WorkoutScheduleDto> list = listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
     final DataCellData data = DataCellData(list: list, dayIndex: dayIndex);
     return sf.DataGridCell<DataCellData>(value: data, columnName: columnName);
   }
 
+  /// Méthode pour générer une DataRow.
   sf.DataGridRow getDataRow(int weekIndex, List<WorkoutScheduleDto> listAppointment) {
     final List<sf.DataGridCell<DataCellData>> list = <sf.DataGridCell<DataCellData>>[];
     for (int i = 0; i < 7; i++) {
@@ -271,6 +400,7 @@ class WorkoutDataSource extends sf.DataGridSource {
     return sf.DataGridRow(cells: list);
   }
 
+  /// Méthode pour générer toutes les DataRow du tableau.
   List<sf.DataGridRow> getListDataRows(int numberWeeks, List<WorkoutScheduleDto> listAppointment) {
     final List<sf.DataGridRow> list = <sf.DataGridRow>[];
     for (int i = 0; i < numberWeeks; i++) {
@@ -282,32 +412,34 @@ class WorkoutDataSource extends sf.DataGridSource {
   @override
   List<DataGridRow> get rows => _workoutData;
 
+  /// Méthode permettant de dessiner une ligne du tableau.
   @override
   sf.DataGridRowAdapter? buildRow(DataGridRow row) {
     return sf.DataGridRowAdapter(
         cells: row.getCells().map((sf.DataGridCell listCell) {
       final DataCellData dataCell = listCell.value as DataCellData;
       final List<WorkoutScheduleDto> listWorkout = dataCell.list;
-      return Stack(
-        alignment: Alignment.center,
-        children: [
-          Text('${dataCell.dayIndex + 1}'),
-          Column(
-            children: listWorkout
-                .map((WorkoutScheduleDto dto) => ListTile(
-                      dense: true,
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(dto.imageUrlWorkout!),
-                      ),
-                      title: Text(dto.nameWorkout!),
-                      trailing: IconButton(
-                        onPressed: () => bloc.deleteWorkoutSchedule(dto),
-                        icon: const Icon(Icons.close),
-                      ),
-                    ))
-                .toList(),
-          )
-        ],
+      final List<Widget> listListTile = listWorkout
+          .map((WorkoutScheduleDto dto) => ListTile(
+                dense: true,
+                leading: (dto.imageUrlWorkout != null)
+                    ? CircleAvatar(backgroundImage: NetworkImage(dto.imageUrlWorkout!), radius: 10)
+                    : CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
+                title: Text(dto.nameWorkout!),
+              ))
+          .toList();
+      return MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Stack(
+          alignment: Alignment.center,
+          children: <Widget>[
+            Text(
+              '${dataCell.dayIndex + 1}',
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            Column(children: listListTile)
+          ],
+        ),
       );
     }).toList());
   }

@@ -6,30 +6,30 @@ import 'package:flutter/widgets.dart';
 import 'exercice.form.builder.dart';
 
 class ExerciceCreatePage {
-  static showCreate(BuildContext context) {
-    ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
+  static void showCreate(BuildContext context) {
+    final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     bloc.init(null);
-    GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (BuildContext context) {
         return AlertDialog(
           content: ExerciceFormBuilder.getForm(_formKey, bloc),
-          actionsPadding: EdgeInsets.all(20),
-          actions: [
+          actionsPadding: const EdgeInsets.all(20),
+          actions: <Widget>[
             FloatingActionButton(
               tooltip: 'Annuler',
               onPressed: () => Navigator.of(context).pop(),
-              child: Icon(Icons.clear),
+              child: const Icon(Icons.clear),
             ),
             FloatingActionButton(
               tooltip: 'Créer',
               onPressed: () {
                 if (_formKey.currentState?.validate() == true) {
-                  bloc.saveExercice().then((value) => Navigator.of(context).pop());
+                  bloc.saveExercice().then((_) => Navigator.of(context).pop());
                 }
               },
-              child: Icon(Icons.check),
+              child: const Icon(Icons.check),
             ),
           ],
         );

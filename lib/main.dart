@@ -44,6 +44,7 @@ class FitnessNcColors {
   static const Color blue50Alpha060 = Color(0x99EEF0F2);
 
   static const Color black900Alpha020 = Color(0x33000000);
+  static const Color black900Alpha011 = Color(0x1D000000);
   static const Color black900Alpha087 = Color(0xDE000000);
   static const Color black900Alpha060 = Color(0x99000000);
 
@@ -80,6 +81,8 @@ class MyApp extends StatelessWidget {
             textTheme: TextTheme(
               headline1: GoogleFonts.workSansTextTheme().headline1!.copyWith(color: FitnessNcColors.blue600, fontSize: 35, fontWeight: FontWeight.bold),
               headline2: GoogleFonts.alfaSlabOneTextTheme().headline2!.copyWith(color: FitnessNcColors.orange500, fontSize: 25),
+              headline3: GoogleFonts.workSansTextTheme().headline3!.copyWith(color: FitnessNcColors.blue800, fontSize: 18),
+              headline6: GoogleFonts.workSansTextTheme().headline6!.copyWith(color: FitnessNcColors.black900Alpha011, fontSize: 50),
               subtitle1: GoogleFonts.workSansTextTheme().subtitle1!.copyWith(color: FitnessNcColors.blue800, fontSize: 15),
               subtitle2: GoogleFonts.roboto(color: FitnessNcColors.orange500, fontSize: 18),
             ),
