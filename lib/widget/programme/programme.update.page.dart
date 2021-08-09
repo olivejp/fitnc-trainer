@@ -36,24 +36,39 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> buttons = <Widget>[];
+    if (widget.bloc.programme.available == null || widget.bloc.programme.available == false) {
+      buttons.add(FloatingActionButton.extended(
+        onPressed: () {
+          if (_formKey.currentState?.validate() == true) {
+            widget.bloc.validateProgramme().then((_) => Navigator.pop(context));
+          }
+        },
+        backgroundColor: Colors.green,
+        label: const Text('Valider'),
+        icon: const Icon(Icons.check),
+      ));
+    }
+    buttons.addAll([
+      FloatingActionButton(
+        onPressed: () => Navigator.of(context).pop(),
+        tooltip: 'Annuler',
+        child: const Icon(Icons.clear),
+      ),
+      FloatingActionButton(
+        onPressed: () {
+          if (_formKey.currentState?.validate() == true) {
+            widget.bloc.saveProgramme().then((_) => Navigator.pop(context));
+          }
+        },
+        tooltip: 'Enregistrer',
+        child: const Icon(Icons.save),
+      )
+    ]);
+
     return Scaffold(
         backgroundColor: Colors.transparent,
-        floatingActionButton: ButtonBar(children: [
-          FloatingActionButton(
-            onPressed: () => Navigator.of(context).pop(),
-            tooltip: 'Annuler',
-            child: const Icon(Icons.clear),
-          ),
-          FloatingActionButton(
-            onPressed: () {
-              if (_formKey.currentState?.validate() == true) {
-                widget.bloc.saveProgramme().then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
-              }
-            },
-            tooltip: 'Valider',
-            child: const Icon(Icons.check),
-          )
-        ]),
+        floatingActionButton: ButtonBar(children: buttons),
         body: GenericUpdateWidget(
           maximumWidth: 2680,
           child: Form(
@@ -64,7 +79,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
                   padding: const EdgeInsets.only(bottom: 20.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
+                    children: <Widget>[
                       StorageStreamImageWidget(
                         onSaved: (StorageFile? storagePair) => widget.bloc.setStoragePair(storagePair),
                         streamInitialStorageFile: widget.bloc.obsStoragePair,
@@ -74,7 +89,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
                         child: Padding(
                           padding: const EdgeInsets.only(left: 20),
                           child: Row(
-                            children: [
+                            children: <Widget>[
                               Expanded(
                                 child: TextFormField(
                                     initialValue: widget.bloc.programme.name,
@@ -115,7 +130,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
                   minLines: 5,
                   maxLines: 20,
                   onChanged: (String value) => widget.bloc.description = value,
-                  decoration: const InputDecoration(labelText: 'Description',helperText: 'Optionel'),
+                  decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionel'),
                 ),
                 SizedBox(
                   height: 800,
@@ -434,7 +449,7 @@ class WorkoutDataSource extends sf.DataGridSource {
           children: <Widget>[
             Text(
               '${dataCell.dayIndex + 1}',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.headline5,
             ),
             Column(children: listListTile)
           ],

@@ -11,6 +11,7 @@ class Programme extends AbstractFitnessStorageDomain {
 
   String? description;
   String? numberWeeks;
+  bool? available;
 
   @override
   Map<String, dynamic> toJson() => _$ProgrammeToJson(this);

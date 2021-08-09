@@ -37,7 +37,6 @@ class WorkoutSetPage extends StatelessWidget {
                           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
                         )),
                     Expanded(
-                      flex: 1,
                       child: TextFormField(
                         decoration: const InputDecoration(
                           border: UnderlineInputBorder(),
@@ -71,7 +70,7 @@ class WorkoutSetPage extends StatelessWidget {
   }
 
   Widget getGridView(List<Exercice?> listExercice) {
-    return LayoutBuilder(builder: (context, constraints) {
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       int nbColumns = 2;
       if (constraints.maxWidth > 1200) {
         nbColumns = 10;
@@ -113,7 +112,7 @@ class WorkoutSetPage extends StatelessWidget {
       firstChild = Image.network(
         exercice.imageUrl!,
         fit: BoxFit.cover,
-        loadingBuilder: (context, child, loadingProgress) {
+        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
           if (loadingProgress == null) {
             return child;
           }

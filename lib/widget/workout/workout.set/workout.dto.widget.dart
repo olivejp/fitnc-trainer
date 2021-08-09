@@ -26,6 +26,13 @@ class _ListTileDtoState extends State<ListTileDto> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget leading = widget.dto.imageUrlExercice != null
+        ? CircleAvatar(foregroundImage: NetworkImage(widget.dto.imageUrlExercice!), radius: 10,)
+        : Icon(
+      Icons.sports_volleyball,
+      size: 10,
+      color: Theme.of(context).primaryColor,
+    );
     return ListTile(
       dense: true,
       minLeadingWidth: 20,
@@ -42,14 +49,21 @@ class _ListTileDtoState extends State<ListTileDto> {
         ),
       ),
       title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text(
-                widget.dto.nameExercice!,
-                style: const TextStyle(fontSize: 14),
+              Row(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: leading,
+                  ),
+                  Text(
+                    widget.dto.nameExercice!,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ],
               ),
               TextButton(
                   onPressed: () {

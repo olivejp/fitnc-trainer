@@ -81,6 +81,7 @@ class WorkoutSetLeftPanelBloc {
     dto.nameExercice = exerciceDragged.name;
     dto.imageUrlExercice = exerciceDragged.imageUrl;
     dto.order = getMaxOrder(listDtos);
+    dto.lines.add(Line());
     listDtos.add(dto);
     subjectListDtos.sink.add(listDtos);
 

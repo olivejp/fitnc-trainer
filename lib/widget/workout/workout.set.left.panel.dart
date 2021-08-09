@@ -1,10 +1,8 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:fitnc_trainer/bloc/workout/workout_set_left_panel.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
-import 'package:fitnc_trainer/domain/line.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.dto.dart';
-import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set/workout.dto.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +11,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animations/loading_animations.dart';
-import 'package:rxdart/rxdart.dart';
 
 class WorkoutSetLeftPanel extends StatelessWidget {
   WorkoutSetLeftPanel({Key? key, required this.workout}) : super(key: key) {
@@ -58,9 +55,9 @@ class WorkoutSetLeftPanel extends StatelessWidget {
                 ],
               );
               return DragTarget<Exercice>(
-                onWillAccept: (Exercice? exerciceToAccept) => (exerciceToAccept is Exercice),
+                onWillAccept: (Exercice? exerciceToAccept) => exerciceToAccept is Exercice,
                 onAccept: (Exercice exerciceDragged) => bloc.addWorkoutSet(exerciceDragged),
-                builder: (BuildContext context, candidateData, List rejectedData) {
+                builder: (BuildContext context, List<Exercice?> candidateData, List rejectedData) {
                   Color color = Colors.transparent;
                   if (candidateData.isNotEmpty) {
                     color = Theme.of(context).primaryColor;

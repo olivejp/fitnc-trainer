@@ -186,4 +186,9 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with Abstra
         .map((Workout workout) => DropdownMenuItem<Workout>(value: workout, child: Text(workout.name!)))
         .toList();
   }
+
+  Future<void> validateProgramme() {
+    programme.available = true;
+    return saveProgramme();
+  }
 }
