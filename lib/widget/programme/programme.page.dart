@@ -59,7 +59,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
   @override
   void initState() {
     super.initState();
-    bloc.getStreamProgramme().listen((List<Programme> event) {
+    bloc.listenAll().listen((List<Programme> event) {
       listCompleteProgramme.clear();
       listCompleteProgramme.addAll(event);
       _streamListProgramme.sink.add(listCompleteProgramme);

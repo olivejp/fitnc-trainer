@@ -1,5 +1,6 @@
 import 'package:fitnc_trainer/bloc/exercice/exercice_update.bloc.dart';
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
+import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
@@ -15,20 +16,43 @@ import 'package:rxdart/rxdart.dart';
 import 'exercice.create.page.dart';
 
 class ExercicePage extends StatefulWidget {
-  ExercicePage({Key? key}) : super(key: key);
-
-  static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
+  const ExercicePage({Key? key}) : super(key: key);
 
   @override
   State<ExercicePage> createState() => _ExercicePageState();
 }
 
+abstract class SearchWidgetState<U, T extends StatefulWidget> extends State<T> {
+  final BehaviorSubject<List<U>> _streamSearch = BehaviorSubject<List<U>>();
+
+  List<U> search(String query);
+
+  String? _query;
+
+  set query(String? text) {
+    _query = text;
+    _search();
+  }
+
+  String? get query => _query;
+
+  void _search() {
+    final String? text = _query?.toUpperCase();
+    final List<U> listFiltered = <U>[];
+    if (text != null &&  text.isNotEmpty) {
+      listFiltered.addAll(search(text));
+    }
+    _streamSearch.sink.add(listFiltered);
+  }
+}
+
 class _ExercicePageState extends State<ExercicePage> {
   final HomePageBloc homePageBloc = HomePageBloc.instance();
-
   final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
   final List<Exercice> listCompleteExercice = <Exercice>[];
   final BehaviorSubject<List<Exercice>> _streamListExercice = BehaviorSubject<List<Exercice>>();
+  final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
+
   String? _query;
 
   set query(String? text) {
@@ -57,7 +81,7 @@ class _ExercicePageState extends State<ExercicePage> {
   @override
   void initState() {
     super.initState();
-    bloc.getStreamExercice().listen((List<Exercice> event) {
+    bloc.listenAll().listen((List<Exercice> event) {
       listCompleteExercice.clear();
       listCompleteExercice.addAll(event);
       _streamListExercice.sink.add(listCompleteExercice);

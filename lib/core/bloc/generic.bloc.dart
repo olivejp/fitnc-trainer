@@ -14,6 +14,8 @@ import 'package:path/path.dart';
 /// Interface de haut niveau pour les opérations CRUD
 ///
 abstract class AbstractCrudBloc<T> {
+  Stream<List<T>> listenAll();
+
   Future<void> save(T domain);
 
   Future<void> create(T domain);
@@ -66,7 +68,7 @@ abstract class AbstractFirebaseCrudBloc<T extends AbstractFirebaseDomain> implem
 ///
 /// Mixin Bloc pour implémenter les méthodes de base pour le Firebase storage.
 ///
-abstract class AbstractFitnessStorageBloc<T extends AbstractFitnessStorageDomain> {
+abstract class MixinFitnessStorageBloc<T extends AbstractFitnessStorageDomain> {
 
   /// Méthode abstraite
   /// Permet de spécifier l'emplacement où sera stocké le fichier dans Firebase Storage.

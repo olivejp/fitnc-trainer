@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/bloc/workout/workout_update.bloc.dart';
-import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
@@ -19,10 +18,7 @@ import 'package:page_transition/page_transition.dart';
 import 'package:rxdart/rxdart.dart';
 
 class WorkoutPage extends StatefulWidget {
-  WorkoutPage({Key? key}) : super(key: key);
-
-  final HomePageBloc homePageBloc = HomePageBloc.instance();
-  final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.instance();
+  const WorkoutPage({Key? key}) : super(key: key);
 
   @override
   _WorkoutPageState createState() {
@@ -30,14 +26,15 @@ class WorkoutPage extends StatefulWidget {
   }
 }
 
-class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStateMixin {
-  _WorkoutPageState();
+class _WorkoutPageState extends State<WorkoutPage> {
 
-  late AnimationController _controller;
+  final HomePageBloc homePageBloc = HomePageBloc.instance();
+  final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.instance();
+
+  final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
   final List<Workout> listCompleteWorkout = <Workout>[];
   final BehaviorSubject<List<Workout>> _streamListWorkout = BehaviorSubject<List<Workout>>();
   String? _query;
-  DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
   set query(String? text) {
     _query = text;
@@ -64,9 +61,7 @@ class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 5));
-    _controller.forward();
-    widget.bloc.getStreamWorkout().listen((List<Workout> event) {
+    bloc.listenAll().listen((List<Workout> event) {
       listCompleteWorkout.clear();
       listCompleteWorkout.addAll(event);
       searchWorkout();
@@ -76,7 +71,6 @@ class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStat
   @override
   void dispose() {
     _streamListWorkout.close();
-    _controller.dispose();
     super.dispose();
   }
 
@@ -140,19 +134,19 @@ class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStat
                         } else {
                           final List<Workout> listWorkout = snapshot.data!;
                           return StreamBuilder<bool>(
-                              stream: widget.homePageBloc.currentDisplayObs,
+                              stream: homePageBloc.currentDisplayObs,
                               builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
                                 if (snapshot.hasData) {
                                   if (snapshot.data != null && snapshot.data == true) {
                                     return WorkoutListView(
                                       listWorkout: listWorkout,
-                                      bloc: widget.bloc,
+                                      bloc: bloc,
                                       dateFormat: dateFormat,
                                     );
                                   } else {
                                     return WorkoutGridView(
                                       listWorkout: listWorkout,
-                                      bloc: widget.bloc,
+                                      bloc: bloc,
                                     );
                                   }
                                 }
@@ -235,7 +229,7 @@ class WorkoutDeleteButton extends StatelessWidget {
           builder: (BuildContext context) => AlertDialog(
             title: const Text('Etes vous sûr de vouloir supprimer ce workout?'),
             actions: <Widget>[
-              TextButton(onPressed: () => bloc.delete(workout).then((_) => Navigator.pop(context)), child: const Text('Oui')),
+              TextButton(onPressed: () => bloc.deleteWorkout(workout).then((_) => Navigator.pop(context)), child: const Text('Oui')),
               TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
             ],
           ),

@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with AbstractFitnessStorageBloc<Programme> {
+class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinFitnessStorageBloc<Programme> {
   ProgrammeUpdateBloc._();
 
   factory ProgrammeUpdateBloc.instance() {
@@ -25,6 +25,11 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with Abstra
   }
 
   static ProgrammeUpdateBloc? _instance;
+
+  @override
+  Stream<List<Programme>> listenAll() {
+    return trainersService.listenToProgramme();
+  }
 
   @override
   CollectionReference<Object?> getCollectionReference() {
@@ -102,12 +107,8 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with Abstra
     }
   }
 
-  Stream<List<Programme>> getStreamProgramme() {
-    return trainersService.listenToProgramme();
-  }
-
   Future<void> deleteProgramme(Programme programme) {
-    return trainersService.getProgrammeReference().doc(programme.uid).delete().then((_) => deleteAllFiles(programme));
+    return delete(programme).then((_) => deleteAllFiles(programme));
   }
 
   set name(String value) {
@@ -191,4 +192,5 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with Abstra
     programme.available = true;
     return saveProgramme();
   }
+
 }

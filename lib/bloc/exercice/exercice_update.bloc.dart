@@ -11,7 +11,7 @@ import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with AbstractFitnessStorageBloc<Exercice> {
+class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with MixinFitnessStorageBloc<Exercice> {
   ExerciceUpdateBloc._();
 
   factory ExerciceUpdateBloc.instance() {
@@ -34,6 +34,12 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with Abstract
   Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl.stream;
 
   Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
+
+
+  @override
+  Stream<List<Exercice>> listenAll() {
+    return trainersService.listenToExercice();
+  }
 
   @override
   CollectionReference<Object?> getCollectionReference() {
@@ -82,14 +88,6 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with Abstract
     return;
   }
 
-  Stream<List<Exercice>> getStreamExercice() {
-    return trainersService.listenToExercice();
-  }
-
-  Future<void> deleteExercice(Exercice exercice) {
-    return trainersService.getExerciceReference().doc(exercice.uid).delete().then((_) => deleteAllFiles(exercice));
-  }
-
   set typeExercice(String? value) {
     exercice?.typeExercice = value;
   }
@@ -126,4 +124,5 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with Abstract
     exercice?.storageFile = storageFile;
     subjectStoragePair.sink.add(exercice?.storageFile);
   }
+
 }

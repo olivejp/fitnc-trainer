@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
-class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with AbstractFitnessStorageBloc<Workout> {
+class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with MixinFitnessStorageBloc<Workout> {
   WorkoutUpdateBloc._();
 
   factory WorkoutUpdateBloc.instance() {
@@ -51,6 +51,11 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with AbstractFi
   Stream<List<Line>?> get obsLines => subjectListRepsWeight.stream;
 
   @override
+  Stream<List<Workout>> listenAll() {
+    return trainersService.listenToWorkout();
+  }
+
+  @override
   String getStorageRef(User user, Workout workout) {
     return 'trainers/${user.uid}/workouts/${workout.uid}/$pathWorkoutMainImage';
   }
@@ -78,6 +83,10 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with AbstractFi
     }
   }
 
+  Future<void> deleteWorkout(Workout workout) {
+    return delete(workout).then((_) => deleteAllFiles(workout));
+  }
+
   Workout? getWorkout() {
     return _workout;
   }
@@ -89,10 +98,6 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with AbstractFi
       _workout.uid = getCollectionReference().doc().id;
       return createStorage(_workout).then((_) => create(_workout));
     }
-  }
-
-  Stream<List<Workout>> getStreamWorkout() {
-    return trainersService.listenToWorkout();
   }
 
   set name(String? value) {
