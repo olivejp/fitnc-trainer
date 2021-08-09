@@ -7,22 +7,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class ExerciceUpdatePage extends StatefulWidget {
-  final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
-
   ExerciceUpdatePage({Key? key, Exercice? exercice}) : super(key: key) {
     bloc.init(exercice);
   }
 
+  final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
+
   @override
   _ExerciceUpdatePageState createState() {
-    return new _ExerciceUpdatePageState();
+    return _ExerciceUpdatePageState();
   }
 }
 
 class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   _ExerciceUpdatePageState();
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
         floatingActionButton: ButtonBar(children: [
           FloatingActionButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Icon(Icons.clear),
+            child: const Icon(Icons.clear),
             tooltip: 'Annuler',
           ),
           FloatingActionButton(
@@ -40,7 +40,7 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
                 widget.bloc.saveExercice().then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
               }
             },
-            child: Icon(Icons.check),
+            child: const Icon(Icons.check),
             tooltip: 'Valider',
           )
         ]),
