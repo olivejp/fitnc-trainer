@@ -88,13 +88,6 @@ class _ExercicePageState extends State<ExercicePage> {
     });
   }
 
-
-  @override
-  void dispose() {
-    _streamListExercice.close();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return RoutedPage(

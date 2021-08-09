@@ -40,16 +40,6 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with MixinFitne
   WorkoutSet set = WorkoutSet();
   Exercice? exerciceSelected;
 
-  BehaviorSubject<StorageFile?> subjectStorageFile = BehaviorSubject<StorageFile?>();
-  BehaviorSubject<String?> subjectTypeExercice = BehaviorSubject<String?>();
-  BehaviorSubject<List<Line>?> subjectListRepsWeight = BehaviorSubject<List<Line>?>();
-
-  Stream<StorageFile?> get obsStorageFile => subjectStorageFile.stream;
-
-  Stream<String?> get obsTypeExercice => subjectTypeExercice.stream;
-
-  Stream<List<Line>?> get obsLines => subjectListRepsWeight.stream;
-
   @override
   Stream<List<Workout>> listenAll() {
     return trainersService.listenToWorkout();
@@ -71,15 +61,13 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with MixinFitne
   }
 
   void init(Workout? workout) {
-    subjectStorageFile.sink.add(null);
 
     if (workout != null) {
       _workout = workout;
       _workout.storageFile = StorageFile();
-      getFutureStorageFile(_workout).then((StorageFile? value) => subjectStorageFile.sink.add(value));
+      getFutureStorageFile(_workout);
     } else {
       _workout = Workout();
-      subjectStorageFile.sink.add(null);
     }
   }
 
@@ -120,7 +108,6 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with MixinFitne
 
   set storageFile(StorageFile? storagePair) {
     _workout.storageFile = storagePair;
-    subjectStorageFile.sink.add(_workout.storageFile);
   }
 
   StorageFile? get storageFile => _workout.storageFile;
@@ -128,7 +115,6 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with MixinFitne
   void setExercice(Exercice? exerciceSelected) {
     this.exerciceSelected = exerciceSelected;
     set.uidExercice = this.exerciceSelected?.uid;
-    subjectTypeExercice.sink.add(this.exerciceSelected?.typeExercice);
   }
 
   Future<StorageFile?> getStorageFile() {

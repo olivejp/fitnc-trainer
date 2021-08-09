@@ -69,12 +69,6 @@ class _WorkoutPageState extends State<WorkoutPage> {
   }
 
   @override
-  void dispose() {
-    _streamListWorkout.close();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return RoutedPage(
       child: Scaffold(

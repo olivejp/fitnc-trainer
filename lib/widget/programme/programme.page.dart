@@ -67,12 +67,6 @@ class _ProgrammePageState extends State<ProgrammePage> {
   }
 
   @override
-  void dispose() {
-    _streamListProgramme.close();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return RoutedPage(
       child: Scaffold(
