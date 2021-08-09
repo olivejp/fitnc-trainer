@@ -16,6 +16,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:rxdart/rxdart.dart';
 
 class WorkoutPage extends StatefulWidget {
   WorkoutPage({Key? key}) : super(key: key);
@@ -33,21 +34,51 @@ class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStat
   _WorkoutPageState();
 
   late AnimationController _controller;
+  final List<Workout> listCompleteWorkout = <Workout>[];
+  final BehaviorSubject<List<Workout>> _streamListWorkout = BehaviorSubject<List<Workout>>();
+  String? _query;
+  DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
+
+  set query(String? text) {
+    _query = text;
+    searchWorkout();
+  }
+
+  String? get query => _query;
+
+  void searchWorkout() {
+    final String? text = _query?.toUpperCase();
+    List<Workout> listFiltered;
+    if (text != null && text.isNotEmpty) {
+      listFiltered = listCompleteWorkout.where((Workout element) {
+        final bool inName = element.name != null && element.name!.toUpperCase().contains(text);
+        final bool inDescription = element.description != null && element.description!.toUpperCase().contains(text);
+        return inName || inDescription;
+      }).toList();
+    } else {
+      listFiltered = listCompleteWorkout;
+    }
+    _streamListWorkout.sink.add(listFiltered);
+  }
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: const Duration(seconds: 5));
     _controller.forward();
+    widget.bloc.getStreamWorkout().listen((List<Workout> event) {
+      listCompleteWorkout.clear();
+      listCompleteWorkout.addAll(event);
+      searchWorkout();
+    });
   }
 
   @override
   void dispose() {
+    _streamListWorkout.close();
     _controller.dispose();
     super.dispose();
   }
-
-  DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
   @override
   Widget build(BuildContext context) {
@@ -80,13 +111,11 @@ class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStat
                           flex: 3,
                           child: SelectableText(
                             'Workout',
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .headline1,
+                            style: Theme.of(context).textTheme.headline1,
                           )),
                       Expanded(
                         child: TextFormField(
+                          onChanged: (String text) => query = text,
                           decoration: const InputDecoration(
                             border: UnderlineInputBorder(),
                             prefixIcon: Icon(Icons.search),
@@ -103,7 +132,7 @@ class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStat
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 60),
                   child: StreamBuilder<List<Workout>>(
-                    stream: widget.bloc.getStreamWorkout(),
+                    stream: _streamListWorkout,
                     builder: (BuildContext context, AsyncSnapshot<List<Workout>> snapshot) {
                       if (snapshot.connectionState == ConnectionState.active) {
                         if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
@@ -132,9 +161,7 @@ class _WorkoutPageState extends State<WorkoutPage> with SingleTickerProviderStat
                         }
                       }
                       return LoadingRotating.square(
-                        backgroundColor: Theme
-                            .of(context)
-                            .primaryColor,
+                        backgroundColor: Theme.of(context).primaryColor,
                       );
                     },
                   ),
@@ -205,14 +232,13 @@ class WorkoutDeleteButton extends StatelessWidget {
       onPressed: () {
         showDialog(
           context: context,
-          builder: (BuildContext context) =>
-              AlertDialog(
-                title: const Text('Etes vous sûr de vouloir supprimer ce workout?'),
-                actions: <Widget>[
-                  TextButton(onPressed: () => bloc.delete(workout).then((_) => Navigator.pop(context)), child: const Text('Oui')),
-                  TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
-                ],
-              ),
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Etes vous sûr de vouloir supprimer ce workout?'),
+            actions: <Widget>[
+              TextButton(onPressed: () => bloc.delete(workout).then((_) => Navigator.pop(context)), child: const Text('Oui')),
+              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
+            ],
+          ),
         );
       },
       icon: const Icon(Icons.delete, color: Colors.grey, size: 24),
@@ -243,14 +269,13 @@ class WorkoutGridCard extends StatelessWidget {
       onDelete: (Workout domain) {
         showDialog(
           context: context,
-          builder: (BuildContext context) =>
-              AlertDialog(
-                title: const Text('Etes vous sûr de vouloir supprimer ce workout?'),
-                actions: <Widget>[
-                  TextButton(onPressed: () => bloc.delete(workout).then((_) => Navigator.pop(context)), child: const Text('Oui')),
-                  TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
-                ],
-              ),
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text('Etes vous sûr de vouloir supprimer ce workout?'),
+            actions: <Widget>[
+              TextButton(onPressed: () => bloc.delete(workout).then((_) => Navigator.pop(context)), child: const Text('Oui')),
+              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
+            ],
+          ),
         );
       },
     );

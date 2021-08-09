@@ -12,15 +12,65 @@ import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:rxdart/rxdart.dart';
 
 import 'programme.create.page.dart';
 
-class ProgrammePage extends StatelessWidget {
-  ProgrammePage({Key? key}) : super(key: key);
+class ProgrammePage extends StatefulWidget {
+  const ProgrammePage({Key? key}) : super(key: key);
+
+  @override
+  State<ProgrammePage> createState() => _ProgrammePageState();
+}
+
+class _ProgrammePageState extends State<ProgrammePage> {
 
   final HomePageBloc homePageBloc = HomePageBloc.instance();
   final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.instance();
+
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
+
+  final List<Programme> listCompleteProgramme = <Programme>[];
+  final BehaviorSubject<List<Programme>> _streamListProgramme = BehaviorSubject<List<Programme>>();
+  String? _query;
+
+  set query(String? text) {
+    _query = text;
+    searchProgramme();
+  }
+
+  String? get query => _query;
+
+  void searchProgramme() {
+    final String? text = _query?.toUpperCase();
+    List<Programme> listFiltered;
+    if (text != null && text.isNotEmpty) {
+      listFiltered = listCompleteProgramme.where((Programme element) {
+        final bool inName = element.name != null && element.name!.toUpperCase().contains(text);
+        final bool inDescription = element.description != null && element.description!.toUpperCase().contains(text);
+        return inName || inDescription;
+      }).toList();
+    } else {
+      listFiltered = listCompleteProgramme;
+    }
+    _streamListProgramme.sink.add(listFiltered);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    bloc.getStreamProgramme().listen((List<Programme> event) {
+      listCompleteProgramme.clear();
+      listCompleteProgramme.addAll(event);
+      _streamListProgramme.sink.add(listCompleteProgramme);
+    });
+  }
+
+  @override
+  void dispose() {
+    _streamListProgramme.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +104,7 @@ class ProgrammePage extends StatelessWidget {
                       )),
                   Expanded(
                     child: TextFormField(
+                      onChanged: (String text) => query = text,
                       decoration: const InputDecoration(
                         border: UnderlineInputBorder(),
                         prefixIcon: Icon(Icons.search),
@@ -67,7 +118,7 @@ class ProgrammePage extends StatelessWidget {
             ),
             Expanded(
               child: StreamBuilder<List<Programme>>(
-                stream: bloc.getStreamProgramme(),
+                stream: _streamListProgramme,
                 builder: (BuildContext context, AsyncSnapshot<List<Programme>> snapshot) {
                   if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
                     return const Center(child: Text('Aucun programme trouvé.'));
