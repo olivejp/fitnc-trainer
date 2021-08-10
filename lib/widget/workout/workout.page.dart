@@ -193,15 +193,7 @@ class WorkoutListView extends StatelessWidget {
                 bloc: bloc,
               )
             ]),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  PageTransition(
-                      duration: Duration.zero,
-                      reverseDuration: Duration.zero,
-                      type: PageTransitionType.fade,
-                      child: WorkoutUpdatePage(workout: workout)));
-            },
+            onTap: () => Navigator.pushNamed(context, WorkoutUpdatePage.routeName, arguments: workout),
           );
         });
   }
@@ -245,14 +237,7 @@ class WorkoutGridCard extends StatelessWidget {
     return FitnessGridCard<Workout>(
       domain: workout,
       onTap: (Workout domain) {
-        Navigator.push(
-            context,
-            PageTransition(
-              duration: Duration.zero,
-              reverseDuration: Duration.zero,
-              type: PageTransitionType.fade,
-              child: WorkoutUpdatePage(workout: workout),
-            ));
+        Navigator.pushNamed(context, WorkoutUpdatePage.routeName, arguments: domain);
       },
       onDelete: (Workout domain) {
         showDialog(

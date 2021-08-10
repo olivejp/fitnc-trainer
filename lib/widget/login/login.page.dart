@@ -11,10 +11,9 @@ import '../bottom.widget.dart';
 typedef CallbackUserCredential = void Function(UserCredential userCredential);
 
 class LoginPage extends StatefulWidget {
-  LoginPage({Key? key, this.namePage = '', this.callback}) : super(key: key);
+  LoginPage({Key? key,  this.callback}) : super(key: key);
 
   final LoginBloc bloc = LoginBloc.getInstance();
-  final String namePage;
   final CallbackUserCredential? callback;
 
   @override
@@ -37,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       backgroundColor: FitnessNcColors.blue50,
-        body: Stack(children: [
+        body: Stack(children: <Widget>[
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -115,16 +114,16 @@ class _LoginPageState extends State<LoginPage> {
                                             onPressed: () => setState(() => _vnHidePassword.value = !_vnHidePassword.value),
                                             icon: ValueListenableBuilder<bool>(
                                               builder: (BuildContext context, bool value, Widget? child) {
-                                                return value ? Icon(Icons.visibility_outlined) : Icon(Icons.visibility_off_outlined);
+                                                return value ? const Icon(Icons.visibility_outlined) : const Icon(Icons.visibility_off_outlined);
                                               },
                                               valueListenable: _vnHidePassword,
                                             ))),
-                                    onChanged: (value) => widget.bloc.password = value,
-                                    onFieldSubmitted: (value) => onPressedEnter(),
+                                    onChanged: (String value) => widget.bloc.password = value,
+                                    onFieldSubmitted: (_) => onPressedEnter(),
                                   ),
                                   TextButton(
                                       onPressed: () => print('hello'),
-                                      child: Text(
+                                      child: const Text(
                                         'Mot de passe oublié ?',
                                       )),
                                 ],
@@ -133,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                             Padding(
                               padding: const EdgeInsets.only(top: 30),
                               child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(minimumSize: Size(double.infinity, 55)),
+                                style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 55)),
                                 onPressed: onPressedEnter,
                                 child: Text(
                                   'Continuer',
@@ -159,11 +158,11 @@ class _LoginPageState extends State<LoginPage> {
                   Padding(
                     padding: const EdgeInsets.only(top: 30, left: 20),
                     child: Row(
-                      children: [
-                        Text("Vous n'avez pas de compte ?"),
+                      children: <Widget>[
+                        const Text("Vous n'avez pas de compte ?"),
                         TextButton(
                             onPressed: () => Navigator.pushNamed(context, '/sign_up'),
-                            child: Text(
+                            child: const Text(
                               "S'incrire",
                             )),
                       ],
@@ -175,18 +174,18 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ],
       ),
-      BottomCu(),
+      const BottomCu(),
     ]));
   }
 
   void onPressedEnter() {
     widget.bloc.cleanError();
     if (_formKey.currentState?.validate() == true) {
-      widget.bloc.login().then((value) {
+      widget.bloc.login().then((UserCredential value) {
         if (widget.callback != null) {
           widget.callback!(value);
         }
-      }).catchError((error) {
+      }).catchError((Object? error) {
         widget.bloc.setError(error.toString());
       });
     }

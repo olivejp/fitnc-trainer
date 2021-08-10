@@ -36,15 +36,7 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
         children: domains.map((T domain) {
           return FitnessGridCard<T>(
             domain: domain,
-            onTap: (T domain) {
-              Navigator.push(
-                  context,
-                  PageTransition<T>(
-                      duration: Duration.zero,
-                      reverseDuration: Duration.zero,
-                      type: PageTransitionType.fade,
-                      child: bloc.openUpdate(context, domain)));
-            },
+            onTap: (T domain) => bloc.openUpdate(context, domain),
             onDelete: (T domain) {
               showDialog(
                 context: context,

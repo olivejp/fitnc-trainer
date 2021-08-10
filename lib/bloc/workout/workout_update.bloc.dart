@@ -56,8 +56,8 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with MixinFitne
   }
 
   @override
-  Widget openUpdate(BuildContext context, Workout workout) {
-    return WorkoutUpdatePage(workout: workout);
+  void openUpdate(BuildContext context, Workout workout) {
+    Navigator.pushNamed(context, WorkoutUpdatePage.routeName, arguments: workout);
   }
 
   void init(Workout? workout) {

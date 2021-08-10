@@ -7,12 +7,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutUpdatePage extends StatefulWidget {
-  WorkoutUpdatePage({Key? key, required this.workout}) : super(key: key) {
-    bloc.init(workout);
-  }
+  WorkoutUpdatePage({Key? key}) : super(key: key);
 
   final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.instance();
-  final Workout workout;
+  static String routeName = '/update_workout';
 
   @override
   _WorkoutUpdatePageState createState() {
@@ -23,14 +21,21 @@ class WorkoutUpdatePage extends StatefulWidget {
 class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
   _WorkoutUpdatePageState();
 
+  late Workout workout;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    // Récupération du Workout passé en argument.
+    workout = ModalRoute.of(context)!.settings.arguments as Workout? ?? Workout();
+
+    // Initialisation du bloc.
+    widget.bloc.init(workout);
+
     final WorkoutUpdateBloc bloc = widget.bloc;
     final List<DropdownMenuItem<String>> typesWorkout = <DropdownMenuItem<String>>[
       const DropdownMenuItem<String>(
-        value:'none',
+        value: 'none',
         child: Text(
           "Aucun type d'entraînement",
           style: TextStyle(fontStyle: FontStyle.italic),
@@ -104,7 +109,8 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                           child: Padding(
                             padding: const EdgeInsets.only(left: 20),
                             child: DropdownButtonFormField<String>(
-                                decoration: const InputDecoration(hintText: "Type d'entrainement",labelText: "Type d'entrainement", constraints: BoxConstraints(maxHeight: 72)),
+                                decoration: const InputDecoration(
+                                    hintText: "Type d'entrainement", labelText: "Type d'entrainement", constraints: BoxConstraints(maxHeight: 72)),
                                 icon: const Icon(Icons.arrow_downward),
                                 onChanged: (String? value) => bloc.timerType = value,
                                 value: bloc.getWorkout()?.timerType,
@@ -128,7 +134,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                     child: Row(
                       children: <Widget>[
                         Expanded(
-                          child: WorkoutSetPage(workout: widget.workout),
+                          child: WorkoutSetPage(workout: workout),
                         ),
                       ],
                     ),

@@ -67,6 +67,9 @@ class MyApp extends StatelessWidget {
       authService.updateUser(user);
     });
 
+    final Widget homePage = MyHomePage(appTitle);
+    final Widget loginPage = LoginPage();
+
     return OKToast(
       position: ToastPosition.bottom,
       child: MaterialApp(
@@ -79,7 +82,8 @@ class MyApp extends StatelessWidget {
                 selectedLabelTextStyle: GoogleFonts.workSansTextTheme().headline1!.copyWith(color: FitnessNcColors.orange500, fontSize: 18),
                 unselectedLabelTextStyle: GoogleFonts.workSansTextTheme().headline1!.copyWith(color: FitnessNcColors.blue200, fontSize: 18)),
             textTheme: TextTheme(
-              headline1: GoogleFonts.workSansTextTheme().headline1!.copyWith(color: FitnessNcColors.blue600, fontSize: 35, fontWeight: FontWeight.bold),
+              headline1:
+                  GoogleFonts.workSansTextTheme().headline1!.copyWith(color: FitnessNcColors.blue600, fontSize: 35, fontWeight: FontWeight.bold),
               headline2: GoogleFonts.alfaSlabOneTextTheme().headline2!.copyWith(color: FitnessNcColors.orange500, fontSize: 25),
               headline3: GoogleFonts.workSansTextTheme().headline3!.copyWith(color: FitnessNcColors.blue800, fontSize: 18),
               headline5: GoogleFonts.workSansTextTheme().headline5!.copyWith(color: FitnessNcColors.black900Alpha011, fontSize: 50),
@@ -93,13 +97,13 @@ class MyApp extends StatelessWidget {
             floatingActionButtonTheme: const FloatingActionButtonThemeData(foregroundColor: FitnessNcColors.white50),
           ),
           routes: {
+            '/login': (BuildContext context) => loginPage,
             '/sign_up': (BuildContext context) => SignUpPage(
                   namePage: 'Création de compte',
                   callback: (UserCredential userCredential) => Navigator.pop(context),
                 ),
-            '/add_workout': (BuildContext context) => WorkoutUpdatePage(
-                  workout: Workout(),
-                ),
+            '/add_workout': (BuildContext context) => WorkoutUpdatePage(),
+            WorkoutUpdatePage.routeName: (BuildContext context) => WorkoutUpdatePage(),
             '/add_abonne': (BuildContext context) => AbonneUpdatePage(),
             '/add_exercice': (BuildContext context) => ExerciceUpdatePage()
           },
@@ -112,8 +116,7 @@ class MyApp extends StatelessWidget {
                       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
                         return FutureBuilder<bool>(
                             future: bloc.isConnected(),
-                            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) =>
-                                snapshot.data == true ? MyHomePage(appTitle) : LoginPage(namePage: 'Connexion'));
+                            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) => snapshot.data == true ? homePage : loginPage);
                       });
                 } else if (snapshot.hasError) {
                   return const Center(
