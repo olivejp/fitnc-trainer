@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
+import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.page.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,9 +27,9 @@ class MyHomePage extends StatelessWidget {
   final HomePageBloc bloc = HomePageBloc.instance();
   final String title;
   final List<Destination> destinations = <Destination>[
-    Destination(icon: const Icon(Icons.account_tree_outlined), pageName: 'Programme', index: 0, page: ProgrammePage()),
-    Destination(icon: const Icon(Icons.sports_volleyball_outlined), pageName: 'Workout', index: 1, page: WorkoutPage()),
-    Destination(icon: const Icon(Icons.sports_handball_outlined), pageName: 'Exercice', index: 2, page: ExercicePage()),
+    Destination(icon: const Icon(Icons.account_tree_outlined), pageName: 'Programme', index: 0, page: const ProgrammePage()),
+    Destination(icon: const Icon(Icons.sports_volleyball_outlined), pageName: 'Workout', index: 1, page: const WorkoutPage()),
+    Destination(icon: const Icon(Icons.sports_handball_outlined), pageName: 'Exercice', index: 2, page: const ExercicePage()),
   ];
 
   @override
@@ -111,6 +112,13 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
             return NavigationRail(
                 extended: isExtended,
                 selectedIndex: _vnSelectedIndex.value,
+                trailing: _NavigationRailFolderSection(folders: <_NavigationFolder>[
+                  _NavigationFolder(
+                    label: 'Déconnexion',
+                    iconData: Icons.exit_to_app_outlined,
+                    onTap: () => widget.bloc.logout(),
+                  )
+                ]),
                 leading: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -161,6 +169,88 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
                   );
                 }).toList());
           },
+        );
+      },
+    );
+  }
+}
+
+class _NavigationFolder {
+  _NavigationFolder({required this.label, required this.iconData, required this.onTap});
+
+  final IconData iconData;
+  final String label;
+  final void Function() onTap;
+}
+
+class _NavigationRailFolderSection extends StatelessWidget {
+  const _NavigationRailFolderSection({required this.folders});
+
+  final List<_NavigationFolder> folders;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final NavigationRailThemeData navigationRailTheme = theme.navigationRailTheme;
+    final Animation<double> animation = NavigationRail.extendedAnimation(context);
+
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (BuildContext context, Widget? child) {
+        return Visibility(
+          maintainAnimation: true,
+          maintainState: true,
+          visible: animation.value > 0,
+          child: Opacity(
+            opacity: animation.value,
+            child: Align(
+              widthFactor: animation.value,
+              alignment: AlignmentDirectional.centerStart,
+              child: SizedBox(
+                height: 485,
+                width: 256,
+                child: ListView(
+                  padding: const EdgeInsets.all(12),
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: <Widget>[
+                    const Divider(
+                      color: FitnessNcColors.blue200,
+                      thickness: 0.4,
+                      indent: 14,
+                      endIndent: 16,
+                    ),
+                    const SizedBox(height: 16),
+                    for (_NavigationFolder folder in folders)
+                      InkWell(
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(36),
+                        ),
+                        onTap: folder.onTap,
+                        child: Column(
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                const SizedBox(width: 12),
+                                Icon(
+                                  folder.iconData,
+                                  color: navigationRailTheme.unselectedLabelTextStyle!.color,
+                                ),
+                                const SizedBox(width: 24),
+                                Text(
+                                  folder.label,
+                                  style: navigationRailTheme.unselectedLabelTextStyle,
+                                ),
+                                const SizedBox(height: 72),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         );
       },
     );

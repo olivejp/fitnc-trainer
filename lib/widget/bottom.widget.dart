@@ -13,7 +13,6 @@ class BottomCu extends StatelessWidget {
       end: 0,
       textDirection: TextDirection.ltr,
       child: BottomAppBar(
-        color: Colors.transparent,
         child: ConstrainedBox(
           constraints: BoxConstraints(maxHeight: 50, minHeight: 50),
           child: Row(
@@ -23,13 +22,13 @@ class BottomCu extends StatelessWidget {
                   onPressed: () => print('hello'),
                   child: Text(
                     'Copyrigth @Deveo.nc',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.grey),
                   )),
               TextButton(
                   onPressed: () => print('hello'),
                   child: Text(
                     'Conditions d\'utilisation',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.grey),
                   )),
             ],
           ),
