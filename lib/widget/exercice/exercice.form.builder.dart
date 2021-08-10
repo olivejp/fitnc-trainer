@@ -49,7 +49,7 @@ class ExerciceFormBuilder {
               children: <Widget>[
                 Expanded(
                     child: ParamDropdownButton(
-                  hint: const Text("Type d'exercice", style: TextStyle(fontStyle: FontStyle.italic)),
+                  decoration: const InputDecoration(labelText: "Type d'exercice"),
                   paramName: 'type_exercice',
                   initialValue: bloc.typeExercice,
                   onChanged: (String? onChangedValue) => bloc.typeExercice = onChangedValue,

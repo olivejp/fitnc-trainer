@@ -86,9 +86,11 @@ abstract class MixinFitnessStorageBloc<T extends AbstractFitnessStorageDomain> {
 
   /// Supprime tous les documents présents dans Firebase Storage à l'adresse du getUrl() puis envoie le nouveau document.
   Future<void> eraseAndReplaceStorage(T domain) async {
+    await deleteAllFiles(domain);
     if (domain.storageFile != null && domain.storageFile!.fileBytes != null && domain.storageFile!.fileName != null) {
-      await deleteAllFiles(domain);
       await createStorage(domain);
+    } else {
+      domain.imageUrl = null;
     }
   }
 
