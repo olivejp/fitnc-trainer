@@ -6,86 +6,75 @@ import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/domain/trainers.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
-import 'package:fitnc_trainer/domain/workout_set.domain.dart';
-import 'package:fitnc_trainer/domain/workout_set.dto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
-  static TrainersService? _instance;
-
   // Private constructor with the ._()
   TrainersService._() : super(collectionReference: FirebaseFirestore.instance.collection('trainers')) {
     _instance = this;
   }
 
-  static TrainersService getInstance() {
+  factory TrainersService.instance() {
     _instance ??= TrainersService._();
     return _instance!;
   }
 
+  static TrainersService? _instance;
+
   @override
-  Trainers mapSnapshotToModel(DocumentSnapshot snapshot) {
-    return Trainers.fromJson(snapshot.data() as Map<String, dynamic>);
+  Trainers mapSnapshotToModel(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    return Trainers.fromJson(snapshot.data()!);
   }
 
   DocumentReference getCurrentTrainerRef() {
-    return this.collectionReference.doc(FirebaseAuth.instance.currentUser?.uid);
+    return collectionReference.doc(FirebaseAuth.instance.currentUser?.uid);
   }
 
-  CollectionReference getWorkoutReference() {
+  CollectionReference<Map<String, dynamic>> getWorkoutReference() {
     return getCurrentTrainerRef().collection('workout');
   }
 
-  CollectionReference getAbonneReference() {
+  CollectionReference<Map<String, dynamic>> getAbonneReference() {
     return getCurrentTrainerRef().collection('abonne');
   }
 
-  CollectionReference getExerciceReference() {
+  CollectionReference<Map<String, dynamic>> getExerciceReference() {
     return getCurrentTrainerRef().collection('exercice');
   }
 
-  CollectionReference getProgrammeReference() {
+  CollectionReference<Map<String, dynamic>> getProgrammeReference() {
     return getCurrentTrainerRef().collection('programme');
   }
 
   Stream<List<Workout>> listenToWorkout() {
-    return getWorkoutReference()
-        .orderBy('createDate')
-        .snapshots()
-        .map((QuerySnapshot event) => event.docs.map((QueryDocumentSnapshot<Object?> doc) => Workout.fromJson(doc.data() as Map<String, dynamic>)).toList());
+    return getWorkoutReference().orderBy('createDate').snapshots().map((QuerySnapshot<Map<String, dynamic>> event) =>
+        event.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> doc) => Workout.fromJson(doc.data())).toList());
   }
 
-  Stream<List<Abonne?>> listenToAbonne() {
-    return getAbonneReference()
-        .snapshots()
-        .map((QuerySnapshot event) => event.docs.map((QueryDocumentSnapshot<Object?> doc) => Abonne.fromJson(doc.data() as Map<String, dynamic>)).toList());
+  Stream<List<Abonne>> listenToAbonne() {
+    return getAbonneReference().snapshots().map((QuerySnapshot<Map<String, dynamic>> event) =>
+        event.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> doc) => Abonne.fromJson(doc.data())).toList());
   }
 
   Stream<List<Exercice>> listenToExercice() {
-    return getExerciceReference()
-        .orderBy('createDate')
-        .snapshots()
-        .map((QuerySnapshot event) => event.docs.map((QueryDocumentSnapshot<Object?> doc) => Exercice.fromJson(doc.data() as Map<String, dynamic>)).toList());
+    return getExerciceReference().orderBy('createDate').snapshots().map((QuerySnapshot<Map<String, dynamic>> event) =>
+        event.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> doc) => Exercice.fromJson(doc.data())).toList());
   }
 
   Stream<List<Programme>> listenToProgramme() {
-    return getProgrammeReference()
-        .orderBy('createDate')
-        .snapshots()
-        .map((QuerySnapshot event) => event.docs.map((QueryDocumentSnapshot doc) => Programme.fromJson(doc.data() as Map<String, dynamic>)).toList());
+    return getProgrammeReference().orderBy('createDate').snapshots().map((QuerySnapshot<Map<String, dynamic>> event) =>
+        event.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> doc) => Programme.fromJson(doc.data())).toList());
   }
 
   Stream<List<DropdownMenuItem<Exercice>>> getExerciceStreamDropdownMenuItem() {
-    return getExerciceReference()
-        .orderBy('name')
-        .snapshots()
-        .map((QuerySnapshot querysnapshot) => querysnapshot.docs.map((QueryDocumentSnapshot queryDocSnapshot) {
-              final Exercice exercice = Exercice.fromJson(queryDocSnapshot.data() as Map<String, dynamic>);
+    return getExerciceReference().orderBy('name').snapshots().map(
+        (QuerySnapshot<Map<String, dynamic>> querysnapshot) => querysnapshot.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> queryDocSnapshot) {
+              final Exercice exercice = Exercice.fromJson(queryDocSnapshot.data());
               final ImageProvider? provider = exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null;
               return DropdownMenuItem<Exercice>(
                 value: exercice,
-                child: Row(children: [
+                child: Row(children: <Widget>[
                   CircleAvatar(
                     foregroundImage: provider,
                   ),

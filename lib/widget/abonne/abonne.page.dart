@@ -1,20 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fitnc_trainer/bloc/abonne/abonne.bloc.dart';
 import 'package:fitnc_trainer/bloc/abonne/abonne_update.bloc.dart';
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/domain/abonne.domain.dart';
+import 'package:fitnc_trainer/service/util.service.dart';
+import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:rxdart/rxdart.dart';
 
+import '../generic.grid.card.dart';
 import 'abonne.update.page.dart';
 
 class AbonnePage extends StatefulWidget {
-  final HomePageBloc homePageBloc = HomePageBloc.instance();
-  final AbonneUpdateBloc bloc = AbonneUpdateBloc.getInstance();
-
-  AbonnePage({Key? key}) : super(key: key);
+  const AbonnePage({Key? key}) : super(key: key);
 
   @override
   _AbonnePageState createState() {
@@ -23,188 +26,94 @@ class AbonnePage extends StatefulWidget {
 }
 
 class _AbonnePageState extends State<AbonnePage> {
-  _AbonnePageState();
+  final HomePageBloc homePageBloc = HomePageBloc.instance();
+  final AbonneBloc bloc = AbonneBloc.instance();
 
-  DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
+  final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
+  final List<Abonne> listCompleteAbonne = <Abonne>[];
+  final BehaviorSubject<List<Abonne>> _streamListAbonne = BehaviorSubject<List<Abonne>>();
+  String? _query;
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(25.0),
-      child: StreamBuilder<List<Abonne?>>(
-        stream: widget.bloc.getStreamAbonne(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
-            return Center(child: Text('Aucun abonne trouvé.'));
-          } else {
-            List<Abonne?> listAbonne = snapshot.data!;
-            return StreamBuilder<bool>(
-                stream: widget.homePageBloc.currentDisplayObs,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (snapshot.data != null && snapshot.data == true) {
-                      return getListView(listAbonne);
-                    } else {
-                      return getGridView(listAbonne);
-                    }
-                  }
-                  return Container();
-                });
-            // return getListView(snapshot.data);
-          }
-        },
-      ),
-    );
+  set query(String? text) {
+    _query = text;
+    UtilSearch.search(_query, listCompleteAbonne, _streamListAbonne);
   }
 
-  Widget getGridView(List<Abonne?> listAbonne) {
-    return LayoutBuilder(builder: (context, constraints) {
-      int nbColumns = 1;
-      if (constraints.maxWidth > 1200) {
-        nbColumns = 5;
-      } else if (constraints.maxWidth > 1000) {
-        nbColumns = 4;
-      } else if (constraints.maxWidth > 800) {
-        nbColumns = 3;
-      } else if (constraints.maxWidth > 600) {
-        nbColumns = 2;
-      }
+  String? get query => _query;
 
-      return GridView.count(
-        mainAxisSpacing: 20.0,
-        crossAxisSpacing: 20.0,
-        crossAxisCount: nbColumns,
-        children: listAbonne.map((abonne) {
-          Widget leading = abonne?.imageUrl != null
-              ? CircleAvatar(foregroundImage: NetworkImage(abonne!.imageUrl!))
-              : Icon(
-                  Icons.sports_volleyball,
-                  color: Theme.of(context).primaryColor,
-                );
-
-          Widget dateNaissance = abonne?.dateNaissance != null
-              ? Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    abonne!.dateNaissance!,
-                    maxLines: 5,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                )
-              : Container();
-
-          Widget subtitle = abonne?.createDate != null
-              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((abonne!.createDate as Timestamp).millisecondsSinceEpoch)))
-              : Container();
-
-          if (abonne != null) {
-            return InkWell(
-              splashColor: Theme.of(context).primaryColor,
-              hoverColor: Theme.of(context).primaryColor,
-              borderRadius: BorderRadius.circular(5),
-              onTap: () => Navigator.push(
-                  context,
-                  PageTransition(
-                      duration: Duration.zero,
-                      reverseDuration: Duration.zero,
-                      type: PageTransitionType.fade,
-                      child: AbonneUpdatePage(
-                        abonne: abonne,
-                      ))),
-              child: Card(
-                clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    ListTile(
-                      leading: leading,
-                      title: Text('${abonne.nom!} ${abonne.prenom}'),
-                      subtitle: subtitle,
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 10, left: 10),
-                        child: dateNaissance,
-                      ),
-                    ),
-                    ButtonBar(
-                      alignment: MainAxisAlignment.end,
-                      children: [
-                        getDeleteButton(context, abonne),
-                      ],
-                    ),
-                  ],
-                ),
-                elevation: 2,
-              ),
-            );
-          } else {
-            return Container();
-          }
-        }).toList(),
-      );
+  @override
+  void initState() {
+    super.initState();
+    bloc.listenAll().listen((List<Abonne> event) {
+      listCompleteAbonne.clear();
+      listCompleteAbonne.addAll(event);
+      UtilSearch.search(_query, listCompleteAbonne, _streamListAbonne);
     });
   }
 
-  ListView getListView(List<Abonne?> listAbonne) {
-    return ListView.separated(
-        separatorBuilder: (context, index) => Divider(),
-        itemCount: listAbonne.length,
-        itemBuilder: (context, index) {
-          Abonne abonne = listAbonne[index] as Abonne;
-          Widget leading = (abonne.imageUrl != null) ? CircleAvatar(foregroundImage: NetworkImage(abonne.imageUrl!)) : CircleAvatar();
-
-          Widget subtitle = abonne.createDate != null
-              ? Text(dateFormat.format(DateTime.fromMillisecondsSinceEpoch((abonne.createDate as Timestamp).millisecondsSinceEpoch)))
-              : Container();
-
-          return ListTile(
-            leading: leading,
-            title: Text('${abonne.nom!} ${abonne.prenom!}'),
-            subtitle: subtitle,
-            trailing: Wrap(
-              children: [getDeleteButton(context, abonne)],
-            ),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  PageTransition(
-                      duration: Duration.zero,
-                      reverseDuration: Duration.zero,
-                      type: PageTransitionType.fade,
-                      child: AbonneUpdatePage(
-                        abonne: abonne,
-                      )));
-            },
-          );
-        });
-  }
-
-  IconButton getDeleteButton(BuildContext context, Abonne abonne) {
-    return IconButton(
-      tooltip: 'Supprimer',
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Etes vous sûr de vouloir supprimer ce abonne?'),
-            actions: [
-              TextButton(onPressed: () => deleteAbonne(abonne, context), child: Text('Oui')),
-              TextButton(onPressed: () => Navigator.pop(context), child: Text('Annuler'))
-            ],
+  @override
+  Widget build(BuildContext context) {
+    return RoutedPage(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        floatingActionButton: FloatingActionButton.extended(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+          onPressed: () => AbonneUpdatePage(abonne: Abonne()),
+          label: Text(
+            'Créer un abonne',
+            style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
           ),
-        );
-      },
-      icon: Icon(
-        Icons.delete,
-        color: Colors.grey,
-        size: 24,
+          icon: Icon(
+            Icons.add,
+            color: Color(Colors.white.value),
+            size: 25.0,
+          ),
+        ),
+        body: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+              child: Row(
+                children: [
+                  Expanded(
+                      flex: 3,
+                      child: SelectableText(
+                        'Abonne',
+                        style: Theme.of(context).textTheme.headline1,
+                      )),
+                  Expanded(
+                    child: TextFormField(
+                      onChanged: (String text) => query = text,
+                      decoration: const InputDecoration(
+                        border: UnderlineInputBorder(),
+                        prefixIcon: Icon(Icons.search),
+                        hintText: 'Recherche...',
+                      ),
+                      textAlignVertical: TextAlignVertical.bottom,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: StreamBuilder<List<Abonne>>(
+                stream: _streamListAbonne,
+                builder: (BuildContext context, AsyncSnapshot<List<Abonne>> snapshot) {
+                  if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
+                    return const Center(child: Text('Aucun abonne trouvé.'));
+                  } else {
+                    final List<Abonne> listAbonne = snapshot.data!;
+                    return FitnessGridView<Abonne>(
+                      domains: listAbonne,
+                      bloc: bloc,
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
-  }
-
-  void deleteAbonne(Abonne abonne, BuildContext context) {
-    widget.bloc.deleteAbonne(abonne).then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
   }
 }

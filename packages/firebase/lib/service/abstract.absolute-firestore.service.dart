@@ -8,11 +8,11 @@ import 'abstract.firestore.service.dart';
 /// Classe abstract qui permet de se brancher sur une collection Firestore au niveau 0.
 abstract class AbstractAbsoluteFirestoreService<T>
     extends AbstractFirestoreService<T> {
-  CollectionReference collectionReference;
-
   AbstractAbsoluteFirestoreService({required this.collectionReference});
 
-  CollectionReference getCollectionReferenceItemsSubcollection(
+  CollectionReference<Map<String, dynamic>> collectionReference;
+
+  CollectionReference<Map<String, dynamic>> getCollectionReferenceItemsSubcollection(
       String uid, String subcollectionName) {
     return collectionReference.doc(uid).collection(subcollectionName);
   }
@@ -21,7 +21,7 @@ abstract class AbstractAbsoluteFirestoreService<T>
     return getSpecific(collectionReference, uid);
   }
 
-  Future<DocumentReference> add(Map<String, dynamic> item) {
+  Future<DocumentReference<Map<String, dynamic>>> add(Map<String, dynamic> item) {
     return addSpecific(collectionReference, item);
   }
 

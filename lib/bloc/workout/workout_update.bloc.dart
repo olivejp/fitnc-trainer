@@ -29,7 +29,7 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with MixinFitne
 
   static WorkoutUpdateBloc? _instance;
 
-  TrainersService trainersService = TrainersService.getInstance();
+  TrainersService trainersService = TrainersService.instance();
   WorkoutSetService workoutSetService = WorkoutSetService.getInstance();
 
   final GlobalKey<FormFieldState> consigneKey = GlobalKey<FormFieldState>();

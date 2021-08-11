@@ -12,7 +12,7 @@ import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 class AbonneUpdatePage extends StatefulWidget {
-  final AbonneUpdateBloc bloc = AbonneUpdateBloc.getInstance();
+  final AbonneUpdateBloc bloc = AbonneUpdateBloc.instance();
 
   final double containerHeight = 110;
 

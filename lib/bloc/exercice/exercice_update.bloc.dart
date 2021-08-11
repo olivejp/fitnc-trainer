@@ -21,7 +21,7 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with MixinFit
 
   static ExerciceUpdateBloc? _instance;
 
-  TrainersService trainersService = TrainersService.getInstance();
+  TrainersService trainersService = TrainersService.instance();
   ParamService paramService = ParamService.getInstance();
   Exercice? exercice;
 

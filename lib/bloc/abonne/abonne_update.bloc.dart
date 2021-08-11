@@ -9,29 +9,28 @@ import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
 class AbonneUpdateBloc {
-  TrainersService trainersService = TrainersService.getInstance();
-  Abonne abonne = Abonne();
-
-  Uint8List? _fileBytes;
-  String? _fileName;
-  String? _oldFileName;
-
-  BehaviorSubject<Uint8List?>? _streamSelectedImage;
-
-  Stream<Uint8List?>? get selectedImageObs => _streamSelectedImage?.stream;
-
-  static AbonneUpdateBloc? _instance;
-  final String pathAbonneMainImage = 'mainImage';
-
   AbonneUpdateBloc._();
 
-  static AbonneUpdateBloc getInstance() {
-    if (_instance == null) {
-      _instance = AbonneUpdateBloc._();
-    }
+  factory AbonneUpdateBloc.instance() {
+    _instance ??= AbonneUpdateBloc._();
     return _instance!;
   }
 
+  static AbonneUpdateBloc? _instance;
+
+  final TrainersService trainersService = TrainersService.instance();
+  Abonne abonne = Abonne();
+  Uint8List? _fileBytes;
+
+  String? _fileName;
+
+  String? _oldFileName;
+
+  BehaviorSubject<Uint8List?>? _streamSelectedImage;
+  Stream<Uint8List?>? get selectedImageObs => _streamSelectedImage?.stream;
+
+  final String pathAbonneMainImage = 'mainImage';
+  
   void init(Abonne? enteredAbonne) {
     _fileBytes = null;
     _fileName = null;
@@ -66,11 +65,9 @@ class AbonneUpdateBloc {
   }
 
   Future<void> createAbonne() async {
-    CollectionReference<Object?> collectionReference =
-        trainersService.getAbonneReference();
+    CollectionReference<Object?> collectionReference = trainersService.getAbonneReference();
 
-    abonne.uid =
-        collectionReference.doc().id; // Récupération d'une nouvelle ID.
+    abonne.uid = collectionReference.doc().id; // Récupération d'une nouvelle ID.
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (_fileBytes != null) {
@@ -80,8 +77,7 @@ class AbonneUpdateBloc {
   }
 
   Future<void> updateAbonne() async {
-    CollectionReference<Object?> collectionReference =
-        trainersService.getAbonneReference();
+    CollectionReference<Object?> collectionReference = trainersService.getAbonneReference();
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (_fileBytes != null && _oldFileName != _fileName) {
@@ -96,13 +92,9 @@ class AbonneUpdateBloc {
     return sendToFireStore(collectionReference);
   }
 
-  Future<void> sendToFireStore(
-      CollectionReference<Object?> collectionReference) {
+  Future<void> sendToFireStore(CollectionReference<Object?> collectionReference) {
     abonne.createDate = FieldValue.serverTimestamp();
-    return collectionReference
-        .doc(abonne.uid)
-        .set(abonne.toJson())
-        .then((value) {
+    return collectionReference.doc(abonne.uid).set(abonne.toJson()).then((value) {
       abonne = Abonne();
     });
   }
@@ -119,11 +111,7 @@ class AbonneUpdateBloc {
   }
 
   Future<void> deleteAbonne(Abonne abonne) {
-    return trainersService
-        .getAbonneReference()
-        .doc(abonne.uid)
-        .delete()
-        .then((value) => deleteAbonneMainImage(abonne));
+    return trainersService.getAbonneReference().doc(abonne.uid).delete().then((value) => deleteAbonneMainImage(abonne));
   }
 
   Future<void> deleteAbonneMainImage(Abonne abonne) {
@@ -139,10 +127,7 @@ class AbonneUpdateBloc {
   }
 
   Future<void> update(Abonne abonne) {
-    return trainersService
-        .getAbonneReference()
-        .doc(abonne.uid)
-        .set(abonne.toJson());
+    return trainersService.getAbonneReference().doc(abonne.uid).set(abonne.toJson());
   }
 
   void setImage(Uint8List? bytes, String? name) {

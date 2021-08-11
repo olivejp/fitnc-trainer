@@ -28,7 +28,7 @@ abstract class AbstractCrudBloc<T> {
 ///
 /// Classe abstraite dont on doit étendre pour récupérer les méthodes par défaut pour le CRUD Firebase.
 ///
-abstract class AbstractFirebaseCrudBloc<T extends AbstractFirebaseDomain> implements AbstractCrudBloc<T> {
+abstract class AbstractFirebaseCrudBloc<T extends AbstractDomain> implements AbstractCrudBloc<T> {
   /// Méthode abstraite qui retournera la collectionReference.
   CollectionReference<Object?> getCollectionReference();
 
@@ -147,7 +147,7 @@ abstract class MixinFitnessStorageBloc<T extends AbstractFitnessStorageDomain> {
 ///
 /// Classe Bloc spécifique à l'application Fitness NC pour implémenter les méthodes de base du CRUD
 ///
-abstract class AbstractFitnessCrudBloc<T extends AbstractFirebaseDomain> extends AbstractFirebaseCrudBloc<T> {
+abstract class AbstractFitnessCrudBloc<T extends AbstractDomain> extends AbstractFirebaseCrudBloc<T> {
   /// Méthode abstraite qui retournera le widget à ouvrir pour une mise à jour.
   Widget openUpdate(BuildContext context, T domain);
 }

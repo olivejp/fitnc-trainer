@@ -47,7 +47,7 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
   }
 
   FirestorageService firestorageService = FirestorageService.instance();
-  TrainersService trainersService = TrainersService.getInstance();
+  TrainersService trainersService = TrainersService.instance();
   ParamService paramService = ParamService.getInstance();
 
   BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();

@@ -1,52 +1,44 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
 import 'package:fitnc_trainer/domain/abonne.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/widget/abonne/abonne.update.page.dart';
+import 'package:flutter/src/widgets/framework.dart';
 
-class AbonneBloc {
-  TrainersService trainersService = TrainersService.getInstance();
-  Abonne _abonne = Abonne();
-
-  static AbonneBloc? _instance;
-
+class AbonneBloc extends AbstractFitnessCrudBloc<Abonne> with MixinFitnessStorageBloc<Abonne> {
   AbonneBloc._();
 
-  static AbonneBloc getInstance() {
-    if (_instance == null) {
-      _instance = AbonneBloc._();
-    }
+  factory AbonneBloc.instance() {
+    _instance ??= AbonneBloc._();
     return _instance!;
   }
 
-  Future<void> abonne() {
-    CollectionReference collectionReference =
-        trainersService.getAbonneReference();
+  static AbonneBloc? _instance;
 
-    _abonne.uid = collectionReference.doc().id;
-    _abonne.createDate = FieldValue.serverTimestamp();
-    return collectionReference
-        .doc(_abonne.uid)
-        .set(_abonne.toJson())
-        .then((value) {
-      _abonne = Abonne();
-    });
+  final String pathWorkoutMainImage = 'mainImage';
+  final TrainersService trainersService = TrainersService.instance();
+  late Abonne abonne;
+
+  @override
+  CollectionReference<Object?> getCollectionReference() {
+    return trainersService.getAbonneReference();
   }
 
-  Stream<List<Abonne?>> getStreamAbonne() {
+  @override
+  String getStorageRef(User user, Abonne domain) {
+    return 'trainers/${user.uid}/abonnes/${domain.uid}/$pathWorkoutMainImage';
+  }
+
+  @override
+  Stream<List<Abonne>> listenAll() {
     return trainersService.listenToAbonne();
   }
 
-  Future<void> deleteAbonne(Abonne abonne) {
-    return trainersService.getAbonneReference().doc(abonne.uid).delete();
-  }
-
-  changeName(String value) {
-    _abonne.nom = value;
-  }
-
-  Future<void> update(Abonne abonne) {
-    return trainersService
-        .getAbonneReference()
-        .doc(abonne.uid)
-        .set(abonne.toJson());
+  @override
+  Widget openUpdate(BuildContext context, Abonne domain) {
+    return AbonneUpdatePage(
+      abonne: domain,
+    );
   }
 }

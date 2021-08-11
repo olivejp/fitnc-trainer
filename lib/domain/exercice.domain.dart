@@ -5,7 +5,7 @@ import 'abstract.domain.dart';
 part 'exercice.domain.g.dart';
 
 @JsonSerializable()
-class Exercice extends AbstractFitnessStorageDomain {
+class Exercice extends AbstractFitnessStorageDomain implements InterfaceDomainSearchable {
   Exercice() : super();
 
   factory Exercice.fromJson(Map<String, dynamic> data) => _$ExerciceFromJson(data);
@@ -13,12 +13,13 @@ class Exercice extends AbstractFitnessStorageDomain {
   String? typeExercice;
   String? videoUrl;
   String? youtubeUrl;
-
-  @override
-  String getName() {
-    return 'exercice';
-  }
+  String? description;
 
   @override
   Map<String, dynamic> toJson() => _$ExerciceToJson(this);
+
+  @override
+  List<String> searchFields() {
+    return ['name', 'description'];
+  }
 }

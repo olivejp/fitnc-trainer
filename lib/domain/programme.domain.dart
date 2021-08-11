@@ -4,19 +4,20 @@ import 'package:json_annotation/json_annotation.dart';
 part 'programme.domain.g.dart';
 
 @JsonSerializable()
-class Programme extends AbstractFitnessStorageDomain {
+class Programme extends AbstractFitnessStorageDomain implements InterfaceDomainSearchable {
   Programme();
 
   factory Programme.fromJson(Map<String, dynamic> data) => _$ProgrammeFromJson(data);
 
   String? numberWeeks;
   bool? available;
-
-  @override
-  String getName() {
-    return 'programme';
-  }
+  String? description;
 
   @override
   Map<String, dynamic> toJson() => _$ProgrammeToJson(this);
+
+  @override
+  List<String> searchFields() {
+    return ['name', 'description'];
+  }
 }

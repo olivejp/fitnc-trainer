@@ -18,7 +18,7 @@ class SignUpBloc {
   }
 
   static SignUpBloc? _instance;
-  static final TrainersService trainersService = TrainersService.getInstance();
+  static final TrainersService trainersService = TrainersService.instance();
 
   String nom = '';
   String prenom = '';

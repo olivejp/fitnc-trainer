@@ -12,7 +12,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:loading_animations/loading_animations.dart';
 import 'package:rxdart/rxdart.dart';
 
 class WorkoutPage extends StatefulWidget {

@@ -13,7 +13,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutSetService {
-  final TrainersService trainersService = TrainersService.getInstance();
+  final TrainersService trainersService = TrainersService.instance();
 
   // Private constructor with the ._()
   WorkoutSetService._() {

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 
+import 'abonne/abonne.page.dart';
 import 'programme/programme.page.dart';
 import 'workout/workout.page.dart';
 
@@ -30,6 +31,7 @@ class MyHomePage extends StatelessWidget {
     Destination(icon: const Icon(Icons.account_tree_outlined), pageName: 'Programme', index: 0, page: const ProgrammePage()),
     Destination(icon: const Icon(Icons.sports_volleyball_outlined), pageName: 'Workout', index: 1, page: const WorkoutPage()),
     Destination(icon: const Icon(Icons.sports_handball_outlined), pageName: 'Exercice', index: 2, page: const ExercicePage()),
+    Destination(icon: const Icon(Icons.person), pageName: 'Abonné', index: 3, page: const AbonnePage()),
   ];
 
   @override
@@ -43,7 +45,11 @@ class MyHomePage extends StatelessWidget {
         body: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            FitnessDrawer(bloc: bloc, destinations: destinations),
+            FitnessDrawer(
+              bloc: bloc,
+              destinations: destinations,
+              appName: title,
+            ),
             Expanded(
               child: GenericContainerWidget(
                 opacity: 0.5,
@@ -68,8 +74,9 @@ class MyHomePage extends StatelessWidget {
 }
 
 class FitnessDrawer extends StatefulWidget {
-  const FitnessDrawer({required this.bloc, required this.destinations});
+  const FitnessDrawer({required this.bloc, required this.destinations, required this.appName});
 
+  final String appName;
   final HomePageBloc bloc;
   final List<Destination> destinations;
 
@@ -143,7 +150,7 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
                               child: Opacity(
                                 opacity: _animation.value,
                                 child: Text(
-                                  'Fitness Nc',
+                                  widget.appName,
                                   style: Theme.of(context).textTheme.headline2,
                                 ),
                               ),

@@ -13,7 +13,7 @@ import 'package:loading_animations/loading_animations.dart';
 class WorkoutSetPage extends StatelessWidget {
   WorkoutSetPage({Key? key, required this.workout}) : super(key: key);
 
-  final TrainersService trainersService = TrainersService.getInstance();
+  final TrainersService trainersService = TrainersService.instance();
   final Workout workout;
 
   static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
