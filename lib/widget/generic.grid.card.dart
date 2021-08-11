@@ -1,9 +1,8 @@
-
 import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
 import 'package:fitnc_trainer/domain/abstract.domain.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
-
 
 ///
 /// Classe Widget pour une GridView spécialisée pour un AbstractFitnessDomain.
@@ -36,12 +35,25 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
         children: domains.map((T domain) {
           return FitnessGridCard<T>(
             domain: domain,
-            onTap: (T domain) => bloc.openUpdate(context, domain),
+            onTap: (T domain) {
+              Navigator.push(
+                  context,
+                  PageTransition<Widget>(
+                    duration: Duration.zero,
+                    reverseDuration: Duration.zero,
+                    type: PageTransitionType.fade,
+                    child: bloc.openUpdate(context, domain),
+                  ));
+            },
             onDelete: (T domain) {
               showDialog(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
-                  title: const Text('Êtes-vous sûr de vouloir supprimer cet exercice ?'),
+                  title: RichText(
+                      text: TextSpan(text: 'Êtes-vous sûr de vouloir supprimer : ', children: <InlineSpan>[
+                    TextSpan(text: domain.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const TextSpan(text: ' ?'),
+                  ])),
                   actions: <Widget>[
                     TextButton(onPressed: () => bloc.delete(domain).then((_) => Navigator.pop(context)), child: const Text('Oui')),
                     TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))

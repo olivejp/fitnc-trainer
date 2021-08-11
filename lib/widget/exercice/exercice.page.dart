@@ -2,6 +2,7 @@ import 'package:fitnc_trainer/bloc/exercice/exercice_update.bloc.dart';
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
+import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,30 +23,6 @@ class ExercicePage extends StatefulWidget {
   State<ExercicePage> createState() => _ExercicePageState();
 }
 
-abstract class SearchWidgetState<U, T extends StatefulWidget> extends State<T> {
-  final BehaviorSubject<List<U>> _streamSearch = BehaviorSubject<List<U>>();
-
-  List<U> search(String query);
-
-  String? _query;
-
-  set query(String? text) {
-    _query = text;
-    _search();
-  }
-
-  String? get query => _query;
-
-  void _search() {
-    final String? text = _query?.toUpperCase();
-    final List<U> listFiltered = <U>[];
-    if (text != null &&  text.isNotEmpty) {
-      listFiltered.addAll(search(text));
-    }
-    _streamSearch.sink.add(listFiltered);
-  }
-}
-
 class _ExercicePageState extends State<ExercicePage> {
   final HomePageBloc homePageBloc = HomePageBloc.instance();
   final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
@@ -57,26 +34,10 @@ class _ExercicePageState extends State<ExercicePage> {
 
   set query(String? text) {
     _query = text;
-    searchExercice();
+    UtilSearch.search(_query, listCompleteExercice, _streamListExercice);
   }
 
   String? get query => _query;
-
-  /// Recherche des exercices.
-  void searchExercice() {
-    final String? text = _query?.toUpperCase();
-    List<Exercice> listFiltered;
-    if (text != null &&  text.isNotEmpty) {
-      listFiltered = listCompleteExercice.where((Exercice element) {
-        final bool inName = element.name != null && element.name!.toUpperCase().contains(text);
-        final bool inDescription = element.description != null && element.description!.toUpperCase().contains(text);
-        return inName || inDescription;
-      }).toList();
-    } else {
-      listFiltered = listCompleteExercice;
-    }
-    _streamListExercice.sink.add(listFiltered);
-  }
 
   @override
   void initState() {
@@ -103,23 +64,20 @@ class _ExercicePageState extends State<ExercicePage> {
           icon: const Icon(
             Icons.add,
             color: Colors.white,
-            size: 20.0,
+            size: 25.0,
           ),
         ),
         body: Column(
-          children: [
+          children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15),
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
               child: Row(
-                children: [
+                children: <Widget>[
                   Expanded(
                       flex: 3,
                       child: SelectableText(
                         'Exercice',
-                        style: Theme
-                            .of(context)
-                            .textTheme
-                            .headline1,
+                        style: Theme.of(context).textTheme.headline1,
                       )),
                   Expanded(
                     child: TextFormField(

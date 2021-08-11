@@ -5,14 +5,12 @@ import 'package:fitnc_trainer/widget/exercice/exercice.update.page.dart';
 import 'package:fitnc_trainer/widget/home.page.dart';
 import 'package:fitnc_trainer/widget/login/login.page.dart';
 import 'package:fitnc_trainer/widget/login/sign-up.page.dart';
-import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'bloc/main.bloc.dart';
-import 'domain/workout.domain.dart';
 
 void main() {
   runApp(MyApp());
@@ -63,12 +61,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // On écoute les changement de l'utilisateur.
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       authService.updateUser(user);
     });
-
-    final Widget homePage = MyHomePage(appTitle);
-    final Widget loginPage = LoginPage();
 
     return OKToast(
       position: ToastPosition.bottom,
@@ -97,13 +93,12 @@ class MyApp extends StatelessWidget {
             floatingActionButtonTheme: const FloatingActionButtonThemeData(foregroundColor: FitnessNcColors.white50),
           ),
           routes: {
-            '/login': (BuildContext context) => loginPage,
+            '/login': (BuildContext context) => LoginPage(
+                  callback: (UserCredential userCredential) => Navigator.of(context).pushNamed('/'),
+                ),
             '/sign_up': (BuildContext context) => SignUpPage(
-                  namePage: 'Création de compte',
                   callback: (UserCredential userCredential) => Navigator.pop(context),
                 ),
-            '/add_workout': (BuildContext context) => WorkoutUpdatePage(),
-            WorkoutUpdatePage.routeName: (BuildContext context) => WorkoutUpdatePage(),
             '/add_abonne': (BuildContext context) => AbonneUpdatePage(),
             '/add_exercice': (BuildContext context) => ExerciceUpdatePage()
           },
@@ -116,7 +111,13 @@ class MyApp extends StatelessWidget {
                       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
                         return FutureBuilder<bool>(
                             future: bloc.isConnected(),
-                            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) => snapshot.data == true ? homePage : loginPage);
+                            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                              return snapshot.data == true
+                                  ? MyHomePage(appTitle)
+                                  : LoginPage(
+                                      callback: (UserCredential userCredential) => Navigator.of(context).pushNamed('/'),
+                                    );
+                            });
                       });
                 } else if (snapshot.hasError) {
                   return const Center(

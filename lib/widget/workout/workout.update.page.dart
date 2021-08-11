@@ -7,10 +7,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutUpdatePage extends StatefulWidget {
-  WorkoutUpdatePage({Key? key}) : super(key: key);
+  WorkoutUpdatePage({Key? key, required this.workout}) : super(key: key);
 
+  final Workout workout;
   final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.instance();
-  static String routeName = '/update_workout';
 
   @override
   _WorkoutUpdatePageState createState() {
@@ -21,16 +21,13 @@ class WorkoutUpdatePage extends StatefulWidget {
 class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
   _WorkoutUpdatePageState();
 
-  late Workout workout;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    // Récupération du Workout passé en argument.
-    workout = ModalRoute.of(context)!.settings.arguments as Workout? ?? Workout();
 
     // Initialisation du bloc.
-    widget.bloc.init(workout);
+    widget.bloc.init(widget.workout);
 
     final WorkoutUpdateBloc bloc = widget.bloc;
     final List<DropdownMenuItem<String>> typesWorkout = <DropdownMenuItem<String>>[
@@ -134,7 +131,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                     child: Row(
                       children: <Widget>[
                         Expanded(
-                          child: WorkoutSetPage(workout: workout),
+                          child: WorkoutSetPage(workout: widget.workout),
                         ),
                       ],
                     ),

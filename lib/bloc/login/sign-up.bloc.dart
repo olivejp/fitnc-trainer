@@ -4,10 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/domain/trainers.domain.dart';
 import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class SignUpBloc {
+
+  factory SignUpBloc.instance() {
+    _instance ??= SignUpBloc._();
+    return _instance!;
+  }
+
   SignUpBloc._() {
     _streamError = BehaviorSubject<String?>.seeded(null);
   }
@@ -22,10 +27,6 @@ class SignUpBloc {
   String password = '';
   String passwordCheck = '';
 
-  static SignUpBloc getInstance() {
-    _instance ??= SignUpBloc._();
-    return _instance!;
-  }
 
   final AuthService authService = AuthService.getInstance();
   BehaviorSubject<String?>? _streamError;

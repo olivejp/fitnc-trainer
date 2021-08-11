@@ -1,8 +1,8 @@
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/bloc/programme/programme_update.bloc.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
+import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
-import 'package:fitnc_trainer/widget/programme/programme.update.page.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'programme.create.page.dart';
@@ -24,7 +23,6 @@ class ProgrammePage extends StatefulWidget {
 }
 
 class _ProgrammePageState extends State<ProgrammePage> {
-
   final HomePageBloc homePageBloc = HomePageBloc.instance();
   final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.instance();
 
@@ -36,25 +34,10 @@ class _ProgrammePageState extends State<ProgrammePage> {
 
   set query(String? text) {
     _query = text;
-    searchProgramme();
+    UtilSearch.search(_query, listCompleteProgramme, _streamListProgramme);
   }
 
   String? get query => _query;
-
-  void searchProgramme() {
-    final String? text = _query?.toUpperCase();
-    List<Programme> listFiltered;
-    if (text != null && text.isNotEmpty) {
-      listFiltered = listCompleteProgramme.where((Programme element) {
-        final bool inName = element.name != null && element.name!.toUpperCase().contains(text);
-        final bool inDescription = element.description != null && element.description!.toUpperCase().contains(text);
-        return inName || inDescription;
-      }).toList();
-    } else {
-      listFiltered = listCompleteProgramme;
-    }
-    _streamListProgramme.sink.add(listFiltered);
-  }
 
   @override
   void initState() {
@@ -87,7 +70,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
         body: Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15),
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
               child: Row(
                 children: <Widget>[
                   Expanded(
@@ -118,8 +101,8 @@ class _ProgrammePageState extends State<ProgrammePage> {
                     return const Center(child: Text('Aucun programme trouvé.'));
                   } else {
                     final List<Programme> programmes = snapshot.data!;
-                    return ProgrammeGridView(
-                      programmes: programmes,
+                    return FitnessGridView<Programme>(
+                      domains: programmes,
                       bloc: bloc,
                     );
                   }
@@ -130,74 +113,5 @@ class _ProgrammePageState extends State<ProgrammePage> {
         ),
       ),
     );
-  }
-}
-
-class ProgrammeGridView extends StatelessWidget {
-  const ProgrammeGridView({Key? key, required this.programmes, required this.bloc}) : super(key: key);
-
-  final List<Programme> programmes;
-  final ProgrammeUpdateBloc bloc;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      int nbColumns = 1;
-      if (constraints.maxWidth > 1200) {
-        nbColumns = 6;
-      } else if (constraints.maxWidth > 1000) {
-        nbColumns = 4;
-      } else if (constraints.maxWidth > 800) {
-        nbColumns = 3;
-      } else if (constraints.maxWidth > 600) {
-        nbColumns = 2;
-      }
-
-      return GridView.count(
-        childAspectRatio: 13 / 9,
-        padding: const EdgeInsets.all(10.0),
-        mainAxisSpacing: 10.0,
-        crossAxisSpacing: 10.0,
-        crossAxisCount: nbColumns,
-        children: programmes.map((Programme programme) {
-          return ProgrammeGridCard(programme: programme, bloc: bloc);
-        }).toList(),
-      );
-    });
-  }
-}
-
-class ProgrammeGridCard extends StatelessWidget {
-  const ProgrammeGridCard({Key? key, required this.programme, required this.bloc}) : super(key: key);
-
-  final Programme programme;
-  final ProgrammeUpdateBloc bloc;
-
-  @override
-  Widget build(BuildContext context) {
-    return FitnessGridCard<Programme>(
-        domain: programme,
-        onTap: (Programme programme) {
-          Navigator.push(
-              context,
-              PageTransition(
-                duration: Duration.zero,
-                reverseDuration: Duration.zero,
-                type: PageTransitionType.fade,
-                child: ProgrammeUpdatePage(programme: programme),
-              ));
-        },
-        onDelete: (Programme programme) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) => AlertDialog(
-              title: const Text('Etes vous sûr de vouloir supprimer ce programme ?'),
-              actions: <Widget>[
-                TextButton(onPressed: () => bloc.deleteProgramme(programme).then((_) => Navigator.pop(context)), child: const Text('Oui')),
-                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
-              ],
-            ),
-          );
-        });
   }
 }

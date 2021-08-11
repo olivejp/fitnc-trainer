@@ -9,8 +9,12 @@ class Workout extends AbstractFitnessStorageDomain {
 
   factory Workout.fromJson(Map<String, dynamic> data) => _$WorkoutFromJson(data);
 
-  String? description;
   String? timerType;
+
+  @override
+  String getName() {
+    return 'workout';
+  }
 
   @override
   Map<String, dynamic> toJson() => _$WorkoutToJson(this);

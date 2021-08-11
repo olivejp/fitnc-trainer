@@ -149,5 +149,5 @@ abstract class MixinFitnessStorageBloc<T extends AbstractFitnessStorageDomain> {
 ///
 abstract class AbstractFitnessCrudBloc<T extends AbstractFirebaseDomain> extends AbstractFirebaseCrudBloc<T> {
   /// Méthode abstraite qui retournera le widget à ouvrir pour une mise à jour.
-  void openUpdate(BuildContext context, T domain);
+  Widget openUpdate(BuildContext context, T domain);
 }

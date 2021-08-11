@@ -6,6 +6,7 @@ abstract class AbstractFirebaseDomain {
 
   String? uid;
   String? name;
+  String? description;
   dynamic createDate;
   dynamic updateDate;
 
@@ -16,6 +17,7 @@ abstract class AbstractFitnessStorageDomain extends AbstractFirebaseDomain {
   AbstractFitnessStorageDomain();
 
   String? imageUrl;
+  String getName();
 
   @JsonKey(ignore: true)
   StorageFile? storageFile;

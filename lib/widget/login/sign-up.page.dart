@@ -11,11 +11,10 @@ import '../../main.dart';
 typedef CallbackUserCredential = void Function(UserCredential userCredential);
 
 class SignUpPage extends StatefulWidget {
-  SignUpPage({Key? key, this.namePage = '', this.callback}) : super(key: key);
+  SignUpPage({Key? key, this.callback}) : super(key: key);
 
-  final SignUpBloc bloc = SignUpBloc.getInstance();
+  final SignUpBloc bloc = SignUpBloc.instance();
   final CallbackUserCredential? callback;
-  final String namePage;
 
   @override
   _SignUpPageState createState() {
@@ -52,7 +51,7 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ],
     );
-    final Widget columnForm = Column(
+    final Widget columnRight = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Center(
@@ -126,7 +125,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             child: TextFormField(
                               style: GoogleFonts.roboto(fontSize: 15),
                               decoration: InputDecoration(
-                                suffixIcon: Icon(Icons.email),
+                                suffixIcon: const Icon(Icons.email),
                                 labelText: 'Email',
                                 focusedBorder: defaultBorder,
                                 border: defaultBorder,
@@ -152,7 +151,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               style: GoogleFonts.roboto(fontSize: 15),
                               onChanged: (String value) => widget.bloc.telephone = value,
                               decoration: InputDecoration(
-                                suffixIcon: Icon(Icons.phone_android),
+                                suffixIcon: const Icon(Icons.phone_android),
                                 labelText: 'Téléphone',
                                 focusedBorder: defaultBorder,
                                 border: defaultBorder,
@@ -224,11 +223,11 @@ class _SignUpPageState extends State<SignUpPage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                const Text("Vous avez un compte ?"),
+                                const Text('Vous avez un compte ?'),
                                 TextButton(
                                     onPressed: () => Navigator.pushNamed(context, '/login'),
                                     child: const Text(
-                                      "Connexion.",
+                                      'Connexion.',
                                     )),
                               ],
                             ),
@@ -264,11 +263,11 @@ class _SignUpPageState extends State<SignUpPage> {
             toShow = Row(
               children: <Widget>[
                 Expanded(child: columnLeft),
-                Expanded(child: columnForm),
+                Expanded(child: columnRight),
               ],
             );
           } else {
-            toShow = columnForm;
+            toShow = columnRight;
           }
           return Stack(children: <Widget>[toShow, const BottomCu()]);
         },

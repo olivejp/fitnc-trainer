@@ -9,9 +9,13 @@ class Programme extends AbstractFitnessStorageDomain {
 
   factory Programme.fromJson(Map<String, dynamic> data) => _$ProgrammeFromJson(data);
 
-  String? description;
   String? numberWeeks;
   bool? available;
+
+  @override
+  String getName() {
+    return 'programme';
+  }
 
   @override
   Map<String, dynamic> toJson() => _$ProgrammeToJson(this);
