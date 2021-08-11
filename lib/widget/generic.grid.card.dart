@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
 import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:flutter/cupertino.dart';
@@ -34,6 +35,7 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
         crossAxisCount: nbColumns,
         children: domains.map((T domain) {
           return FitnessGridCard<T>(
+            bloc: bloc,
             domain: domain,
             onTap: (T domain) {
               Navigator.push(
@@ -72,9 +74,10 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
 /// Classe Widget pour une Grid Card.
 ///
 class FitnessGridCard<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
-  const FitnessGridCard({Key? key, required this.domain, required this.onTap, required this.onDelete}) : super(key: key);
+  const FitnessGridCard({Key? key, required this.domain, required this.onTap, required this.onDelete, required this.bloc}) : super(key: key);
 
   final T domain;
+  final AbstractFitnessCrudBloc<T> bloc;
   final void Function(T domain) onTap;
   final void Function(T domain) onDelete;
 

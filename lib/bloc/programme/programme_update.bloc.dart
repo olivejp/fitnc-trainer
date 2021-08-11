@@ -65,13 +65,23 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
 
   final String pathProgrammeMainImage = 'mainImage';
   final List<WorkoutScheduleDto> listDtos = <WorkoutScheduleDto>[];
+  final ValueNotifier<int> vnNumberWeek = ValueNotifier<int>(0);
   late Programme programme;
+
+  int getNumberWeeks(String? numberWeeks) {
+    if (numberWeeks != null) {
+      return int.parse(numberWeeks.substring(0, 1));
+    } else {
+      return 0;
+    }
+  }
 
   void init(Programme? programmeEntered) {
     subjectStoragePair.sink.add(null);
 
     if (programmeEntered != null) {
       programme = programmeEntered;
+      vnNumberWeek.value = getNumberWeeks(programme.numberWeeks);
       programme.storageFile = StorageFile();
       getFutureStorageFile(programme).then((StorageFile? storageFile) => subjectStoragePair.sink.add(storageFile));
 
@@ -115,11 +125,15 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
     programme.name = value;
   }
 
+  String get name => programme.name!;
+
   set numberWeeks(String? value) {
     programme.numberWeeks = value;
+    // TODO Vérifier si on a des workout positionné avant la nouvelle fin du programme, affiché un message.
+    vnNumberWeek.value = getNumberWeeks(programme.numberWeeks);
   }
 
-  String get name => programme.name!;
+  String? get numberWeeks => programme.numberWeeks;
 
   set description(String? value) {
     programme.description = value;
@@ -192,5 +206,4 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
     programme.available = true;
     return saveProgramme();
   }
-
 }

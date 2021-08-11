@@ -45,8 +45,8 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
           }
         },
         backgroundColor: Colors.green,
-        label: const Text('Valider'),
-        icon: const Icon(Icons.check),
+        label: const Text('Publier'),
+        icon: const Icon(Icons.public),
       ));
     }
     buttons.addAll([
@@ -132,10 +132,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
                   onChanged: (String value) => widget.bloc.description = value,
                   decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionel'),
                 ),
-                SizedBox(
-                  height: 800,
-                  child: WorkoutSchedulePanel(),
-                )
+                WorkoutSchedulePanel()
               ],
             ),
           ),
@@ -172,7 +169,10 @@ class WorkoutChoicePanel extends StatelessWidget {
                     )),
                   ),
                   data: list[index],
-                  child: const Icon(Icons.view_headline),
+                  child: const MouseRegion(
+                    child: Icon(Icons.view_headline),
+                    cursor: SystemMouseCursors.grab,
+                  ),
                 ),
                 title: Row(
                   children: <Widget>[
@@ -243,31 +243,37 @@ class WorkoutSchedulePanel extends StatelessWidget {
               builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
                 if (snapshot.hasData) {
                   final List<WorkoutScheduleDto> listScheduledWorkouts = snapshot.data!;
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 125),
-                    child: Container(
-                      decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-                      padding: const EdgeInsets.all(1),
-                      child: sf.SfDataGrid(
-                        onCellTap: (sf.DataGridCellTapDetails details) => popupDayDetails(details, listScheduledWorkouts),
-                        highlightRowOnHover: false,
-                        headerGridLinesVisibility: GridLinesVisibility.both,
-                        columnWidthMode: ColumnWidthMode.fill,
-                        headerRowHeight: 50,
-                        frozenRowsCount: 20,
-                        frozenColumnsCount: 20,
-                        navigationMode: GridNavigationMode.cell,
-                        gridLinesVisibility: GridLinesVisibility.both,
-                        selectionMode: SelectionMode.single,
-                        columns: listHeadersColumn,
-                        rowHeight: 150,
-                        source: WorkoutDataSource(
-                            context: context,
-                            numberWeeks: 8,
-                            listAppointment: listScheduledWorkouts,
-                            listAvailableWorkout: listAvailableWorkout,
-                            columnNames: columnNames,
-                            bloc: bloc),
+                  return SizedBox(
+                    height: 800,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 125),
+                      child: ValueListenableBuilder<int>(
+                        valueListenable: bloc.vnNumberWeek,
+                        builder: (BuildContext context, int nbWeeks, Widget? child) => Container(
+                          // decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+                          padding: const EdgeInsets.all(1),
+                          child: sf.SfDataGrid(
+                            onCellTap: (sf.DataGridCellTapDetails details) => popupDayDetails(details, listScheduledWorkouts),
+                            highlightRowOnHover: false,
+                            headerGridLinesVisibility: GridLinesVisibility.both,
+                            columnWidthMode: ColumnWidthMode.fill,
+                            headerRowHeight: 50,
+                            frozenRowsCount: 20,
+                            frozenColumnsCount: 20,
+                            navigationMode: GridNavigationMode.cell,
+                            gridLinesVisibility: GridLinesVisibility.both,
+                            selectionMode: SelectionMode.single,
+                            columns: listHeadersColumn,
+                            rowHeight: 150,
+                            source: WorkoutDataSource(
+                                context: context,
+                                numberWeeks: nbWeeks,
+                                listAppointment: listScheduledWorkouts,
+                                listAvailableWorkout: listAvailableWorkout,
+                                columnNames: columnNames,
+                                bloc: bloc),
+                          ),
+                        ),
                       ),
                     ),
                   );
@@ -432,14 +438,23 @@ class WorkoutDataSource extends sf.DataGridSource {
     return sf.DataGridRowAdapter(
         cells: row.getCells().map((sf.DataGridCell listCell) {
       final DataCellData dataCell = listCell.value as DataCellData;
+      final ScrollController _controller = ScrollController();
       final List<WorkoutScheduleDto> listWorkout = dataCell.list;
       final List<Widget> listListTile = listWorkout
-          .map((WorkoutScheduleDto dto) => ListTile(
-                dense: true,
-                leading: (dto.imageUrlWorkout != null)
-                    ? CircleAvatar(backgroundImage: NetworkImage(dto.imageUrlWorkout!), radius: 10)
-                    : CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
-                title: Text(dto.nameWorkout!),
+          .map((WorkoutScheduleDto dto) => Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Row(
+                  children: <Widget>[
+                    if (dto.imageUrlWorkout != null)
+                      CircleAvatar(backgroundImage: NetworkImage(dto.imageUrlWorkout!), radius: 10)
+                    else
+                      CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Text(dto.nameWorkout!),
+                    )
+                  ],
+                ),
               ))
           .toList();
       return MouseRegion(
@@ -451,7 +466,14 @@ class WorkoutDataSource extends sf.DataGridSource {
               '${dataCell.dayIndex + 1}',
               style: Theme.of(context).textTheme.headline5,
             ),
-            Column(children: listListTile)
+            Scrollbar(
+              controller: _controller,
+              isAlwaysShown: true,
+              child: ListView(
+                controller: _controller,
+                children: listListTile,
+              ),
+            )
           ],
         ),
       );
