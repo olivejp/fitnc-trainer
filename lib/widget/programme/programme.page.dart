@@ -46,6 +46,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
       listCompleteProgramme.clear();
       listCompleteProgramme.addAll(event);
       _streamListProgramme.sink.add(listCompleteProgramme);
+      UtilSearch.search(_query, listCompleteProgramme, _streamListProgramme);
     });
   }
 

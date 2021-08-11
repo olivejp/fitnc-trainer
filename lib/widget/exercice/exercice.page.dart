@@ -46,6 +46,7 @@ class _ExercicePageState extends State<ExercicePage> {
       listCompleteExercice.clear();
       listCompleteExercice.addAll(event);
       _streamListExercice.sink.add(listCompleteExercice);
+      UtilSearch.search(_query, listCompleteExercice, _streamListExercice);
     });
   }
 
