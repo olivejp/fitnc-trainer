@@ -14,7 +14,7 @@ class ExerciceCreatePage {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: ExerciceFormBuilder.getForm(_formKey, bloc),
+          content: ExerciceFormBuilder.getForm(context, _formKey, bloc),
           actionsPadding: const EdgeInsets.all(20),
           actions: <Widget>[
             FloatingActionButton(

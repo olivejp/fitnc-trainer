@@ -17,11 +17,11 @@ class GenericUpdateWidget extends StatelessWidget {
           limit = maximumWidth;
         }
         return Column(
-          children: [
+          children: <Widget>[
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: <Widget>[
                   ConstrainedBox(
                     constraints: BoxConstraints.expand(width: limit),
                     child: Padding(

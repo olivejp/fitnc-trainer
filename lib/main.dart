@@ -5,12 +5,15 @@ import 'package:fitnc_trainer/widget/exercice/exercice.update.page.dart';
 import 'package:fitnc_trainer/widget/home.page.dart';
 import 'package:fitnc_trainer/widget/login/login.page.dart';
 import 'package:fitnc_trainer/widget/login/sign-up.page.dart';
+import 'package:fitnc_trainer/widget/workout/workout.page.dart';
+import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'bloc/main.bloc.dart';
+import 'domain/workout.domain.dart';
 
 void main() {
   runApp(MyApp());
@@ -27,6 +30,7 @@ class MyApp extends StatelessWidget {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       authService.updateUser(user);
     });
+
 
     return OKToast(
       position: ToastPosition.bottom,
@@ -94,6 +98,9 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class FitnessConstants {
+  static const double textFormFieldHeight = 45;
+}
 
 class FitnessNcColors {
   static const Color white50 = Color(0xFFFFFFFF);

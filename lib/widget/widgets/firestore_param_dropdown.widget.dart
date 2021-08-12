@@ -46,7 +46,22 @@ class TimerDropdownButton extends StatelessWidget {
 }
 
 class ParamDropdownButton extends StatelessWidget {
-  static const Icon DEFAULT_ICON = Icon(Icons.arrow_downward);
+
+  ParamDropdownButton({
+    this.key,
+    this.style,
+    this.decoration,
+    required this.paramName,
+    required this.initialValue,
+    required this.onChanged,
+    this.icon = defaultIcon,
+    this.onlyValue = false,
+    this.hint,
+    this.insertNull = false,
+    this.nullElement,
+  });
+
+  static const Icon defaultIcon = Icon(Icons.arrow_downward);
 
   final Key? key;
   final ParamService paramService = ParamService.getInstance();
@@ -61,19 +76,6 @@ class ParamDropdownButton extends StatelessWidget {
   final bool insertNull;
   final String? nullElement;
 
-  ParamDropdownButton({
-    this.key,
-    this.style,
-    this.decoration,
-    required this.paramName,
-    required this.initialValue,
-    required this.onChanged,
-    this.icon = DEFAULT_ICON,
-    this.onlyValue = false,
-    this.hint,
-    this.insertNull = false,
-    this.nullElement,
-  });
 
   @override
   Widget build(BuildContext context) {

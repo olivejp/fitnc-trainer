@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.page.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -37,9 +36,10 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      bloc.isExpanded = true;
       if (constraints.maxWidth <= 1024) {
         bloc.isExpanded = false;
+      } else {
+        bloc.isExpanded = true;
       }
       return Scaffold(
         body: Row(
@@ -51,20 +51,17 @@ class MyHomePage extends StatelessWidget {
               appName: title,
             ),
             Expanded(
-              child: GenericContainerWidget(
-                opacity: 0.5,
-                child: StreamBuilder<int>(
-                    stream: bloc.currentPageObs,
-                    builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-                      if (snapshot.hasData) {
-                        final Iterable<Destination> destinationsFiltered = destinations.where((Destination dest) => dest.index == snapshot.data!);
-                        if (destinationsFiltered.isNotEmpty) {
-                          return destinationsFiltered.first.page;
-                        }
+              child: StreamBuilder<int>(
+                  stream: bloc.currentPageObs,
+                  builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                    if (snapshot.hasData) {
+                      final Iterable<Destination> destinationsFiltered = destinations.where((Destination dest) => dest.index == snapshot.data!);
+                      if (destinationsFiltered.isNotEmpty) {
+                        return destinationsFiltered.first.page;
                       }
-                      return Container();
-                    }),
-              ),
+                    }
+                    return Container();
+                  }),
             ),
           ],
         ),

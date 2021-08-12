@@ -1,6 +1,7 @@
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/bloc/programme/programme_update.bloc.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
+import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
@@ -22,14 +23,16 @@ class ProgrammePage extends StatefulWidget {
   State<ProgrammePage> createState() => _ProgrammePageState();
 }
 
-class _ProgrammePageState extends State<ProgrammePage> {
+class _ProgrammePageState extends State<ProgrammePage> with SingleTickerProviderStateMixin {
   final HomePageBloc homePageBloc = HomePageBloc.instance();
   final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.instance();
-
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
-
   final List<Programme> listCompleteProgramme = <Programme>[];
   final BehaviorSubject<List<Programme>> _streamListProgramme = BehaviorSubject<List<Programme>>();
+
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
   String? _query;
 
   set query(String? text) {
@@ -42,6 +45,9 @@ class _ProgrammePageState extends State<ProgrammePage> {
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(vsync: this, duration: Duration(seconds: 5));
+    _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
+
     bloc.listenAll().listen((List<Programme> event) {
       listCompleteProgramme.clear();
       listCompleteProgramme.addAll(event);

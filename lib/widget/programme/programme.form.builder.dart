@@ -4,6 +4,8 @@ import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
+
 class ProgrammeFormBuilder {
   static Widget getForm(GlobalKey<FormState> _formKey, ProgrammeUpdateBloc bloc) {
     return ConstrainedBox(
@@ -43,11 +45,12 @@ class ProgrammeFormBuilder {
                           ),
                           Expanded(
                             child: Padding(
-                              padding: const EdgeInsets.only(left:8.0),
+                              padding: const EdgeInsets.only(left: 8.0),
                               child: ParamDropdownButton(
                                   paramName: 'number_weeks',
                                   initialValue: bloc.programme.numberWeeks,
-                                  decoration: const InputDecoration(labelText: 'Nombre de semaine',),
+                                  decoration: const InputDecoration(
+                                      labelText: 'Nombre de semaine', constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight)),
                                   onChanged: (String? value) => bloc.numberWeeks = value),
                             ),
                           )

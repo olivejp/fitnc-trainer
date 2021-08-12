@@ -28,24 +28,9 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.transparent,
-        floatingActionButton: ButtonBar(children: [
-          FloatingActionButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Icon(Icons.clear),
-            tooltip: 'Annuler',
-          ),
-          FloatingActionButton(
-            onPressed: () {
-              if (_formKey.currentState?.validate() == true) {
-                widget.bloc.saveExercice().then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
-              }
-            },
-            child: const Icon(Icons.check),
-            tooltip: 'Valider',
-          )
-        ]),
         body: GenericUpdateWidget(
-          child: ExerciceFormBuilder.getForm(_formKey, widget.bloc),
+          maximumWidth: 1200,
+          child: ExerciceFormBuilder.getForm(context, _formKey, widget.bloc),
         ));
   }
 }

@@ -1,4 +1,3 @@
-import 'package:animations/animations.dart';
 import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
 import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:flutter/cupertino.dart';
@@ -37,16 +36,14 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
           return FitnessGridCard<T>(
             bloc: bloc,
             domain: domain,
-            onTap: (T domain) {
-              Navigator.push(
-                  context,
-                  PageTransition<Widget>(
-                    duration: Duration.zero,
-                    reverseDuration: Duration.zero,
-                    type: PageTransitionType.fade,
-                    child: bloc.openUpdate(context, domain),
-                  ));
-            },
+            onTap: (T domain) => Navigator.push(
+                context,
+                PageTransition<Widget>(
+                  duration: Duration.zero,
+                  reverseDuration: Duration.zero,
+                  type: PageTransitionType.fade,
+                  child: bloc.openUpdate(context, domain),
+                )),
             onDelete: (T domain) {
               showDialog(
                 context: context,
@@ -97,12 +94,7 @@ class FitnessGridCard<T extends AbstractFitnessStorageDomain> extends StatelessW
             Expanded(
               flex: 3,
               child: (domain.imageUrl?.isNotEmpty == true)
-                  ? Ink.image(
-                      image: NetworkImage(
-                        domain.imageUrl!,
-                      ),
-                      fit: BoxFit.cover,
-                    )
+                  ? Ink.image(image: NetworkImage(domain.imageUrl!), fit: BoxFit.cover)
                   : Container(decoration: const BoxDecoration(color: Colors.amber)),
             ),
             Expanded(
