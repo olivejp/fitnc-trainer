@@ -5,6 +5,7 @@ import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:video_player/video_player.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
@@ -18,7 +19,14 @@ class ExerciceFormBuilder {
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue100),
           onPressed: () {
             if (_formKey.currentState?.validate() == true) {
-              bloc.saveExercice().then((_) => Navigator.pop(context));
+              bloc
+                  .saveExercice()
+                  .then(
+                    (_) => showToast('Exercice sauvegardé', backgroundColor: Colors.green),
+                  )
+                  .catchError(
+                    (_) => showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent),
+                  );
             }
           },
           icon: const Icon(Icons.save, color: Colors.white),
@@ -37,7 +45,7 @@ class ExerciceFormBuilder {
           Padding(
             padding: const EdgeInsets.only(bottom: 20.0),
             child: Column(
-              children:<Widget> [
+              children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[

@@ -33,7 +33,7 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
         crossAxisSpacing: 10.0,
         crossAxisCount: nbColumns,
         children: domains.map((T domain) {
-          return FitnessGridCard<T>(
+          return _FitnessGridCard<T>(
             bloc: bloc,
             domain: domain,
             onTap: (T domain) => Navigator.push(
@@ -70,8 +70,8 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
 ///
 /// Classe Widget pour une Grid Card.
 ///
-class FitnessGridCard<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
-  const FitnessGridCard({Key? key, required this.domain, required this.onTap, required this.onDelete, required this.bloc}) : super(key: key);
+class _FitnessGridCard<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
+  const _FitnessGridCard({Key? key, required this.domain, required this.onTap, required this.onDelete, required this.bloc}) : super(key: key);
 
   final T domain;
   final AbstractFitnessCrudBloc<T> bloc;

@@ -7,6 +7,7 @@ import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:oktoast/oktoast.dart';
 
 class WorkoutUpdatePage extends StatefulWidget {
   WorkoutUpdatePage({Key? key, required this.workout}) : super(key: key);
@@ -35,7 +36,11 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue100),
           onPressed: () {
             if (_formKey.currentState?.validate() == true) {
-              widget.bloc.saveWorkout().then((_) => Navigator.pop(context));
+              widget.bloc.saveWorkout().then((_) => showToast('Workout sauvegardé', backgroundColor: Colors.green)).catchError(
+                (error) {
+                  showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent);
+                },
+              );
             }
           },
           icon: const Icon(Icons.save, color: Colors.white),

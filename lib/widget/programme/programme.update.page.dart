@@ -15,6 +15,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animations/loading_animations.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart' as sf;
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -56,7 +57,12 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue100),
           onPressed: () {
             if (_formKey.currentState?.validate() == true) {
-              widget.bloc.saveProgramme().then((_) => Navigator.pop(context));
+              widget.bloc.saveProgramme().then(
+                    (_) => showToast('Exercice sauvegardé', backgroundColor: Colors.green),
+              )
+                  .catchError(
+                    (_) => showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent),
+              );
             }
           },
           icon: const Icon(Icons.save, color: Colors.white),

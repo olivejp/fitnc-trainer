@@ -20,8 +20,9 @@ class WorkoutSetLeftPanelBloc {
     return _instance!;
   }
 
-  Workout? _workout;
+  late Workout? _workout;
 
+  final int debounceTime = 200;
   final List<WorkoutSetDto> listDtos = <WorkoutSetDto>[];
   final WorkoutSetService workoutSetService = WorkoutSetService.getInstance();
   final BehaviorSubject<List<WorkoutSetDto>> subjectListDtos = BehaviorSubject<List<WorkoutSetDto>>();
@@ -87,15 +88,11 @@ class WorkoutSetLeftPanelBloc {
 
     getSetRef(dto)
         .set(WorkoutSet.fromJson(dto.toJson()).toJson())
-        .then((_) => showToast('Set ajouté.', duration: const Duration(seconds: 2)))
         .catchError((_) => showToast("Une erreur est survenue lors de l'enregistrement du set.", duration: const Duration(seconds: 2)));
   }
 
   void deleteFromFireStore(WorkoutSetDto dto) {
-    getSetRef(dto)
-        .delete()
-        .then((_) => showToast('Set supprimé.', duration: const Duration(seconds: 2)))
-        .catchError((Object onError) => showToast('Erreur lors de la suppression du Set.', duration: const Duration(seconds: 2)));
+    getSetRef(dto).delete().catchError((Object onError) => showToast('Erreur lors de la suppression du Set.', duration: const Duration(seconds: 2)));
   }
 
   void switchOrder(WorkoutSetDto dto, int newOrder) {
@@ -135,20 +132,18 @@ class WorkoutSetLeftPanelBloc {
   void updateFirestoreSet(WorkoutSetDto dto, Map<String, dynamic> values) {
     getSetRef(dto)
         .update(values)
-        .then((_) => print('Set mis à jour'))
         .catchError((Object onError) => showToast('Erreur lors de la mise à jour du Set.', duration: const Duration(seconds: 2)));
   }
 
   void updateWorkoutSet(WorkoutSetDto dto) {
     getSetRef(dto)
         .set(dto.toJson())
-        .then((_) => showToast('Set mis à jour', duration: Duration(seconds: 2)))
         .catchError((Object onError) => showToast('Erreur lors de la mise à jour du Set.', duration: const Duration(seconds: 2)));
   }
 
   void setReps(WorkoutSetDto dto, Line line, String value) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
+    _debounce = Timer(Duration(milliseconds: debounceTime), () {
       line.reps = value;
       updateWorkoutSet(dto);
     });
@@ -156,7 +151,7 @@ class WorkoutSetLeftPanelBloc {
 
   void setWeight(WorkoutSetDto dto, Line line, String value) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
+    _debounce = Timer(Duration(milliseconds: debounceTime), () {
       line.weight = value;
       updateWorkoutSet(dto);
     });
@@ -164,7 +159,7 @@ class WorkoutSetLeftPanelBloc {
 
   void setRestTime(WorkoutSetDto dto, Line line, String? value) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
+    _debounce = Timer(Duration(milliseconds: debounceTime), () {
       line.restTime = value;
       updateWorkoutSet(dto);
     });
@@ -172,7 +167,7 @@ class WorkoutSetLeftPanelBloc {
 
   void setTime(WorkoutSetDto dto, Line line, String? value) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
+    _debounce = Timer(Duration(milliseconds: debounceTime), () {
       line.time = value;
       updateWorkoutSet(dto);
     });

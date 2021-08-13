@@ -1,6 +1,7 @@
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.left.panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,27 +10,71 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animations/loading_animations.dart';
+import 'package:rxdart/rxdart.dart';
 
-class WorkoutSetPage extends StatelessWidget {
-  WorkoutSetPage({Key? key, required this.workout}) : super(key: key);
+class WorkoutSetPageBloc {
+  WorkoutSetPageBloc._();
 
-  final TrainersService trainersService = TrainersService.instance();
+  factory WorkoutSetPageBloc.instance() {
+    _instance ??= WorkoutSetPageBloc._();
+    return WorkoutSetPageBloc._instance!;
+  }
+
+  static WorkoutSetPageBloc? _instance;
+
+  final List<Exercice> listCompleteExercice = <Exercice>[];
+  final BehaviorSubject<List<Exercice>> _streamListExercice = BehaviorSubject<List<Exercice>>();
+}
+
+class WorkoutSetPage extends StatefulWidget {
+  const WorkoutSetPage({Key? key, required this.workout}) : super(key: key);
+
   final Workout workout;
 
   static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
   @override
+  State<WorkoutSetPage> createState() => _WorkoutSetPageState();
+}
+
+class _WorkoutSetPageState extends State<WorkoutSetPage> {
+
+  final TrainersService trainersService = TrainersService.instance();
+  final WorkoutSetPageBloc bloc = WorkoutSetPageBloc.instance();
+
+  String? _query;
+
+  set query(String? text) {
+    _query = text;
+    UtilSearch.search(_query, bloc.listCompleteExercice, bloc._streamListExercice);
+  }
+
+  String? get query => _query;
+
+  @override
+  void initState() {
+    super.initState();
+    trainersService.listenToExercice()
+    .listen((List<Exercice> event) {
+      bloc.listCompleteExercice.clear();
+      bloc.listCompleteExercice.addAll(event);
+      bloc._streamListExercice.sink.add(bloc.listCompleteExercice);
+      UtilSearch.search(_query, bloc.listCompleteExercice, bloc._streamListExercice);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Row(
-      children: [
-        WorkoutSetLeftPanel(workout: workout),
+      children: <Widget>[
+        WorkoutSetLeftPanel(workout: widget.workout),
         Expanded(
           child: Column(
-            children: [
+            children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(left: 15, right: 15),
                 child: Row(
-                  children: [
+                  children: <Widget>[
                     const Expanded(
                         flex: 3,
                         child: Text(
@@ -43,6 +88,7 @@ class WorkoutSetPage extends StatelessWidget {
                           prefixIcon: Icon(Icons.search),
                           hintText: 'Recherche...',
                         ),
+                        onChanged: (String value) => query = value,
                         textAlignVertical: TextAlignVertical.bottom,
                       ),
                     ),
@@ -51,13 +97,12 @@ class WorkoutSetPage extends StatelessWidget {
               ),
               Expanded(
                 child: StreamBuilder<List<Exercice?>>(
-                  stream: trainersService.listenToExercice(),
-                  builder: (context, snapshot) {
+                  stream: bloc._streamListExercice,
+                  builder: (BuildContext context, AsyncSnapshot<List<Exercice?>> snapshot) {
                     if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
-                      return Center(child: Text('Aucun exercice trouvé.'));
+                      return const Center(child: Text('Aucun exercice trouvé.'));
                     } else {
-                      List<Exercice?> listExercice = snapshot.data!;
-                      return getGridView(listExercice);
+                      return WorkoutExerciceGridView(listExercice: snapshot.data!);
                     }
                   },
                 ),
@@ -68,17 +113,24 @@ class WorkoutSetPage extends StatelessWidget {
       ],
     );
   }
+}
 
-  Widget getGridView(List<Exercice?> listExercice) {
+class WorkoutExerciceGridView extends StatelessWidget {
+  const WorkoutExerciceGridView({Key? key, required this.listExercice}) : super(key: key);
+
+  final List<Exercice?> listExercice;
+
+  @override
+  Widget build(BuildContext context) {
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       int nbColumns = 2;
-      if (constraints.maxWidth > 1200) {
+      if (constraints.maxWidth > 1000) {
         nbColumns = 10;
-      } else if (constraints.maxWidth > 1000) {
-        nbColumns = 7;
       } else if (constraints.maxWidth > 800) {
-        nbColumns = 5;
+        nbColumns = 7;
       } else if (constraints.maxWidth > 600) {
+        nbColumns = 5;
+      } else if (constraints.maxWidth > 400) {
         nbColumns = 4;
       }
 
@@ -89,15 +141,15 @@ class WorkoutSetPage extends StatelessWidget {
         crossAxisSpacing: 10.0,
         crossAxisCount: nbColumns,
         children: listExercice.where((Exercice? exercice) => exercice != null).map((Exercice? exercice) {
-          Widget gridCard = getGridCard(context, exercice!);
+          final Widget gridCard = ExerciceCard(
+            exercice: exercice!,
+          );
           return Draggable<Exercice>(
             feedback: gridCard,
             data: exercice,
             child: InkWell(
-              splashColor: Theme.of(context).primaryColor,
-              hoverColor: Theme.of(context).primaryColor,
               borderRadius: BorderRadius.circular(5),
-              onTap: () => print('Hello'),
+              onTap: () {},
               child: gridCard,
             ),
           );
@@ -105,8 +157,15 @@ class WorkoutSetPage extends StatelessWidget {
       );
     });
   }
+}
 
-  Widget getGridCard(BuildContext context, Exercice exercice) {
+class ExerciceCard extends StatelessWidget {
+  const ExerciceCard({Key? key, required this.exercice}) : super(key: key);
+
+  final Exercice exercice;
+
+  @override
+  Widget build(BuildContext context) {
     Widget firstChild;
     if (exercice.imageUrl != null) {
       firstChild = Image.network(
@@ -116,7 +175,9 @@ class WorkoutSetPage extends StatelessWidget {
           if (loadingProgress == null) {
             return child;
           }
-          return LoadingRotating.square(backgroundColor: Theme.of(context).primaryColor,);
+          return LoadingRotating.square(
+            backgroundColor: Theme.of(context).primaryColor,
+          );
         },
       );
     } else {
@@ -134,7 +195,7 @@ class WorkoutSetPage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+          children: <Widget>[
             Flexible(flex: 5, child: firstChild),
             Flexible(
               flex: 2,

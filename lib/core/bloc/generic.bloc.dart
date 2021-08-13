@@ -8,6 +8,7 @@ import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:oktoast/oktoast.dart';
 import 'package:path/path.dart';
 
 ///
@@ -69,7 +70,6 @@ abstract class AbstractFirebaseCrudBloc<T extends AbstractDomain> implements Abs
 /// Mixin Bloc pour implémenter les méthodes de base pour le Firebase storage.
 ///
 abstract class MixinFitnessStorageBloc<T extends AbstractFitnessStorageDomain> {
-
   /// Méthode abstraite
   /// Permet de spécifier l'emplacement où sera stocké le fichier dans Firebase Storage.
   /// Cette url sera complétée avec le nom du fichier, ex:
@@ -100,13 +100,17 @@ abstract class MixinFitnessStorageBloc<T extends AbstractFitnessStorageDomain> {
     if (user == null) {
       throw Exception('Utilisateur non connecté');
     }
-    return FirebaseStorage.instance.ref(getStorageRef(user, domain)).listAll().then((ListResult value) {
-      final List<Future<void>> listFuture = <Future<void>>[];
-      for (final Reference ref in value.items) {
-        listFuture.add(ref.delete());
-      }
-      return listFuture;
-    }).then((List<Future<void>> listFuture) => Future.wait(listFuture));
+    return FirebaseStorage.instance
+        .ref(getStorageRef(user, domain))
+        .listAll()
+        .then((ListResult value) {
+          final List<Future<void>> listFuture = <Future<void>>[];
+          for (final Reference ref in value.items) {
+            listFuture.add(ref.delete());
+          }
+          return listFuture;
+        })
+        .then((List<Future<void>> listFuture) => Future.wait(listFuture));
   }
 
   /// Envoi le StorageFile sur Firebase Storage et renvoie l'URL de l'image à partir du Storage Firebase.
