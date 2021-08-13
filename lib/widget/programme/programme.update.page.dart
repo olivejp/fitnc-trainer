@@ -54,7 +54,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
     }
     buttons.addAll(<Widget>[
       TextButton.icon(
-          style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue100),
+          style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () {
             if (_formKey.currentState?.validate() == true) {
               widget.bloc.saveProgramme().then(
@@ -68,7 +68,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
           icon: const Icon(Icons.save, color: Colors.white),
           label: const Text('Enregistrer', style: TextStyle(color: Colors.white))),
       TextButton.icon(
-          style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue100),
+          style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.close, color: Colors.white),
           label: const Text('Fermer', style: TextStyle(color: Colors.white))),
@@ -466,12 +466,15 @@ class WorkoutDataSource extends sf.DataGridSource {
                 child: Row(
                   children: <Widget>[
                     if (dto.imageUrlWorkout != null)
-                      CircleAvatar(backgroundImage: NetworkImage(dto.imageUrlWorkout!), radius: 10)
+                      Expanded(child: CircleAvatar(backgroundImage: NetworkImage(dto.imageUrlWorkout!), radius: 10))
                     else
-                      CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Text(dto.nameWorkout!),
+                      Expanded(child: CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10)),
+                    Expanded(
+                      flex: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8),
+                        child: Text(dto.nameWorkout!),
+                      ),
                     )
                   ],
                 ),

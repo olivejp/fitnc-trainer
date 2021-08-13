@@ -48,6 +48,17 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                       begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
             ),
           ),
+          Transform(
+            transform: Matrix4.identity()
+              ..translate(MediaQuery.of(context).size.width - 80)
+              ..add(Matrix4.skewX(-0.3)),
+            child: Container(
+              width: 20,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
+            ),
+          ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[

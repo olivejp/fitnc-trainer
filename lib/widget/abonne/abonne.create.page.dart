@@ -1,35 +1,34 @@
-import 'package:fitnc_trainer/bloc/programme/programme_update.bloc.dart';
+import 'package:fitnc_trainer/bloc/abonne/abonne_update.bloc.dart';
+import 'package:fitnc_trainer/widget/abonne/abonne.update.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'programme.form.builder.dart';
-
-class ProgrammeCreatePage {
+class AbonneCreatePage {
   static void showCreate(BuildContext context) {
-    ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.instance();
+    final AbonneUpdateBloc bloc = AbonneUpdateBloc.instance();
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     bloc.init(null);
-    GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (BuildContext context) {
         return AlertDialog(
-          content: ProgrammeFormBuilder.getForm(_formKey, bloc),
-          actionsPadding: EdgeInsets.all(20),
+          content: AbonneUpdatePage(),
+          actionsPadding: const EdgeInsets.all(20),
           actions: [
             FloatingActionButton(
               tooltip: 'Annuler',
               onPressed: () => Navigator.of(context).pop(),
-              child: Icon(Icons.clear),
+              child: const Icon(Icons.clear),
             ),
             FloatingActionButton(
               tooltip: 'Créer',
               onPressed: () {
                 if (_formKey.currentState?.validate() == true) {
-                  bloc.saveProgramme().then((value) => Navigator.of(context).pop());
+                  bloc.saveAbonne().then((_) => Navigator.of(context).pop());
                 }
               },
-              child: Icon(Icons.check),
+              child: const Icon(Icons.check),
             ),
           ],
         );

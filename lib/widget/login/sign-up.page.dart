@@ -256,21 +256,47 @@ class _SignUpPageState extends State<SignUpPage> {
 
     return Scaffold(
       backgroundColor: FitnessNcColors.blue50,
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          Widget toShow;
-          if (constraints.maxWidth > 900) {
-            toShow = Row(
-              children: <Widget>[
-                Expanded(child: columnLeft),
-                Expanded(child: columnRight),
-              ],
-            );
-          } else {
-            toShow = columnRight;
-          }
-          return Stack(children: <Widget>[toShow, const BottomCu()]);
-        },
+      body: Stack(
+        children: [
+          Transform(
+            transform: Matrix4.identity()
+              ..translate(MediaQuery.of(context).size.width)
+              ..add(Matrix4.skewX(-0.3)),
+            child: Container(
+              width: 200,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
+            ),
+          ),
+          Transform(
+            transform: Matrix4.identity()
+              ..translate(MediaQuery.of(context).size.width - 80)
+              ..add(Matrix4.skewX(-0.3)),
+            child: Container(
+              width: 20,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
+            ),
+          ),
+          LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              Widget toShow;
+              if (constraints.maxWidth > 900) {
+                toShow = Row(
+                  children: <Widget>[
+                    Expanded(child: columnLeft),
+                    Expanded(child: columnRight),
+                  ],
+                );
+              } else {
+                toShow = columnRight;
+              }
+              return Stack(children: <Widget>[toShow, const BottomCu()]);
+            },
+          )
+        ],
       ),
     );
   }

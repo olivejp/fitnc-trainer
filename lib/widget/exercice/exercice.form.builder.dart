@@ -16,7 +16,7 @@ class ExerciceFormBuilder {
 
     final List<Widget> buttons = <Widget>[
       TextButton.icon(
-          style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue100),
+          style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () {
             if (_formKey.currentState?.validate() == true) {
               bloc
@@ -32,7 +32,7 @@ class ExerciceFormBuilder {
           icon: const Icon(Icons.save, color: Colors.white),
           label: const Text('Enregistrer', style: TextStyle(color: Colors.white))),
       TextButton.icon(
-          style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue100),
+          style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.close, color: Colors.white),
           label: const Text('Fermer', style: TextStyle(color: Colors.white))),

@@ -5,15 +5,13 @@ import 'package:fitnc_trainer/widget/exercice/exercice.update.page.dart';
 import 'package:fitnc_trainer/widget/home.page.dart';
 import 'package:fitnc_trainer/widget/login/login.page.dart';
 import 'package:fitnc_trainer/widget/login/sign-up.page.dart';
-import 'package:fitnc_trainer/widget/workout/workout.page.dart';
-import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:oktoast/oktoast.dart';
 
 import 'bloc/main.bloc.dart';
-import 'domain/workout.domain.dart';
 
 void main() {
   runApp(MyApp());
@@ -38,11 +36,11 @@ class MyApp extends StatelessWidget {
           title: appTitle,
           theme: ThemeData(
             navigationRailTheme: NavigationRailThemeData(
-                backgroundColor: FitnessNcColors.blue800,
+                backgroundColor: FitnessNcColors.blue100,
                 selectedIconTheme: const IconThemeData(color: FitnessNcColors.orange500),
-                unselectedIconTheme: const IconThemeData(color: FitnessNcColors.white50),
-                selectedLabelTextStyle: GoogleFonts.workSansTextTheme().headline1!.copyWith(color: FitnessNcColors.orange500, fontSize: 18),
-                unselectedLabelTextStyle: GoogleFonts.workSansTextTheme().headline1!.copyWith(color: FitnessNcColors.blue200, fontSize: 18)),
+                unselectedIconTheme: const IconThemeData(color: FitnessNcColors.blue800),
+                selectedLabelTextStyle: GoogleFonts.workSansTextTheme().headline1!.copyWith(color: FitnessNcColors.orange500, fontSize: 18, fontWeight: FontWeight.bold),
+                unselectedLabelTextStyle: GoogleFonts.workSansTextTheme().headline1!.copyWith(color: FitnessNcColors.blue600, fontSize: 18)),
             textTheme: TextTheme(
               headline1:
                   GoogleFonts.workSansTextTheme().headline1!.copyWith(color: FitnessNcColors.blue600, fontSize: 35, fontWeight: FontWeight.bold),
@@ -99,7 +97,7 @@ class MyApp extends StatelessWidget {
 }
 
 class FitnessConstants {
-  static const double textFormFieldHeight = 45;
+  static const double textFormFieldHeight = 60;
 }
 
 class FitnessNcColors {
