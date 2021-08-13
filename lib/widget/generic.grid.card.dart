@@ -27,6 +27,7 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
       }
 
       return GridView.count(
+        shrinkWrap: true,
         childAspectRatio: 13 / 9,
         padding: const EdgeInsets.all(10.0),
         mainAxisSpacing: 10.0,

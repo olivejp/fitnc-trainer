@@ -94,7 +94,7 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
   }
 
   @override
-  Param mapSnapshotToModel(DocumentSnapshot snapshot) {
+  Param mapSnapshotToModel(DocumentSnapshot<Map<String, dynamic>> snapshot) {
     return Param.fromJson(snapshot.data() as Map<String, dynamic>);
   }
 }
