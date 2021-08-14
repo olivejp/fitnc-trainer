@@ -3,6 +3,7 @@ import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
+import 'package:fitnc_trainer/widget/exercice/exercice.form.builder.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:flutter/cupertino.dart';
@@ -32,6 +33,7 @@ class _ExercicePageState extends State<ExercicePage> {
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
   final List<bool> _toggleSelections = List<bool>.generate(3, (_) => false);
   final ValueNotifier<int> _vnDisplay = ValueNotifier<int>(0);
+  final ValueNotifier<Exercice?> _vnWorkout = ValueNotifier<Exercice?>(null);
 
   String? _query;
 
@@ -120,54 +122,80 @@ class _ExercicePageState extends State<ExercicePage> {
                 ],
               ),
             ),
-            StreamBuilder<List<Exercice>>(
-              stream: _streamListExercice,
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<Exercice>> snapshot) {
-                if (!snapshot.hasData ||
-                    (snapshot.hasData && snapshot.data!.isEmpty)) {
-                  return const Center(child: Text('Aucun exercice trouvé.'));
-                } else {
-                  final List<Exercice> list = snapshot.data!;
-                  return ValueListenableBuilder<int>(
-                      valueListenable: _vnDisplay,
-                      builder:
-                          (BuildContext context, int value, Widget? child) {
-                        if (value == 0) {
-                          return FitnessGridView<Exercice>(
-                            domains: list,
-                            bloc: bloc,
-                          );
-                        } else if (value == 1) {
-                          return HorizontalGridView<Exercice>(
-                              listDomains: list);
-                        } else {
-                          return ListView.separated(
-                              shrinkWrap: true,
-                              itemBuilder: (BuildContext context, int index) {
-                                final Exercice exercice = list.elementAt(index);
-                                return ListTile(
-                                  leading: CircleAvatar(
-                                    foregroundImage: exercice.imageUrl != null
-                                        ? NetworkImage(exercice.imageUrl!)
-                                        : null,
+            Expanded(
+              child: StreamBuilder<List<Exercice>>(
+                stream: _streamListExercice,
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<Exercice>> snapshot) {
+                  if (!snapshot.hasData ||
+                      (snapshot.hasData && snapshot.data!.isEmpty)) {
+                    return const Center(child: Text('Aucun exercice trouvé.'));
+                  } else {
+                    final List<Exercice> list = snapshot.data!;
+                    return ValueListenableBuilder<int>(
+                        valueListenable: _vnDisplay,
+                        builder:
+                            (BuildContext context, int value, Widget? child) {
+                          if (value == 0) {
+                            return FitnessGridView<Exercice>(
+                              domains: list,
+                              bloc: bloc,
+                            );
+                          } else if (value == 1) {
+                            return Column(children: <Widget>[
+                              HorizontalGridView<Exercice>(
+                                  listDomains: list,
+                                  onChanged: (Exercice exercice) =>
+                                      _vnWorkout.value = exercice),
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: ValueListenableBuilder<Exercice?>(
+                                        builder: (BuildContext context,
+                                            Exercice? exercice, Widget? child) {
+                                          final ExerciceUpdateBloc bloc =
+                                              ExerciceUpdateBloc.instance();
+                                          bloc.init(exercice);
+                                          return ExerciceFormBuilder.getForm(
+                                              context,
+                                              GlobalKey<FormState>(),
+                                              bloc);
+                                        },
+                                        valueListenable: _vnWorkout),
                                   ),
-                                  title: Text(list.elementAt(index).name!),
-                                  trailing: IconButton(
-                                      onPressed: () {},
-                                      icon: const Icon(Icons.clear)),
-                                );
-                              },
-                              separatorBuilder:
-                                  (BuildContext context, int index) =>
-                                      const Divider(
-                                        height: 2,
-                                      ),
-                              itemCount: list.length);
-                        }
-                      });
-                }
-              },
+                                ),
+                              ),
+                            ]);
+                          } else {
+                            return ListView.separated(
+                                shrinkWrap: true,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final Exercice exercice =
+                                      list.elementAt(index);
+                                  return ListTile(
+                                    leading: CircleAvatar(
+                                      foregroundImage: exercice.imageUrl != null
+                                          ? NetworkImage(exercice.imageUrl!)
+                                          : null,
+                                    ),
+                                    title: Text(list.elementAt(index).name!),
+                                    trailing: IconButton(
+                                        onPressed: () {},
+                                        icon: const Icon(Icons.clear)),
+                                  );
+                                },
+                                separatorBuilder:
+                                    (BuildContext context, int index) =>
+                                        const Divider(
+                                          height: 2,
+                                        ),
+                                itemCount: list.length);
+                          }
+                        });
+                  }
+                },
+              ),
             ),
           ],
         ),
@@ -178,32 +206,38 @@ class _ExercicePageState extends State<ExercicePage> {
 
 class HorizontalGridView<T extends AbstractFitnessStorageDomain>
     extends StatelessWidget {
-  const HorizontalGridView({Key? key, required this.listDomains})
+  const HorizontalGridView(
+      {Key? key, required this.listDomains, required this.onChanged})
       : super(key: key);
 
   final List<T> listDomains;
+  final void Function(T domain) onChanged;
 
   @override
   Widget build(BuildContext context) {
     return LimitedBox(
       maxHeight: 200,
       child: GridView(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 1, mainAxisExtent: 200, childAspectRatio: 1 / 4),
-        scrollDirection: Axis.horizontal,
-        shrinkWrap: true,
-        children:
-            listDomains.map((T e) => HorizontalGridCard<T>(domain: e)).toList(),
-      ),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 1, mainAxisExtent: 200, childAspectRatio: 1 / 4),
+          scrollDirection: Axis.horizontal,
+          shrinkWrap: true,
+          children: listDomains
+              .map((T e) =>
+                  HorizontalGridCard<T>(domain: e, onChanged: onChanged))
+              .toList()),
     );
   }
 }
 
 class HorizontalGridCard<T extends AbstractFitnessStorageDomain>
     extends StatelessWidget {
-  const HorizontalGridCard({Key? key, required this.domain}) : super(key: key);
+  const HorizontalGridCard(
+      {Key? key, required this.domain, required this.onChanged})
+      : super(key: key);
 
   final T domain;
+  final void Function(T domain) onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -212,6 +246,7 @@ class HorizontalGridCard<T extends AbstractFitnessStorageDomain>
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       elevation: 2,
       child: InkWell(
+        onTap: () => onChanged(domain),
         splashColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
         borderRadius: BorderRadius.circular(5),
         child: Column(
