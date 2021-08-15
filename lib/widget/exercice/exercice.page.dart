@@ -2,6 +2,7 @@ import 'package:fitnc_trainer/bloc/exercice/exercice_update.bloc.dart';
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
+import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.form.builder.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
@@ -33,7 +34,7 @@ class _ExercicePageState extends State<ExercicePage> {
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
   final List<bool> _toggleSelections = List<bool>.generate(3, (_) => false);
   final ValueNotifier<int> _vnDisplay = ValueNotifier<int>(0);
-  final ValueNotifier<Exercice?> _vnWorkout = ValueNotifier<Exercice?>(null);
+  final ValueNotifier<Exercice?> _vnExercice = ValueNotifier<Exercice?>(null);
 
   String? _query;
 
@@ -91,18 +92,41 @@ class _ExercicePageState extends State<ExercicePage> {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         Expanded(
-                          child: ToggleButtons(
-                            children: [
-                              Icon(Icons.list),
-                              Icon(Icons.grid_view),
-                              Icon(Icons.grid_4x4),
-                            ],
-                            isSelected: _toggleSelections,
-                            onPressed: (int index) {
-                              _toggleSelections[index] =
-                                  !_toggleSelections[index];
-                              _vnDisplay.value = index;
-                            },
+                          child: IconTheme(
+                            data: const IconThemeData(size: 15),
+                            child: ValueListenableBuilder<int>(
+                              valueListenable: _vnDisplay,
+                              builder: (BuildContext context, int value,
+                                      Widget? child) =>
+                                  ToggleButtons(
+                                color: FitnessNcColors.blue200,
+                                selectedColor: FitnessNcColors.blue800,
+                                constraints: const BoxConstraints(
+                                    minHeight: 40, maxHeight: 40),
+                                borderRadius: BorderRadius.circular(5),
+                                isSelected: _toggleSelections,
+                                onPressed: (int index) {
+                                  _toggleSelections.map((_) => false).toList();
+                                  _toggleSelections[index] =
+                                      !_toggleSelections[index];
+                                  _vnDisplay.value = index;
+                                },
+                                children: const <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Icon(Icons.list),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Icon(Icons.grid_view),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Icon(Icons.grid_4x4),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                         Expanded(
@@ -146,7 +170,7 @@ class _ExercicePageState extends State<ExercicePage> {
                               HorizontalGridView<Exercice>(
                                   listDomains: list,
                                   onChanged: (Exercice exercice) =>
-                                      _vnWorkout.value = exercice),
+                                      _vnExercice.value = exercice),
                               Expanded(
                                 child: SingleChildScrollView(
                                   child: Padding(
@@ -162,7 +186,7 @@ class _ExercicePageState extends State<ExercicePage> {
                                               GlobalKey<FormState>(),
                                               bloc);
                                         },
-                                        valueListenable: _vnWorkout),
+                                        valueListenable: _vnExercice),
                                   ),
                                 ),
                               ),
@@ -216,10 +240,10 @@ class HorizontalGridView<T extends AbstractFitnessStorageDomain>
   @override
   Widget build(BuildContext context) {
     return LimitedBox(
-      maxHeight: 200,
+      maxHeight: 300,
       child: GridView(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 1, mainAxisExtent: 200, childAspectRatio: 1 / 4),
+              crossAxisCount: 2, mainAxisExtent: 200, childAspectRatio: 1 / 4),
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,
           children: listDomains
