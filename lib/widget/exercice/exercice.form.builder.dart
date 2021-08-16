@@ -15,18 +15,15 @@ class ExerciceBuilderPage {
   static void create(BuildContext context) {
     showDialog(
         context: context,
-        builder: (BuildContext context) => const AlertDialog(
-            title: Text("Création de l'exercice"),
-            content: ExerciceGeneric(isCreation: true)));
+        builder: (BuildContext context) => const AlertDialog(title: Text("Création d'un exercice"), content: ExerciceGeneric(isCreation: true)));
   }
 
   /// Permet de créer une AlertDialog pour la mise à jour d'un exercice.
-  static void update(
-      {required BuildContext context, required Exercice exercice}) {
+  static void update({required BuildContext context, required Exercice exercice}) {
     showDialog(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-            title: const Text("Mise à jour d'un exercice"),
+            title: const Text("Mise à jour"),
             content: ExerciceGeneric(
               isCreation: false,
               exercice: exercice,
@@ -36,8 +33,7 @@ class ExerciceBuilderPage {
 
 /// Composant générique pour l'exercice (Mise à jour / Création).
 class ExerciceGeneric extends StatefulWidget {
-  const ExerciceGeneric({Key? key, required this.isCreation, this.exercice})
-      : super(key: key);
+  const ExerciceGeneric({Key? key, required this.isCreation, this.exercice}) : super(key: key);
 
   final bool isCreation;
   final Exercice? exercice;
@@ -57,28 +53,23 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
   Widget build(BuildContext context) {
     bloc.init(widget.exercice);
 
-    final Widget saveButton = ElevatedButton.icon(
+    final Widget saveButton = Padding(
+      padding: EdgeInsets.only(right: 10),
+      child: ElevatedButton(
         onPressed: () {
           if (_formKey.currentState?.validate() == true) {
             bloc.saveExercice().then((_) {
-              showToast(
-                  widget.isCreation ? 'Exercice créé' : 'Exercice mis à jour',
-                  backgroundColor: Colors.green);
-
-              if (widget.isCreation) {
-                Navigator.of(context).pop();
-              }
-            }).catchError((_) => showToast("Erreur lors de la sauvegarde",
-                backgroundColor: Colors.redAccent));
+              showToast(widget.isCreation ? 'Exercice créé' : 'Exercice mis à jour', backgroundColor: Colors.green);
+              Navigator.of(context).pop();
+            }).catchError((_) => showToast("Erreur lors de la sauvegarde", backgroundColor: Colors.redAccent));
           }
         },
-        icon: const Icon(Icons.save, color: Colors.white),
-        label: const Text('Créer', style: TextStyle(color: Colors.white)));
+        child: Text(widget.isCreation ? 'Créer' : 'Enregistrer', style: TextStyle(color: Colors.white)),
+      ),
+    );
 
-    final Widget closeButton = ElevatedButton.icon(
-        onPressed: () => Navigator.pop(context),
-        icon: const Icon(Icons.close, color: Colors.white),
-        label: const Text('Fermer', style: TextStyle(color: Colors.white)));
+    final Widget closeButton =
+        ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Fermer', style: TextStyle(color: Colors.white)));
 
     final List<Widget> buttons = <Widget>[saveButton, closeButton];
 
@@ -97,11 +88,9 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
                 Row(
                   children: <Widget>[
                     StorageStreamImageWidget(
-                      onSaved: (StorageFile? storagePair) =>
-                          bloc.setStoragePair(storagePair),
+                      onSaved: (StorageFile? storagePair) => bloc.setStoragePair(storagePair),
                       streamInitialStorageFile: bloc.obsStoragePair,
-                      onDeleted: (StorageFile? storagePair) =>
-                          bloc.setStoragePair(null),
+                      onDeleted: (StorageFile? storagePair) => bloc.setStoragePair(null),
                     ),
                     Expanded(
                       child: Padding(
@@ -130,13 +119,11 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
                   child: ParamDropdownButton(
                 decoration: const InputDecoration(
                     labelText: "Type d'exercice",
-                    constraints: BoxConstraints(
-                        maxHeight: FitnessConstants.textFormFieldHeight),
+                    constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
                     contentPadding: EdgeInsets.symmetric(horizontal: 10)),
                 paramName: 'type_exercice',
                 initialValue: bloc.typeExercice,
-                onChanged: (String? onChangedValue) =>
-                    bloc.typeExercice = onChangedValue,
+                onChanged: (String? onChangedValue) => bloc.typeExercice = onChangedValue,
               ))
             ],
           ),
@@ -148,8 +135,7 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
               minLines: 5,
               maxLines: 20,
               onChanged: (String value) => bloc.description = value,
-              decoration: const InputDecoration(
-                  labelText: 'Description', helperText: 'Optionnel'),
+              decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
             ),
           ),
           Padding(
@@ -163,8 +149,7 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
                       initialValue: bloc.videoUrl,
                       onChanged: (String value) => bloc.videoUrl = value,
                       labelText: 'URL vidéo',
-                      hintText:
-                          'Exemple : https://myStorage.com/squat_video.mp4',
+                      hintText: 'Exemple : https://myStorage.com/squat_video.mp4',
                     ),
                   ),
                 ),
@@ -197,14 +182,11 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
             children: <Widget>[
               StreamBuilder<String?>(
                 stream: bloc.selectedVideoUrlObs,
-                builder:
-                    (BuildContext context, AsyncSnapshot<String?> snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
                   if (snapshot.hasData) {
-                    _videoController =
-                        VideoPlayerController.network(snapshot.data!);
+                    _videoController = VideoPlayerController.network(snapshot.data!);
                     return FutureBuilder<Object?>(
-                      builder: (BuildContext context,
-                          AsyncSnapshot<Object?> snapshot) {
+                      builder: (BuildContext context, AsyncSnapshot<Object?> snapshot) {
                         if (_videoController?.value.isInitialized == true) {
                           return LimitedBox(
                             maxWidth: 500,
@@ -231,11 +213,8 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
             children: <Widget>[
               StreamBuilder<String?>(
                 stream: bloc.selectedYoutubeUrlObs,
-                builder:
-                    (BuildContext context, AsyncSnapshot<String?> snapshot) {
-                  if (snapshot.hasData &&
-                      snapshot.data != null &&
-                      snapshot.data!.isNotEmpty) {
+                builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+                  if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
                     _youtubeController = YoutubePlayerController(
                       initialVideoId: snapshot.data!,
                       params: const YoutubePlayerParams(
