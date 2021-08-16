@@ -41,11 +41,6 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
     return 'trainers/${user.uid}/programmes/${programme.uid}';
   }
 
-  @override
-  Widget openUpdate(BuildContext context, Programme programme) {
-    return ProgrammeUpdatePage(programme: programme);
-  }
-
   FirestorageService firestorageService = FirestorageService.instance();
   TrainersService trainersService = TrainersService.instance();
   ParamService paramService = ParamService.getInstance();

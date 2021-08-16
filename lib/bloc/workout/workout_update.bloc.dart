@@ -55,17 +55,6 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with MixinFitne
     return trainersService.getWorkoutReference();
   }
 
-  @override
-  void openUpdate(BuildContext context, Workout workout) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) =>
-            AlertDialog(
-              contentPadding: EdgeInsets.all(20),
-              content: SizedBox(width: 1280,child: WorkoutUpdatePage(workout: workout)),
-            ));
-  }
-
   void init(Workout? workout) {
     if (workout != null) {
       _workout = workout;

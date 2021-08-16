@@ -51,11 +51,6 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice>
   }
 
   @override
-  void openUpdate(BuildContext context, Exercice exercice) {
-    ExerciceBuilderPage.update(context: context, exercice: exercice);
-  }
-
-  @override
   String getStorageRef(User user, Exercice exercice) {
     return 'trainers/${user.uid}/exercices/${exercice.uid}';
   }

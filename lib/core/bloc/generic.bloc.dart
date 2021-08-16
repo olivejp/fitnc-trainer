@@ -152,6 +152,4 @@ abstract class MixinFitnessStorageBloc<T extends AbstractFitnessStorageDomain> {
 /// Classe Bloc spécifique à l'application Fitness NC pour implémenter les méthodes de base du CRUD
 ///
 abstract class AbstractFitnessCrudBloc<T extends AbstractDomain> extends AbstractFirebaseCrudBloc<T> {
-  /// Méthode abstraite qui retournera le widget à ouvrir pour une mise à jour.
-  void openUpdate(BuildContext context, T domain);
 }

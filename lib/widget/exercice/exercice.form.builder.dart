@@ -47,11 +47,15 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
 
   late VideoPlayerController? _videoController;
   late YoutubePlayerController? _youtubeController;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late GlobalKey<FormState> _formKey;
+  final ValueNotifier<Exercice?> _vnExercice = ValueNotifier<Exercice?>(null);
 
   @override
   Widget build(BuildContext context) {
+    _formKey = GlobalKey<FormState>();
+
     bloc.init(widget.exercice);
+    _vnExercice.value = widget.exercice;
 
     final Widget saveButton = Padding(
       padding: EdgeInsets.only(right: 10),
@@ -60,7 +64,9 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
           if (_formKey.currentState?.validate() == true) {
             bloc.saveExercice().then((_) {
               showToast(widget.isCreation ? 'Exercice créé' : 'Exercice mis à jour', backgroundColor: Colors.green);
-              Navigator.of(context).pop();
+              if (widget.isCreation) {
+                Navigator.of(context).pop();
+              }
             }).catchError((_) => showToast("Erreur lors de la sauvegarde", backgroundColor: Colors.redAccent));
           }
         },
@@ -71,7 +77,7 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
     final Widget closeButton =
         ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Fermer', style: TextStyle(color: Colors.white)));
 
-    final List<Widget> buttons = <Widget>[saveButton, closeButton];
+    final List<Widget> buttons = widget.isCreation ? <Widget>[saveButton, closeButton] : <Widget>[saveButton];
 
     return Form(
       key: _formKey,

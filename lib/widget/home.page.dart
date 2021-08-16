@@ -114,6 +114,7 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
           valueListenable: _vnIsExtended,
           builder: (BuildContext context, bool isExtended, Widget? child) {
             return NavigationRail(
+                elevation: 5,
                 extended: isExtended,
                 selectedIndex: _vnSelectedIndex.value,
                 trailing: _NavigationRailFolderSection(folders: <_NavigationFolder>[

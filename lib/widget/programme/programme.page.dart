@@ -4,6 +4,7 @@ import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
+import 'package:fitnc_trainer/widget/programme/programme.update.page.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -111,6 +112,15 @@ class _ProgrammePageState extends State<ProgrammePage> with SingleTickerProvider
                     return FitnessGridView<Programme>(
                       domains: programmes,
                       bloc: bloc,
+                      onTap: (Programme programme) {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) =>
+                                AlertDialog(
+                                  contentPadding: EdgeInsets.all(20),
+                                  content: SizedBox(width: 1280,child: ProgrammeUpdatePage(programme: programme)),
+                                ));
+                      },
                     );
                   }
                 },

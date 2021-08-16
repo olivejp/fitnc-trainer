@@ -1,6 +1,5 @@
 import 'package:fitnc_trainer/bloc/exercice/exercice_update.bloc.dart';
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
-import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
@@ -28,12 +27,11 @@ class _ExercicePageState extends State<ExercicePage> {
   final HomePageBloc homePageBloc = HomePageBloc.instance();
   final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
   final List<Exercice> listCompleteExercice = <Exercice>[];
-  final BehaviorSubject<List<Exercice>> _streamListExercice =
-      BehaviorSubject<List<Exercice>>();
+  final BehaviorSubject<List<Exercice>> _streamListExercice = BehaviorSubject<List<Exercice>>();
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
   final ValueNotifier<int> _vnDisplay = ValueNotifier<int>(0);
-  final ValueNotifier<List<bool>> _vnToggleSelections =
-      ValueNotifier<List<bool>>([true, false]);
+  final ValueNotifier<Exercice?> _vnExerciceSelected = ValueNotifier<Exercice?>(null);
+  final ValueNotifier<List<bool>> _vnToggleSelections = ValueNotifier<List<bool>>([true, false]);
 
   String? _query;
 
@@ -57,6 +55,117 @@ class _ExercicePageState extends State<ExercicePage> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget streamListExercice = StreamBuilder<List<Exercice>>(
+      stream: _streamListExercice,
+      builder: (BuildContext context, AsyncSnapshot<List<Exercice>> snapshot) {
+        if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
+          return const Center(child: Text('Aucun exercice trouvé.'));
+        } else {
+          final List<Exercice> list = snapshot.data!;
+
+          final Widget gridExercice = FitnessGridView<Exercice>(
+            domains: list,
+            bloc: bloc,
+            onTap: (Exercice exercice) => _vnExerciceSelected.value = exercice,
+          );
+
+          final Widget listExercice = ValueListenableBuilder<Exercice?>(
+              valueListenable: _vnExerciceSelected,
+              builder: (BuildContext context, Exercice? exerciceSelected, Widget? child) => ListView.separated(
+                  shrinkWrap: true,
+                  itemBuilder: (BuildContext context, int index) {
+                    final Exercice exercice = list.elementAt(index);
+                    return ListTile(
+                      contentPadding: EdgeInsets.all(20),
+                      selected: exerciceSelected?.uid == exercice.uid,
+                      selectedTileColor: FitnessNcColors.blue50,
+                      leading: CircleAvatar(foregroundImage: exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null),
+                      title: Text(exercice.name!),
+                      trailing: IconButton(onPressed: () => UtilService.showDeleteDialog(context, exercice, bloc), icon: const Icon(Icons.delete)),
+                      onTap: () => _vnExerciceSelected.value = exercice,
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) => const Divider(
+                        height: 2,
+                      ),
+                  itemCount: list.length));
+
+          return ValueListenableBuilder<int>(
+              valueListenable: _vnDisplay,
+              builder: (BuildContext context, int value, Widget? child) {
+                if (value == 0) {
+                  return gridExercice;
+                } else {
+                  return listExercice;
+                }
+              });
+        }
+      },
+    );
+
+    final Widget listSearchExercice = Column(
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(top: 20, bottom: 20, right: 30, left: 30),
+          child: Row(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: IconTheme(
+                  data: const IconThemeData(size: 15),
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: _vnDisplay,
+                    builder: (BuildContext context, int value, Widget? child) => ValueListenableBuilder<List<bool>>(
+                      valueListenable: _vnToggleSelections,
+                      builder: (BuildContext context, List<bool> selections, Widget? child) => ToggleButtons(
+                        color: Colors.grey,
+                        selectedColor: FitnessNcColors.blue300,
+                        borderColor: Colors.grey,
+                        borderWidth: 1,
+                        selectedBorderColor: FitnessNcColors.orange400,
+                        constraints: const BoxConstraints(minHeight: 40, maxHeight: 40),
+                        borderRadius: BorderRadius.circular(5),
+                        isSelected: selections,
+                        onPressed: (int index) {
+                          final List<bool> selectionsFalse = List<bool>.generate(2, (_) => false);
+                          selectionsFalse[index] = !selectionsFalse[index];
+                          _vnToggleSelections.value = selectionsFalse;
+                          _vnDisplay.value = index;
+                        },
+                        children: const <Widget>[
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Icon(Icons.grid_view),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Icon(Icons.list),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              TextField(
+                decoration: InputDecoration(
+                  constraints: BoxConstraints(maxWidth: 250, maxHeight: 40),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1)),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor)),
+                  prefixIcon: Icon(Icons.search),
+                  hintText: 'Recherche...',
+                ),
+                onChanged: (String value) => query = value,
+                textAlignVertical: TextAlignVertical.bottom,
+              ),
+            ],
+          ),
+        ),
+        Expanded(child: streamListExercice),
+      ],
+    );
+
     return RoutedPage(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -79,8 +188,7 @@ class _ExercicePageState extends State<ExercicePage> {
                     onPressed: () => ExerciceBuilderPage.create(context),
                     child: Text(
                       'Créer un exercice',
-                      style: GoogleFonts.roboto(
-                          color: Color(Colors.white.value), fontSize: 15),
+                      style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
                     ),
                   )
                 ],
@@ -89,206 +197,42 @@ class _ExercicePageState extends State<ExercicePage> {
             const Divider(
               height: 2,
             ),
-            Padding(
-              padding: const EdgeInsets.all(20),
+            Expanded(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  TextField(
-                    decoration: InputDecoration(
-                      constraints: BoxConstraints(maxWidth: 250, maxHeight: 40),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          borderSide: BorderSide(width: 1)),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                          borderSide: BorderSide(
-                              width: 1, color: Theme.of(context).primaryColor)),
-                      prefixIcon: Icon(Icons.search),
-                      hintText: 'Recherche...',
-                    ),
-                    onChanged: (String value) => query = value,
-                    textAlignVertical: TextAlignVertical.bottom,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: IconTheme(
-                      data: const IconThemeData(size: 15),
-                      child: ValueListenableBuilder<int>(
-                        valueListenable: _vnDisplay,
-                        builder:
-                            (BuildContext context, int value, Widget? child) =>
-                                ValueListenableBuilder<List<bool>>(
-                          valueListenable: _vnToggleSelections,
-                          builder: (BuildContext context, List<bool> selections,
-                                  Widget? child) =>
-                              ToggleButtons(
-                            color: Colors.grey,
-                            selectedColor: FitnessNcColors.blue300,
-                            borderColor: Colors.grey,
-                            borderWidth: 1,
-                            selectedBorderColor: FitnessNcColors.orange400,
-                            constraints: const BoxConstraints(
-                                minHeight: 40, maxHeight: 40),
-                            borderRadius: BorderRadius.circular(5),
-                            isSelected: selections,
-                            onPressed: (int index) {
-                              final List<bool> selectionsFalse =
-                                  List<bool>.generate(2, (_) => false);
-                              selectionsFalse[index] = !selectionsFalse[index];
-                              _vnToggleSelections.value = selectionsFalse;
-                              _vnDisplay.value = index;
-                            },
-                            children: const <Widget>[
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Icon(Icons.grid_view),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Icon(Icons.list),
-                              ),
-                            ],
-                          ),
+                  Expanded(flex: 2, child: listSearchExercice),
+                  Expanded(
+                      flex: 3,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: ValueListenableBuilder<Exercice?>(
+                          valueListenable: _vnExerciceSelected,
+                          builder: (BuildContext context, Exercice? exercice, Widget? child) {
+                            if (exercice != null) {
+                              bloc.init(exercice);
+                              return Material(borderRadius: BorderRadius.only(topLeft: Radius.circular(20)),
+                                elevation:5 ,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: FitnessNcColors.blue50,
+                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(20))),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(60.0),
+                                    child: ExerciceGeneric(
+                                      isCreation: false,
+                                      exercice: exercice,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return child!;
+                            }
+                          },
+                          child: Container(),
                         ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: StreamBuilder<List<Exercice>>(
-                stream: _streamListExercice,
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Exercice>> snapshot) {
-                  if (!snapshot.hasData ||
-                      (snapshot.hasData && snapshot.data!.isEmpty)) {
-                    return const Center(child: Text('Aucun exercice trouvé.'));
-                  } else {
-                    final List<Exercice> list = snapshot.data!;
-
-                    final Widget gridExercice = FitnessGridView<Exercice>(
-                      domains: list,
-                      bloc: bloc,
-                    );
-
-                    final Widget listExercice = ListView.separated(
-                        shrinkWrap: true,
-                        itemBuilder: (BuildContext context, int index) {
-                          final Exercice exercice = list.elementAt(index);
-                          return ListTile(
-                            leading: CircleAvatar(
-                                foregroundImage: exercice.imageUrl != null
-                                    ? NetworkImage(exercice.imageUrl!)
-                                    : null),
-                            title: Text(exercice.name!),
-                            trailing: IconButton(
-                                onPressed: () => UtilService.showDeleteDialog(
-                                    context, exercice, bloc),
-                                icon: const Icon(Icons.clear)),
-                            onTap: () => bloc.openUpdate(context, exercice),
-                          );
-                        },
-                        separatorBuilder: (BuildContext context, int index) =>
-                            const Divider(
-                              height: 2,
-                            ),
-                        itemCount: list.length);
-
-                    return ValueListenableBuilder<int>(
-                        valueListenable: _vnDisplay,
-                        builder:
-                            (BuildContext context, int value, Widget? child) {
-                          if (value == 0) {
-                            return gridExercice;
-                          } else {
-                            return listExercice;
-                          }
-                        });
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// TODO A reporter dans un autre fichier
-class HorizontalGridView<T extends AbstractFitnessStorageDomain>
-    extends StatelessWidget {
-  const HorizontalGridView(
-      {Key? key, required this.listDomains, required this.onChanged})
-      : super(key: key);
-
-  final List<T> listDomains;
-  final void Function(T domain) onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return LimitedBox(
-      maxHeight: 300,
-      child: GridView(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, mainAxisExtent: 200, childAspectRatio: 1 / 4),
-          scrollDirection: Axis.horizontal,
-          shrinkWrap: true,
-          children: listDomains
-              .map((T e) =>
-                  HorizontalGridCard<T>(domain: e, onChanged: onChanged))
-              .toList()),
-    );
-  }
-}
-
-class HorizontalGridCard<T extends AbstractFitnessStorageDomain>
-    extends StatelessWidget {
-  const HorizontalGridCard(
-      {Key? key, required this.domain, required this.onChanged})
-      : super(key: key);
-
-  final T domain;
-  final void Function(T domain) onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      elevation: 2,
-      child: InkWell(
-        onTap: () => onChanged(domain),
-        splashColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Expanded(
-              flex: 3,
-              child: (domain.imageUrl?.isNotEmpty == true)
-                  ? Ink.image(
-                      image: NetworkImage(domain.imageUrl!), fit: BoxFit.cover)
-                  : Container(
-                      decoration: const BoxDecoration(color: Colors.amber)),
-            ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Text(domain.name!,
-                        style: const TextStyle(fontSize: 15)),
-                  ),
-                  IconButton(
-                    tooltip: 'Supprimer',
-                    onPressed: () {},
-                    icon:
-                        const Icon(Icons.delete, color: Colors.grey, size: 24),
-                  )
+                      )),
                 ],
               ),
             ),
