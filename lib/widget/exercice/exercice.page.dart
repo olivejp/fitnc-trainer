@@ -187,6 +187,7 @@ class _ExercicePageState extends State<ExercicePage> {
                                 onPressed: () => UtilService.showDeleteDialog(
                                     context, exercice, bloc),
                                 icon: const Icon(Icons.clear)),
+                            onTap: () => bloc.openUpdate(context, exercice),
                           );
                         },
                         separatorBuilder: (BuildContext context, int index) =>

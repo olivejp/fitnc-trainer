@@ -78,87 +78,86 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
         child: Text('Circuit'),
       ),
     ];
-    return Scaffold(
-        body: GenericUpdateWidget(
-            maximumWidth: 1200,
-            child: Form(
-                key: _formKey,
-                child: Column(children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 20.0),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            ButtonBar(children: buttons),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            StorageFutureImageWidget(
-                              onSaved: (StorageFile? file) => bloc.storageFile = file,
-                              onDeleted: (_) => bloc.storageFile = null,
-                              futureInitialStorageFile: bloc.getStorageFile(),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 20),
-                                child: FitnessDecorationTextFormField(
-                                    initialValue: bloc.getWorkout()?.name,
-                                    autofocus: true,
-                                    onChanged: (String value) => bloc.name = value,
-                                    labelText: 'Nom du workout',
-                                    validator: (String? value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'Le nom du workout est obligatoire.';
-                                      }
-                                      return null;
-                                    }),
-                              ),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 20),
-                                child: DropdownButtonFormField<String>(
-                                    decoration: const InputDecoration(
-                                      hintText: "Type d'entrainement",
-                                      labelText: "Type d'entrainement",
-                                      contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                                      constraints: BoxConstraints(
-                                        maxHeight: FitnessConstants.textFormFieldHeight,
-                                      ),
-                                    ),
-                                    icon: const Icon(Icons.arrow_downward),
-                                    onChanged: (String? value) => bloc.timerType = value,
-                                    value: bloc.getWorkout()?.timerType,
-                                    items: typesWorkout),
-                              ),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
+    return SingleChildScrollView(
+      child: Form(
+          key: _formKey,
+          child: Column(children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      ButtonBar(children: buttons),
+                    ],
                   ),
-                  TextFormField(
-                    initialValue: bloc.getWorkout()?.description,
-                    maxLength: 2000,
-                    minLines: 5,
-                    maxLines: 20,
-                    onChanged: (String value) => bloc.description = value,
-                    decoration: const InputDecoration(labelText: 'Instructions', hintText: 'Optionnel'),
-                  ),
-                  LimitedBox(
-                    maxWidth: 2000,
-                    maxHeight: 600,
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: WorkoutSetPage(workout: widget.workout),
+                  Row(
+                    children: <Widget>[
+                      StorageFutureImageWidget(
+                        onSaved: (StorageFile? file) => bloc.storageFile = file,
+                        onDeleted: (_) => bloc.storageFile = null,
+                        futureInitialStorageFile: bloc.getStorageFile(),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20),
+                          child: FitnessDecorationTextFormField(
+                              initialValue: bloc.getWorkout()?.name,
+                              autofocus: true,
+                              onChanged: (String value) => bloc.name = value,
+                              labelText: 'Nom du workout',
+                              validator: (String? value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Le nom du workout est obligatoire.';
+                                }
+                                return null;
+                              }),
                         ),
-                      ],
-                    ),
-                  )
-                ]))));
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20),
+                          child: DropdownButtonFormField<String>(
+                              decoration: const InputDecoration(
+                                hintText: "Type d'entrainement",
+                                labelText: "Type d'entrainement",
+                                contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                                constraints: BoxConstraints(
+                                  maxHeight: FitnessConstants.textFormFieldHeight,
+                                ),
+                              ),
+                              icon: const Icon(Icons.arrow_downward),
+                              onChanged: (String? value) => bloc.timerType = value,
+                              value: bloc.getWorkout()?.timerType,
+                              items: typesWorkout),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            TextFormField(
+              initialValue: bloc.getWorkout()?.description,
+              maxLength: 2000,
+              minLines: 5,
+              maxLines: 20,
+              onChanged: (String value) => bloc.description = value,
+              decoration: const InputDecoration(labelText: 'Instructions', hintText: 'Optionnel'),
+            ),
+            LimitedBox(
+              maxWidth: 2000,
+              maxHeight: 600,
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: WorkoutSetPage(workout: widget.workout),
+                  ),
+                ],
+              ),
+            )
+          ])),
+    );
   }
 }
