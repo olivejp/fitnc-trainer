@@ -46,7 +46,7 @@ class _WorkoutSetPageState extends State<WorkoutSetPage> {
 
   set query(String? text) {
     _query = text;
-    UtilSearch.search(_query, bloc.listCompleteExercice, bloc._streamListExercice);
+    UtilService.search(_query, bloc.listCompleteExercice, bloc._streamListExercice);
   }
 
   String? get query => _query;
@@ -59,7 +59,7 @@ class _WorkoutSetPageState extends State<WorkoutSetPage> {
       bloc.listCompleteExercice.clear();
       bloc.listCompleteExercice.addAll(event);
       bloc._streamListExercice.sink.add(bloc.listCompleteExercice);
-      UtilSearch.search(_query, bloc.listCompleteExercice, bloc._streamListExercice);
+      UtilService.search(_query, bloc.listCompleteExercice, bloc._streamListExercice);
     });
   }
 
@@ -204,7 +204,7 @@ class ExerciceCard extends StatelessWidget {
                 child: Center(
                   child: Text(
                     exercice.name!,
-                    maxLines: 2,
+                    maxLines: 1,
                     textAlign: TextAlign.left,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontSize: 12),

@@ -29,7 +29,6 @@ class _ExerciceUpdatePageState extends State<ExerciceUpdatePage> {
     return Scaffold(
         backgroundColor: Colors.transparent,
         body: GenericUpdateWidget(
-          maximumWidth: 1200,
           child: ExerciceFormBuilder.getForm(context, _formKey, widget.bloc),
         ));
   }

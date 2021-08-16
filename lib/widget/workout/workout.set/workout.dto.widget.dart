@@ -67,17 +67,22 @@ class _ListTileDtoState extends State<ListTileDto> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: leading,
-                  ),
-                  Text(
-                    widget.dto.nameExercice!,
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                ],
+              Flexible(
+                child: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: leading,
+                    ),
+                    Flexible(
+                      child: Text(
+                        widget.dto.nameExercice!,
+                        style: const TextStyle(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               ButtonBar(
                 children: <Widget>[

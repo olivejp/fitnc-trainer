@@ -34,7 +34,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   set query(String? text) {
     _query = text;
-    UtilSearch.search(_query, listCompleteWorkout, _streamListWorkout);
+    UtilService.search(_query, listCompleteWorkout, _streamListWorkout);
   }
 
   String? get query => _query;
@@ -45,7 +45,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     bloc.listenAll().listen((List<Workout> event) {
       listCompleteWorkout.clear();
       listCompleteWorkout.addAll(event);
-      UtilSearch.search(_query, listCompleteWorkout, _streamListWorkout);
+      UtilService.search(_query, listCompleteWorkout, _streamListWorkout);
     });
   }
 

@@ -76,7 +76,6 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
 
     return Scaffold(
         body: GenericUpdateWidget(
-          maximumWidth: 1200,
           child: Form(
             key: _formKey,
             child: Column(

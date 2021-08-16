@@ -4,7 +4,6 @@ import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
-import 'package:fitnc_trainer/widget/exercice/exercice.form.builder.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,18 +28,16 @@ class _ExercicePageState extends State<ExercicePage> {
   final HomePageBloc homePageBloc = HomePageBloc.instance();
   final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
   final List<Exercice> listCompleteExercice = <Exercice>[];
-  final BehaviorSubject<List<Exercice>> _streamListExercice =
-      BehaviorSubject<List<Exercice>>();
+  final BehaviorSubject<List<Exercice>> _streamListExercice = BehaviorSubject<List<Exercice>>();
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
-  final List<bool> _toggleSelections = List<bool>.generate(3, (_) => false);
   final ValueNotifier<int> _vnDisplay = ValueNotifier<int>(0);
-  final ValueNotifier<Exercice?> _vnExercice = ValueNotifier<Exercice?>(null);
+  final ValueNotifier<List<bool>> _vnToggleSelections = ValueNotifier<List<bool>>([true, false]);
 
   String? _query;
 
   set query(String? text) {
     _query = text;
-    UtilSearch.search(_query, listCompleteExercice, _streamListExercice);
+    UtilService.search(_query, listCompleteExercice, _streamListExercice);
   }
 
   String? get query => _query;
@@ -52,7 +49,7 @@ class _ExercicePageState extends State<ExercicePage> {
       listCompleteExercice.clear();
       listCompleteExercice.addAll(event);
       _streamListExercice.sink.add(listCompleteExercice);
-      UtilSearch.search(_query, listCompleteExercice, _streamListExercice);
+      UtilService.search(_query, listCompleteExercice, _streamListExercice);
     });
   }
 
@@ -61,86 +58,88 @@ class _ExercicePageState extends State<ExercicePage> {
     return RoutedPage(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        floatingActionButton: FloatingActionButton.extended(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          onPressed: () => ExerciceCreatePage.showCreate(context),
-          label: Text(
-            'Créer un exercice',
-            style: GoogleFonts.roboto(
-                fontSize: 15, color: Color(Colors.white.value)),
-          ),
-          icon: const Icon(
-            Icons.add,
-            color: Colors.white,
-            size: 25.0,
-          ),
-        ),
         body: Column(
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+              padding: const EdgeInsets.all(20),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Expanded(
-                      flex: 2,
-                      child: SelectableText(
-                        'Exercice',
-                        style: Theme.of(context).textTheme.headline1,
-                      )),
-                  Expanded(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Expanded(
-                          child: IconTheme(
-                            data: const IconThemeData(size: 15),
-                            child: ValueListenableBuilder<int>(
-                              valueListenable: _vnDisplay,
-                              builder: (BuildContext context, int value,
-                                      Widget? child) =>
-                                  ToggleButtons(
-                                color: FitnessNcColors.blue200,
-                                selectedColor: FitnessNcColors.blue800,
-                                constraints: const BoxConstraints(
-                                    minHeight: 40, maxHeight: 40),
-                                borderRadius: BorderRadius.circular(5),
-                                isSelected: _toggleSelections,
-                                onPressed: (int index) {
-                                  _toggleSelections.map((_) => false).toList();
-                                  _toggleSelections[index] =
-                                      !_toggleSelections[index];
-                                  _vnDisplay.value = index;
-                                },
-                                children: const <Widget>[
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Icon(Icons.list),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Icon(Icons.grid_view),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Icon(Icons.grid_4x4),
-                                  ),
-                                ],
+                  SelectableText(
+                    'Exercice',
+                    style: Theme.of(context).textTheme.headline1,
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(100, 50),
+                      maximumSize: Size(200, 50),
+                    ),
+                    onPressed: () => ExerciceCreatePage.showCreate(context),
+                    child: Text(
+                      'Créer un exercice',
+                      style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            const Divider(
+              height: 2,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  TextField(
+                    decoration: InputDecoration(
+                      constraints: BoxConstraints(maxWidth: 250, maxHeight: 40),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1)),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor)),
+                      prefixIcon: Icon(Icons.search),
+                      hintText: 'Recherche...',
+                    ),
+                    onChanged: (String value) => query = value,
+                    textAlignVertical: TextAlignVertical.bottom,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: IconTheme(
+                      data: const IconThemeData(size: 15),
+                      child: ValueListenableBuilder<int>(
+                        valueListenable: _vnDisplay,
+                        builder: (BuildContext context, int value, Widget? child) => ValueListenableBuilder<List<bool>>(
+                          valueListenable: _vnToggleSelections,
+                          builder: (BuildContext context, List<bool> selections, Widget? child) => ToggleButtons(
+                            color: Colors.grey,
+                            selectedColor: FitnessNcColors.blue300,
+                            borderColor: Colors.grey,
+                            borderWidth: 1,
+                            selectedBorderColor: FitnessNcColors.orange400,
+                            constraints: const BoxConstraints(minHeight: 40, maxHeight: 40),
+                            borderRadius: BorderRadius.circular(5),
+                            isSelected: selections,
+                            onPressed: (int index) {
+                              final List<bool> selectionsFalse = List<bool>.generate(2, (_) => false);
+                              selectionsFalse[index] = !selectionsFalse[index];
+                              _vnToggleSelections.value = selectionsFalse;
+                              _vnDisplay.value = index;
+                            },
+                            children: const <Widget>[
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Icon(Icons.grid_view),
                               ),
-                            ),
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Icon(Icons.list),
+                              ),
+                            ],
                           ),
                         ),
-                        Expanded(
-                          child: TextFormField(
-                            decoration: const InputDecoration(
-                              border: UnderlineInputBorder(),
-                              prefixIcon: Icon(Icons.search),
-                              hintText: 'Recherche...',
-                            ),
-                            onChanged: (String value) => query = value,
-                            textAlignVertical: TextAlignVertical.bottom,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ],
@@ -149,72 +148,43 @@ class _ExercicePageState extends State<ExercicePage> {
             Expanded(
               child: StreamBuilder<List<Exercice>>(
                 stream: _streamListExercice,
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Exercice>> snapshot) {
-                  if (!snapshot.hasData ||
-                      (snapshot.hasData && snapshot.data!.isEmpty)) {
+                builder: (BuildContext context, AsyncSnapshot<List<Exercice>> snapshot) {
+                  if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
                     return const Center(child: Text('Aucun exercice trouvé.'));
                   } else {
                     final List<Exercice> list = snapshot.data!;
+
+                    final Widget gridExercice = FitnessGridView<Exercice>(
+                      domains: list,
+                      bloc: bloc,
+                      updatePopup: true,
+                      popupTitle: Text('Mise à jour exercice'),
+                      popupWidth: 1200,
+                    );
+
+                    final Widget listExercice = ListView.separated(
+                        shrinkWrap: true,
+                        itemBuilder: (BuildContext context, int index) {
+                          final Exercice exercice = list.elementAt(index);
+                          return ListTile(
+                            leading: CircleAvatar(foregroundImage: exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null),
+                            title: Text(exercice.name!),
+                            trailing:
+                                IconButton(onPressed: () => UtilService.showDeleteDialog(context, exercice, bloc), icon: const Icon(Icons.clear)),
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) => const Divider(
+                              height: 2,
+                            ),
+                        itemCount: list.length);
+
                     return ValueListenableBuilder<int>(
                         valueListenable: _vnDisplay,
-                        builder:
-                            (BuildContext context, int value, Widget? child) {
+                        builder: (BuildContext context, int value, Widget? child) {
                           if (value == 0) {
-                            return FitnessGridView<Exercice>(
-                              domains: list,
-                              bloc: bloc,
-                            );
-                          } else if (value == 1) {
-                            return Column(children: <Widget>[
-                              HorizontalGridView<Exercice>(
-                                  listDomains: list,
-                                  onChanged: (Exercice exercice) =>
-                                      _vnExercice.value = exercice),
-                              Expanded(
-                                child: SingleChildScrollView(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: ValueListenableBuilder<Exercice?>(
-                                        builder: (BuildContext context,
-                                            Exercice? exercice, Widget? child) {
-                                          final ExerciceUpdateBloc bloc =
-                                              ExerciceUpdateBloc.instance();
-                                          bloc.init(exercice);
-                                          return ExerciceFormBuilder.getForm(
-                                              context,
-                                              GlobalKey<FormState>(),
-                                              bloc);
-                                        },
-                                        valueListenable: _vnExercice),
-                                  ),
-                                ),
-                              ),
-                            ]);
+                            return gridExercice;
                           } else {
-                            return ListView.separated(
-                                shrinkWrap: true,
-                                itemBuilder: (BuildContext context, int index) {
-                                  final Exercice exercice =
-                                      list.elementAt(index);
-                                  return ListTile(
-                                    leading: CircleAvatar(
-                                      foregroundImage: exercice.imageUrl != null
-                                          ? NetworkImage(exercice.imageUrl!)
-                                          : null,
-                                    ),
-                                    title: Text(list.elementAt(index).name!),
-                                    trailing: IconButton(
-                                        onPressed: () {},
-                                        icon: const Icon(Icons.clear)),
-                                  );
-                                },
-                                separatorBuilder:
-                                    (BuildContext context, int index) =>
-                                        const Divider(
-                                          height: 2,
-                                        ),
-                                itemCount: list.length);
+                            return listExercice;
                           }
                         });
                   }
@@ -228,11 +198,9 @@ class _ExercicePageState extends State<ExercicePage> {
   }
 }
 
-class HorizontalGridView<T extends AbstractFitnessStorageDomain>
-    extends StatelessWidget {
-  const HorizontalGridView(
-      {Key? key, required this.listDomains, required this.onChanged})
-      : super(key: key);
+// TODO A reporter dans un autre fichier
+class HorizontalGridView<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
+  const HorizontalGridView({Key? key, required this.listDomains, required this.onChanged}) : super(key: key);
 
   final List<T> listDomains;
   final void Function(T domain) onChanged;
@@ -242,23 +210,16 @@ class HorizontalGridView<T extends AbstractFitnessStorageDomain>
     return LimitedBox(
       maxHeight: 300,
       child: GridView(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, mainAxisExtent: 200, childAspectRatio: 1 / 4),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisExtent: 200, childAspectRatio: 1 / 4),
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,
-          children: listDomains
-              .map((T e) =>
-                  HorizontalGridCard<T>(domain: e, onChanged: onChanged))
-              .toList()),
+          children: listDomains.map((T e) => HorizontalGridCard<T>(domain: e, onChanged: onChanged)).toList()),
     );
   }
 }
 
-class HorizontalGridCard<T extends AbstractFitnessStorageDomain>
-    extends StatelessWidget {
-  const HorizontalGridCard(
-      {Key? key, required this.domain, required this.onChanged})
-      : super(key: key);
+class HorizontalGridCard<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
+  const HorizontalGridCard({Key? key, required this.domain, required this.onChanged}) : super(key: key);
 
   final T domain;
   final void Function(T domain) onChanged;
@@ -279,10 +240,8 @@ class HorizontalGridCard<T extends AbstractFitnessStorageDomain>
             Expanded(
               flex: 3,
               child: (domain.imageUrl?.isNotEmpty == true)
-                  ? Ink.image(
-                      image: NetworkImage(domain.imageUrl!), fit: BoxFit.cover)
-                  : Container(
-                      decoration: const BoxDecoration(color: Colors.amber)),
+                  ? Ink.image(image: NetworkImage(domain.imageUrl!), fit: BoxFit.cover)
+                  : Container(decoration: const BoxDecoration(color: Colors.amber)),
             ),
             Expanded(
               child: Row(
@@ -290,14 +249,12 @@ class HorizontalGridCard<T extends AbstractFitnessStorageDomain>
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
-                    child: Text(domain.name!,
-                        style: const TextStyle(fontSize: 15)),
+                    child: Text(domain.name!, style: const TextStyle(fontSize: 15)),
                   ),
                   IconButton(
                     tooltip: 'Supprimer',
                     onPressed: () {},
-                    icon:
-                        const Icon(Icons.delete, color: Colors.grey, size: 24),
+                    icon: const Icon(Icons.delete, color: Colors.grey, size: 24),
                   )
                 ],
               ),

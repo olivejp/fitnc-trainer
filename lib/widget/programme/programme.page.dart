@@ -37,7 +37,7 @@ class _ProgrammePageState extends State<ProgrammePage> with SingleTickerProvider
 
   set query(String? text) {
     _query = text;
-    UtilSearch.search(_query, listCompleteProgramme, _streamListProgramme);
+    UtilService.search(_query, listCompleteProgramme, _streamListProgramme);
   }
 
   String? get query => _query;
@@ -52,7 +52,7 @@ class _ProgrammePageState extends State<ProgrammePage> with SingleTickerProvider
       listCompleteProgramme.clear();
       listCompleteProgramme.addAll(event);
       _streamListProgramme.sink.add(listCompleteProgramme);
-      UtilSearch.search(_query, listCompleteProgramme, _streamListProgramme);
+      UtilService.search(_query, listCompleteProgramme, _streamListProgramme);
     });
   }
 

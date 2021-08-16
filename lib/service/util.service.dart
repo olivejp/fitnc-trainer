@@ -1,9 +1,11 @@
 import 'dart:developer';
 
+import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
 import 'package:fitnc_trainer/domain/abstract.domain.dart';
+import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-class UtilSearch {
+class UtilService {
   ///
   /// Méthode utilitaire pour rechercher dans une liste les éléments contenant la chaine 'query' et émet la liste résultat
   /// dans un Stream donné en paramètre.
@@ -35,5 +37,22 @@ class UtilSearch {
       listFiltered = listCompleteDomain;
     }
     stream.sink.add(listFiltered);
+  }
+
+  static void showDeleteDialog(BuildContext context, AbstractDomain domain, AbstractFitnessCrudBloc<AbstractDomain> bloc) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: RichText(
+            text: TextSpan(text: 'Êtes-vous sûr de vouloir supprimer : ', children: <InlineSpan>[
+              TextSpan(text: domain.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+              const TextSpan(text: ' ?'),
+            ])),
+        actions: <Widget>[
+          TextButton(onPressed: () => bloc.delete(domain).then((_) => Navigator.pop(context)), child: const Text('Oui')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
+        ],
+      ),
+    );
   }
 }

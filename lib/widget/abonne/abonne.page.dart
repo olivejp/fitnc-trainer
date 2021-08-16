@@ -37,7 +37,7 @@ class _AbonnePageState extends State<AbonnePage> {
 
   set query(String? text) {
     _query = text;
-    UtilSearch.search(_query, listCompleteAbonne, _streamListAbonne);
+    UtilService.search(_query, listCompleteAbonne, _streamListAbonne);
   }
 
   String? get query => _query;
@@ -48,7 +48,7 @@ class _AbonnePageState extends State<AbonnePage> {
     bloc.listenAll().listen((List<Abonne> event) {
       listCompleteAbonne.clear();
       listCompleteAbonne.addAll(event);
-      UtilSearch.search(_query, listCompleteAbonne, _streamListAbonne);
+      UtilService.search(_query, listCompleteAbonne, _streamListAbonne);
     });
   }
 
