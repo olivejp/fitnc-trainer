@@ -8,20 +8,17 @@ import 'package:page_transition/page_transition.dart';
 ///
 /// Classe Widget pour une GridView spécialisée pour un AbstractFitnessDomain.
 ///
-class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
-  const FitnessGridView(
-      {Key? key, required this.domains, required this.bloc, this.updatePopup = false, this.popupWidth = double.infinity, this.popupHeight = double.infinity, this.popupTitle})
+class FitnessGridView<T extends AbstractFitnessStorageDomain>
+    extends StatelessWidget {
+  const FitnessGridView({Key? key, required this.domains, required this.bloc})
       : super(key: key);
   final List<T> domains;
   final AbstractFitnessCrudBloc<T> bloc;
-  final bool updatePopup;
-  final double popupWidth;
-  final double popupHeight;
-  final Widget? popupTitle;
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
       int nbColumns = 1;
       if (constraints.maxWidth > 1200) {
         nbColumns = 6;
@@ -44,33 +41,9 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
           return _FitnessGridCard<T>(
             bloc: bloc,
             domain: domain,
-            onTap: (T domain) {
-              if (updatePopup) {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: popupTitle,
-                      content: SizedBox(
-                        height: popupHeight,
-                        width: popupWidth,
-                        child: bloc.openUpdate(context, domain),
-                      ),
-                    );
-                  },
-                );
-              } else {
-                Navigator.push(
-                    context,
-                    PageTransition<Widget>(
-                      duration: Duration.zero,
-                      reverseDuration: Duration.zero,
-                      type: PageTransitionType.fade,
-                      child: bloc.openUpdate(context, domain),
-                    ));
-              }
-            },
-            onDelete: (T domain) => UtilService.showDeleteDialog(context, domain, bloc),
+            onTap: (T domain) => bloc.openUpdate(context, domain),
+            onDelete: (T domain) =>
+                UtilService.showDeleteDialog(context, domain, bloc),
           );
         }).toList(),
       );
@@ -81,8 +54,15 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
 ///
 /// Classe Widget pour une Grid Card.
 ///
-class _FitnessGridCard<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
-  const _FitnessGridCard({Key? key, required this.domain, required this.onTap, required this.onDelete, required this.bloc}) : super(key: key);
+class _FitnessGridCard<T extends AbstractFitnessStorageDomain>
+    extends StatelessWidget {
+  const _FitnessGridCard(
+      {Key? key,
+      required this.domain,
+      required this.onTap,
+      required this.onDelete,
+      required this.bloc})
+      : super(key: key);
 
   final T domain;
   final AbstractFitnessCrudBloc<T> bloc;
@@ -105,8 +85,10 @@ class _FitnessGridCard<T extends AbstractFitnessStorageDomain> extends Stateless
             Expanded(
               flex: 3,
               child: (domain.imageUrl?.isNotEmpty == true)
-                  ? Ink.image(image: NetworkImage(domain.imageUrl!), fit: BoxFit.cover)
-                  : Container(decoration: const BoxDecoration(color: Colors.amber)),
+                  ? Ink.image(
+                      image: NetworkImage(domain.imageUrl!), fit: BoxFit.cover)
+                  : Container(
+                      decoration: const BoxDecoration(color: Colors.amber)),
             ),
             Expanded(
               child: Row(
@@ -126,7 +108,8 @@ class _FitnessGridCard<T extends AbstractFitnessStorageDomain> extends Stateless
                   IconButton(
                     tooltip: 'Supprimer',
                     onPressed: () => onDelete(domain),
-                    icon: const Icon(Icons.delete, color: Colors.grey, size: 24),
+                    icon:
+                        const Icon(Icons.delete, color: Colors.grey, size: 24),
                   )
                 ],
               ),

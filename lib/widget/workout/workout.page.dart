@@ -72,7 +72,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
               child: Row(
-                children: [
+                children: <Widget>[
                   Expanded(
                       flex: 3,
                       child: SelectableText(

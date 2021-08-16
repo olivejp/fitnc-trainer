@@ -143,14 +143,13 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                             decoration: InputDecoration(labelText: 'Prénom'),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Merci de renseigner le prénom de l\'abonné.';
+                                return "Merci de renseigner le prénom de l'abonné.";
                               }
                               return null;
                             }),
                       ),
                     ),
                     Flexible(
-                      flex: 1,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 5),
                         child: TextFormField(
@@ -158,10 +157,10 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                           initialValue: widget.bloc.abonne.dateNaissance,
                           onChanged: widget.bloc.changeDateNaissance,
                           autovalidateMode: AutovalidateMode.always,
-                          validator: (value) {
+                          validator: (String? value) {
                             if (value?.length != null && value!.length >= 8) {
                               DateTime time;
-                              DateTime today = DateTime.now();
+                              final DateTime today = DateTime.now();
                               try {
                                 time = DateFormat('dd/MM/yyyy').parseStrict(value);
                               } on Exception {

@@ -42,7 +42,7 @@ class WorkoutFormBuilder {
               ),
             ),
             DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: 'Type d\'entrainement', hintText: 'Type d\'entrainement'),
+                decoration: const InputDecoration(labelText: "Type d'entrainement", hintText: "Type d'entrainement"),
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Le type d'entrainement est obligatoire.";
@@ -52,29 +52,29 @@ class WorkoutFormBuilder {
                 icon: const Icon(Icons.arrow_downward),
                 onChanged: (String? value) => bloc.timerType = value,
                 value: bloc.getWorkout()?.timerType,
-                items: <DropdownMenuItem<String>>[
-                  DropdownMenuItem(
+                items: const <DropdownMenuItem<String>>[
+                  DropdownMenuItem<String>(
+                    value: 'none',
                     child: Text(
-                      'Aucun type d\'entraînement',
+                      "Aucun type d'entraînement",
                       style: TextStyle(fontStyle: FontStyle.italic),
                     ),
-                    value: 'none',
                   ),
-                  DropdownMenuItem(
-                    child: Text('AMRAP'),
+                  DropdownMenuItem<String>(
                     value: 'AMRAP',
+                    child: Text('AMRAP'),
                   ),
-                  DropdownMenuItem(
-                    child: Text('EMOM'),
+                  DropdownMenuItem<String>(
                     value: 'EMOM',
+                    child: Text('EMOM'),
                   ),
-                  DropdownMenuItem(
-                    child: Text('For Time'),
+                  DropdownMenuItem<String>(
                     value: 'For Time',
+                    child: Text('For Time'),
                   ),
-                  DropdownMenuItem(
-                    child: Text('Circuit'),
+                  DropdownMenuItem<String>(
                     value: 'CIRCUIT',
+                    child: Text('Circuit'),
                   ),
                 ]),
             Padding(

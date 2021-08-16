@@ -15,7 +15,7 @@ class WorkoutCreatePage {
         return AlertDialog(
           content: WorkoutFormBuilder.getForm(_formKey, bloc),
           actionsPadding: EdgeInsets.all(20),
-          actions: [
+          actions: <Widget>[
             FloatingActionButton(
               tooltip: 'Annuler',
               onPressed: () => Navigator.of(context).pop(),
@@ -25,7 +25,7 @@ class WorkoutCreatePage {
               tooltip: 'Créer',
               onPressed: () {
                 if (_formKey.currentState?.validate() == true) {
-                  bloc.saveWorkout().then((value) => Navigator.of(context).pop());
+                  bloc.saveWorkout().then((_) => Navigator.of(context).pop());
                 }
               },
               child: Icon(Icons.check),

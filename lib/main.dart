@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:fitnc_trainer/widget/abonne/abonne.update.page.dart';
-import 'package:fitnc_trainer/widget/exercice/exercice.update.page.dart';
 import 'package:fitnc_trainer/widget/home.page.dart';
 import 'package:fitnc_trainer/widget/login/login.page.dart';
 import 'package:fitnc_trainer/widget/login/sign-up.page.dart';
@@ -29,7 +28,6 @@ class MyApp extends StatelessWidget {
       authService.updateUser(user);
     });
 
-
     return OKToast(
       position: ToastPosition.bottom,
       child: MaterialApp(
@@ -37,55 +35,87 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             navigationRailTheme: NavigationRailThemeData(
                 backgroundColor: FitnessNcColors.blue100,
-                selectedIconTheme: const IconThemeData(color: FitnessNcColors.orange500),
-                unselectedIconTheme: const IconThemeData(color: FitnessNcColors.blue800),
-                selectedLabelTextStyle: GoogleFonts.workSansTextTheme().headline1!.copyWith(color: FitnessNcColors.orange500, fontSize: 18, fontWeight: FontWeight.bold),
-                unselectedLabelTextStyle: GoogleFonts.workSansTextTheme().headline1!.copyWith(color: FitnessNcColors.blue600, fontSize: 18)),
+                selectedIconTheme:
+                    const IconThemeData(color: FitnessNcColors.orange500),
+                unselectedIconTheme:
+                    const IconThemeData(color: FitnessNcColors.blue800),
+                selectedLabelTextStyle: GoogleFonts.workSansTextTheme()
+                    .headline1!
+                    .copyWith(
+                        color: FitnessNcColors.orange500,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
+                unselectedLabelTextStyle: GoogleFonts.workSansTextTheme()
+                    .headline1!
+                    .copyWith(color: FitnessNcColors.blue600, fontSize: 18)),
             textTheme: TextTheme(
-              headline1:
-                  GoogleFonts.workSansTextTheme().headline1!.copyWith(color: FitnessNcColors.blue600, fontSize: 35, fontWeight: FontWeight.bold),
-              headline2: GoogleFonts.alfaSlabOneTextTheme().headline2!.copyWith(color: FitnessNcColors.orange500, fontSize: 25),
-              headline3: GoogleFonts.workSansTextTheme().headline3!.copyWith(color: FitnessNcColors.blue800, fontSize: 18),
-              headline5: GoogleFonts.workSansTextTheme().headline5!.copyWith(color: FitnessNcColors.black900Alpha011, fontSize: 50),
-              headline6: GoogleFonts.workSansTextTheme().headline6!.copyWith(color: FitnessNcColors.black900, fontSize: 15),
-              subtitle1: GoogleFonts.workSansTextTheme().subtitle1!.copyWith(color: FitnessNcColors.blue800, fontSize: 15),
-              subtitle2: GoogleFonts.roboto(color: FitnessNcColors.orange500, fontSize: 18),
+              headline1: GoogleFonts.workSansTextTheme().headline1!.copyWith(
+                  color: FitnessNcColors.blue600,
+                  fontSize: 35,
+                  fontWeight: FontWeight.bold),
+              headline2: GoogleFonts.alfaSlabOneTextTheme()
+                  .headline2!
+                  .copyWith(color: FitnessNcColors.orange500, fontSize: 25),
+              headline3: GoogleFonts.workSansTextTheme()
+                  .headline3!
+                  .copyWith(color: FitnessNcColors.blue800, fontSize: 18),
+              headline5: GoogleFonts.workSansTextTheme().headline5!.copyWith(
+                  color: FitnessNcColors.black900Alpha011, fontSize: 50),
+              headline6: GoogleFonts.workSansTextTheme()
+                  .headline6!
+                  .copyWith(color: FitnessNcColors.black900, fontSize: 15),
+              subtitle1: GoogleFonts.workSansTextTheme()
+                  .subtitle1!
+                  .copyWith(color: FitnessNcColors.blue800, fontSize: 15),
+              subtitle2: GoogleFonts.roboto(
+                  color: FitnessNcColors.orange500, fontSize: 18),
             ),
             fixTextFieldOutlineLabel: true,
-            inputDecorationTheme: InputDecorationTheme(border: OutlineInputBorder(borderRadius: BorderRadius.circular(5))),
+            inputDecorationTheme: InputDecorationTheme(
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(5))),
             primarySwatch: Colors.amber,
-            floatingActionButtonTheme: const FloatingActionButtonThemeData(foregroundColor: FitnessNcColors.white50),
+            floatingActionButtonTheme: const FloatingActionButtonThemeData(
+                foregroundColor: FitnessNcColors.white50),
           ),
           routes: {
             '/login': (BuildContext context) => LoginPage(
-                  callback: (UserCredential userCredential) => Navigator.of(context).pushNamed('/'),
+                  callback: (UserCredential userCredential) =>
+                      Navigator.of(context).pushNamed('/'),
                 ),
             '/sign_up': (BuildContext context) => SignUpPage(
-                  callback: (UserCredential userCredential) => Navigator.pop(context),
+                  callback: (UserCredential userCredential) =>
+                      Navigator.pop(context),
                 ),
             '/add_abonne': (BuildContext context) => AbonneUpdatePage(),
-            '/add_exercice': (BuildContext context) => ExerciceUpdatePage()
           },
           home: FutureBuilder<dynamic>(
               future: bloc.initThridParty(),
               builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                if (snapshot.connectionState == ConnectionState.done && !snapshot.hasError) {
+                if (snapshot.connectionState == ConnectionState.done &&
+                    !snapshot.hasError) {
                   return StreamBuilder<User?>(
                       stream: bloc.streamUser(),
-                      builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+                      builder: (BuildContext context,
+                          AsyncSnapshot<User?> snapshot) {
                         return FutureBuilder<bool>(
                             future: bloc.isConnected(),
-                            builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+                            builder: (BuildContext context,
+                                AsyncSnapshot<bool> snapshot) {
                               return snapshot.data == true
                                   ? MyHomePage(appTitle)
                                   : LoginPage(
-                                      callback: (UserCredential userCredential) => Navigator.of(context).pushNamed('/'),
+                                      callback:
+                                          (UserCredential userCredential) =>
+                                              Navigator.of(context)
+                                                  .pushNamed('/'),
                                     );
                             });
                       });
                 } else if (snapshot.hasError) {
                   return const Center(
-                    child: Text("Erreur lors de l'initialisation de l' 'application."),
+                    child: Text(
+                        "Erreur lors de l'initialisation de l' 'application."),
                   );
                 }
                 return LoadingRotating.square(

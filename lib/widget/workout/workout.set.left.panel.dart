@@ -43,7 +43,7 @@ class WorkoutSetLeftPanel extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
+                      children: <Widget>[
                         const Text(
                           'Glisser ici les exercices du workout.',
                           style: TextStyle(fontStyle: FontStyle.italic),
@@ -57,7 +57,7 @@ class WorkoutSetLeftPanel extends StatelessWidget {
               return DragTarget<Exercice>(
                 onWillAccept: (Exercice? exerciceToAccept) => exerciceToAccept is Exercice,
                 onAccept: (Exercice exerciceDragged) => bloc.addWorkoutSet(exerciceDragged),
-                builder: (BuildContext context, List<Exercice?> candidateData, List rejectedData) {
+                builder: (BuildContext context, List<Exercice?> candidateData, List<dynamic> rejectedData) {
                   Color color = Colors.transparent;
                   if (candidateData.isNotEmpty) {
                     color = Theme.of(context).primaryColor;
@@ -97,7 +97,7 @@ class DragTargetDto extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+            children: <Widget>[
               Icon(
                 Icons.arrow_circle_down,
                 color: Theme.of(context).primaryColor,
@@ -111,10 +111,10 @@ class DragTargetDto extends StatelessWidget {
     return DragTarget<WorkoutSetDto>(
       onWillAccept: (WorkoutSetDto? data) => data is WorkoutSetDto && data.uid != dto.uid,
       onAccept: (WorkoutSetDto data) => bloc.switchOrder(data, dto.order),
-      builder: (BuildContext context, List<WorkoutSetDto?> candidateData, List rejectedData) {
+      builder: (BuildContext context, List<WorkoutSetDto?> candidateData, List<dynamic> rejectedData) {
         final Widget tile = ListTileDto(bloc: bloc, dto: dto);
         if (candidateData.isNotEmpty) {
-          return Column(children: [upWidget, tile]);
+          return Column(children: <Widget>[upWidget, tile]);
         } else {
           return tile;
         }

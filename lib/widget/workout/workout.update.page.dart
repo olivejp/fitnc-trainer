@@ -37,7 +37,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           onPressed: () {
             if (_formKey.currentState?.validate() == true) {
               widget.bloc.saveWorkout().then((_) => showToast('Workout sauvegardé', backgroundColor: Colors.green)).catchError(
-                (error) {
+                (Object? error) {
                   showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent);
                 },
               );

@@ -6,12 +6,13 @@ import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitnc_trainer/widget/exercice/exercice.update.page.dart';
+import 'package:fitnc_trainer/widget/exercice/exercice.form.builder.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with MixinFitnessStorageBloc<Exercice> {
+class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice>
+    with MixinFitnessStorageBloc<Exercice> {
   ExerciceUpdateBloc._();
 
   factory ExerciceUpdateBloc.instance() {
@@ -25,16 +26,19 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with MixinFit
   ParamService paramService = ParamService.getInstance();
   Exercice? exercice;
 
-  final BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
-  final BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject<String?>();
-  final BehaviorSubject<String?> _streamSelectedYoutubeUrl = BehaviorSubject<String?>();
+  final BehaviorSubject<StorageFile?> subjectStoragePair =
+      BehaviorSubject<StorageFile?>();
+  final BehaviorSubject<String?> _streamSelectedVideoUrl =
+      BehaviorSubject<String?>();
+  final BehaviorSubject<String?> _streamSelectedYoutubeUrl =
+      BehaviorSubject<String?>();
 
   Stream<String?>? get selectedVideoUrlObs => _streamSelectedVideoUrl.stream;
 
-  Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl.stream;
+  Stream<String?>? get selectedYoutubeUrlObs =>
+      _streamSelectedYoutubeUrl.stream;
 
   Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
-
 
   @override
   Stream<List<Exercice>> listenAll() {
@@ -47,8 +51,8 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with MixinFit
   }
 
   @override
-  Widget openUpdate(BuildContext context, Exercice exercice) {
-    return ExerciceUpdatePage(exercice: exercice);
+  void openUpdate(BuildContext context, Exercice exercice) {
+    ExerciceBuilderPage.update(context: context, exercice: exercice);
   }
 
   @override
@@ -64,7 +68,8 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with MixinFit
     if (exerciceEntered != null) {
       exercice = exerciceEntered;
       exercice!.storageFile = StorageFile();
-      getFutureStorageFile(exercice!).then((StorageFile? value) => subjectStoragePair.sink.add(value));
+      getFutureStorageFile(exercice!)
+          .then((StorageFile? value) => subjectStoragePair.sink.add(value));
 
       if (exercice!.videoUrl != null) {
         videoUrl = exercice!.videoUrl;
@@ -124,5 +129,4 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with MixinFit
     exercice?.storageFile = storageFile;
     subjectStoragePair.sink.add(exercice?.storageFile);
   }
-
 }

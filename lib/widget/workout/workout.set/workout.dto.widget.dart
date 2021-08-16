@@ -1,12 +1,9 @@
-import 'dart:async';
-
 import 'package:fitnc_trainer/bloc/workout/workout_set_left_panel.bloc.dart';
 import 'package:fitnc_trainer/domain/line.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.dto.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-
 
 class FitnessWorkoutDtoConstants {
   static const double repsMaxHeight = 25;
@@ -16,7 +13,6 @@ class FitnessWorkoutDtoConstants {
   static const double crossMaxHeight = 25;
   static const double crossMaxWidth = 70;
 }
-
 
 class ListTileDto extends StatefulWidget {
   const ListTileDto({
@@ -33,7 +29,8 @@ class ListTileDto extends StatefulWidget {
 }
 
 class _ListTileDtoState extends State<ListTileDto> {
-  late BehaviorSubject<List<Line>> streamLines = BehaviorSubject<List<Line>>.seeded(widget.dto.lines);
+  late BehaviorSubject<List<Line>> streamLines =
+      BehaviorSubject<List<Line>>.seeded(widget.dto.lines);
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +89,9 @@ class _ListTileDtoState extends State<ListTileDto> {
                         streamLines.sink.add(widget.dto.lines);
                       },
                       child: const Text('Ajouter set')),
-                  TextButton(onPressed: () => widget.bloc.deleteWorkoutSet(widget.dto), child: const Text('Supprimer'))
+                  TextButton(
+                      onPressed: () => widget.bloc.deleteWorkoutSet(widget.dto),
+                      child: const Text('Supprimer'))
                 ],
               )
             ],
@@ -101,12 +100,17 @@ class _ListTileDtoState extends State<ListTileDto> {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: StreamBuilder<List<Line>>(
                 stream: streamLines,
-                builder: (BuildContext context, AsyncSnapshot<List<Line>> snapshot) {
+                builder:
+                    (BuildContext context, AsyncSnapshot<List<Line>> snapshot) {
                   return ListView.builder(
                     shrinkWrap: true,
                     itemCount: widget.dto.lines.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return LineDisplay(dto: widget.dto, index: index, bloc: widget.bloc, stream: streamLines);
+                      return LineDisplay(
+                          dto: widget.dto,
+                          index: index,
+                          bloc: widget.bloc,
+                          stream: streamLines);
                     },
                   );
                 }),
@@ -118,7 +122,11 @@ class _ListTileDtoState extends State<ListTileDto> {
 }
 
 class LineDisplay extends StatelessWidget {
-  const LineDisplay({required this.bloc, required this.dto, required this.index, required this.stream});
+  const LineDisplay(
+      {required this.bloc,
+      required this.dto,
+      required this.index,
+      required this.stream});
 
   final WorkoutSetLeftPanelBloc bloc;
   final WorkoutSetDto dto;
@@ -129,7 +137,8 @@ class LineDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Widget> listChildren = <Widget>[];
     final Line line = dto.lines.elementAt(index);
-    final GlobalKey<FormFieldState<String>> restTimeKey = GlobalKey<FormFieldState<String>>();
+    final GlobalKey<FormFieldState<String>> restTimeKey =
+        GlobalKey<FormFieldState<String>>();
     final GlobalKey iconButtonKey = GlobalKey();
     final GlobalKey lineKey = GlobalKey();
 
@@ -137,13 +146,16 @@ class LineDisplay extends StatelessWidget {
 
     switch (dto.typeExercice) {
       case 'REPS_WEIGHT':
-        returnedWidget = RepsWeightLineBuilder(key: lineKey, bloc: bloc, line: line, dto: dto);
+        returnedWidget = RepsWeightLineBuilder(
+            key: lineKey, bloc: bloc, line: line, dto: dto);
         break;
       case 'REPS_ONLY':
-        returnedWidget = RepsOnlyLineBuilder(key: lineKey, bloc: bloc, line: line, dto: dto);
+        returnedWidget =
+            RepsOnlyLineBuilder(key: lineKey, bloc: bloc, line: line, dto: dto);
         break;
       case 'TIME':
-        returnedWidget = TimeLineBuilder(key: lineKey, bloc: bloc, line: line, dto: dto);
+        returnedWidget =
+            TimeLineBuilder(key: lineKey, bloc: bloc, line: line, dto: dto);
         break;
       default:
         returnedWidget = Container();
@@ -194,7 +206,9 @@ class LineDisplay extends StatelessWidget {
 }
 
 class TimeLineBuilder extends StatefulWidget {
-  const TimeLineBuilder({Key? key, required this.bloc, required this.line, required this.dto}) : super(key: key);
+  const TimeLineBuilder(
+      {Key? key, required this.bloc, required this.line, required this.dto})
+      : super(key: key);
 
   final WorkoutSetDto dto;
   final Line line;
@@ -205,7 +219,8 @@ class TimeLineBuilder extends StatefulWidget {
 }
 
 class _TimeLineBuilderState extends State<TimeLineBuilder> {
-  final GlobalKey<FormFieldState<String>> timeKey = GlobalKey<FormFieldState<String>>();
+  final GlobalKey<FormFieldState<String>> timeKey =
+      GlobalKey<FormFieldState<String>>();
 
   @override
   Widget build(BuildContext context) {
@@ -221,11 +236,13 @@ class _TimeLineBuilderState extends State<TimeLineBuilder> {
               size: 12,
             ),
             onlyName: true,
-            decoration: const InputDecoration(contentPadding: EdgeInsets.all(10)),
+            decoration:
+                const InputDecoration(contentPadding: EdgeInsets.all(10)),
             style: const TextStyle(fontSize: 12),
             hint: const Text('Temps', style: TextStyle(fontSize: 10)),
             initialValue: widget.line.time,
-            onChanged: (String? value) => widget.bloc.setTime(widget.dto, widget.line, value),
+            onChanged: (String? value) =>
+                widget.bloc.setTime(widget.dto, widget.line, value),
           ),
         ),
       ],
@@ -234,7 +251,9 @@ class _TimeLineBuilderState extends State<TimeLineBuilder> {
 }
 
 class RepsOnlyLineBuilder extends StatefulWidget {
-  const RepsOnlyLineBuilder({Key? key, required this.bloc, required this.dto, required this.line}) : super(key: key);
+  const RepsOnlyLineBuilder(
+      {Key? key, required this.bloc, required this.dto, required this.line})
+      : super(key: key);
 
   final WorkoutSetLeftPanelBloc bloc;
   final WorkoutSetDto dto;
@@ -255,7 +274,8 @@ class _RepsOnlyLineBuilderState extends State<RepsOnlyLineBuilder> {
           child: TextFormField(
             maxLength: 3,
             initialValue: widget.line.reps,
-            onChanged: (String value) => widget.bloc.setReps(widget.dto, widget.line, value),
+            onChanged: (String value) =>
+                widget.bloc.setReps(widget.dto, widget.line, value),
             textAlignVertical: TextAlignVertical.bottom,
             style: const TextStyle(fontSize: 15),
             decoration: const InputDecoration(
@@ -270,7 +290,9 @@ class _RepsOnlyLineBuilderState extends State<RepsOnlyLineBuilder> {
 }
 
 class RepsWeightLineBuilder extends StatefulWidget {
-  const RepsWeightLineBuilder({Key? key, required this.bloc, required this.dto, required this.line}) : super(key: key);
+  const RepsWeightLineBuilder(
+      {Key? key, required this.bloc, required this.dto, required this.line})
+      : super(key: key);
 
   final WorkoutSetLeftPanelBloc bloc;
   final WorkoutSetDto dto;
@@ -292,11 +314,16 @@ class _RepsWeightLineBuilderState extends State<RepsWeightLineBuilder> {
         maxWidth: FitnessWorkoutDtoConstants.repsMaxWidth,
         child: TextFormField(
           initialValue: widget.line.reps,
-          buildCounter: (BuildContext context, {required int currentLength, required bool isFocused, int? maxLength}) => null,
+          buildCounter: (BuildContext context,
+                  {required int currentLength,
+                  required bool isFocused,
+                  int? maxLength}) =>
+              null,
           maxLength: 3,
           textAlignVertical: TextAlignVertical.bottom,
           style: textStyle,
-          onChanged: (String value) => widget.bloc.setReps(widget.dto, widget.line, value),
+          onChanged: (String value) =>
+              widget.bloc.setReps(widget.dto, widget.line, value),
           decoration: InputDecoration(
             hintText: 'Reps',
             hintStyle: textStyleHint,
@@ -315,7 +342,8 @@ class _RepsWeightLineBuilderState extends State<RepsWeightLineBuilder> {
           initialValue: widget.line.weight,
           textAlignVertical: TextAlignVertical.bottom,
           style: textStyle,
-          onChanged: (String value) => widget.bloc.setWeight(widget.dto, widget.line, value),
+          onChanged: (String value) =>
+              widget.bloc.setWeight(widget.dto, widget.line, value),
           decoration: InputDecoration(
             hintText: 'Weight',
             hintStyle: textStyleHint,

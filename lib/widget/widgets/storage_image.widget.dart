@@ -13,9 +13,21 @@ class StorageFile {
 }
 
 class StorageImageWidget extends StatelessWidget {
-  static const List<String> DEFAULT_ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif'];
+  StorageImageWidget(
+      {required this.onSaved,
+      required this.initialValue,
+      this.validator,
+      this.allowedExtensions = defaultAllowedExtensions,
+      this.onDeleted});
+
+  static const List<String> defaultAllowedExtensions = <String>[
+    'jpg',
+    'jpeg',
+    'png',
+    'gif'
+  ];
   final FirestorageService firestorageService = FirestorageService.instance();
-  final BehaviorSubject<StorageFile?> _streamSelectedImage = BehaviorSubject();
+  final BehaviorSubject<StorageFile?> _streamSelectedImage = BehaviorSubject<StorageFile?>();
   final StorageFile _storagePair = StorageFile();
 
   final FormFieldSetter<StorageFile> onSaved;
@@ -23,9 +35,6 @@ class StorageImageWidget extends StatelessWidget {
   final List<String> allowedExtensions;
   final StorageFile? initialValue;
   final void Function(StorageFile? storagePair)? onDeleted;
-
-  StorageImageWidget(
-      {required this.onSaved, required this.initialValue, this.validator, this.allowedExtensions = DEFAULT_ALLOWED_EXTENSIONS, this.onDeleted});
 
   @override
   Widget build(BuildContext context) {
@@ -45,26 +54,29 @@ class StorageImageWidget extends StatelessWidget {
           borderRadius: const BorderRadius.all(Radius.circular(50)),
           child: StreamBuilder<StorageFile?>(
               stream: _streamSelectedImage.stream,
-              builder: (BuildContext context, AsyncSnapshot<StorageFile?> snapshot) {
+              builder:
+                  (BuildContext context, AsyncSnapshot<StorageFile?> snapshot) {
                 ImageProvider? provider;
-                if (snapshot.hasData && snapshot.data != null && snapshot.data!.fileBytes != null) {
+                if (snapshot.hasData &&
+                    snapshot.data != null &&
+                    snapshot.data!.fileBytes != null) {
                   provider = MemoryImage(snapshot.data!.fileBytes!);
                 }
                 return CircleAvatar(
+                    radius: 50,
+                    foregroundImage: provider,
+                    backgroundColor: Theme.of(context).primaryColor,
                     child: const Icon(
                       Icons.add_photo_alternate,
                       color: Colors.white,
-                    ),
-                    radius: 50,
-                    foregroundImage: provider,
-                    backgroundColor: Theme.of(context).primaryColor);
+                    ));
               }),
         ),
         IconButton(
             tooltip: 'Supprimer la photo',
             onPressed: () {
-              if (this.onDeleted != null) {
-                this.onDeleted!(_storagePair);
+              if (onDeleted != null) {
+                onDeleted!(_storagePair);
               }
               _storagePair.fileName = null;
               _storagePair.fileBytes = null;
@@ -79,7 +91,9 @@ class StorageImageWidget extends StatelessWidget {
   }
 
   void onTap() {
-    FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: allowedExtensions).then((FilePickerResult? result) {
+    FilePicker.platform
+        .pickFiles(type: FileType.custom, allowedExtensions: allowedExtensions)
+        .then((FilePickerResult? result) {
       if (result != null) {
         _storagePair.fileBytes = result.files.first.bytes;
         _storagePair.fileName = result.files.first.name;
@@ -95,17 +109,22 @@ class StorageImageWidget extends StatelessWidget {
 }
 
 class StorageFutureImageWidget extends StatelessWidget {
-
   StorageFutureImageWidget(
       {required this.onSaved,
-        required this.futureInitialStorageFile,
-        this.validator,
-        this.allowedExtensions = DEFAULT_ALLOWED_EXTENSIONS,
-        this.onDeleted});
+      required this.futureInitialStorageFile,
+      this.validator,
+      this.allowedExtensions = DEFAULT_ALLOWED_EXTENSIONS,
+      this.onDeleted});
 
-  static const List<String> DEFAULT_ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif'];
+  static const List<String> DEFAULT_ALLOWED_EXTENSIONS = <String>[
+    'jpg',
+    'jpeg',
+    'png',
+    'gif'
+  ];
   final FirestorageService firestorageService = FirestorageService.instance();
-  final BehaviorSubject<StorageFile?> _streamSelectedImage = BehaviorSubject<StorageFile?>();
+  final BehaviorSubject<StorageFile?> _streamSelectedImage =
+      BehaviorSubject<StorageFile?>();
   final StorageFile _storagePair = StorageFile();
 
   final FormFieldSetter<StorageFile> onSaved;
@@ -139,13 +158,17 @@ class StorageFutureImageWidget extends StatelessWidget {
 
   Widget builderWidget(FormFieldState<StorageFile> field) {
     return Row(
-      children: [
+      children: <Widget>[
         InkWell(
+          onTap: () => onTap(),
+          borderRadius: BorderRadius.all(Radius.circular(50)),
           child: StreamBuilder<StorageFile?>(
               stream: _streamSelectedImage.stream,
               builder: (context, snapshot) {
                 ImageProvider? provider;
-                if (snapshot.hasData && snapshot.data != null && snapshot.data!.fileBytes != null) {
+                if (snapshot.hasData &&
+                    snapshot.data != null &&
+                    snapshot.data!.fileBytes != null) {
                   provider = MemoryImage(snapshot.data!.fileBytes!);
                 }
                 return CircleAvatar(
@@ -157,8 +180,6 @@ class StorageFutureImageWidget extends StatelessWidget {
                     foregroundImage: provider,
                     backgroundColor: Theme.of(context).primaryColor);
               }),
-          onTap: () => onTap(),
-          borderRadius: BorderRadius.all(Radius.circular(50)),
         ),
         IconButton(
             tooltip: 'Supprimer la photo',
@@ -179,7 +200,10 @@ class StorageFutureImageWidget extends StatelessWidget {
   }
 
   void onTap() {
-    FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: this.allowedExtensions).then((result) {
+    FilePicker.platform
+        .pickFiles(
+            type: FileType.custom, allowedExtensions: this.allowedExtensions)
+        .then((result) {
       if (result != null) {
         _storagePair.fileBytes = result.files.first.bytes;
         _storagePair.fileName = result.files.first.name;
@@ -208,10 +232,16 @@ class StorageStreamImageWidget extends StatelessWidget {
     Icons.add_photo_alternate,
     color: Colors.white,
   );
-  static const List<String> defaultAllowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+  static const List<String> defaultAllowedExtensions = [
+    'jpg',
+    'jpeg',
+    'png',
+    'gif'
+  ];
 
   final FirestorageService firestorageService = FirestorageService.instance();
-  final BehaviorSubject<StorageFile?> _streamSelectedImage = BehaviorSubject<StorageFile?>();
+  final BehaviorSubject<StorageFile?> _streamSelectedImage =
+      BehaviorSubject<StorageFile?>();
 
   final StorageFile _storagePair = StorageFile();
   final FormFieldSetter<StorageFile> onSaved;
@@ -238,7 +268,10 @@ class StorageStreamImageWidget extends StatelessWidget {
           return InkWell(
             onTap: () => onTap(),
             borderRadius: const BorderRadius.all(Radius.circular(50)),
-            child: CircleAvatar(radius: radius, backgroundColor: Theme.of(context).primaryColor, child: icon),
+            child: CircleAvatar(
+                radius: radius,
+                backgroundColor: Theme.of(context).primaryColor,
+                child: icon),
           );
         }
       },
@@ -254,12 +287,19 @@ class StorageStreamImageWidget extends StatelessWidget {
           borderRadius: const BorderRadius.all(Radius.circular(50)),
           child: StreamBuilder<StorageFile?>(
               stream: _streamSelectedImage.stream,
-              builder: (BuildContext context, AsyncSnapshot<StorageFile?> snapshot) {
+              builder:
+                  (BuildContext context, AsyncSnapshot<StorageFile?> snapshot) {
                 ImageProvider? provider;
-                if (snapshot.hasData && snapshot.data != null && snapshot.data!.fileBytes != null) {
+                if (snapshot.hasData &&
+                    snapshot.data != null &&
+                    snapshot.data!.fileBytes != null) {
                   provider = MemoryImage(snapshot.data!.fileBytes!);
                 }
-                return CircleAvatar(radius: radius, foregroundImage: provider, backgroundColor: Theme.of(context).primaryColor, child: icon);
+                return CircleAvatar(
+                    radius: radius,
+                    foregroundImage: provider,
+                    backgroundColor: Theme.of(context).primaryColor,
+                    child: icon);
               }),
         ),
         IconButton(
@@ -281,7 +321,9 @@ class StorageStreamImageWidget extends StatelessWidget {
   }
 
   void onTap() {
-    FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: allowedExtensions).then((result) {
+    FilePicker.platform
+        .pickFiles(type: FileType.custom, allowedExtensions: allowedExtensions)
+        .then((result) {
       if (result != null) {
         _storagePair.fileBytes = result.files.first.bytes;
         _storagePair.fileName = result.files.first.name;
@@ -301,5 +343,6 @@ class StorageImageFormField<T> extends FormField<T> {
   final FormFieldSetter<T>? onSaved;
   final FormFieldValidator<T>? validator;
 
-  StorageImageFormField({required this.builder, this.onSaved, this.validator}) : super(builder: builder, onSaved: onSaved, validator: validator);
+  StorageImageFormField({required this.builder, this.onSaved, this.validator})
+      : super(builder: builder, onSaved: onSaved, validator: validator);
 }
