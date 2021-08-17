@@ -39,6 +39,7 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with MixinFitne
   late Workout _workout;
   WorkoutSet set = WorkoutSet();
   Exercice? exerciceSelected;
+  bool sendStorage = false;
 
   @override
   Stream<List<Workout>> listenAll() {
@@ -56,6 +57,7 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with MixinFitne
   }
 
   void init(Workout? workout) {
+    sendStorage = false;
     if (workout != null) {
       _workout = workout;
       _workout.storageFile = StorageFile();
@@ -74,8 +76,13 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with MixinFitne
   }
 
   Future<void> saveWorkout() {
-    if (_workout.uid != null) {
-      return eraseAndReplaceStorage(_workout).then((_) => save(_workout));
+    final bool isUpdate = _workout.uid != null;
+    if (isUpdate) {
+      if (sendStorage) {
+        return eraseAndReplaceStorage(_workout).then((_) => save(_workout));
+      } else {
+        return save(_workout);
+      }
     } else {
       _workout.uid = getCollectionReference().doc().id;
       return createStorage(_workout).then((_) => create(_workout));
@@ -101,6 +108,7 @@ class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with MixinFitne
   String? get timerType => _workout.timerType;
 
   set storageFile(StorageFile? storagePair) {
+    sendStorage = true;
     _workout.storageFile = storagePair;
   }
 

@@ -50,6 +50,7 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with MixinFit
   }
 
   void init(Exercice? exerciceEntered) {
+    sendStorage = false;
     subjectStoragePair.sink.add(null);
     videoUrl = null;
     youtubeUrl = null;
@@ -77,7 +78,7 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with MixinFit
       return;
     }
 
-    bool isUpdate = exercice!.uid != null;
+    final bool isUpdate = exercice!.uid != null;
     if (isUpdate) {
       if (sendStorage) {
         return eraseAndReplaceStorage(exercice!).then((_) => save(exercice!));

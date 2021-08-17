@@ -10,7 +10,6 @@ import 'package:fitnc_trainer/domain/workout_schedule.domain.dart';
 import 'package:fitnc_trainer/domain/workout_schedule.dto.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitnc_trainer/widget/programme/programme.update.page.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
@@ -62,6 +61,7 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
   final List<WorkoutScheduleDto> listDtos = <WorkoutScheduleDto>[];
   final ValueNotifier<int> vnNumberWeek = ValueNotifier<int>(0);
   late Programme programme;
+  bool sendStorage = false;
 
   int getNumberWeeks(String? numberWeeks) {
     if (numberWeeks != null) {
@@ -72,6 +72,7 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
   }
 
   void init(Programme? programmeEntered) {
+    sendStorage = false;
     subjectStoragePair.sink.add(null);
 
     if (programmeEntered != null) {
@@ -105,7 +106,11 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
 
   Future<void> saveProgramme() {
     if (programme.uid != null) {
-      return eraseAndReplaceStorage(programme).then((_) => save(programme));
+      if (sendStorage) {
+        return eraseAndReplaceStorage(programme).then((_) => save(programme));
+      } else {
+        return save(programme);
+      }
     } else {
       programme.uid = getCollectionReference().doc().id;
       return createStorage(programme).then((_) => create(programme));
@@ -137,6 +142,7 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
   String? get description => programme.description;
 
   void setStoragePair(StorageFile? storagePair) {
+    sendStorage = true;
     programme.storageFile = storagePair;
     subjectStoragePair.sink.add(programme.storageFile);
   }
