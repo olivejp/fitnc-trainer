@@ -74,88 +74,84 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
           label: const Text('Fermer', style: TextStyle(color: Colors.white))),
     ]);
 
-    return Scaffold(
-        body: GenericUpdateWidget(
-          child: Form(
-            key: _formKey,
-            child: Column(
+    return Form(
+      key: _formKey,
+      child: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Column(
               children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          ButtonBar(children: buttons),
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          StorageStreamImageWidget(
-                            onSaved: (StorageFile? storagePair) => widget.bloc.setStoragePair(storagePair),
-                            streamInitialStorageFile: widget.bloc.obsStoragePair,
-                            onDeleted: (StorageFile? storagePair) => widget.bloc.setStoragePair(null),
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 20),
-                              child: Column(
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: FitnessDecorationTextFormField(
-                                            initialValue: widget.bloc.programme.name,
-                                            autofocus: true,
-                                            onChanged: (String value) => widget.bloc.name = value,
-                                            labelText: 'Nom',
-                                            validator: (String? value) {
-                                              if (value == null || value.isEmpty) {
-                                                return 'Merci de renseigner le nom du programme.';
-                                              }
-                                              return null;
-                                            }),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            left: 8,
-                                          ),
-                                          child: ParamDropdownButton(
-                                              paramName: 'number_weeks',
-                                              decoration: const InputDecoration(
-                                                  labelText: 'Nombre de semaine',
-                                                  constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
-                                                  contentPadding: EdgeInsets.symmetric(horizontal: 10)),
-                                              initialValue: widget.bloc.programme.numberWeeks,
-                                              onChanged: (String? value) => widget.bloc.numberWeeks = value),
-                                        ),
-                                      )
-                                    ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    ButtonBar(children: buttons),
+                  ],
+                ),
+                Row(
+                  children: <Widget>[
+                    StorageStreamImageWidget(
+                      onSaved: (StorageFile? storagePair) => widget.bloc.setStoragePair(storagePair),
+                      streamInitialStorageFile: widget.bloc.obsStoragePair,
+                      onDeleted: (StorageFile? storagePair) => widget.bloc.setStoragePair(null),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Column(
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: FitnessDecorationTextFormField(
+                                      initialValue: widget.bloc.programme.name,
+                                      autofocus: true,
+                                      onChanged: (String value) => widget.bloc.name = value,
+                                      labelText: 'Nom',
+                                      validator: (String? value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Merci de renseigner le nom du programme.';
+                                        }
+                                        return null;
+                                      }),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 8,
+                                    ),
+                                    child: ParamDropdownButton(
+                                        paramName: 'number_weeks',
+                                        decoration: const InputDecoration(
+                                            labelText: 'Nombre de semaine',
+                                            constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
+                                            contentPadding: EdgeInsets.symmetric(horizontal: 10)),
+                                        initialValue: widget.bloc.programme.numberWeeks,
+                                        onChanged: (String? value) => widget.bloc.numberWeeks = value),
                                   ),
-                                ],
-                              ),
+                                )
+                              ],
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                TextFormField(
-                  initialValue: widget.bloc.programme.description,
-                  maxLength: 2000,
-                  minLines: 5,
-                  maxLines: 20,
-                  onChanged: (String value) => widget.bloc.description = value,
-                  decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionel'),
-                ),
-                WorkoutSchedulePanel()
               ],
             ),
-          ),
-        ));
+            TextFormField(
+              initialValue: widget.bloc.programme.description,
+              maxLength: 2000,
+              minLines: 5,
+              maxLines: 20,
+              onChanged: (String value) => widget.bloc.description = value,
+              decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionel'),
+            ),
+            WorkoutSchedulePanel()
+          ],
+        ),
+      ),
+    );
   }
 }
 

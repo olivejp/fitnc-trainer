@@ -147,12 +147,11 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
               decoration: const InputDecoration(labelText: 'Instructions', hintText: 'Optionnel'),
             ),
             LimitedBox(
-              maxWidth: 2000,
-              maxHeight: 600,
+              maxHeight: 800,
               child: Row(
                 children: <Widget>[
                   Expanded(
-                    child: WorkoutSetPage(workout: widget.workout),
+                    child: WorkoutComposePage(workout: widget.workout),
                   ),
                 ],
               ),
