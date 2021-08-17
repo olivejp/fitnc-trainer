@@ -204,34 +204,26 @@ class _ExercicePageState extends State<ExercicePage> {
                   Expanded(flex: 2, child: listSearchExercice),
                   Expanded(
                       flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 20.0),
-                        child: ValueListenableBuilder<Exercice?>(
-                          valueListenable: _vnExerciceSelected,
-                          builder: (BuildContext context, Exercice? exercice, Widget? child) {
-                            if (exercice != null) {
-                              bloc.init(exercice);
-                              return Material(borderRadius: BorderRadius.only(topLeft: Radius.circular(20)),
-                                elevation:5 ,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: FitnessNcColors.blue50,
-                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(20))),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(60.0),
-                                    child: ExerciceGeneric(
-                                      isCreation: false,
-                                      exercice: exercice,
-                                    ),
-                                  ),
+                      child: ValueListenableBuilder<Exercice?>(
+                        valueListenable: _vnExerciceSelected,
+                        builder: (BuildContext context, Exercice? exercice, Widget? child) {
+                          if (exercice != null) {
+                            bloc.init(exercice);
+                            return Container(
+                              decoration: BoxDecoration(color: FitnessNcColors.blue50),
+                              child: Padding(
+                                padding: const EdgeInsets.all(60.0),
+                                child: ExerciceGeneric(
+                                  isCreation: false,
+                                  exercice: exercice,
                                 ),
-                              );
-                            } else {
-                              return child!;
-                            }
-                          },
-                          child: Container(),
-                        ),
+                              ),
+                            );
+                          } else {
+                            return child!;
+                          }
+                        },
+                        child: Container(decoration: BoxDecoration(color: FitnessNcColors.blue50),),
                       )),
                 ],
               ),
