@@ -29,9 +29,10 @@ class WorkoutComposePageBloc {
 }
 
 class WorkoutComposePage extends StatefulWidget {
-  const WorkoutComposePage({Key? key, required this.workout}) : super(key: key);
+  const WorkoutComposePage({Key? key, required this.workout, this.maxWidthSearchField = 200}) : super(key: key);
 
   final Workout workout;
+  final double maxWidthSearchField;
 
   static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
@@ -42,7 +43,6 @@ class WorkoutComposePage extends StatefulWidget {
 class _WorkoutComposePageState extends State<WorkoutComposePage> {
   final TrainersService trainersService = TrainersService.instance();
   final WorkoutComposePageBloc bloc = WorkoutComposePageBloc.instance();
-
   String? _query;
 
   @override
@@ -63,42 +63,39 @@ class _WorkoutComposePageState extends State<WorkoutComposePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 10,
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Composer',
-              style: Theme.of(context).textTheme.headline1,
-            ),
-            Expanded(
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: _WorkoutSetTopPanel(bloc: bloc, maxWidthSearchField: 200,alignmentSearchField: MainAxisAlignment.end,),
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Composer',
+            style: Theme.of(context).textTheme.headline1,
+          ),
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: _WorkoutSetTopPanel(bloc: bloc, maxWidthSearchField: widget.maxWidthSearchField,alignmentSearchField: MainAxisAlignment.end,),
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Card(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      color: FitnessNcColors.blue50,
+                      child: WorkoutSetBottomPanel(workout: widget.workout),
                     ),
                   ),
-                  Expanded(
-                    flex: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Card(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        color: FitnessNcColors.blue50,
-                        child: WorkoutSetBottomPanel(workout: widget.workout),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

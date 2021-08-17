@@ -92,7 +92,7 @@ class _ListTileDtoState extends State<ListTileDto> {
                         streamLines.sink.add(widget.dto.lines);
                       },
                       child: const Text('Ajouter set')),
-                  TextButton(onPressed: () => widget.bloc.deleteWorkoutSet(widget.dto), child: const Text('Supprimer'))
+                  TextButton(onPressed: () => widget.bloc.deleteWorkoutSet(widget.dto), child: const Text('Retirer'))
                 ],
               )
             ],

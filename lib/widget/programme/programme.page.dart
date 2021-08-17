@@ -90,8 +90,11 @@ class _ProgrammePageState extends State<ProgrammePage> with SingleTickerProvider
                   Expanded(
                     child: TextFormField(
                       onChanged: (String text) => query = text,
-                      decoration: const InputDecoration(
-                        border: UnderlineInputBorder(),
+                      decoration: InputDecoration(
+                        constraints: BoxConstraints(maxHeight: 43),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1)),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor)),
                         prefixIcon: Icon(Icons.search),
                         hintText: 'Recherche...',
                       ),

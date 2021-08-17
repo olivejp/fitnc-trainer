@@ -18,7 +18,7 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
   Widget build(BuildContext context) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          int nbColumns = 1;
+          int nbColumns = 2;
           if (constraints.maxWidth > 1200) {
             nbColumns = 8;
           } else if (constraints.maxWidth > 1000) {

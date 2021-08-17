@@ -106,7 +106,7 @@ class _ExercicePageState extends State<ExercicePage> {
     final Widget listSearchExercice = Column(
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(top: 20, bottom: 20, right: 30, left: 30),
+          padding: const EdgeInsets.only(bottom: 10,right: 10, left: 10),
           child: Row(
             children: <Widget>[
               Padding(
@@ -147,17 +147,19 @@ class _ExercicePageState extends State<ExercicePage> {
                   ),
                 ),
               ),
-              TextField(
-                decoration: InputDecoration(
-                  constraints: BoxConstraints(maxWidth: 250, maxHeight: 40),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1)),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor)),
-                  prefixIcon: Icon(Icons.search),
-                  hintText: 'Recherche...',
+              Expanded(
+                child: TextField(
+                  decoration: InputDecoration(
+                    constraints: BoxConstraints(maxHeight: 43),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1)),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor)),
+                    prefixIcon: Icon(Icons.search),
+                    hintText: 'Recherche...',
+                  ),
+                  onChanged: (String value) => query = value,
+                  textAlignVertical: TextAlignVertical.bottom,
                 ),
-                onChanged: (String value) => query = value,
-                textAlignVertical: TextAlignVertical.bottom,
               ),
             ],
           ),
@@ -193,9 +195,6 @@ class _ExercicePageState extends State<ExercicePage> {
                   )
                 ],
               ),
-            ),
-            const Divider(
-              height: 2,
             ),
             Expanded(
               child: Row(

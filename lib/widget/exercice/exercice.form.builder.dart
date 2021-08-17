@@ -59,7 +59,8 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
 
     final Widget saveButton = Padding(
       padding: EdgeInsets.only(right: 10),
-      child: ElevatedButton(
+      child: TextButton(
+        style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
         onPressed: () {
           if (_formKey.currentState?.validate() == true) {
             bloc.saveExercice().then((_) {
@@ -74,8 +75,14 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
       ),
     );
 
-    final Widget closeButton =
-        ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Fermer', style: TextStyle(color: Colors.white)));
+    final Widget closeButton = TextButton(
+      style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
+      onPressed: () => Navigator.pop(context),
+      child: const Text(
+        'Fermer',
+        style: TextStyle(color: Colors.white),
+      ),
+    );
 
     final List<Widget> buttons = widget.isCreation ? <Widget>[saveButton, closeButton] : <Widget>[saveButton];
 
@@ -83,10 +90,6 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
       key: _formKey,
       child: Column(
         children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: buttons,
-          ),
           Padding(
             padding: const EdgeInsets.only(bottom: 20.0),
             child: Column(
@@ -241,6 +244,10 @@ class _ExerciceGenericState extends State<ExerciceGeneric> {
                 },
               )
             ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: buttons,
           ),
         ],
       ),
