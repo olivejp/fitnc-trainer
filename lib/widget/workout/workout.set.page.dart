@@ -63,53 +63,60 @@ class _WorkoutComposePageState extends State<WorkoutComposePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(top: 20, left: 20),
+          child: Text(
             'Composer',
             style: Theme.of(context).textTheme.headline1,
           ),
-          Expanded(
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: _WorkoutSetTopPanel(bloc: bloc, maxWidthSearchField: widget.maxWidthSearchField,alignmentSearchField: MainAxisAlignment.end,),
+        ),
+        Expanded(
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16, right: 16, left: 16),
+                  child: _WorkoutSetTopPanel(
+                    bloc: bloc,
+                    maxWidthSearchField: widget.maxWidthSearchField,
+                    alignmentSearchField: MainAxisAlignment.end,
                   ),
                 ),
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Card(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      color: FitnessNcColors.blue50,
-                      child: WorkoutSetBottomPanel(workout: widget.workout),
-                    ),
+              ),
+              Expanded(
+                flex: 3,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
+                  child: Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    color: FitnessNcColors.blue50,
+                    child: WorkoutSetBottomPanel(workout: widget.workout),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
 class _WorkoutSetTopPanel extends StatelessWidget {
-  const _WorkoutSetTopPanel({
+  _WorkoutSetTopPanel({
     Key? key,
-    required this.bloc, this.alignmentSearchField = MainAxisAlignment.start, this.maxWidthSearchField = 150,
+    required this.bloc,
+    this.alignmentSearchField = MainAxisAlignment.start,
+    this.maxWidthSearchField = 150,
   }) : super(key: key);
 
   final WorkoutComposePageBloc bloc;
   final MainAxisAlignment alignmentSearchField;
   final double maxWidthSearchField;
+  final TextEditingController _searchTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -121,12 +128,20 @@ class _WorkoutSetTopPanel extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: TextFormField(
+                controller: _searchTextController,
                 decoration: InputDecoration(
                   constraints: BoxConstraints(maxWidth: maxWidthSearchField, maxHeight: 30),
                   border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1)),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor)),
                   prefixIcon: Icon(Icons.search),
+                  suffixIcon: IconButton(
+                      iconSize: 15,
+                      onPressed: () {
+                        _searchTextController.clear();
+                        bloc.subjectQuery.sink.add(null);
+                      },
+                      icon: Icon(Icons.clear)),
                   hintStyle: TextStyle(fontSize: 14),
                   hintText: 'Recherche...',
                 ),
@@ -154,9 +169,12 @@ class _WorkoutSetTopPanel extends StatelessWidget {
 }
 
 class _WorkoutComposeExerciceGridView extends StatelessWidget {
-  const _WorkoutComposeExerciceGridView({Key? key, required this.listExercice}) : super(key: key);
+  _WorkoutComposeExerciceGridView({Key? key, required this.listExercice}) : super(key: key);
 
   final List<Exercice?> listExercice;
+  final ScrollController _scrollController = ScrollController();
+  final int scrollStep = 200;
+  final double radiusButtonStep = 10;
 
   @override
   Widget build(BuildContext context) {
@@ -172,33 +190,89 @@ class _WorkoutComposeExerciceGridView extends StatelessWidget {
         nbColumns = 4;
       }
 
-      return Scrollbar(
-
-        isAlwaysShown: true,
-        child: GridView.count(
-          semanticChildCount: listExercice.length,
-          shrinkWrap: true,
-          // gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1, mainAxisExtent: 150, childAspectRatio: 1 / 4),
-          scrollDirection: Axis.horizontal,
-          crossAxisCount: 1,
-          childAspectRatio: 0.7,
-
-          mainAxisSpacing: 10,
-          children: listExercice.where((Exercice? exercice) => exercice != null).map((Exercice? exercice) {
-            final Widget gridCard = _WorkoutComposeExerciceCard(
-              exercice: exercice!,
-            );
-            return Draggable<Exercice>(
-              feedback: gridCard,
-              data: exercice,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(5),
-                onTap: () {},
-                child: gridCard,
+      return Stack(
+        children: <Widget>[
+          Positioned(
+            top: 0,
+            bottom: 0,
+            left: 30,
+            right: 30,
+            child: Scrollbar(
+              isAlwaysShown: true,
+              controller: _scrollController,
+              child: GridView.count(
+                controller: _scrollController,
+                semanticChildCount: listExercice.length,
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                crossAxisCount: 1,
+                childAspectRatio: 0.7,
+                crossAxisSpacing: 5,
+                mainAxisSpacing: 5,
+                children: listExercice.where((Exercice? exercice) => exercice != null).map((Exercice? exercice) {
+                  final Widget gridCard = _WorkoutComposeExerciceCard(
+                    exercice: exercice!,
+                  );
+                  return Draggable<Exercice>(
+                    feedback: gridCard,
+                    data: exercice,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(5),
+                      onTap: () {},
+                      child: gridCard,
+                    ),
+                  );
+                }).toList(),
               ),
-            );
-          }).toList(),
-        ),
+            ),
+          ),
+          Positioned(
+              top: 0,
+              bottom: 0,
+              left: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                    color: FitnessNcColors.blue50Alpha060,
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(radiusButtonStep), bottomLeft: Radius.circular(radiusButtonStep))),
+                width: 30,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      iconSize: 15,
+                      icon: Icon(Icons.arrow_back),
+                      onPressed: () {
+                        double offset = _scrollController.offset;
+                        _scrollController.jumpTo(offset - scrollStep);
+                      },
+                    ),
+                  ],
+                ),
+              )),
+          Positioned(
+              top: 0,
+              bottom: 0,
+              right: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                    color: FitnessNcColors.blue50Alpha060,
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(radiusButtonStep), bottomRight: Radius.circular(radiusButtonStep))),
+                width: 30,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      iconSize: 15,
+                      icon: Icon(Icons.arrow_forward),
+                      onPressed: () {
+                        double offset = _scrollController.offset;
+                        _scrollController.jumpTo(offset + scrollStep);
+                      },
+                    ),
+                  ],
+                ),
+              )),
+        ],
       );
     });
   }

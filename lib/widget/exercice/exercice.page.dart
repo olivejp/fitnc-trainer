@@ -184,8 +184,8 @@ class _ExercicePageState extends State<ExercicePage> {
                   ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      minimumSize: Size(100, 50),
-                      maximumSize: Size(200, 50),
+                      minimumSize: const Size(100, 50),
+                      maximumSize: const Size(200, 50),
                     ),
                     onPressed: () => ExerciceBuilderPage.create(context),
                     child: Text(
@@ -209,7 +209,7 @@ class _ExercicePageState extends State<ExercicePage> {
                           if (exercice != null) {
                             bloc.init(exercice);
                             return Container(
-                              decoration: BoxDecoration(color: FitnessNcColors.blue50),
+                              decoration: const BoxDecoration(color: FitnessNcColors.blue50),
                               child: Padding(
                                 padding: const EdgeInsets.all(60.0),
                                 child: ExerciceGeneric(
@@ -222,7 +222,7 @@ class _ExercicePageState extends State<ExercicePage> {
                             return child!;
                           }
                         },
-                        child: Container(decoration: BoxDecoration(color: FitnessNcColors.blue50),),
+                        child: Container(decoration: const BoxDecoration(color: FitnessNcColors.blue50),),
                       )),
                 ],
               ),
