@@ -12,9 +12,45 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'exercice.form.builder.dart';
+
+class ExercicePageNotifier extends ChangeNotifier {
+  int _display = 0;
+  Exercice? _exerciceSelected;
+  final List<bool> _toggleSelections = <bool>[true, false];
+  bool _dualScreen = false;
+
+  int get display => _display;
+
+  set display(int newDisplay) {
+    _display = newDisplay;
+    notifyListeners();
+  }
+
+  Exercice? get exerciceSelected => _exerciceSelected;
+
+  set exerciceSelected(Exercice? newDisplay) {
+    _exerciceSelected = newDisplay;
+    notifyListeners();
+  }
+
+  List<bool> get toggleSelections => _toggleSelections;
+
+  void changeToggleSelections(int index, bool value) {
+    _toggleSelections[index] = value;
+    notifyListeners();
+  }
+
+  bool get dualScreen => _dualScreen;
+
+  set dualScreen(bool newDualScreen) {
+    _dualScreen = newDualScreen;
+    notifyListeners();
+  }
+}
 
 class ExercicePage extends StatefulWidget {
   const ExercicePage({Key? key}) : super(key: key);
@@ -106,7 +142,7 @@ class _ExercicePageState extends State<ExercicePage> {
     final Widget listSearchExercice = Column(
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(bottom: 10,right: 10, left: 10),
+          padding: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
           child: Row(
             children: <Widget>[
               Padding(
@@ -168,66 +204,83 @@ class _ExercicePageState extends State<ExercicePage> {
       ],
     );
 
-    return RoutedPage(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  SelectableText(
-                    'Exercice',
-                    style: Theme.of(context).textTheme.headline1,
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(100, 50),
-                      maximumSize: const Size(200, 50),
+    return ChangeNotifierProvider<ExercicePageNotifier>(
+      create: (BuildContext context) => ExercicePageNotifier(),
+      child: RoutedPage(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    SelectableText(
+                      'Exercice',
+                      style: Theme.of(context).textTheme.headline1,
                     ),
-                    onPressed: () => ExerciceBuilderPage.create(context),
-                    child: Text(
-                      'Créer un exercice',
-                      style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
-                    ),
-                  )
-                ],
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(100, 50),
+                        maximumSize: const Size(200, 50),
+                      ),
+                      onPressed: () => ExerciceBuilderPage.create(context),
+                      child: Text(
+                        'Créer un exercice',
+                        style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(flex: 2, child: listSearchExercice),
-                  Expanded(
-                      flex: 3,
-                      child: ValueListenableBuilder<Exercice?>(
-                        valueListenable: _vnExerciceSelected,
-                        builder: (BuildContext context, Exercice? exercice, Widget? child) {
-                          if (exercice != null) {
-                            bloc.init(exercice);
-                            return Container(
-                              decoration: const BoxDecoration(color: FitnessNcColors.blue50),
-                              child: Padding(
-                                padding: const EdgeInsets.all(60.0),
-                                child: ExerciceGeneric(
-                                  isCreation: false,
-                                  exercice: exercice,
-                                ),
+              Expanded(
+                child: Consumer<ExercicePageNotifier>(
+                  builder: (BuildContext context, ExercicePageNotifier exericeNotifier, Widget? child) {
+                    bloc.init(exericeNotifier.exerciceSelected);
+
+                    Widget widgetExercice;
+                    if (exericeNotifier.exerciceSelected != null) {
+                      widgetExercice = Container(
+                        decoration: BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
+                        child: Padding(
+                          padding: const EdgeInsets.all(30.0),
+                          child: ExerciceGeneric(
+                            isCreation: false,
+                            exercice: exericeNotifier.exerciceSelected,
+                          ),
+                        ),
+                      );
+                    } else {
+                      widgetExercice = Container(
+                        decoration: BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
+                      );
+                    }
+
+                    return LayoutBuilder(
+                      builder: (BuildContext context, BoxConstraints constraints) {
+                        exericeNotifier.dualScreen = constraints.maxWidth > 1280;
+                        if (exericeNotifier.dualScreen) {
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Expanded(flex: 2, child: listSearchExercice),
+                              Expanded(
+                                flex: 3,
+                                child: widgetExercice,
                               ),
-                            );
-                          } else {
-                            return child!;
-                          }
-                        },
-                        child: Container(decoration: const BoxDecoration(color: FitnessNcColors.blue50),),
-                      )),
-                ],
+                            ],
+                          );
+                        } else {
+                          return listSearchExercice;
+                        }
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

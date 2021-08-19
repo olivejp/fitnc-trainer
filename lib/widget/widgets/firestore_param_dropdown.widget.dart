@@ -38,8 +38,7 @@ class TimerDropdownButton extends StatelessWidget {
       icon: icon,
       onChanged: onChanged,
       value: initialValue,
-      items:
-          timerService.getDropdownMenuItem(onlyName, insertNull, nullElement),
+      items: timerService.getDropdownMenuItem(onlyName, insertNull, nullElement),
       hint: hint,
       decoration: decoration,
     );
@@ -82,8 +81,7 @@ class ParamDropdownButton extends StatelessWidget {
       style: style,
       decoration: decoration,
       initialValue: initialValue,
-      future: paramService.getFutureParamAsDropdown(
-          paramName, onlyValue, insertNull, nullElement),
+      future: paramService.getFutureParamAsDropdown(paramName, onlyValue, insertNull, nullElement),
       onChanged: onChanged,
       icon: icon,
       hint: hint,
@@ -92,6 +90,9 @@ class ParamDropdownButton extends StatelessWidget {
 }
 
 class FutureDropdownButton extends StatelessWidget {
+  const FutureDropdownButton(
+      {this.key, this.decoration, this.style, required this.future, required this.initialValue, required this.onChanged, this.icon, this.hint});
+
   final Key? key;
   final TextStyle? style;
   final String? initialValue;
@@ -101,22 +102,11 @@ class FutureDropdownButton extends StatelessWidget {
   final Widget? hint;
   final Future<List<DropdownMenuItem<String?>>> future;
 
-  FutureDropdownButton(
-      {this.key,
-      this.decoration,
-      this.style,
-      required this.future,
-      required this.initialValue,
-      required this.onChanged,
-      this.icon,
-      this.hint});
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<DropdownMenuItem<String?>>>(
         future: future,
-        builder: (BuildContext context,
-            AsyncSnapshot<List<DropdownMenuItem<String?>>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<DropdownMenuItem<String?>>> snapshot) {
           if (snapshot.hasData) {
             return DropdownButtonFormField<String?>(
               style: style,
@@ -145,14 +135,7 @@ class FutureDropdownButton extends StatelessWidget {
 
 class StreamDropdownButton extends StatelessWidget {
   const StreamDropdownButton(
-      {this.key,
-      this.decoration,
-      this.style,
-      required this.stream,
-      required this.initialValue,
-      required this.onChanged,
-      this.icon,
-      this.hint});
+      {this.key, this.decoration, this.style, required this.stream, required this.initialValue, required this.onChanged, this.icon, this.hint});
 
   final Key? key;
   final TextStyle? style;
@@ -167,8 +150,7 @@ class StreamDropdownButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<List<DropdownMenuItem<String?>>>(
         stream: stream,
-        builder: (BuildContext context,
-            AsyncSnapshot<List<DropdownMenuItem<String?>>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<DropdownMenuItem<String?>>> snapshot) {
           if (snapshot.hasData) {
             return DropdownButtonFormField<String?>(
               style: style,
