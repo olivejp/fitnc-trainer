@@ -81,9 +81,9 @@ class _ExercicePageState extends State<ExercicePage> {
   @override
   void initState() {
     super.initState();
-    bloc.listenAll().listen((List<Exercice> event) {
+    bloc.listenAll().listen((List<Exercice> listExercice) {
       listCompleteExercice.clear();
-      listCompleteExercice.addAll(event);
+      listCompleteExercice.addAll(listExercice);
       _streamListExercice.sink.add(listCompleteExercice);
       UtilService.search(_query, listCompleteExercice, _streamListExercice);
     });
@@ -107,24 +107,7 @@ class _ExercicePageState extends State<ExercicePage> {
 
           final Widget listExercice = ValueListenableBuilder<Exercice?>(
               valueListenable: _vnExerciceSelected,
-              builder: (BuildContext context, Exercice? exerciceSelected, Widget? child) => ListView.separated(
-                  shrinkWrap: true,
-                  itemBuilder: (BuildContext context, int index) {
-                    final Exercice exercice = list.elementAt(index);
-                    return ListTile(
-                      contentPadding: EdgeInsets.all(20),
-                      selected: exerciceSelected?.uid == exercice.uid,
-                      selectedTileColor: FitnessNcColors.blue50,
-                      leading: CircleAvatar(foregroundImage: exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null),
-                      title: Text(exercice.name!),
-                      trailing: IconButton(onPressed: () => UtilService.showDeleteDialog(context, exercice, bloc), icon: const Icon(Icons.delete)),
-                      onTap: () => _vnExerciceSelected.value = exercice,
-                    );
-                  },
-                  separatorBuilder: (BuildContext context, int index) => const Divider(
-                        height: 2,
-                      ),
-                  itemCount: list.length));
+              builder: (BuildContext context, Exercice? exerciceSelected, Widget? child) => ExerciceListViewSeparated(list: list, bloc: bloc, vnExerciceSelected: _vnExerciceSelected));
 
           return ValueListenableBuilder<int>(
               valueListenable: _vnDisplay,
@@ -236,7 +219,8 @@ class _ExercicePageState extends State<ExercicePage> {
               ),
               Expanded(
                 child: Consumer<ExercicePageNotifier>(
-                  builder: (BuildContext context, ExercicePageNotifier exericeNotifier, Widget? child) {
+                  child: listSearchExercice,
+                  builder: (BuildContext context, ExercicePageNotifier exericeNotifier, Widget? listSearchExerciceChild) {
                     bloc.init(exericeNotifier.exerciceSelected);
 
                     Widget widgetExercice;
@@ -264,7 +248,7 @@ class _ExercicePageState extends State<ExercicePage> {
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Expanded(flex: 2, child: listSearchExercice),
+                              Expanded(flex: 2, child: listSearchExerciceChild!),
                               Expanded(
                                 flex: 3,
                                 child: widgetExercice,
@@ -272,7 +256,7 @@ class _ExercicePageState extends State<ExercicePage> {
                             ],
                           );
                         } else {
-                          return listSearchExercice;
+                          return listSearchExerciceChild!;
                         }
                       },
                     );
@@ -283,6 +267,59 @@ class _ExercicePageState extends State<ExercicePage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class ExerciceListViewSeparated extends StatelessWidget {
+  const ExerciceListViewSeparated({
+    Key? key,
+    required this.list,
+    required this.bloc,
+    required ValueNotifier<Exercice?> vnExerciceSelected,
+  }) : _vnExerciceSelected = vnExerciceSelected, super(key: key);
+
+  final List<Exercice> list;
+  final ExerciceUpdateBloc bloc;
+  final ValueNotifier<Exercice?> _vnExerciceSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+        shrinkWrap: true,
+        itemBuilder: (BuildContext context, int index) {
+          final Exercice exercice = list.elementAt(index);
+          return ExerciceListTile(exercice: exercice, bloc: bloc, vnExerciceSelected: _vnExerciceSelected);
+        },
+        separatorBuilder: (BuildContext context, int index) => const Divider(
+              height: 2,
+            ),
+        itemCount: list.length);
+  }
+}
+
+class ExerciceListTile extends StatelessWidget {
+  const ExerciceListTile({
+    Key? key,
+    required this.exercice,
+    required this.bloc,
+    required ValueNotifier<Exercice?> vnExerciceSelected,
+  }) : _vnExerciceSelected = vnExerciceSelected, super(key: key);
+
+  final Exercice exercice;
+  final ExerciceUpdateBloc bloc;
+  final ValueNotifier<Exercice?> _vnExerciceSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.all(20),
+      selected: exerciceSelected?.uid == exercice.uid,
+      selectedTileColor: FitnessNcColors.blue50,
+      leading: CircleAvatar(foregroundImage: exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null),
+      title: Text(exercice.name!),
+      trailing: IconButton(onPressed: () => UtilService.showDeleteDialog(context, exercice, bloc), icon: const Icon(Icons.delete)),
+      onTap: () => _vnExerciceSelected.value = exercice,
     );
   }
 }
