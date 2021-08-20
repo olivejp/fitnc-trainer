@@ -27,8 +27,6 @@ class UtilService {
               finded = true;
               break;
             }
-          } else {
-            log("Le field $searchField} n'est pas un String.");
           }
         }
         return finded;

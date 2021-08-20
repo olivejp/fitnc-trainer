@@ -179,17 +179,6 @@ class _WorkoutComposeExerciceGridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
-      int nbColumns = 2;
-      if (constraints.maxWidth > 1000) {
-        nbColumns = 10;
-      } else if (constraints.maxWidth > 800) {
-        nbColumns = 7;
-      } else if (constraints.maxWidth > 600) {
-        nbColumns = 5;
-      } else if (constraints.maxWidth > 400) {
-        nbColumns = 4;
-      }
-
       return Stack(
         children: <Widget>[
           Positioned(
@@ -201,6 +190,7 @@ class _WorkoutComposeExerciceGridView extends StatelessWidget {
               isAlwaysShown: true,
               controller: _scrollController,
               child: GridView.count(
+                padding: EdgeInsets.only(bottom: 10),
                 controller: _scrollController,
                 semanticChildCount: listExercice.length,
                 shrinkWrap: true,

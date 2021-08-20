@@ -29,6 +29,15 @@ class ExercicePageViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool dualScreen = false;
+
+  void setDualScreen(bool isDualScreen) {
+    if (dualScreen != isDualScreen) {
+      dualScreen = isDualScreen;
+      notifyListeners();
+    }
+  }
+
   int display = 0;
 
   void setDisplay(int display) {
@@ -38,10 +47,24 @@ class ExercicePageViewModel extends ChangeNotifier {
 
   Exercice? exerciceSelected;
 
-  void selectExercice(Exercice? exercice) {
+  void selectExercice(BuildContext context, Exercice? exercice) {
     exerciceSelected = exercice;
     bloc.init(exercice);
     notifyListeners();
+
+    if (!dualScreen) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          insetPadding: EdgeInsets.all(10),
+          content: ExerciceUpdateCreateGeneric(
+            displayCloseButton: true,
+            isCreation: false,
+            exercice: exercice,
+          ),
+        ),
+      );
+    }
   }
 }
 
@@ -62,63 +85,71 @@ class _ExercicePageState extends State<ExercicePage> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<ExercicePageViewModel>(
       create: (BuildContext context) => ExercicePageViewModel(),
-      builder: (BuildContext context, Widget? child) => RoutedPage(
-        child: Consumer<ExercicePageViewModel>(builder: (BuildContext context, ExercicePageViewModel vm, Widget? child) {
-          return Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Column(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      SelectableText(
-                        'Exercice',
-                        style: Theme.of(context).textTheme.headline1,
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(100, 50),
-                          maximumSize: const Size(200, 50),
-                        ),
-                        onPressed: () => ExerciceBuilderPage.create(context),
-                        child: Text(
-                          'Créer un exercice',
-                          style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
-                        ),
-                      )
-                    ],
-                  ),
+      builder: (BuildContext context, Widget? child) => RoutedPage(child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return Consumer<ExercicePageViewModel>(builder: (BuildContext context, ExercicePageViewModel vm, Widget? child) {
+            vm.setDualScreen(constraints.maxWidth > 800);
+            final List<Widget> list = <Widget>[
+              Expanded(flex: 2, child: ExerciceListSearch(vm: vm, bloc: bloc)),
+            ];
+
+            if (vm.dualScreen) {
+              list.add(Expanded(
+                flex: 3,
+                child: Container(
+                  decoration: const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
+                  child: (vm.exerciceSelected != null)
+                      ? Padding(
+                          padding: const EdgeInsets.all(60.0),
+                          child: ExerciceUpdateCreateGeneric(
+                            isCreation: false,
+                            exercice: vm.exerciceSelected,
+                          ),
+                        )
+                      : null,
                 ),
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Expanded(flex: 2, child: ExerciceListSearch(vm: vm, bloc: bloc)),
-                      Expanded(
-                        flex: 3,
-                        child: Container(
-                          decoration: const BoxDecoration(color: FitnessNcColors.blue50),
-                          child: (vm.exerciceSelected != null)
-                              ? Padding(
-                                  padding: const EdgeInsets.all(60.0),
-                                  child: ExerciceUpdateCreateGeneric(
-                                    isCreation: false,
-                                    exercice: vm.exerciceSelected,
-                                  ),
-                                )
-                              : null,
+              ));
+            }
+
+            return Scaffold(
+              backgroundColor: Colors.transparent,
+              body: Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        SelectableText(
+                          'Exercice',
+                          style: Theme.of(context).textTheme.headline1,
                         ),
-                      ),
-                    ],
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size(100, 50),
+                            maximumSize: const Size(200, 50),
+                          ),
+                          onPressed: () => ExerciceBuilderPage.create(context),
+                          child: Text(
+                            'Créer un exercice',
+                            style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        }),
-      ),
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: list,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          });
+        },
+      )),
     );
   }
 }
@@ -251,7 +282,7 @@ class ExerciceStreamBuilder extends StatelessWidget {
               ? FitnessGridView<Exercice>(
                   domains: list,
                   bloc: bloc,
-                  onTap: (Exercice exercice) => vm.selectExercice(exercice),
+                  onTap: (Exercice exercice) => vm.selectExercice(context, exercice),
                 )
               : ExerciceListViewSeparated(
                   list: list,
@@ -312,7 +343,7 @@ class ExerciceListTile extends StatelessWidget {
       leading: CircleAvatar(foregroundImage: exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null),
       title: Text(exercice.name!),
       trailing: IconButton(onPressed: () => UtilService.showDeleteDialog(context, exercice, bloc), icon: const Icon(Icons.delete)),
-      onTap: () => vm.selectExercice(exercice),
+      onTap: () => vm.selectExercice(context, exercice),
     );
   }
 }

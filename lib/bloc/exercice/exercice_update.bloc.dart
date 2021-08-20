@@ -52,8 +52,6 @@ class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with MixinFit
   void init(Exercice? exerciceEntered) {
     sendStorage = false;
     subjectStoragePair.sink.add(null);
-    videoUrl = null;
-    youtubeUrl = null;
 
     if (exerciceEntered != null) {
       exercice = exerciceEntered;

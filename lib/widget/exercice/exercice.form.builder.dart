@@ -15,7 +15,8 @@ class ExerciceBuilderPage {
   static void create(BuildContext context) {
     showDialog(
         context: context,
-        builder: (BuildContext context) => const AlertDialog(title: Text("Création d'un exercice"), content: ExerciceUpdateCreateGeneric(isCreation: true)));
+        builder: (BuildContext context) =>
+            const AlertDialog(title: Text("Création d'un exercice"), content: ExerciceUpdateCreateGeneric(isCreation: true)));
   }
 
   /// Permet de créer une AlertDialog pour la mise à jour d'un exercice.
@@ -33,9 +34,10 @@ class ExerciceBuilderPage {
 
 /// Composant générique pour l'exercice (Mise à jour / Création).
 class ExerciceUpdateCreateGeneric extends StatefulWidget {
-  const ExerciceUpdateCreateGeneric({Key? key, required this.isCreation, this.exercice}) : super(key: key);
+  const ExerciceUpdateCreateGeneric({Key? key, required this.isCreation, this.exercice, this.displayCloseButton = false}) : super(key: key);
 
   final bool isCreation;
+  final bool displayCloseButton;
   final Exercice? exercice;
 
   @override
@@ -84,7 +86,7 @@ class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneri
       ),
     );
 
-    final List<Widget> buttons = widget.isCreation ? <Widget>[saveButton, closeButton] : <Widget>[saveButton];
+    final List<Widget> buttons = widget.displayCloseButton ? <Widget>[saveButton, closeButton] : <Widget>[saveButton];
 
     return Form(
       key: _formKey,
@@ -245,9 +247,9 @@ class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneri
               )
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: buttons,
+          Padding(
+            padding: const EdgeInsets.only(top: 20.0),
+            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: buttons),
           ),
         ],
       ),
