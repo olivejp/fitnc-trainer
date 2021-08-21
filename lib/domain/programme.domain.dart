@@ -12,6 +12,7 @@ class Programme extends AbstractFitnessStorageDomain implements InterfaceDomainS
   String? numberWeeks;
   bool? available;
   String? description;
+  dynamic publishDate;
 
   @override
   Map<String, dynamic> toJson() => _$ProgrammeToJson(this);

@@ -45,7 +45,7 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
         style: TextButton.styleFrom(backgroundColor: Colors.green),
         onPressed: () {
           if (_formKey.currentState?.validate() == true) {
-            widget.bloc.validateProgramme().then((_) => Navigator.pop(context));
+            widget.bloc.publishProgramme().then((_) => Navigator.pop(context));
           }
         },
         label: const Text('Publier', style: TextStyle(color: Colors.white)),

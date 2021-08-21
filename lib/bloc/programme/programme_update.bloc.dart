@@ -15,7 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinFitnessStorageBloc<Programme> {
+class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme>
+    with MixinFitnessStorageBloc<Programme> {
   ProgrammeUpdateBloc._();
 
   factory ProgrammeUpdateBloc.instance() {
@@ -44,18 +45,24 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
   TrainersService trainersService = TrainersService.instance();
   ParamService paramService = ParamService.getInstance();
 
-  BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
-  final BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject<String?>();
-  final BehaviorSubject<String?> _streamSelectedYoutubeUrl = BehaviorSubject<String?>();
-  final BehaviorSubject<List<WorkoutScheduleDto>> _streamWorkoutScheduleDto = BehaviorSubject<List<WorkoutScheduleDto>>();
+  BehaviorSubject<StorageFile?> subjectStoragePair =
+      BehaviorSubject<StorageFile?>();
+  final BehaviorSubject<String?> _streamSelectedVideoUrl =
+      BehaviorSubject<String?>();
+  final BehaviorSubject<String?> _streamSelectedYoutubeUrl =
+      BehaviorSubject<String?>();
+  final BehaviorSubject<List<WorkoutScheduleDto>> _streamWorkoutScheduleDto =
+      BehaviorSubject<List<WorkoutScheduleDto>>();
 
   Stream<String?>? get selectedVideoUrlObs => _streamSelectedVideoUrl.stream;
 
-  Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl.stream;
+  Stream<String?>? get selectedYoutubeUrlObs =>
+      _streamSelectedYoutubeUrl.stream;
 
   Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
 
-  Stream<List<WorkoutScheduleDto>> get workoutScheduleObs => _streamWorkoutScheduleDto.stream;
+  Stream<List<WorkoutScheduleDto>> get workoutScheduleObs =>
+      _streamWorkoutScheduleDto.stream;
 
   final String pathProgrammeMainImage = 'mainImage';
   final List<WorkoutScheduleDto> listDtos = <WorkoutScheduleDto>[];
@@ -79,7 +86,8 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
       programme = programmeEntered;
       vnNumberWeek.value = getNumberWeeks(programme.numberWeeks);
       programme.storageFile = StorageFile();
-      getFutureStorageFile(programme).then((StorageFile? storageFile) => subjectStoragePair.sink.add(storageFile));
+      getFutureStorageFile(programme).then((StorageFile? storageFile) =>
+          subjectStoragePair.sink.add(storageFile));
 
       // On récupère une fois la liste des WorkoutScheduleDto
       trainersService
@@ -89,7 +97,8 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
           .orderBy('dateSchedule')
           .get()
           .then((QuerySnapshot<Map<String, dynamic>> event) => event.docs
-              .map((QueryDocumentSnapshot<Map<String, dynamic>> e) => WorkoutSchedule.fromJson(e.data()))
+              .map((QueryDocumentSnapshot<Map<String, dynamic>> e) =>
+                  WorkoutSchedule.fromJson(e.data()))
               .map((WorkoutSchedule e) => mapToFutureWorkoutScheduleDto(e))
               .toList())
           .then((List<Future<WorkoutScheduleDto>> event) => Future.wait(event))
@@ -149,7 +158,12 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
 
   void addWorkoutSchedule(Workout workout, int dayIndex) {
     final WorkoutScheduleDto dto = WorkoutScheduleDto.empty();
-    dto.uid = trainersService.getProgrammeReference().doc(programme.uid).collection('workouts').doc().id;
+    dto.uid = trainersService
+        .getProgrammeReference()
+        .doc(programme.uid)
+        .collection('workouts')
+        .doc()
+        .id;
     dto.uidWorkout = workout.uid;
     dto.nameWorkout = workout.name;
     dto.imageUrlWorkout = workout.imageUrl;
@@ -163,9 +177,11 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
         .collection('workouts')
         .doc(dto.uid)
         .set(dto.toJson())
-        .then((_) => showToast('Workout ajouté au programme.', duration: const Duration(seconds: 2)))
-        .catchError(
-            (_) => showToast("Une erreur est survenue lors de l'enregistrement du workout au programme.", duration: const Duration(seconds: 2)));
+        .then((_) => showToast('Workout ajouté au programme.',
+            duration: const Duration(seconds: 2)))
+        .catchError((_) => showToast(
+            "Une erreur est survenue lors de l'enregistrement du workout au programme.",
+            duration: const Duration(seconds: 2)));
   }
 
   Future<WorkoutScheduleDto> mapToFutureWorkoutScheduleDto(WorkoutSchedule e) {
@@ -173,7 +189,8 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
         .getWorkoutReference()
         .doc(e.uidWorkout)
         .get()
-        .then((DocumentSnapshot<Object?> value) => Workout.fromJson(value.data() as Map<String, dynamic>))
+        .then((DocumentSnapshot<Object?> value) =>
+            Workout.fromJson(value.data() as Map<String, dynamic>))
         .then((Workout value) {
       final WorkoutScheduleDto dto = WorkoutScheduleDto.fromSchedule(e);
       dto.nameWorkout = value.name;
@@ -196,15 +213,35 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme> with MixinF
   }
 
   Future<List<DropdownMenuItem<Workout>>> getWorkoutDropdownItems() async {
-    QuerySnapshot<Object?> query = await trainersService.getWorkoutReference().get();
+    QuerySnapshot<Object?> query =
+        await trainersService.getWorkoutReference().get();
     return query.docs
         .map((e) => Workout.fromJson(e.data() as Map<String, dynamic>))
-        .map((Workout workout) => DropdownMenuItem<Workout>(value: workout, child: Text(workout.name!)))
+        .map((Workout workout) => DropdownMenuItem<Workout>(
+            value: workout, child: Text(workout.name!)))
         .toList();
   }
 
-  Future<void> validateProgramme() {
+  /// Publication du programme dans une collection où tous les utilisateurs pourront les trouver.
+  Future<void> publishProgramme() {
     programme.available = true;
-    return saveProgramme();
+    programme.publishDate = FieldValue.serverTimestamp();
+    return saveProgramme().then((_) {
+      FirebaseFirestore.instance
+          .collection("publishedProgrammes")
+          .doc(programme.uid)
+          .set(programme.toJson());
+    });
+  }
+
+  /// Dépublication du programme dans une collection.
+  Future<void> unpublishProgramme() {
+    programme.available = false;
+    return saveProgramme().then((_) {
+      FirebaseFirestore.instance
+          .collection("publishedProgrammes")
+          .doc(programme.uid)
+          .delete();
+    });
   }
 }
