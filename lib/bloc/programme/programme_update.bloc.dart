@@ -223,25 +223,64 @@ class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme>
   }
 
   /// Publication du programme dans une collection où tous les utilisateurs pourront les trouver.
-  Future<void> publishProgramme() {
+  Future<void> publishProgramme() async {
     programme.available = true;
     programme.publishDate = FieldValue.serverTimestamp();
-    return saveProgramme().then((_) {
-      FirebaseFirestore.instance
-          .collection("publishedProgrammes")
-          .doc(programme.uid)
-          .set(programme.toJson());
-    });
+    await saveProgramme();
+
+    // Ouverture d'un batch.
+    final WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    final DocumentReference<Map<String, dynamic>> programmeRef =
+        FirebaseFirestore.instance
+            .collection("publishedProgrammes")
+            .doc(programme.uid);
+
+    batch.set(programmeRef, programme.toJson());
+
+    // Lecture de tous les workouts.
+    final QuerySnapshot<Map<String, dynamic>> mapWorkouts =
+        await trainersService
+            .getProgrammeReference()
+            .doc(programme.uid)
+            .collection("workouts")
+            .get();
+
+    for (final QueryDocumentSnapshot<Map<String, dynamic>> docs
+        in mapWorkouts.docs) {
+      DocumentReference<Map<String, dynamic>> docRef =
+          programmeRef.collection("workouts").doc(docs.id);
+      batch.set(docRef, docs.data());
+    }
+
+    batch.commit();
   }
 
   /// Dépublication du programme dans une collection.
-  Future<void> unpublishProgramme() {
+  Future<void> unpublishProgramme() async {
     programme.available = false;
-    return saveProgramme().then((_) {
-      FirebaseFirestore.instance
-          .collection("publishedProgrammes")
-          .doc(programme.uid)
-          .delete();
-    });
+    await saveProgramme();
+
+    final DocumentReference<Map<String, dynamic>> programmeRef =
+        FirebaseFirestore.instance
+            .collection("publishedProgrammes")
+            .doc(programme.uid);
+
+    // Ouverture d'un batch.
+    final WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    // Suppression du programme publié.
+    batch.delete(programmeRef);
+
+    // Suppression de tous les Workouts.
+    final QuerySnapshot<Map<String, dynamic>> values =
+        await programmeRef.collection("workouts").get();
+
+    for (final QueryDocumentSnapshot<Map<String, dynamic>> element
+        in values.docs) {
+      batch.delete(element.reference);
+    }
+
+    batch.commit();
   }
 }

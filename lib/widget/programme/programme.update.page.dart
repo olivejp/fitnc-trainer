@@ -40,6 +40,18 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
   @override
   Widget build(BuildContext context) {
     final List<Widget> buttons = <Widget>[];
+    if (widget.bloc.programme.available == true) {
+      buttons.add(TextButton.icon(
+        style: TextButton.styleFrom(backgroundColor: Colors.red),
+        onPressed: () {
+          if (_formKey.currentState?.validate() == true) {
+            widget.bloc.unpublishProgramme().then((_) => Navigator.pop(context));
+          }
+        },
+        label: const Text('Dépublier', style: TextStyle(color: Colors.white)),
+        icon: const Icon(Icons.public, color: Colors.white),
+      ));
+    }
     if (widget.bloc.programme.available == null || widget.bloc.programme.available == false) {
       buttons.add(TextButton.icon(
         style: TextButton.styleFrom(backgroundColor: Colors.green),
