@@ -23,8 +23,6 @@ class LoginBloc {
     return _instance!;
   }
 
-  final AuthService authService = AuthService.getInstance();
-
   final AuthParam _authParam = AuthParam();
   BehaviorSubject<String?>? _streamError;
 
@@ -66,13 +64,5 @@ class LoginBloc {
 
   String get password {
     return _authParam.password;
-  }
-
-  Future<UserCredential> login() {
-    return FirebaseAuth.instance.signInWithEmailAndPassword(email: _authParam.email, password: _authParam.password);
-  }
-
-  Future<UserCredential> signUp() {
-    return FirebaseAuth.instance.createUserWithEmailAndPassword(email: _authParam.email, password: _authParam.password);
   }
 }

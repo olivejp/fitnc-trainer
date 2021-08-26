@@ -2,10 +2,8 @@ import 'package:fitnc_trainer/bloc/programme/programme_update.bloc.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_schedule.dto.dart';
-import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -18,6 +16,8 @@ import 'package:loading_animations/loading_animations.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart' as sf;
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+
+import '../../constants.dart';
 
 class ProgrammeUpdatePage extends StatefulWidget {
   ProgrammeUpdatePage({Key? key, Programme? programme}) : super(key: key) {
@@ -69,12 +69,14 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () {
             if (_formKey.currentState?.validate() == true) {
-              widget.bloc.saveProgramme().then(
+              widget.bloc
+                  .saveProgramme()
+                  .then(
                     (_) => showToast('Exercice sauvegardé', backgroundColor: Colors.green),
-              )
+                  )
                   .catchError(
                     (_) => showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent),
-              );
+                  );
             }
           },
           icon: const Icon(Icons.save, color: Colors.white),

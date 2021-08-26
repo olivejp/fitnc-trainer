@@ -27,8 +27,6 @@ class SignUpBloc {
   String password = '';
   String passwordCheck = '';
 
-
-  final AuthService authService = AuthService.getInstance();
   BehaviorSubject<String?>? _streamError;
 
   Stream<String?>? get errorsObservable => _streamError?.stream;

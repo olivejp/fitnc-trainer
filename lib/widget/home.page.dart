@@ -2,12 +2,15 @@ import 'dart:ui';
 
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/main.dart';
+import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
+import 'package:provider/provider.dart';
 
+import '../constants.dart';
 import 'abonne/abonne.page.dart';
 import 'programme/programme.page.dart';
 import 'workout/workout.page.dart';
@@ -107,6 +110,7 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    final AuthService authService = Provider.of<AuthService>(context, listen: false);
     return ValueListenableBuilder<int>(
       valueListenable: _vnSelectedIndex,
       builder: (BuildContext context, int value, Widget? child) {
@@ -121,7 +125,7 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
                   _NavigationFolder(
                     label: 'Déconnexion',
                     iconData: Icons.exit_to_app_outlined,
-                    onTap: () => widget.bloc.logout(),
+                    onTap: () => authService.signOut(),
                   )
                 ]),
                 leading: Row(

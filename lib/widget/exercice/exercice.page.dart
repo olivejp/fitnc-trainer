@@ -15,6 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../constants.dart';
 import 'exercice.form.builder.dart';
 
 class ExercicePageViewModel extends ChangeNotifier {

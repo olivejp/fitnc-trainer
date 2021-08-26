@@ -2,6 +2,8 @@ import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/main.dart';
 import 'package:flutter/material.dart';
 
+import '../../constants.dart';
+
 class FitnessDecorationTextFormField extends StatelessWidget {
   const FitnessDecorationTextFormField({Key? key, this.initialValue, this.labelText, this.onChanged, this.validator, this.autofocus = false, this.hintText}) : super(key: key);
 

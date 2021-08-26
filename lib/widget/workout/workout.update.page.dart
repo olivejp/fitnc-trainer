@@ -8,6 +8,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 
+import '../../constants.dart';
+
 class WorkoutUpdatePage extends StatefulWidget {
   WorkoutUpdatePage({Key? key, required this.workout}) : super(key: key);
 

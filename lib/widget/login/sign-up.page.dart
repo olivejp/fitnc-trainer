@@ -5,10 +5,32 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
+import '../../constants.dart';
 import '../../main.dart';
 
 typedef CallbackUserCredential = void Function(UserCredential userCredential);
+
+/// ChangeNotifier pour changer l'état des boutons 'Hide password'.
+class HidePasswordNotifier with ChangeNotifier {
+  bool _hidePassword1 = true;
+  bool _hidePassword2 = true;
+
+  bool get hidePassword1 => _hidePassword1;
+
+  bool get hidePassword2 => _hidePassword2;
+
+  void switchPassword1() {
+    _hidePassword1 = !_hidePassword1;
+    notifyListeners();
+  }
+
+  void switchPassword2() {
+    _hidePassword2 = !_hidePassword2;
+    notifyListeners();
+  }
+}
 
 class SignUpPage extends StatefulWidget {
   SignUpPage({Key? key, this.callback}) : super(key: key);
@@ -25,11 +47,7 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   _SignUpPageState();
 
-  final ValueNotifier<bool> _vnHidePassword = ValueNotifier<bool>(true);
-  final ValueNotifier<bool> _vnHideSecondPassword = ValueNotifier<bool>(true);
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool showPassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -161,46 +179,47 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 60),
-                            child: ValueListenableBuilder<bool>(
-                              valueListenable: _vnHidePassword,
-                              builder: (BuildContext context, bool hidePassword, Widget? child) => TextFormField(
-                                  style: GoogleFonts.roboto(fontSize: 15),
-                                  onChanged: (String value) => widget.bloc.password = value,
-                                  obscureText: hidePassword,
-                                  decoration: InputDecoration(
-                                      labelText: 'Mot de passe',
-                                      focusedBorder: defaultBorder,
-                                      border: defaultBorder,
-                                      enabledBorder: defaultBorder,
-                                      suffixIcon: IconButton(
-                                        tooltip: hidePassword ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
-                                        onPressed: () => _vnHidePassword.value = !_vnHidePassword.value,
-                                        icon: hidePassword ? const Icon(Icons.visibility_outlined) : const Icon(Icons.visibility_off_outlined),
-                                      )),
-                                  validator: (String? value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Le mot de passe ne peut pas être vide.';
-                                    }
-                                  }),
-                            ),
+                            child: Consumer<HidePasswordNotifier>(
+                                builder: (_, HidePasswordNotifier hidePasswordNotifier, __) => TextFormField(
+                                    style: GoogleFonts.roboto(fontSize: 15),
+                                    onChanged: (String value) => widget.bloc.password = value,
+                                    obscureText: hidePasswordNotifier.hidePassword1,
+                                    decoration: InputDecoration(
+                                        labelText: 'Mot de passe',
+                                        focusedBorder: defaultBorder,
+                                        border: defaultBorder,
+                                        enabledBorder: defaultBorder,
+                                        suffixIcon: IconButton(
+                                          tooltip: hidePasswordNotifier.hidePassword1 ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
+                                          onPressed: hidePasswordNotifier.switchPassword1,
+                                          icon: hidePasswordNotifier.hidePassword1
+                                              ? const Icon(Icons.visibility_outlined)
+                                              : const Icon(Icons.visibility_off_outlined),
+                                        )),
+                                    validator: (String? value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Le mot de passe ne peut pas être vide.';
+                                      }
+                                    })),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 20),
-                            child: ValueListenableBuilder<bool>(
-                              valueListenable: _vnHideSecondPassword,
-                              builder: (BuildContext context, bool hidePassword, Widget? child) => TextFormField(
+                            child: Consumer<HidePasswordNotifier>(
+                              builder: (_, HidePasswordNotifier hidePasswordNotifier, __) => TextFormField(
                                   style: GoogleFonts.roboto(fontSize: 15),
                                   onChanged: (String value) => widget.bloc.passwordCheck = value,
-                                  obscureText: hidePassword,
+                                  obscureText: hidePasswordNotifier.hidePassword2,
                                   decoration: InputDecoration(
                                       focusedBorder: defaultBorder,
                                       border: defaultBorder,
                                       enabledBorder: defaultBorder,
                                       labelText: 'Retaper votre mot de passe',
                                       suffixIcon: IconButton(
-                                          tooltip: hidePassword ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
-                                          onPressed: () => _vnHideSecondPassword.value = !_vnHideSecondPassword.value,
-                                          icon: hidePassword ? const Icon(Icons.visibility_outlined) : const Icon(Icons.visibility_off_outlined))),
+                                          tooltip: hidePasswordNotifier.hidePassword2 ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
+                                          onPressed: hidePasswordNotifier.switchPassword2,
+                                          icon: hidePasswordNotifier.hidePassword2
+                                              ? const Icon(Icons.visibility_outlined)
+                                              : const Icon(Icons.visibility_off_outlined))),
                                   validator: (String? value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Le mot de passe ne peut pas être vide.';
@@ -254,49 +273,52 @@ class _SignUpPageState extends State<SignUpPage> {
       ],
     );
 
-    return Scaffold(
-      backgroundColor: FitnessNcColors.blue50,
-      body: Stack(
-        children: [
-          Transform(
-            transform: Matrix4.identity()
-              ..translate(MediaQuery.of(context).size.width)
-              ..add(Matrix4.skewX(-0.3)),
-            child: Container(
-              width: 200,
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
+    return ChangeNotifierProvider<HidePasswordNotifier>(
+      create: (BuildContext context) => HidePasswordNotifier(),
+      child: Scaffold(
+        backgroundColor: FitnessNcColors.blue50,
+        body: Stack(
+          children: [
+            Transform(
+              transform: Matrix4.identity()
+                ..translate(MediaQuery.of(context).size.width)
+                ..add(Matrix4.skewX(-0.3)),
+              child: Container(
+                width: 200,
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
+              ),
             ),
-          ),
-          Transform(
-            transform: Matrix4.identity()
-              ..translate(MediaQuery.of(context).size.width - 80)
-              ..add(Matrix4.skewX(-0.3)),
-            child: Container(
-              width: 20,
-              decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
+            Transform(
+              transform: Matrix4.identity()
+                ..translate(MediaQuery.of(context).size.width - 80)
+                ..add(Matrix4.skewX(-0.3)),
+              child: Container(
+                width: 20,
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
+              ),
             ),
-          ),
-          LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints constraints) {
-              Widget toShow;
-              if (constraints.maxWidth > 900) {
-                toShow = Row(
-                  children: <Widget>[
-                    Expanded(child: columnLeft),
-                    Expanded(child: columnRight),
-                  ],
-                );
-              } else {
-                toShow = columnRight;
-              }
-              return Stack(children: <Widget>[toShow, const BottomCu()]);
-            },
-          )
-        ],
+            LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                Widget toShow;
+                if (constraints.maxWidth > 900) {
+                  toShow = Row(
+                    children: <Widget>[
+                      Expanded(child: columnLeft),
+                      Expanded(child: columnRight),
+                    ],
+                  );
+                } else {
+                  toShow = columnRight;
+                }
+                return Stack(children: <Widget>[toShow, const BottomCu()]);
+              },
+            )
+          ],
+        ),
       ),
     );
   }

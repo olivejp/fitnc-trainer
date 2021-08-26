@@ -1,4 +1,3 @@
-import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HomePageBloc {
@@ -14,8 +13,6 @@ class HomePageBloc {
   }
 
   static HomePageBloc? _instance;
-
-  final AuthService authService = AuthService.getInstance();
 
   int _currentPage = 0;
   bool _currentDisplay = false;
@@ -40,10 +37,6 @@ class HomePageBloc {
   void changePage(int newPage) {
     _currentPage = newPage;
     _streamCurrentPage.sink.add(_currentPage);
-  }
-
-  Future<bool> logout() {
-    return authService.disconnect();
   }
 
   void toggleDisplay() {

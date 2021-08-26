@@ -13,6 +13,8 @@ import 'package:intl/intl.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../../constants.dart';
+
 class WorkoutComposePageBloc {
   WorkoutComposePageBloc._();
 
