@@ -14,7 +14,7 @@ class FirebaseWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FirebaseService firebaseService = Provider.of<FirebaseService>(context);
+    final FirebaseService firebaseService = Provider.of<FirebaseService>(context, listen: false);
     return FutureBuilder<FirebaseApp>(
       future: firebaseService.initialize(),
       builder: (_, AsyncSnapshot<FirebaseApp> snapshot) {

@@ -12,7 +12,7 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
       : super(key: key);
   final List<T> domains;
   final void Function(T domain)? onTap;
-  final AbstractFitnessCrudBloc<T> bloc;
+  final AbstractFitnessCrudService<T> bloc;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +66,7 @@ class _FitnessGridCard<T extends AbstractFitnessStorageDomain> extends Stateless
       : super(key: key);
 
   final T domain;
-  final AbstractFitnessCrudBloc<T> bloc;
+  final AbstractFitnessCrudService<T> bloc;
   final void Function(T domain) onTap;
   final void Function(T domain) onDelete;
 

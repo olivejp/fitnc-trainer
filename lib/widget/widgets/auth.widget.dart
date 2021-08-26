@@ -11,7 +11,7 @@ class AuthWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AuthService authService = Provider.of<AuthService>(context);
+    final AuthService authService = Provider.of<AuthService>(context, listen: false);
     return StreamBuilder<User?>(
       stream: authService.getUserConnected(),
       builder: (_, AsyncSnapshot<User?> snapshot) {

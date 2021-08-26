@@ -15,8 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ProgrammeUpdateBloc extends AbstractFitnessCrudBloc<Programme>
-    with MixinFitnessStorageBloc<Programme> {
+class ProgrammeUpdateBloc extends AbstractFitnessCrudService<Programme>
+    with MixinFitnessStorageService<Programme> {
   ProgrammeUpdateBloc._();
 
   factory ProgrammeUpdateBloc.instance() {

@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
-class WorkoutUpdateBloc extends AbstractFitnessCrudBloc<Workout> with MixinFitnessStorageBloc<Workout> {
+class WorkoutUpdateBloc extends AbstractFitnessCrudService<Workout> with MixinFitnessStorageService<Workout> {
   WorkoutUpdateBloc._();
 
   factory WorkoutUpdateBloc.instance() {

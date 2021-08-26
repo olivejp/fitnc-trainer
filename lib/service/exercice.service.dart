@@ -7,32 +7,24 @@ import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
+import 'package:flutter/widgets.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ExerciceUpdateBloc extends AbstractFitnessCrudBloc<Exercice> with MixinFitnessStorageBloc<Exercice> {
-  ExerciceUpdateBloc._();
+class ExerciceService extends AbstractFitnessCrudService<Exercice> with MixinFitnessStorageService<Exercice> {
 
-  factory ExerciceUpdateBloc.instance() {
-    _instance ??= ExerciceUpdateBloc._();
-    return _instance!;
+  ExerciceService(BuildContext context){
+    trainersService = TrainersService.instance();
+    paramService = ParamService.getInstance();
   }
 
-  static ExerciceUpdateBloc? _instance;
-
-  TrainersService trainersService = TrainersService.instance();
-  ParamService paramService = ParamService.getInstance();
+  late TrainersService trainersService;
+  late ParamService paramService;
   Exercice? exercice;
   bool sendStorage = false;
 
   final BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
   final BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject<String?>();
   final BehaviorSubject<String?> _streamSelectedYoutubeUrl = BehaviorSubject<String?>();
-
-  Stream<String?>? get selectedVideoUrlObs => _streamSelectedVideoUrl.stream;
-
-  Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl.stream;
-
-  Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
 
   @override
   Stream<List<Exercice>> listenAll() {

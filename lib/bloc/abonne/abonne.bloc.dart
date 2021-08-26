@@ -6,7 +6,7 @@ import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/abonne/abonne.update.page.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
-class AbonneBloc extends AbstractFitnessCrudBloc<Abonne> with MixinFitnessStorageBloc<Abonne> {
+class AbonneBloc extends AbstractFitnessCrudService<Abonne> with MixinFitnessStorageService<Abonne> {
   AbonneBloc._();
 
   factory AbonneBloc.instance() {

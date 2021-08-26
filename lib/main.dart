@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fitnc_trainer/service/exercice.service.dart';
 import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:fitnc_trainer/service/firebase.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
@@ -32,6 +33,7 @@ void main() {
   runApp(MultiProvider(providers: <SingleChildWidget>[
     Provider<AuthService>(create: (_) => AuthService()),
     Provider<FirebaseService>(create: (_) => FirebaseService()),
+    Provider<ExerciceService>(create: (BuildContext context) => ExerciceService(context)),
     ChangeNotifierProvider<DisplayTypeNotifier>(create: (_) => DisplayTypeNotifier())
   ], child: MyApp()));
 }

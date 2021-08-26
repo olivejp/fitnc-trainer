@@ -1,7 +1,6 @@
-import 'package:fitnc_trainer/bloc/exercice/exercice_update.bloc.dart';
+import 'package:fitnc_trainer/service/exercice.service.dart';
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
-import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
@@ -19,7 +18,11 @@ import '../../constants.dart';
 import 'exercice.form.builder.dart';
 
 class ExercicePageViewModel extends ChangeNotifier {
-  final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
+  ExercicePageViewModel(BuildContext context) {
+    bloc = Provider.of<ExerciceService>(context, listen: false);
+  }
+
+  late ExerciceService bloc;
 
   List<bool> toggleSelections = <bool>[true, false];
 
@@ -32,7 +35,7 @@ class ExercicePageViewModel extends ChangeNotifier {
 
   bool dualScreen = false;
 
-  void setDualScreen(bool isDualScreen) {
+  void setDualScreen({required bool isDualScreen}) {
     if (dualScreen != isDualScreen) {
       dualScreen = isDualScreen;
       notifyListeners();
@@ -48,7 +51,7 @@ class ExercicePageViewModel extends ChangeNotifier {
 
   Exercice? exerciceSelected;
 
-  void selectExercice(BuildContext context, Exercice? exercice) {
+  void selectExercice(BuildContext context, Exercice exercice) {
     exerciceSelected = exercice;
     bloc.init(exercice);
     notifyListeners();
@@ -56,8 +59,8 @@ class ExercicePageViewModel extends ChangeNotifier {
     if (!dualScreen) {
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          insetPadding: EdgeInsets.all(10),
+        builder: (BuildContext context) => AlertDialog(
+          insetPadding: const EdgeInsets.all(10),
           content: ExerciceUpdateCreateGeneric(
             displayCloseButton: true,
             isCreation: false,
@@ -78,18 +81,20 @@ class ExercicePage extends StatefulWidget {
 
 class _ExercicePageState extends State<ExercicePage> {
   final HomePageBloc homePageBloc = HomePageBloc.instance();
-  final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
+
   final List<Exercice> listCompleteExercice = <Exercice>[];
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
   @override
   Widget build(BuildContext context) {
+    final ExerciceService bloc = Provider.of<ExerciceService>(context, listen: false);
+
     return ChangeNotifierProvider<ExercicePageViewModel>(
-      create: (BuildContext context) => ExercicePageViewModel(),
+      create: (BuildContext context) => ExercicePageViewModel(context),
       builder: (BuildContext context, Widget? child) => RoutedPage(child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           return Consumer<ExercicePageViewModel>(builder: (BuildContext context, ExercicePageViewModel vm, Widget? child) {
-            vm.setDualScreen(constraints.maxWidth > 800);
+            vm.setDualScreen(isDualScreen: constraints.maxWidth > 800);
             final List<Widget> list = <Widget>[
               Expanded(flex: 2, child: ExerciceListSearch(vm: vm, bloc: bloc)),
             ];
@@ -104,7 +109,7 @@ class _ExercicePageState extends State<ExercicePage> {
                           padding: const EdgeInsets.all(60.0),
                           child: ExerciceUpdateCreateGeneric(
                             isCreation: false,
-                            exercice: vm.exerciceSelected,
+                            exercice: vm.exerciceSelected!,
                           ),
                         )
                       : null,
@@ -162,7 +167,7 @@ class ExerciceListSearch extends StatefulWidget {
     required this.vm,
   }) : super(key: key);
 
-  final ExerciceUpdateBloc bloc;
+  final ExerciceService bloc;
   final ExercicePageViewModel vm;
 
   @override
@@ -230,11 +235,11 @@ class _ExerciceListSearchState extends State<ExerciceListSearch> {
               Expanded(
                 child: TextField(
                   decoration: InputDecoration(
-                    constraints: BoxConstraints(maxHeight: 43),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1)),
+                    constraints: const BoxConstraints(maxHeight: 43),
+                    border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
                     focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor)),
-                    prefixIcon: Icon(Icons.search),
+                        borderRadius: const BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(color: Theme.of(context).primaryColor)),
+                    prefixIcon: const Icon(Icons.search),
                     hintText: 'Recherche...',
                   ),
                   onChanged: (String value) {
@@ -267,7 +272,7 @@ class ExerciceStreamBuilder extends StatelessWidget {
         super(key: key);
 
   final BehaviorSubject<List<Exercice>> _streamListExercice;
-  final ExerciceUpdateBloc bloc;
+  final ExerciceService bloc;
   final ExercicePageViewModel vm;
 
   @override
@@ -305,7 +310,7 @@ class ExerciceListViewSeparated extends StatelessWidget {
   }) : super(key: key);
 
   final List<Exercice> list;
-  final ExerciceUpdateBloc bloc;
+  final ExerciceService bloc;
   final ExercicePageViewModel vm;
 
   @override
@@ -333,12 +338,12 @@ class ExerciceListTile extends StatelessWidget {
 
   final ExercicePageViewModel vm;
   final Exercice exercice;
-  final ExerciceUpdateBloc bloc;
+  final ExerciceService bloc;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: EdgeInsets.all(20),
+      contentPadding: const EdgeInsets.all(20),
       selected: vm.exerciceSelected?.uid == exercice.uid,
       selectedTileColor: FitnessNcColors.blue50,
       leading: CircleAvatar(foregroundImage: exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null),

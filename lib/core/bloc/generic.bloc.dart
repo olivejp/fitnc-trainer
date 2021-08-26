@@ -14,7 +14,7 @@ import 'package:path/path.dart';
 ///
 /// Interface de haut niveau pour les opérations CRUD
 ///
-abstract class AbstractCrudBloc<T> {
+abstract class AbstractCrudService<T> {
   Stream<List<T>> listenAll();
 
   Future<void> save(T domain);
@@ -29,7 +29,7 @@ abstract class AbstractCrudBloc<T> {
 ///
 /// Classe abstraite dont on doit étendre pour récupérer les méthodes par défaut pour le CRUD Firebase.
 ///
-abstract class AbstractFirebaseCrudBloc<T extends AbstractDomain> implements AbstractCrudBloc<T> {
+abstract class AbstractFirebaseCrudService<T extends AbstractDomain> implements AbstractCrudService<T> {
   /// Méthode abstraite qui retournera la collectionReference.
   CollectionReference<Object?> getCollectionReference();
 
@@ -67,9 +67,9 @@ abstract class AbstractFirebaseCrudBloc<T extends AbstractDomain> implements Abs
 }
 
 ///
-/// Mixin Bloc pour implémenter les méthodes de base pour le Firebase storage.
+/// Mixin Service pour implémenter les méthodes de base pour le Firebase storage.
 ///
-abstract class MixinFitnessStorageBloc<T extends AbstractFitnessStorageDomain> {
+abstract class MixinFitnessStorageService<T extends AbstractFitnessStorageDomain> {
   /// Méthode abstraite
   /// Permet de spécifier l'emplacement où sera stocké le fichier dans Firebase Storage.
   /// Cette url sera complétée avec le nom du fichier, ex:
@@ -151,5 +151,5 @@ abstract class MixinFitnessStorageBloc<T extends AbstractFitnessStorageDomain> {
 ///
 /// Classe Bloc spécifique à l'application Fitness NC pour implémenter les méthodes de base du CRUD
 ///
-abstract class AbstractFitnessCrudBloc<T extends AbstractDomain> extends AbstractFirebaseCrudBloc<T> {
+abstract class AbstractFitnessCrudService<T extends AbstractDomain> extends AbstractFirebaseCrudService<T> {
 }
