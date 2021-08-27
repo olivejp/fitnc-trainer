@@ -81,13 +81,17 @@ class MyApp extends StatelessWidget {
           },
           home: LayoutBuilder(
             builder: (_, BoxConstraints constraints) {
+              DisplayType displayType = DisplayType.desktop;
               if (constraints.maxWidth >= 1280) {
-                displayTypeNotifier.changeDisplay(DisplayType.desktop);
+                displayType = DisplayType.desktop;
               } else if (constraints.maxWidth >= 800 && constraints.maxWidth <= 1279) {
-                displayTypeNotifier.changeDisplay(DisplayType.tablet);
+                displayType = DisplayType.tablet;
               } else {
-                displayTypeNotifier.changeDisplay(DisplayType.mobile);
+                displayType = DisplayType.mobile;
               }
+              WidgetsBinding.instance?.addPostFrameCallback((Duration timeStamp) {
+                displayTypeNotifier.changeDisplay(displayType);
+              });
               return const FirebaseWidget();
             },
           )),

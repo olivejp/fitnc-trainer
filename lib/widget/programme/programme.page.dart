@@ -1,7 +1,6 @@
 import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
 import 'package:fitnc_trainer/bloc/programme/programme_update.bloc.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
-import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/programme/programme.update.page.dart';
@@ -94,7 +93,8 @@ class _ProgrammePageState extends State<ProgrammePage> with SingleTickerProvider
                         constraints: BoxConstraints(maxHeight: 43),
                         border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1)),
                         focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor)),
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor)),
                         prefixIcon: Icon(Icons.search),
                         hintText: 'Recherche...',
                       ),
@@ -113,16 +113,50 @@ class _ProgrammePageState extends State<ProgrammePage> with SingleTickerProvider
                   } else {
                     final List<Programme> programmes = snapshot.data!;
                     return FitnessGridView<Programme>(
+                      defaultDesktopColumns: 4,
+                      defaultTabletColumns: 3,
+                      defaultMobileColumns: 1,
+                      childAspectRatio: 16 / 20,
                       domains: programmes,
                       bloc: bloc,
-                      onTap: (Programme programme) {
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) =>
-                                AlertDialog(
-                                  contentPadding: EdgeInsets.all(20),
-                                  content: SizedBox(width: 1280,child: ProgrammeUpdatePage(programme: programme)),
-                                ));
+                      getCard: (Programme programme) {
+                        return Card(
+                          clipBehavior: Clip.antiAlias,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                          elevation: 2,
+                          child: InkWell(
+                            child: Stack(
+                              children: <Widget>[
+                                Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
+                                  Expanded(
+                                    flex: 3,
+                                    child: (programme.imageUrl?.isNotEmpty == true)
+                                        ? Ink.image(image: NetworkImage(programme.imageUrl!), fit: BoxFit.cover)
+                                        : Container(decoration: const BoxDecoration(color: Colors.amber)),
+                                  ),
+                                  Expanded(
+                                    child: Text(programme.name!),
+                                  )
+                                ]),
+                                const Positioned(
+                                    top: 5,
+                                    right: 5,
+                                    child: Chip(
+                                      label: Text('Publié'),
+                                      avatar: Icon(Icons.golf_course),
+                                    ))
+                              ],
+                            ),
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) => AlertDialog(
+                                        contentPadding: EdgeInsets.all(20),
+                                        content: SizedBox(width: 1280, child: ProgrammeUpdatePage(programme: programme)),
+                                      ));
+                            },
+                          ),
+                        );
                       },
                     );
                   }

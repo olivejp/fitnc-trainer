@@ -286,6 +286,8 @@ class ExerciceStreamBuilder extends StatelessWidget {
           final List<Exercice> list = snapshot.data!;
           return (vm.display == 0)
               ? FitnessGridView<Exercice>(
+                  defaultDesktopColumns: 3,
+                  defaultTabletColumns: 2,
                   domains: list,
                   bloc: bloc,
                   onTap: (Exercice exercice) => vm.selectExercice(context, exercice),
