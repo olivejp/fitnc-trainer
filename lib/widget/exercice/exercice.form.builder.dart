@@ -6,6 +6,7 @@ import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -13,8 +14,8 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 import '../../constants.dart';
 
+/// Classe ViewModel de la page générique.
 class ExerciceGenericPageVm with ChangeNotifier {
-
   ExerciceGenericPageVm(BuildContext context, this.exercice) {
     exerciceService = Provider.of<ExerciceService>(context, listen: false);
     notifyListeners();
@@ -23,6 +24,11 @@ class ExerciceGenericPageVm with ChangeNotifier {
   late ExerciceService exerciceService;
   Exercice exercice;
   bool sendStorage = false;
+
+  void changeExercice(Exercice exo) {
+    exercice = exo;
+    notifyListeners();
+  }
 
   void changeStorageFile(StorageFile? storageFile) {
     exercice.storageFile = storageFile;
@@ -49,10 +55,7 @@ class ExerciceGenericPageVm with ChangeNotifier {
         return exerciceService.save(exercice);
       }
     } else {
-      exercice.uid = exerciceService
-          .getCollectionReference()
-          .doc()
-          .id;
+      exercice.uid = exerciceService.getCollectionReference().doc().id;
       return exerciceService.createStorage(exercice).then((_) => exerciceService.create(exercice));
     }
   }
@@ -63,26 +66,24 @@ class ExerciceBuilderPage {
   static void create(BuildContext context) {
     showDialog(
         context: context,
-        builder: (BuildContext context) =>
-            AlertDialog(
-                title: const Text("Création d'un exercice"),
-                content: ExerciceUpdateCreateGeneric(
-                  isCreation: true,
-                  exercice: Exercice(),
-                )));
+        builder: (BuildContext context) => AlertDialog(
+            title: const Text("Création d'un exercice"),
+            content: ExerciceUpdateCreateGeneric(
+              isCreation: true,
+              exercice: Exercice(),
+            )));
   }
 
   /// Permet de créer une AlertDialog pour la mise à jour d'un exercice.
   static void update({required BuildContext context, required Exercice exercice}) {
     showDialog(
         context: context,
-        builder: (BuildContext context) =>
-            AlertDialog(
-                title: const Text("Mise à jour"),
-                content: ExerciceUpdateCreateGeneric(
-                  isCreation: false,
-                  exercice: exercice,
-                )));
+        builder: (BuildContext context) => AlertDialog(
+            title: const Text('Mise à jour'),
+            content: ExerciceUpdateCreateGeneric(
+              isCreation: false,
+              exercice: exercice,
+            )));
   }
 }
 
@@ -99,7 +100,6 @@ class ExerciceUpdateCreateGeneric extends StatefulWidget {
 }
 
 class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneric> {
-
   late VideoPlayerController? _videoController;
   late YoutubePlayerController? _youtubeController;
   late GlobalKey<FormState> _formKey;
@@ -108,11 +108,12 @@ class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneri
   Widget build(BuildContext context) {
     _formKey = GlobalKey<FormState>();
 
-
     return ChangeNotifierProvider<ExerciceGenericPageVm>(
       create: (BuildContext context) => ExerciceGenericPageVm(context, widget.exercice),
       builder: (BuildContext context, Widget? child) {
         final ExerciceGenericPageVm vm = Provider.of<ExerciceGenericPageVm>(context, listen: false);
+
+        vm.changeExercice(widget.exercice);
 
         final Widget saveButton = Padding(
           padding: const EdgeInsets.only(right: 10),
@@ -125,7 +126,7 @@ class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneri
                   if (widget.isCreation) {
                     Navigator.of(context).pop();
                   }
-                }).catchError((_) => showToast("Erreur lors de la sauvegarde", backgroundColor: Colors.redAccent));
+                }).catchError((_) => showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent));
               }
             },
             child: Text(widget.isCreation ? 'Créer' : 'Enregistrer', style: TextStyle(color: Colors.white)),
@@ -183,14 +184,14 @@ class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneri
                 children: <Widget>[
                   Expanded(
                       child: ParamDropdownButton(
-                        decoration: const InputDecoration(
-                            labelText: "Type d'exercice",
-                            constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 10)),
-                        paramName: 'type_exercice',
-                        initialValue: vm.exercice.typeExercice,
-                        onChanged: (String? onChangedValue) => vm.exercice.typeExercice = onChangedValue,
-                      ))
+                    decoration: const InputDecoration(
+                        labelText: "Type d'exercice",
+                        constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 10)),
+                    paramName: 'type_exercice',
+                    initialValue: vm.exercice.typeExercice,
+                    onChanged: (String? onChangedValue) => vm.exercice.typeExercice = onChangedValue,
+                  ))
                 ],
               ),
               Padding(
@@ -247,9 +248,9 @@ class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneri
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Consumer<ExerciceGenericPageVm>(
-                    builder: (_, ExerciceGenericPageVm value, __) {
-                      if (value.exercice.youtubeUrl != null) {
-                        _videoController = VideoPlayerController.network(value.exercice.youtubeUrl!);
+                    builder: (_, ExerciceGenericPageVm consumeVm, __) {
+                      if (consumeVm.exercice.videoUrl != null) {
+                        _videoController = VideoPlayerController.network(consumeVm.exercice.videoUrl!);
                         return FutureBuilder<Object?>(
                           builder: (BuildContext context, AsyncSnapshot<Object?> snapshot) {
                             if (_videoController?.value.isInitialized == true) {
@@ -276,26 +277,28 @@ class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneri
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Consumer<ExerciceGenericPageVm>(builder: (_, ExerciceGenericPageVm consumeVm, __) {
-                    if (consumeVm.exercice.videoUrl != null) {
-                      _youtubeController = YoutubePlayerController(
-                        initialVideoId: consumeVm.exercice.videoUrl!,
-                        params: const YoutubePlayerParams(
-                          autoPlay: false,
-                          showFullscreenButton: true,
-                        ),
-                      );
-                      _youtubeController!.pause();
-                      return LimitedBox(
-                        maxWidth: 500,
-                        child: YoutubePlayerIFrame(
-                          controller: _youtubeController,
-                        ),
-                      );
-                    } else {
-                      return Container();
-                    }
-                  },)
+                  Consumer<ExerciceGenericPageVm>(
+                    builder: (_, ExerciceGenericPageVm consumeVm, __) {
+                      if (consumeVm.exercice.youtubeUrl != null) {
+                        _youtubeController = YoutubePlayerController(
+                          initialVideoId: consumeVm.exercice.youtubeUrl!,
+                          params: const YoutubePlayerParams(
+                            autoPlay: false,
+                            showFullscreenButton: true,
+                          ),
+                        );
+                        _youtubeController!.pause();
+                        return LimitedBox(
+                          maxWidth: 500,
+                          child: YoutubePlayerIFrame(
+                            controller: _youtubeController,
+                          ),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
+                  )
                 ],
               ),
               Padding(
