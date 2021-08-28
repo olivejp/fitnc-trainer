@@ -15,7 +15,7 @@ class ExerciceBuilderPage {
   static void create(BuildContext context) {
     showDialog(
         context: context,
-        builder: (BuildContext context) => const AlertDialog(title: Text("Création d'un exercice"), content: ExerciceGeneric(isCreation: true)));
+        builder: (BuildContext context) => const AlertDialog(title: Text("Création d'un exercice"), content: ExerciceUpdateCreateGeneric(isCreation: true)));
   }
 
   /// Permet de créer une AlertDialog pour la mise à jour d'un exercice.
@@ -24,7 +24,7 @@ class ExerciceBuilderPage {
         context: context,
         builder: (BuildContext context) => AlertDialog(
             title: const Text("Mise à jour"),
-            content: ExerciceGeneric(
+            content: ExerciceUpdateCreateGeneric(
               isCreation: false,
               exercice: exercice,
             )));
@@ -32,17 +32,17 @@ class ExerciceBuilderPage {
 }
 
 /// Composant générique pour l'exercice (Mise à jour / Création).
-class ExerciceGeneric extends StatefulWidget {
-  const ExerciceGeneric({Key? key, required this.isCreation, this.exercice}) : super(key: key);
+class ExerciceUpdateCreateGeneric extends StatefulWidget {
+  const ExerciceUpdateCreateGeneric({Key? key, required this.isCreation, this.exercice}) : super(key: key);
 
   final bool isCreation;
   final Exercice? exercice;
 
   @override
-  State<ExerciceGeneric> createState() => _ExerciceGenericState();
+  State<ExerciceUpdateCreateGeneric> createState() => _ExerciceUpdateCreateGenericState();
 }
 
-class _ExerciceGenericState extends State<ExerciceGeneric> {
+class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneric> {
   final ExerciceUpdateBloc bloc = ExerciceUpdateBloc.instance();
 
   late VideoPlayerController? _videoController;
