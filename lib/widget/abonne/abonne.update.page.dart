@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:fitnc_trainer/bloc/abonne/abonne_update.bloc.dart';
+import 'package:fitnc_trainer/bloc/abonne/abonne_update.vm.dart';
 import 'package:fitnc_trainer/domain/abonne.domain.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,34 +10,54 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class AbonneUpdatePage extends StatefulWidget {
-  final AbonneUpdateBloc bloc = AbonneUpdateBloc.instance();
+  const AbonneUpdatePage({Key? key, this.abonne}) : super(key: key);
 
-  final double containerHeight = 110;
-
-  AbonneUpdatePage({Key? key, Abonne? abonne}) : super(key: key) {
-    bloc.init(abonne);
-  }
+  final Abonne? abonne;
 
   @override
   _AbonneUpdatePageState createState() {
-    return new _AbonneUpdatePageState();
+    return _AbonneUpdatePageState();
   }
 }
 
 class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  _AbonneUpdatePageState();
+  final double containerHeight = 110;
 
   @override
   Widget build(BuildContext context) {
-    String appBarTitle = widget.bloc.abonne.uid != null ? '${widget.bloc.abonne.nom!} ${widget.bloc.abonne.prenom!}' : 'Nouveau abonné';
+    final AbonneUpdateVm vm = Provider.of<AbonneUpdateVm>(context);
+
+    void deletePhoto() {
+      vm.setImage(null, null);
+    }
+
+    void callPhotoPicker() {
+      FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: [
+        'jpg',
+        'png',
+        'gif'
+      ]).then((FilePickerResult? result) {
+        if (result != null) {
+          vm.setImage(result.files.first.bytes, result.files.first.name);
+        }
+      });
+    }
+
+    vm.init(widget.abonne);
+    final String appBarTitle =
+        vm.abonne.uid != null ? '${vm.nom!} ${vm.prenom!}' : 'Nouveau abonné';
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Text(appBarTitle, style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(fontSize: 30)),
+        title: Text(appBarTitle,
+            style: Theme.of(context)
+                .appBarTheme
+                .titleTextStyle
+                ?.copyWith(fontSize: 30)),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
@@ -55,30 +75,32 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   StreamBuilder<Uint8List?>(
-                      stream: widget.bloc.selectedImageObs,
-                      builder: (context, snapshot) {
+                      stream: vm.selectedImageObs,
+                      builder: (BuildContext context,
+                          AsyncSnapshot<Uint8List?> snapshot) {
                         ImageProvider? provider;
                         if (snapshot.hasData && snapshot.data != null) {
                           provider = MemoryImage(snapshot.data!);
                         }
 
                         return InkWell(
+                          onTap: callPhotoPicker,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(50)),
                           child: CircleAvatar(
+                              radius: 50,
+                              foregroundImage: provider,
+                              backgroundColor: Theme.of(context).primaryColor,
                               child: Icon(
                                 Icons.add_photo_alternate,
                                 color: Color(Colors.white.value),
-                              ),
-                              radius: 50,
-                              foregroundImage: provider,
-                              backgroundColor: Theme.of(context).primaryColor),
-                          onTap: callPhotoPicker,
-                          borderRadius: BorderRadius.all(Radius.circular(50)),
+                              )),
                         );
                       }),
                   IconButton(
                       tooltip: 'Supprimer la photo',
                       onPressed: () => deletePhoto(),
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.delete,
                         color: Colors.grey,
                       )),
@@ -92,56 +114,58 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                       child: Padding(
                         padding: const EdgeInsets.only(right: 5),
                         child: DropdownButtonFormField<String>(
-                            decoration: InputDecoration(labelText: 'Genre'),
-                            icon: Icon(Icons.transgender_rounded),
-                            onChanged: (String? value) => widget.bloc.abonne.sexe = value,
-                            value: widget.bloc.abonne.sexe,
-                            validator: (value) {
+                            decoration:
+                                const InputDecoration(labelText: 'Genre'),
+                            icon: const Icon(Icons.transgender_rounded),
+                            onChanged: (String? value) => vm.sexe = value,
+                            value: vm.sexe,
+                            validator: (String? value) {
                               if (value == null || value.isEmpty) {
-                                return 'Merci de renseigner le genre de l\'abonné';
+                                return "Merci de renseigner le genre de l'abonné";
                               }
                               return null;
                             },
-                            items: [
-                              DropdownMenuItem(
-                                child: Text('Homme'),
+                            items: const <DropdownMenuItem<String>>[
+                              DropdownMenuItem<String>(
                                 value: 'Homme',
+                                child: Text('Homme'),
                               ),
-                              DropdownMenuItem(
-                                child: Text('Femme'),
+                              DropdownMenuItem<String>(
                                 value: 'Femme',
+                                child: Text('Femme'),
                               ),
                             ]),
                       ),
-                      flex: 1,
                     ),
                     Flexible(
+                      flex: 1,
                       child: Padding(
                         padding: const EdgeInsets.only(right: 5),
                         child: TextFormField(
-                            initialValue: widget.bloc.abonne.nom,
+                            initialValue: vm.nom,
                             autofocus: true,
-                            onChanged: (value) => widget.bloc.abonne.nom = value,
-                            decoration: InputDecoration(labelText: 'Nom'),
-                            validator: (value) {
+                            onChanged: (String value) => vm.nom = value,
+                            decoration: const InputDecoration(labelText: 'Nom'),
+                            validator: (String? value) {
                               if (value == null || value.isEmpty) {
                                 return 'Merci de renseigner le nom du abonne.';
                               }
                               return null;
                             }),
                       ),
-                      flex: 1,
                     ),
                     Flexible(
                       flex: 1,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 5),
                         child: TextFormField(
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                            initialValue: widget.bloc.abonne.prenom,
-                            onChanged: (value) => widget.bloc.changePrenom(value),
-                            decoration: InputDecoration(labelText: 'Prénom'),
-                            validator: (value) {
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            initialValue: vm.prenom,
+                            onChanged: (String? value) => vm.prenom = value,
+                            decoration:
+                                const InputDecoration(labelText: 'Prénom'),
+                            validator: (String? value) {
                               if (value == null || value.isEmpty) {
                                 return "Merci de renseigner le prénom de l'abonné.";
                               }
@@ -154,15 +178,17 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                         padding: const EdgeInsets.only(left: 5),
                         child: TextFormField(
                           maxLength: 10,
-                          initialValue: widget.bloc.abonne.dateNaissance,
-                          onChanged: widget.bloc.changeDateNaissance,
+                          initialValue: vm.dateNaissance,
+                          onChanged: (String? value) =>
+                              vm.dateNaissance = value,
                           autovalidateMode: AutovalidateMode.always,
                           validator: (String? value) {
                             if (value?.length != null && value!.length >= 8) {
                               DateTime time;
                               final DateTime today = DateTime.now();
                               try {
-                                time = DateFormat('dd/MM/yyyy').parseStrict(value);
+                                time =
+                                    DateFormat('dd/MM/yyyy').parseStrict(value);
                               } on Exception {
                                 return 'Date incorrecte. Format accepté dd/mm/aaaa.';
                               }
@@ -172,7 +198,10 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                               return null;
                             }
                           },
-                          decoration: InputDecoration(suffixIcon: Icon(Icons.event_note), hintText: 'dd/mm/aaaa', labelText: 'Date de naissance'),
+                          decoration: const InputDecoration(
+                              suffixIcon: Icon(Icons.event_note),
+                              hintText: 'dd/mm/aaaa',
+                              labelText: 'Date de naissance'),
                         ),
                       ),
                     ),
@@ -180,24 +209,24 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                 ),
               ),
               Row(
-                children: [
+                children: <Widget>[
                   Flexible(
+                    flex: 1,
                     child: Padding(
                       padding: const EdgeInsets.only(right: 5),
                       child: TextFormField(
                           keyboardType: TextInputType.emailAddress,
-                          initialValue: widget.bloc.abonne.email,
+                          initialValue: vm.email,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
-                          onChanged: widget.bloc.changeEmail,
-                          decoration: InputDecoration(labelText: 'Email'),
-                          validator: (value) {
+                          onChanged: (String? value) => vm.email = value,
+                          decoration: const InputDecoration(labelText: 'Email'),
+                          validator: (String? value) {
                             if (value == null || value.isEmpty) {
-                              return 'Merci de renseigner l\'email de l\abonné.';
+                              return "Merci de renseigner l'email de l'abonné.";
                             }
                             return null;
                           }),
                     ),
-                    flex: 1,
                   ),
                   Flexible(
                     flex: 1,
@@ -206,10 +235,16 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                       child: TextFormField(
                         maxLength: 10,
                         keyboardType: TextInputType.phone,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                        initialValue: (widget.bloc.abonne.telephone1) != null ? widget.bloc.abonne.telephone1.toString() : '',
-                        onChanged: (value) => widget.bloc.abonne.telephone1 = int.tryParse(value),
-                        decoration: InputDecoration(labelText: 'Téléphone fixe'),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        initialValue: (vm.telephone1) != null
+                            ? vm.telephone1.toString()
+                            : '',
+                        onChanged: (String value) =>
+                            vm.telephone1 = int.tryParse(value),
+                        decoration:
+                            const InputDecoration(labelText: 'Téléphone fixe'),
                       ),
                     ),
                   ),
@@ -220,10 +255,16 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                       child: TextFormField(
                         maxLength: 10,
                         keyboardType: TextInputType.phone,
-                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                        initialValue: (widget.bloc.abonne.telephone2) != null ? widget.bloc.abonne.telephone2.toString() : '',
-                        onChanged: (value) => widget.bloc.abonne.telephone2 = int.tryParse(value),
-                        decoration: InputDecoration(labelText: 'Téléphone mobile'),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        initialValue: (vm.telephone2) != null
+                            ? vm.telephone2.toString()
+                            : '',
+                        onChanged: (value) =>
+                            vm.telephone2 = int.tryParse(value),
+                        decoration:
+                            InputDecoration(labelText: 'Téléphone mobile'),
                       ),
                     ),
                   ),
@@ -232,21 +273,24 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
               Column(children: [
                 TextFormField(
                   maxLength: 50,
-                  initialValue: widget.bloc.abonne.adresse1,
-                  onChanged: (value) => widget.bloc.abonne.adresse1 = value,
-                  decoration: InputDecoration(alignLabelWithHint: true, labelText: 'Adresse ligne 1'),
+                  initialValue: vm.adresse1,
+                  onChanged: (String value) => vm.adresse1 = value,
+                  decoration: const InputDecoration(
+                      alignLabelWithHint: true, labelText: 'Adresse ligne 1'),
                 ),
                 TextFormField(
                   maxLength: 50,
-                  initialValue: widget.bloc.abonne.adresse2,
-                  onChanged: (value) => widget.bloc.abonne.adresse2 = value,
-                  decoration: InputDecoration(alignLabelWithHint: true, labelText: 'Adresse ligne 2'),
+                  initialValue: vm.adresse2,
+                  onChanged: (String value) => vm.adresse2 = value,
+                  decoration: const InputDecoration(
+                      alignLabelWithHint: true, labelText: 'Adresse ligne 2'),
                 ),
                 TextFormField(
                   maxLength: 50,
-                  initialValue: widget.bloc.abonne.adresse3,
-                  onChanged: (value) => widget.bloc.abonne.adresse3 = value,
-                  decoration: InputDecoration(alignLabelWithHint: true, labelText: 'Adresse ligne 3'),
+                  initialValue: vm.adresse3,
+                  onChanged: (String value) => vm.adresse3 = value,
+                  decoration: const InputDecoration(
+                      alignLabelWithHint: true, labelText: 'Adresse ligne 3'),
                 ),
               ]),
             ],
@@ -256,23 +300,14 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (_formKey.currentState?.validate() == true) {
-            widget.bloc.saveAbonne().then((value) => Navigator.pop(context)).catchError((error) => print(error.toString()));
+            vm
+                .saveAbonne()
+                .then((value) async => Navigator.pop(context))
+                .catchError((error) async => print(error.toString()));
           }
         },
-        child: Icon(Icons.check),
+        child: const Icon(Icons.check),
       ),
     );
-  }
-
-  void deletePhoto() {
-    widget.bloc.setImage(null, null);
-  }
-
-  void callPhotoPicker() {
-    FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['jpg', 'png', 'gif']).then((result) {
-      if (result != null) {
-        widget.bloc.setImage(result.files.first.bytes, result.files.first.name);
-      }
-    });
   }
 }

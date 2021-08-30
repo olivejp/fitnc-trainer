@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class BottomCu extends StatelessWidget {
-  const BottomCu({
+class FitnessBottomCu extends StatelessWidget {
+  const FitnessBottomCu({
     Key? key,
   }) : super(key: key);
 

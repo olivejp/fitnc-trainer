@@ -4,20 +4,17 @@ import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
 import 'package:fitnc_trainer/domain/abonne.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/abonne/abonne.update.page.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class AbonneBloc extends AbstractFitnessCrudService<Abonne> with MixinFitnessStorageService<Abonne> {
-  AbonneBloc._();
-
-  factory AbonneBloc.instance() {
-    _instance ??= AbonneBloc._();
-    return _instance!;
+class AbonneService extends AbstractFitnessCrudService<Abonne>
+    with MixinFitnessStorageService<Abonne> {
+  AbonneService(BuildContext context) {
+    trainersService = Provider.of<TrainersService>(context, listen: false);
   }
 
-  static AbonneBloc? _instance;
-
   final String pathWorkoutMainImage = 'mainImage';
-  final TrainersService trainersService = TrainersService.instance();
+  late TrainersService trainersService;
   late Abonne abonne;
 
   @override
@@ -35,7 +32,6 @@ class AbonneBloc extends AbstractFitnessCrudService<Abonne> with MixinFitnessSto
     return trainersService.listenToAbonne();
   }
 
-  @override
   Widget openUpdate(BuildContext context, Abonne domain) {
     return AbonneUpdatePage(
       abonne: domain,

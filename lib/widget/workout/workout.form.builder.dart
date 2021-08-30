@@ -1,10 +1,10 @@
-import 'package:fitnc_trainer/bloc/workout/workout_update.bloc.dart';
+import 'package:fitnc_trainer/service/workout.service.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutFormBuilder {
-  static Widget getForm(GlobalKey<FormState> _formKey, WorkoutUpdateBloc bloc) {
+  static Widget getForm(GlobalKey<FormState> _formKey, WorkoutService bloc) {
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 800),
       child: Form(
@@ -18,8 +18,10 @@ class WorkoutFormBuilder {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   StorageFutureImageWidget(
-                    onSaved: (StorageFile? storagePair) => bloc.storageFile = storagePair,
-                    onDeleted: (StorageFile? storagePair) => bloc.storageFile = null,
+                    onSaved: (StorageFile? storagePair) =>
+                        bloc.storageFile = storagePair,
+                    onDeleted: (StorageFile? storagePair) =>
+                        bloc.storageFile = null,
                     futureInitialStorageFile: bloc.getStorageFile(),
                   ),
                   Expanded(
@@ -29,7 +31,8 @@ class WorkoutFormBuilder {
                           initialValue: bloc.getWorkout()?.name,
                           autofocus: true,
                           onChanged: (String value) => bloc.name = value,
-                          decoration: const InputDecoration(labelText: 'Nom du workout'),
+                          decoration: const InputDecoration(
+                              labelText: 'Nom du workout'),
                           validator: (String? value) {
                             if (value == null || value.isEmpty) {
                               return 'Le nom du workout est obligatoire.';
@@ -42,7 +45,9 @@ class WorkoutFormBuilder {
               ),
             ),
             DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: "Type d'entrainement", hintText: "Type d'entrainement"),
+                decoration: const InputDecoration(
+                    labelText: "Type d'entrainement",
+                    hintText: "Type d'entrainement"),
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Le type d'entrainement est obligatoire.";
@@ -85,7 +90,8 @@ class WorkoutFormBuilder {
                 minLines: 5,
                 maxLines: 20,
                 onChanged: (String value) => bloc.description = value,
-                decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
+                decoration: const InputDecoration(
+                    labelText: 'Description', helperText: 'Optionnel'),
               ),
             ),
           ],

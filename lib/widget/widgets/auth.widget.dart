@@ -11,13 +11,18 @@ class AuthWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AuthService authService = Provider.of<AuthService>(context, listen: false);
+    final AuthService authService =
+        Provider.of<AuthService>(context, listen: false);
     return StreamBuilder<User?>(
       stream: authService.getUserConnected(),
       builder: (_, AsyncSnapshot<User?> snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           final User? user = snapshot.data;
-          return user != null ? MyHomePage(FitnessConstants.appTitle) : LoginPage();
+          if (user != null) {
+            return Provider<User>.value(value: user, child: const MyHomePage());
+          } else {
+            return const LoginPage();
+          }
         }
         return const Scaffold(
           body: Center(

@@ -5,20 +5,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:http/http.dart' as http;
 
 class FirestorageService {
-  FirestorageService._() {
-    _instance = this;
-  }
-
-  factory FirestorageService.instance() {
-    _instance ??= FirestorageService._();
-    return _instance!;
-  }
-
-  static FirestorageService? _instance;
-
-  Future<String> sendToStorageAndGetReference(String url, Uint8List fileByte) async {
-    final SettableMetadata metadata = SettableMetadata(cacheControl: 'max-age=36000', contentType: 'image/jpeg');
-    return FirebaseStorage.instance.ref(url).putData(fileByte, metadata).then((TaskSnapshot ref) => ref.ref.getDownloadURL());
+  Future<String> sendToStorageAndGetReference(
+      String url, Uint8List fileByte) async {
+    final SettableMetadata metadata = SettableMetadata(
+        cacheControl: 'max-age=36000', contentType: 'image/jpeg');
+    return FirebaseStorage.instance
+        .ref(url)
+        .putData(fileByte, metadata)
+        .then((TaskSnapshot ref) => ref.ref.getDownloadURL());
   }
 
   Future<Uint8List> getRemoteImageToUint8List(String imageUrl) async {

@@ -4,21 +4,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/abonne.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-class AbonneUpdateBloc {
-  AbonneUpdateBloc._();
-
-  factory AbonneUpdateBloc.instance() {
-    _instance ??= AbonneUpdateBloc._();
-    return _instance!;
+class AbonneUpdateVm {
+  AbonneUpdateVm(BuildContext context) {
+    trainersService = Provider.of<TrainersService>(context, listen: false);
   }
 
-  static AbonneUpdateBloc? _instance;
-
-  final TrainersService trainersService = TrainersService.instance();
+  late TrainersService trainersService;
   Abonne abonne = Abonne();
   Uint8List? _fileBytes;
 
@@ -30,7 +27,7 @@ class AbonneUpdateBloc {
   Stream<Uint8List?>? get selectedImageObs => _streamSelectedImage?.stream;
 
   final String pathAbonneMainImage = 'mainImage';
-  
+
   void init(Abonne? enteredAbonne) {
     _fileBytes = null;
     _fileName = null;
@@ -52,10 +49,6 @@ class AbonneUpdateBloc {
     return abonne;
   }
 
-  void dispose() {
-    _streamSelectedImage?.close();
-  }
-
   Future<void> saveAbonne() {
     if (abonne.uid != null && abonne.uid?.isNotEmpty == true) {
       return updateAbonne();
@@ -65,9 +58,11 @@ class AbonneUpdateBloc {
   }
 
   Future<void> createAbonne() async {
-    CollectionReference<Object?> collectionReference = trainersService.getAbonneReference();
+    final CollectionReference<Object?> collectionReference =
+        trainersService.getAbonneReference();
 
-    abonne.uid = collectionReference.doc().id; // Récupération d'une nouvelle ID.
+    abonne.uid =
+        collectionReference.doc().id; // Récupération d'une nouvelle ID.
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (_fileBytes != null) {
@@ -77,7 +72,8 @@ class AbonneUpdateBloc {
   }
 
   Future<void> updateAbonne() async {
-    CollectionReference<Object?> collectionReference = trainersService.getAbonneReference();
+    CollectionReference<Object?> collectionReference =
+        trainersService.getAbonneReference();
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (_fileBytes != null && _oldFileName != _fileName) {
@@ -92,9 +88,13 @@ class AbonneUpdateBloc {
     return sendToFireStore(collectionReference);
   }
 
-  Future<void> sendToFireStore(CollectionReference<Object?> collectionReference) {
+  Future<void> sendToFireStore(
+      CollectionReference<Object?> collectionReference) {
     abonne.createDate = FieldValue.serverTimestamp();
-    return collectionReference.doc(abonne.uid).set(abonne.toJson()).then((value) {
+    return collectionReference
+        .doc(abonne.uid)
+        .set(abonne.toJson())
+        .then((value) {
       abonne = Abonne();
     });
   }
@@ -111,7 +111,11 @@ class AbonneUpdateBloc {
   }
 
   Future<void> deleteAbonne(Abonne abonne) {
-    return trainersService.getAbonneReference().doc(abonne.uid).delete().then((value) => deleteAbonneMainImage(abonne));
+    return trainersService
+        .getAbonneReference()
+        .doc(abonne.uid)
+        .delete()
+        .then((value) => deleteAbonneMainImage(abonne));
   }
 
   Future<void> deleteAbonneMainImage(Abonne abonne) {
@@ -122,12 +126,15 @@ class AbonneUpdateBloc {
         .catchError((error) => print(error));
   }
 
-  changeName(String value) {
+  set changeName(String value) {
     abonne.nom = value;
   }
 
   Future<void> update(Abonne abonne) {
-    return trainersService.getAbonneReference().doc(abonne.uid).set(abonne.toJson());
+    return trainersService
+        .getAbonneReference()
+        .doc(abonne.uid)
+        .set(abonne.toJson());
   }
 
   void setImage(Uint8List? bytes, String? name) {
@@ -140,35 +147,63 @@ class AbonneUpdateBloc {
     return http.readBytes(Uri.parse(imageUrl));
   }
 
-  changeDateNaissance(String? value) {
+  set dateNaissance(String? value) {
     abonne.dateNaissance = value;
   }
 
-  changePrenom(String value) {
+  String? get dateNaissance => abonne.dateNaissance;
+
+  set sexe(String? value) {
+    abonne.sexe = value;
+  }
+
+  String? get sexe => abonne.sexe;
+
+  set nom(String? value) {
+    abonne.nom = value;
+  }
+
+  String? get nom => abonne.nom;
+
+  set prenom(String? value) {
     abonne.prenom = value;
   }
 
-  changeTelephone1(String value) {
-    abonne.telephone1 = int.tryParse(value);
+  String? get prenom => abonne.prenom;
+
+  set telephone1(int? value) {
+    abonne.telephone1 = value;
   }
 
-  changeEmail(String value) {
+  int? get telephone1 => abonne.telephone1;
+
+  set email(String? value) {
     abonne.email = value;
   }
 
-  changeTelephone2(String value) {
-    abonne.telephone2 = int.tryParse(value);
+  String? get email => abonne.email;
+
+  set telephone2(int? value) {
+    abonne.telephone2 = value;
   }
 
-  changeAdresse1(String value) {
+  int? get telephone2 => abonne.telephone2;
+
+  set adresse1(String? value) {
     abonne.adresse1 = value;
   }
 
-  changeAdresse2(String value) {
+  String? get adresse1 => abonne.adresse1;
+
+  set adresse2(String? value) {
     abonne.adresse2 = value;
   }
 
-  changeAdresse3(String value) {
+  String? get adresse2 => abonne.adresse2;
+
+  set adresse3(String? value) {
     abonne.adresse3 = value;
   }
+
+  String? get adresse3 => abonne.adresse3;
 }

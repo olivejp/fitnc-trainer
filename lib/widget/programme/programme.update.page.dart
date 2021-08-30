@@ -1,7 +1,9 @@
-import 'package:fitnc_trainer/bloc/programme/programme_update.bloc.dart';
+import 'package:fitnc_trainer/bloc/programme/programme.vm.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_schedule.dto.dart';
+import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/widget/programme/programme.page.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
@@ -14,50 +16,43 @@ import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:oktoast/oktoast.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart' as sf;
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 import '../../constants.dart';
 
-class ProgrammeUpdatePage extends StatefulWidget {
-  ProgrammeUpdatePage({Key? key, Programme? programme}) : super(key: key) {
-    bloc.init(programme);
-  }
+class ProgrammeUpdatePage extends StatelessWidget {
+  ProgrammeUpdatePage({Key? key, required this.programme}) : super(key: key);
 
-  final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.instance();
-
-  @override
-  _ProgrammeUpdatePageState createState() {
-    return _ProgrammeUpdatePageState();
-  }
-}
-
-class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
-  _ProgrammeUpdatePageState();
-
+  final Programme programme;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     final List<Widget> buttons = <Widget>[];
-    if (widget.bloc.programme.available == true) {
+    final ProgrammeVm vm = Provider.of<ProgrammeVm>(context, listen: false);
+
+    vm.init(programme);
+
+    if (vm.programme.available == true) {
       buttons.add(TextButton.icon(
         style: TextButton.styleFrom(backgroundColor: Colors.red),
         onPressed: () {
           if (_formKey.currentState?.validate() == true) {
-            widget.bloc.unpublishProgramme().then((_) => Navigator.pop(context));
+            vm.unpublish().then((_) => Navigator.pop(context));
           }
         },
         label: const Text('Dépublier', style: TextStyle(color: Colors.white)),
         icon: const Icon(Icons.public, color: Colors.white),
       ));
     }
-    if (widget.bloc.programme.available == null || widget.bloc.programme.available == false) {
+    if (vm.programme.available == null || vm.programme.available == false) {
       buttons.add(TextButton.icon(
         style: TextButton.styleFrom(backgroundColor: Colors.green),
         onPressed: () {
           if (_formKey.currentState?.validate() == true) {
-            widget.bloc.publishProgramme().then((_) => Navigator.pop(context));
+            vm.publish().then((_) => Navigator.pop(context));
           }
         },
         label: const Text('Publier', style: TextStyle(color: Colors.white)),
@@ -69,18 +64,21 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () {
             if (_formKey.currentState?.validate() == true) {
-              widget.bloc
-                  .saveProgramme()
+              vm
+                  .save()
                   .then(
-                    (_) => showToast('Exercice sauvegardé', backgroundColor: Colors.green),
+                    (_) => showToast('Exercice sauvegardé',
+                        backgroundColor: Colors.green),
                   )
                   .catchError(
-                    (_) => showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent),
+                    (_) => showToast('Erreur lors de la sauvegarde',
+                        backgroundColor: Colors.redAccent),
                   );
             }
           },
           icon: const Icon(Icons.save, color: Colors.white),
-          label: const Text('Enregistrer', style: TextStyle(color: Colors.white))),
+          label:
+              const Text('Enregistrer', style: TextStyle(color: Colors.white))),
       TextButton.icon(
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () => Navigator.pop(context),
@@ -98,9 +96,11 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
               child: Row(
                 children: <Widget>[
                   StorageStreamImageWidget(
-                    onSaved: (StorageFile? storagePair) => widget.bloc.setStoragePair(storagePair),
-                    streamInitialStorageFile: widget.bloc.obsStoragePair,
-                    onDeleted: (StorageFile? storagePair) => widget.bloc.setStoragePair(null),
+                    onSaved: (StorageFile? storagePair) =>
+                        vm.setStoragePair(storagePair),
+                    streamInitialStorageFile: vm.obsStoragePair,
+                    onDeleted: (StorageFile? storagePair) =>
+                        vm.setStoragePair(null),
                   ),
                   Flexible(
                     child: Column(
@@ -122,12 +122,14 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
                                       children: <Widget>[
                                         Expanded(
                                           child: FitnessDecorationTextFormField(
-                                              initialValue: widget.bloc.programme.name,
+                                              initialValue: vm.programme.name,
                                               autofocus: true,
-                                              onChanged: (String value) => widget.bloc.name = value,
+                                              onChanged: (String value) =>
+                                                  vm.name = value,
                                               labelText: 'Nom',
                                               validator: (String? value) {
-                                                if (value == null || value.isEmpty) {
+                                                if (value == null ||
+                                                    value.isEmpty) {
                                                   return 'Merci de renseigner le nom du programme.';
                                                 }
                                                 return null;
@@ -141,11 +143,18 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
                                             child: ParamDropdownButton(
                                                 paramName: 'number_weeks',
                                                 decoration: const InputDecoration(
-                                                    labelText: 'Nombre de semaine',
-                                                    constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
-                                                    contentPadding: EdgeInsets.symmetric(horizontal: 10)),
-                                                initialValue: widget.bloc.programme.numberWeeks,
-                                                onChanged: (String? value) => widget.bloc.numberWeeks = value),
+                                                    labelText:
+                                                        'Nombre de semaine',
+                                                    constraints: BoxConstraints(
+                                                        maxHeight: FitnessConstants
+                                                            .textFormFieldHeight),
+                                                    contentPadding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 10)),
+                                                initialValue:
+                                                    vm.programme.numberWeeks,
+                                                onChanged: (String? value) =>
+                                                    vm.numberWeeks = value),
                                           ),
                                         )
                                       ],
@@ -163,12 +172,13 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
               ),
             ),
             TextFormField(
-              initialValue: widget.bloc.programme.description,
+              initialValue: vm.programme.description,
               maxLength: 2000,
               minLines: 5,
               maxLines: 20,
-              onChanged: (String value) => widget.bloc.description = value,
-              decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionel'),
+              onChanged: (String value) => vm.description = value,
+              decoration: const InputDecoration(
+                  labelText: 'Description', helperText: 'Optionel'),
             ),
             WorkoutSchedulePanel()
           ],
@@ -178,69 +188,96 @@ class _ProgrammeUpdatePageState extends State<ProgrammeUpdatePage> {
   }
 }
 
-class WorkoutChoicePanel extends StatelessWidget {
-  static final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.instance();
-
+class _WorkoutChoicePanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Workout?>>(
-      stream: bloc.trainersService.listenToWorkout(),
-      builder: (BuildContext context, AsyncSnapshot<List<Workout?>> snapshot) {
-        if (snapshot.hasData) {
-          final List<Workout?> list = snapshot.data!;
-          return ListView.separated(
-            separatorBuilder: (BuildContext context, int index) => const Divider(height: 2.0),
-            itemCount: list.length,
-            itemBuilder: (BuildContext context, int index) {
-              final Workout? workout = list.elementAt(index);
-              return ListTile(
-                leading: Draggable<Workout>(
-                  feedback: SizedBox(
-                    width: 200,
-                    height: 50,
-                    child: Card(
-                        child: ListTile(
-                      title: Text(list[index]!.name!),
-                      leading: (workout?.imageUrl != null)
-                          ? CircleAvatar(backgroundImage: NetworkImage(workout!.imageUrl!), radius: 10)
-                          : CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
-                    )),
-                  ),
-                  data: list[index],
-                  child: const MouseRegion(
-                    child: Icon(Icons.view_headline),
-                    cursor: SystemMouseCursors.grab,
-                  ),
-                ),
-                title: Row(
-                  children: <Widget>[
-                    if (workout?.imageUrl != null)
-                      CircleAvatar(backgroundImage: NetworkImage(workout!.imageUrl!), radius: 10)
-                    else
-                      CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Text(list[index]!.name!),
+    return Provider<TrainersService>(
+      create: (_) => TrainersService(),
+      builder: (_, __) {
+        final TrainersService trainersService =
+            Provider.of<TrainersService>(context, listen: false);
+        return StreamBuilder<List<Workout?>>(
+          stream: trainersService.listenToWorkout(),
+          builder:
+              (BuildContext context, AsyncSnapshot<List<Workout?>> snapshot) {
+            if (snapshot.hasData) {
+              final List<Workout?> list = snapshot.data!;
+              return ListView.separated(
+                separatorBuilder: (BuildContext context, int index) =>
+                    const Divider(height: 2.0),
+                itemCount: list.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final Workout? workout = list.elementAt(index);
+                  return ListTile(
+                    leading: Draggable<Workout>(
+                      feedback: SizedBox(
+                        width: 200,
+                        height: 50,
+                        child: Card(
+                            child: ListTile(
+                          title: Text(list[index]!.name!),
+                          leading: (workout?.imageUrl != null)
+                              ? CircleAvatar(
+                                  backgroundImage:
+                                      NetworkImage(workout!.imageUrl!),
+                                  radius: 10)
+                              : CircleAvatar(
+                                  backgroundColor:
+                                      Theme.of(context).primaryColor,
+                                  radius: 10),
+                        )),
+                      ),
+                      data: list[index],
+                      child: const MouseRegion(
+                        cursor: SystemMouseCursors.grab,
+                        child: Icon(Icons.view_headline),
+                      ),
                     ),
-                  ],
-                ),
+                    title: Row(
+                      children: <Widget>[
+                        if (workout?.imageUrl != null)
+                          CircleAvatar(
+                              backgroundImage: NetworkImage(workout!.imageUrl!),
+                              radius: 10)
+                        else
+                          CircleAvatar(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              radius: 10),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Text(list[index]!.name!),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               );
-            },
-          );
-        }
-        return LoadingBouncingGrid.circle();
+            }
+            return LoadingBouncingGrid.circle();
+          },
+        );
       },
     );
   }
 }
 
 class WorkoutSchedulePanel extends StatelessWidget {
-  static final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.instance();
-  static final TextStyle columnTextStyle = GoogleFonts.roboto(fontSize: 10, fontWeight: FontWeight.bold);
-  static final List<String> columnNames = <String>['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+  static final TextStyle columnTextStyle =
+      GoogleFonts.roboto(fontSize: 10, fontWeight: FontWeight.bold);
+  static final List<String> columnNames = <String>[
+    'Lundi',
+    'Mardi',
+    'Mercredi',
+    'Jeudi',
+    'Vendredi',
+    'Samedi',
+    'Dimanche'
+  ];
 
   @override
   Widget build(BuildContext context) {
+    final ProgrammeVm vm = Provider.of<ProgrammeVm>(context, listen: false);
+
     final List<sf.GridColumn> listHeadersColumn = columnNames
         .map((String columnName) => sf.GridColumn(
             columnName: columnName,
@@ -252,46 +289,62 @@ class WorkoutSchedulePanel extends StatelessWidget {
         .toList();
 
     /// Méthode permettant d'afficher l'affectation des Workouts à une date.
-    void popupDayDetails(sf.DataGridCellTapDetails details, List<WorkoutScheduleDto> listAppointment) {
+    void popupDayDetails(sf.DataGridCellTapDetails details,
+        List<WorkoutScheduleDto> listAppointment) {
       final int columnIndex = details.rowColumnIndex.columnIndex;
       final int rowIndex = details.rowColumnIndex.rowIndex;
       final int dayIndex = ((rowIndex - 1) * 7) + columnIndex + 1;
+
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          final List<WorkoutScheduleDto> list = listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
-          return AlertDialog(
-            title: Text('Jour $dayIndex'),
-            actions: <Widget>[
-              TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Sortir')),
-            ],
-            content: PopupDayDetail(bloc: bloc, dayIndex: dayIndex, list: list),
+          final List<WorkoutScheduleDto> list = listAppointment
+              .where((WorkoutScheduleDto element) =>
+                  element.dateSchedule == dayIndex)
+              .toList();
+
+          return ProgrammeProviders(
+            builder: (BuildContext context) => AlertDialog(
+              title: Text('Jour $dayIndex'),
+              actions: <Widget>[
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Sortir')),
+              ],
+              content: PopupDayDetail(dayIndex: dayIndex, list: list),
+            ),
           );
         },
       );
     }
 
     return FutureBuilder<List<DropdownMenuItem<Workout>>>(
-        future: bloc.getWorkoutDropdownItems(),
-        builder: (BuildContext context, AsyncSnapshot<List<DropdownMenuItem<Workout>>> snapshot) {
+        future: vm.getWorkoutDropdownItems(),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<DropdownMenuItem<Workout>>> snapshot) {
           if (snapshot.hasData) {
-            final List<DropdownMenuItem<Workout>> listAvailableWorkout = snapshot.data!;
+            final List<DropdownMenuItem<Workout>> listAvailableWorkout =
+                snapshot.data!;
             return StreamBuilder<List<WorkoutScheduleDto>>(
-              stream: bloc.workoutScheduleObs,
-              builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
+              stream: vm.workoutScheduleObs,
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
                 if (snapshot.hasData) {
-                  final List<WorkoutScheduleDto> listScheduledWorkouts = snapshot.data!;
+                  final List<WorkoutScheduleDto> listScheduledWorkouts =
+                      snapshot.data!;
                   return SizedBox(
                     height: 800,
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 125),
-                      child: ValueListenableBuilder<int>(
-                        valueListenable: bloc.vnNumberWeek,
-                        builder: (BuildContext context, int nbWeeks, Widget? child) => Container(
-                          // decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-                          padding: const EdgeInsets.all(1),
-                          child: sf.SfDataGrid(
-                            onCellTap: (sf.DataGridCellTapDetails details) => popupDayDetails(details, listScheduledWorkouts),
+                      child: Container(
+                        // decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+                        padding: const EdgeInsets.all(1),
+                        child: Consumer<ProgrammeVm>(
+                          builder: (BuildContext context, ProgrammeVm consumeVm,
+                                  Widget? child) =>
+                              sf.SfDataGrid(
+                            onCellTap: (sf.DataGridCellTapDetails details) =>
+                                popupDayDetails(details, listScheduledWorkouts),
                             highlightRowOnHover: false,
                             headerGridLinesVisibility: GridLinesVisibility.both,
                             columnWidthMode: ColumnWidthMode.fill,
@@ -303,13 +356,12 @@ class WorkoutSchedulePanel extends StatelessWidget {
                             selectionMode: SelectionMode.single,
                             columns: listHeadersColumn,
                             rowHeight: 150,
-                            source: WorkoutDataSource(
+                            source: _WorkoutDataSource(
                                 context: context,
-                                numberWeeks: nbWeeks,
+                                numberWeeks: consumeVm.numberWeeksInt,
                                 listAppointment: listScheduledWorkouts,
                                 listAvailableWorkout: listAvailableWorkout,
-                                columnNames: columnNames,
-                                bloc: bloc),
+                                columnNames: columnNames),
                           ),
                         ),
                       ),
@@ -330,17 +382,17 @@ class WorkoutSchedulePanel extends StatelessWidget {
 class PopupDayDetail extends StatelessWidget {
   const PopupDayDetail({
     Key? key,
-    required this.bloc,
     required this.dayIndex,
     required this.list,
   }) : super(key: key);
 
-  final ProgrammeUpdateBloc bloc;
   final int dayIndex;
   final List<WorkoutScheduleDto> list;
 
   @override
   Widget build(BuildContext context) {
+    final ProgrammeVm vm = Provider.of<ProgrammeVm>(context);
+
     return SizedBox(
       height: 800,
       width: 600,
@@ -349,58 +401,18 @@ class PopupDayDetail extends StatelessWidget {
           Flexible(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: DragTarget<Workout>(
-                  onAccept: (Workout workout) => bloc.addWorkoutSchedule(workout, dayIndex - 1),
-                  onWillAccept: (Workout? data) => data is Workout,
-                  builder: (BuildContext context, List<Workout?> candidateData, List<Object?> rejectedData) {
-                    return Container(
-                      decoration:
-                          BoxDecoration(border: Border.all(width: 1, color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
-                      child: Column(
-                        children: <Widget>[
-                          const Text('Glisser ici les workout de la journée.'),
-                          StreamBuilder<List<WorkoutScheduleDto>>(
-                              initialData: list,
-                              stream: bloc.workoutScheduleObs,
-                              builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
-                                if (snapshot.hasData) {
-                                  final List<WorkoutScheduleDto> listWorkout =
-                                      snapshot.data!.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex - 1).toList();
-                                  return ListView.separated(
-                                    shrinkWrap: true,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      final WorkoutScheduleDto dto = listWorkout.elementAt(index);
-                                      return ListTile(
-                                        leading: (dto.imageUrlWorkout != null)
-                                            ? CircleAvatar(backgroundImage: NetworkImage(dto.imageUrlWorkout!), radius: 10)
-                                            : CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
-                                        title: Text(dto.nameWorkout!),
-                                        trailing: IconButton(
-                                          onPressed: () => bloc.deleteWorkoutSchedule(dto),
-                                          icon: const Icon(Icons.close),
-                                        ),
-                                      );
-                                    },
-                                    separatorBuilder: (BuildContext context, int index) => const Divider(height: 2.0),
-                                    itemCount: listWorkout.length,
-                                  );
-                                } else {
-                                  return LoadingBouncingGrid.circle();
-                                }
-                              }),
-                        ],
-                      ),
-                    );
-                  }),
+              child:
+                  _WorkoutSelectedPanel(vm: vm, dayIndex: dayIndex, list: list),
             ),
           ),
           Flexible(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
-                  decoration:
-                      BoxDecoration(border: Border.all(width: 1, color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
-                  child: WorkoutChoicePanel()),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: const BorderRadius.all(Radius.circular(5))),
+                  child: _WorkoutChoicePanel()),
             ),
           ),
         ],
@@ -409,11 +421,86 @@ class PopupDayDetail extends StatelessWidget {
   }
 }
 
+class _WorkoutSelectedPanel extends StatelessWidget {
+  const _WorkoutSelectedPanel({
+    Key? key,
+    required this.vm,
+    required this.dayIndex,
+    required this.list,
+  }) : super(key: key);
+
+  final ProgrammeVm vm;
+  final int dayIndex;
+  final List<WorkoutScheduleDto> list;
+
+  @override
+  Widget build(BuildContext context) {
+    return DragTarget<Workout>(
+        onAccept: (Workout workout) =>
+            vm.addWorkoutSchedule(workout, dayIndex - 1),
+        onWillAccept: (Workout? data) => data is Workout,
+        builder: (BuildContext context, List<Workout?> candidateData,
+            List<Object?> rejectedData) {
+          return Container(
+            decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.grey),
+                borderRadius: const BorderRadius.all(Radius.circular(5))),
+            child: Column(
+              children: <Widget>[
+                const Text('Glisser ici les workout de la journée.'),
+                StreamBuilder<List<WorkoutScheduleDto>>(
+                    initialData: list,
+                    stream: vm.workoutScheduleObs,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
+                      if (snapshot.hasData) {
+                        final List<WorkoutScheduleDto> listWorkout = snapshot
+                            .data!
+                            .where((WorkoutScheduleDto element) =>
+                                element.dateSchedule == dayIndex - 1)
+                            .toList();
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            final WorkoutScheduleDto dto =
+                                listWorkout.elementAt(index);
+                            return ListTile(
+                              leading: (dto.imageUrlWorkout != null)
+                                  ? CircleAvatar(
+                                      backgroundImage:
+                                          NetworkImage(dto.imageUrlWorkout!),
+                                      radius: 10)
+                                  : CircleAvatar(
+                                      backgroundColor:
+                                          Theme.of(context).primaryColor,
+                                      radius: 10),
+                              title: Text(dto.nameWorkout!),
+                              trailing: IconButton(
+                                onPressed: () => vm.deleteWorkoutSchedule(dto),
+                                icon: const Icon(Icons.close),
+                              ),
+                            );
+                          },
+                          separatorBuilder: (BuildContext context, int index) =>
+                              const Divider(height: 2.0),
+                          itemCount: listWorkout.length,
+                        );
+                      } else {
+                        return LoadingBouncingGrid.circle();
+                      }
+                    }),
+              ],
+            ),
+          );
+        });
+  }
+}
+
 ///
 /// Data d'une cellule
 /// Une cellule a toujours un dayIndex mais aussi une liste des Workout à effectuer pour ce jour.
-class DataCellData {
-  DataCellData({required this.list, required this.dayIndex});
+class _DataCellData {
+  _DataCellData({required this.list, required this.dayIndex});
 
   List<WorkoutScheduleDto> list;
   int dayIndex;
@@ -422,10 +509,9 @@ class DataCellData {
 ///
 /// DataSource du GridData
 ///
-class WorkoutDataSource extends sf.DataGridSource {
-  WorkoutDataSource(
-      {required this.bloc,
-      required this.context,
+class _WorkoutDataSource extends sf.DataGridSource {
+  _WorkoutDataSource(
+      {required this.context,
       required this.numberWeeks,
       required this.listAppointment,
       required this.listAvailableWorkout,
@@ -433,7 +519,6 @@ class WorkoutDataSource extends sf.DataGridSource {
     _workoutData = getListDataRows(numberWeeks, listAppointment);
   }
 
-  ProgrammeUpdateBloc bloc;
   BuildContext context;
   int numberWeeks;
   List<WorkoutScheduleDto> listAppointment;
@@ -442,15 +527,20 @@ class WorkoutDataSource extends sf.DataGridSource {
   List<String> columnNames;
 
   /// Méthode pour générer une DataCell.
-  sf.DataGridCell<DataCellData> getDataCell(String columnName, int dayIndex, List<WorkoutScheduleDto> listAppointment) {
-    final List<WorkoutScheduleDto> list = listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
-    final DataCellData data = DataCellData(list: list, dayIndex: dayIndex);
-    return sf.DataGridCell<DataCellData>(value: data, columnName: columnName);
+  sf.DataGridCell<_DataCellData> getDataCell(String columnName, int dayIndex,
+      List<WorkoutScheduleDto> listAppointment) {
+    final List<WorkoutScheduleDto> list = listAppointment
+        .where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex)
+        .toList();
+    final _DataCellData data = _DataCellData(list: list, dayIndex: dayIndex);
+    return sf.DataGridCell<_DataCellData>(value: data, columnName: columnName);
   }
 
   /// Méthode pour générer une DataRow.
-  sf.DataGridRow getDataRow(int weekIndex, List<WorkoutScheduleDto> listAppointment) {
-    final List<sf.DataGridCell<DataCellData>> list = <sf.DataGridCell<DataCellData>>[];
+  sf.DataGridRow getDataRow(
+      int weekIndex, List<WorkoutScheduleDto> listAppointment) {
+    final List<sf.DataGridCell<_DataCellData>> list =
+        <sf.DataGridCell<_DataCellData>>[];
     for (int i = 0; i < 7; i++) {
       final int dayIndex = (7 * weekIndex) + i;
       list.add(getDataCell(columnNames[i], dayIndex, listAppointment));
@@ -459,8 +549,10 @@ class WorkoutDataSource extends sf.DataGridSource {
   }
 
   /// Méthode pour générer toutes les DataRow du tableau.
-  List<sf.DataGridRow> getListDataRows(int numberWeeks, List<WorkoutScheduleDto> listAppointment) {
+  List<sf.DataGridRow> getListDataRows(
+      int numberWeeks, List<WorkoutScheduleDto> listAppointment) {
     final List<sf.DataGridRow> list = <sf.DataGridRow>[];
+
     for (int i = 0; i < numberWeeks; i++) {
       list.add(getDataRow(i, listAppointment));
     }
@@ -475,7 +567,7 @@ class WorkoutDataSource extends sf.DataGridSource {
   sf.DataGridRowAdapter? buildRow(DataGridRow row) {
     return sf.DataGridRowAdapter(
         cells: row.getCells().map((sf.DataGridCell listCell) {
-      final DataCellData dataCell = listCell.value as DataCellData;
+      final _DataCellData dataCell = listCell.value as _DataCellData;
       final ScrollController _controller = ScrollController();
       final List<WorkoutScheduleDto> listWorkout = dataCell.list;
       final List<Widget> listListTile = listWorkout
@@ -484,9 +576,16 @@ class WorkoutDataSource extends sf.DataGridSource {
                 child: Row(
                   children: <Widget>[
                     if (dto.imageUrlWorkout != null)
-                      Expanded(child: CircleAvatar(backgroundImage: NetworkImage(dto.imageUrlWorkout!), radius: 10))
+                      Expanded(
+                          child: CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(dto.imageUrlWorkout!),
+                              radius: 10))
                     else
-                      Expanded(child: CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10)),
+                      Expanded(
+                          child: CircleAvatar(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              radius: 10)),
                     Expanded(
                       flex: 5,
                       child: Padding(

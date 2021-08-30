@@ -2,23 +2,17 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/domain/trainers.domain.dart';
-import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-class SignUpBloc {
-
-  factory SignUpBloc.instance() {
-    _instance ??= SignUpBloc._();
-    return _instance!;
+class SignUpVm {
+  SignUpVm(BuildContext context) {
+    trainersService = Provider.of<TrainersService>(context, listen: false);
   }
 
-  SignUpBloc._() {
-    _streamError = BehaviorSubject<String?>.seeded(null);
-  }
-
-  static SignUpBloc? _instance;
-  static final TrainersService trainersService = TrainersService.instance();
+  late TrainersService trainersService;
 
   String nom = '';
   String prenom = '';
@@ -39,7 +33,12 @@ class SignUpBloc {
 
   Future<bool> disconnect() {
     final Completer<bool> completer = Completer<bool>();
-    FirebaseAuth.instance.signOut().then((_) => completer.complete(true)).catchError((Object error) => completer.completeError(false));
+
+    FirebaseAuth.instance
+        .signOut()
+        .then((_) => completer.complete(true))
+        .catchError((Object error) => completer.completeError(false));
+
     return completer.future;
   }
 
@@ -52,10 +51,23 @@ class SignUpBloc {
   }
 
   Future<UserCredential> signUp() async {
-    final UserCredential credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-    final Trainers newTrainer = Trainers(uid: credential.user!.uid, email: email, nom: nom, prenom: prenom, telephone: telephone);
-    await trainersService.collectionReference.doc(newTrainer.uid).set(newTrainer.toJson());
-    final UserCredential credentialSigned = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+    final UserCredential credential = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
+
+    final Trainers newTrainer = Trainers(
+        uid: credential.user!.uid,
+        email: email,
+        nom: nom,
+        prenom: prenom,
+        telephone: telephone);
+
+    await trainersService.collectionReference
+        .doc(newTrainer.uid)
+        .set(newTrainer.toJson());
+
+    final UserCredential credentialSigned = await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password);
+
     return credentialSigned;
   }
 }

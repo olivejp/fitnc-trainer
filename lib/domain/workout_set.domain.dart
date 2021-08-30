@@ -5,10 +5,10 @@ part 'workout_set.domain.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class WorkoutSet {
-
   WorkoutSet({this.uidExercice = '', this.consigne = '', this.order = 0});
 
-  factory WorkoutSet.fromJson(Map<String, dynamic> data) => _$WorkoutSetFromJson(data);
+  factory WorkoutSet.fromJson(Map<String, dynamic> data) =>
+      _$WorkoutSetFromJson(data);
 
   String? uid;
   String? uidExercice;

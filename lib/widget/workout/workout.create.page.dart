@@ -1,25 +1,26 @@
-import 'package:fitnc_trainer/bloc/workout/workout_update.bloc.dart';
+import 'package:fitnc_trainer/service/workout.service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'workout.form.builder.dart';
 
 class WorkoutCreatePage {
-  static showCreate(BuildContext context) {
-    WorkoutUpdateBloc bloc = WorkoutUpdateBloc.instance();
+  static void showCreate(BuildContext context) {
+    final WorkoutService bloc = Provider.of<WorkoutService>(context);
     bloc.init(null);
-    GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (BuildContext context) {
         return AlertDialog(
           content: WorkoutFormBuilder.getForm(_formKey, bloc),
-          actionsPadding: EdgeInsets.all(20),
+          actionsPadding: const EdgeInsets.all(20),
           actions: <Widget>[
             FloatingActionButton(
               tooltip: 'Annuler',
               onPressed: () => Navigator.of(context).pop(),
-              child: Icon(Icons.clear),
+              child: const Icon(Icons.clear),
             ),
             FloatingActionButton(
               tooltip: 'Créer',
@@ -28,7 +29,7 @@ class WorkoutCreatePage {
                   bloc.saveWorkout().then((_) => Navigator.of(context).pop());
                 }
               },
-              child: Icon(Icons.check),
+              child: const Icon(Icons.check),
             ),
           ],
         );

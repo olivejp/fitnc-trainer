@@ -1,4 +1,4 @@
-import 'package:fitnc_trainer/bloc/programme/programme_update.bloc.dart';
+import 'package:fitnc_trainer/bloc/programme/programme.vm.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,7 +8,7 @@ import '../../constants.dart';
 import '../../main.dart';
 
 class ProgrammeFormBuilder {
-  static Widget getForm(GlobalKey<FormState> _formKey, ProgrammeUpdateBloc bloc) {
+  static Widget getForm(GlobalKey<FormState> _formKey, ProgrammeVm bloc) {
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 800),
       child: Form(
@@ -22,9 +22,11 @@ class ProgrammeFormBuilder {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   StorageStreamImageWidget(
-                    onSaved: (StorageFile? storagePair) => bloc.setStoragePair(storagePair),
+                    onSaved: (StorageFile? storagePair) =>
+                        bloc.setStoragePair(storagePair),
                     streamInitialStorageFile: bloc.obsStoragePair,
-                    onDeleted: (StorageFile? storagePair) => bloc.setStoragePair(null),
+                    onDeleted: (StorageFile? storagePair) =>
+                        bloc.setStoragePair(null),
                   ),
                   Expanded(
                     child: Padding(
@@ -36,7 +38,8 @@ class ProgrammeFormBuilder {
                                 initialValue: bloc.programme.name,
                                 autofocus: true,
                                 onChanged: (String value) => bloc.name = value,
-                                decoration: const InputDecoration(labelText: 'Nom'),
+                                decoration:
+                                    const InputDecoration(labelText: 'Nom'),
                                 validator: (String? value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Merci de renseigner le nom du programme.';
@@ -51,8 +54,12 @@ class ProgrammeFormBuilder {
                                   paramName: 'number_weeks',
                                   initialValue: bloc.programme.numberWeeks,
                                   decoration: const InputDecoration(
-                                      labelText: 'Nombre de semaine', constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight)),
-                                  onChanged: (String? value) => bloc.numberWeeks = value),
+                                      labelText: 'Nombre de semaine',
+                                      constraints: BoxConstraints(
+                                          maxHeight: FitnessConstants
+                                              .textFormFieldHeight)),
+                                  onChanged: (String? value) =>
+                                      bloc.numberWeeks = value),
                             ),
                           )
                         ],
@@ -68,7 +75,8 @@ class ProgrammeFormBuilder {
               minLines: 5,
               maxLines: 20,
               onChanged: (String? value) => bloc.description = value,
-              decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
+              decoration: const InputDecoration(
+                  labelText: 'Description', helperText: 'Optionnel'),
             ),
           ],
         ),

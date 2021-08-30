@@ -4,27 +4,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
-import 'package:fitnc_trainer/service/param.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ExerciceService extends AbstractFitnessCrudService<Exercice> with MixinFitnessStorageService<Exercice> {
-
-  ExerciceService(BuildContext context){
-    trainersService = TrainersService.instance();
-    paramService = ParamService.getInstance();
+class ExerciceService extends AbstractFitnessCrudService<Exercice>
+    with MixinFitnessStorageService<Exercice> {
+  ExerciceService(BuildContext context) {
+    trainersService = Provider.of<TrainersService>(context, listen: false);
   }
 
   late TrainersService trainersService;
-  late ParamService paramService;
   Exercice? exercice;
   bool sendStorage = false;
 
-  final BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
-  final BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject<String?>();
-  final BehaviorSubject<String?> _streamSelectedYoutubeUrl = BehaviorSubject<String?>();
+  final BehaviorSubject<StorageFile?> subjectStoragePair =
+      BehaviorSubject<StorageFile?>();
+  final BehaviorSubject<String?> _streamSelectedVideoUrl =
+      BehaviorSubject<String?>();
+  final BehaviorSubject<String?> _streamSelectedYoutubeUrl =
+      BehaviorSubject<String?>();
 
   @override
   Stream<List<Exercice>> listenAll() {

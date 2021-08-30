@@ -4,7 +4,6 @@ part 'line.domain.g.dart';
 
 @JsonSerializable()
 class Line {
-
   Line();
 
   factory Line.fromJson(Map<String, dynamic> data) => _$LineFromJson(data);

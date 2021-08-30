@@ -1,6 +1,7 @@
-import 'package:fitnc_trainer/bloc/home.page.bloc.dart';
-import 'package:fitnc_trainer/bloc/programme/programme_update.bloc.dart';
+import 'package:fitnc_trainer/bloc/programme/programme.vm.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
+import 'package:fitnc_trainer/service/programme.service.dart';
+import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/programme/programme.update.page.dart';
@@ -12,9 +13,34 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'programme.create.page.dart';
+
+class ProgrammeProviders extends StatelessWidget {
+  const ProgrammeProviders({Key? key, required this.builder}) : super(key: key);
+  final WidgetBuilder builder;
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: <SingleChildWidget>[
+        Provider<TrainersService>(
+          create: (_) => TrainersService(),
+        ),
+        Provider<ProgrammeService>(
+          create: (BuildContext context) => ProgrammeService(context),
+        ),
+        ChangeNotifierProvider<ProgrammeVm>(
+          create: (BuildContext context) => ProgrammeVm(context),
+        ),
+      ],
+      builder: (BuildContext context, __) => builder(context),
+    );
+  }
+}
 
 class ProgrammePage extends StatefulWidget {
   const ProgrammePage({Key? key}) : super(key: key);
@@ -23,15 +49,11 @@ class ProgrammePage extends StatefulWidget {
   State<ProgrammePage> createState() => _ProgrammePageState();
 }
 
-class _ProgrammePageState extends State<ProgrammePage> with SingleTickerProviderStateMixin {
-  final HomePageBloc homePageBloc = HomePageBloc.instance();
-  final ProgrammeUpdateBloc bloc = ProgrammeUpdateBloc.instance();
+class _ProgrammePageState extends State<ProgrammePage> {
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
   final List<Programme> listCompleteProgramme = <Programme>[];
-  final BehaviorSubject<List<Programme>> _streamListProgramme = BehaviorSubject<List<Programme>>();
-
-  late AnimationController _animationController;
-  late Animation<double> _animation;
+  final BehaviorSubject<List<Programme>> _streamListProgramme =
+      BehaviorSubject<List<Programme>>();
 
   String? _query;
 
@@ -43,129 +65,157 @@ class _ProgrammePageState extends State<ProgrammePage> with SingleTickerProvider
   String? get query => _query;
 
   @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(vsync: this, duration: Duration(seconds: 5));
-    _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
+  Widget build(BuildContext context) {
+    return RoutedPage(child: ProgrammeProviders(
+      builder: (BuildContext context) {
+        final ProgrammeService service =
+            Provider.of<ProgrammeService>(context, listen: false);
 
-    bloc.listenAll().listen((List<Programme> event) {
-      listCompleteProgramme.clear();
-      listCompleteProgramme.addAll(event);
-      _streamListProgramme.sink.add(listCompleteProgramme);
-      UtilService.search(_query, listCompleteProgramme, _streamListProgramme);
-    });
+        /// Ecoute tous les programmes et met à jour la liste locale des programmes.
+        service.listenAll().listen((List<Programme> event) {
+          listCompleteProgramme.clear();
+          listCompleteProgramme.addAll(event);
+          _streamListProgramme.sink.add(listCompleteProgramme);
+          UtilService.search(
+              _query, listCompleteProgramme, _streamListProgramme);
+        });
+
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+          floatingActionButton: FloatingActionButton.extended(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+            onPressed: () => ProgrammeCreatePage.showCreate(context),
+            label: Text(
+              'Créer un programme',
+              style: GoogleFonts.roboto(
+                  fontSize: 15, color: Color(Colors.white.value)),
+            ),
+            icon: Icon(
+              Icons.add,
+              color: Color(Colors.white.value),
+              size: 25.0,
+            ),
+          ),
+          body: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                        flex: 3,
+                        child: Text(
+                          'Programme',
+                          style: Theme.of(context).textTheme.headline1,
+                        )),
+                    Expanded(
+                      child: TextFormField(
+                        onChanged: (String text) => query = text,
+                        decoration: InputDecoration(
+                          constraints: const BoxConstraints(maxHeight: 43),
+                          border: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5))),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(5)),
+                              borderSide: BorderSide(
+                                  color: Theme.of(context).primaryColor)),
+                          prefixIcon: const Icon(Icons.search),
+                          hintText: 'Recherche...',
+                        ),
+                        textAlignVertical: TextAlignVertical.bottom,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: StreamBuilder<List<Programme>>(
+                  stream: _streamListProgramme,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Programme>> snapshot) {
+                    if (!snapshot.hasData ||
+                        (snapshot.hasData && snapshot.data!.isEmpty)) {
+                      return const Center(
+                          child: Text('Aucun programme trouvé.'));
+                    } else {
+                      final List<Programme> programmes = snapshot.data!;
+                      return FitnessGridView<Programme>(
+                        defaultDesktopColumns: 6,
+                        childAspectRatio: 15 / 16,
+                        domains: programmes,
+                        bloc: service,
+                        getCard: (Programme pgm) =>
+                            getProgrammeCard(pgm, context),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    ));
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return RoutedPage(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        floatingActionButton: FloatingActionButton.extended(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          onPressed: () => ProgrammeCreatePage.showCreate(context),
-          label: Text(
-            'Créer un programme',
-            style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
-          ),
-          icon: Icon(
-            Icons.add,
-            color: Color(Colors.white.value),
-            size: 25.0,
-          ),
-        ),
-        body: Column(
+  Card getProgrammeCard(Programme programme, BuildContext context) {
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      elevation: 2,
+      child: InkWell(
+        child: Stack(
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-              child: Row(
+            Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Expanded(
-                      flex: 3,
-                      child: Text(
-                        'Programme',
-                        style: Theme.of(context).textTheme.headline1,
-                      )),
-                  Expanded(
-                    child: TextFormField(
-                      onChanged: (String text) => query = text,
-                      decoration: InputDecoration(
-                        constraints: BoxConstraints(maxHeight: 43),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1)),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor)),
-                        prefixIcon: Icon(Icons.search),
-                        hintText: 'Recherche...',
-                      ),
-                      textAlignVertical: TextAlignVertical.bottom,
-                    ),
+                    flex: 3,
+                    child: (programme.imageUrl?.isNotEmpty == true)
+                        ? Ink.image(
+                            image: NetworkImage(programme.imageUrl!),
+                            fit: BoxFit.cover)
+                        : Container(
+                            decoration:
+                                const BoxDecoration(color: Colors.amber)),
                   ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: StreamBuilder<List<Programme>>(
-                stream: _streamListProgramme,
-                builder: (BuildContext context, AsyncSnapshot<List<Programme>> snapshot) {
-                  if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
-                    return const Center(child: Text('Aucun programme trouvé.'));
-                  } else {
-                    final List<Programme> programmes = snapshot.data!;
-                    return FitnessGridView<Programme>(
-                      defaultDesktopColumns: 4,
-                      defaultTabletColumns: 3,
-                      defaultMobileColumns: 1,
-                      childAspectRatio: 16 / 20,
-                      domains: programmes,
-                      bloc: bloc,
-                      getCard: (Programme programme) {
-                        return Card(
-                          clipBehavior: Clip.antiAlias,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                          elevation: 2,
-                          child: InkWell(
-                            child: Stack(
-                              children: <Widget>[
-                                Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
-                                  Expanded(
-                                    flex: 3,
-                                    child: (programme.imageUrl?.isNotEmpty == true)
-                                        ? Ink.image(image: NetworkImage(programme.imageUrl!), fit: BoxFit.cover)
-                                        : Container(decoration: const BoxDecoration(color: Colors.amber)),
-                                  ),
-                                  Expanded(
-                                    child: Text(programme.name!),
-                                  )
-                                ]),
-                                const Positioned(
-                                    top: 5,
-                                    right: 5,
-                                    child: Chip(
-                                      label: Text('Publié'),
-                                      avatar: Icon(Icons.golf_course),
-                                    ))
-                              ],
-                            ),
-                            onTap: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) => AlertDialog(
-                                        contentPadding: EdgeInsets.all(20),
-                                        content: SizedBox(width: 1280, child: ProgrammeUpdatePage(programme: programme)),
-                                      ));
-                            },
-                          ),
-                        );
-                      },
-                    );
-                  }
-                },
-              ),
-            ),
+                  Expanded(
+                    child: Center(child: Text(programme.name!)),
+                  )
+                ]),
+            if (programme.publishDate != null)
+              const Positioned(
+                  top: 5,
+                  right: 5,
+                  child: Chip(
+                    backgroundColor: Colors.green,
+                    label: Text('Publié'),
+                    avatar: Icon(Icons.public),
+                  ))
+            else
+              Container()
           ],
         ),
+        onTap: () => onTap(context, programme),
       ),
     );
+  }
+
+  Future<dynamic> onTap(BuildContext context, Programme programme) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+              contentPadding: const EdgeInsets.all(20),
+              content: SizedBox(
+                width: 1280,
+                child: ProgrammeProviders(
+                  builder: (BuildContext context) =>
+                      ProgrammeUpdatePage(programme: programme),
+                ),
+              ),
+            ));
   }
 }

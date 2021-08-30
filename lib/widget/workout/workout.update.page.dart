@@ -1,6 +1,5 @@
-import 'package:fitnc_trainer/bloc/workout/workout_update.bloc.dart';
+import 'package:fitnc_trainer/service/workout.service.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
-import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.page.dart';
@@ -11,10 +10,9 @@ import 'package:oktoast/oktoast.dart';
 import '../../constants.dart';
 
 class WorkoutUpdatePage extends StatefulWidget {
-  WorkoutUpdatePage({Key? key, required this.workout}) : super(key: key);
+  const WorkoutUpdatePage({Key? key, required this.workout}) : super(key: key);
 
   final Workout workout;
-  final WorkoutUpdateBloc bloc = WorkoutUpdateBloc.instance();
 
   @override
   _WorkoutUpdatePageState createState() {
@@ -29,23 +27,31 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
+    final WorkoutService vm = WorkoutService(context);
+
     // Initialisation du bloc.
-    widget.bloc.init(widget.workout);
+    vm.init(widget.workout);
 
     final List<Widget> buttons = <Widget>[
       TextButton.icon(
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () {
             if (_formKey.currentState?.validate() == true) {
-              widget.bloc.saveWorkout().then((_) => showToast('Workout sauvegardé', backgroundColor: Colors.green)).catchError(
+              vm
+                  .saveWorkout()
+                  .then((_) => showToast('Workout sauvegardé',
+                      backgroundColor: Colors.green))
+                  .catchError(
                 (Object? error) {
-                  showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent);
+                  showToast('Erreur lors de la sauvegarde',
+                      backgroundColor: Colors.redAccent);
                 },
               );
             }
           },
           icon: const Icon(Icons.save, color: Colors.white),
-          label: const Text('Enregistrer', style: TextStyle(color: Colors.white))),
+          label:
+              const Text('Enregistrer', style: TextStyle(color: Colors.white))),
       TextButton.icon(
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () => Navigator.pop(context),
@@ -53,8 +59,8 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           label: const Text('Fermer', style: TextStyle(color: Colors.white))),
     ];
 
-    final WorkoutUpdateBloc bloc = widget.bloc;
-    final List<DropdownMenuItem<String>> typesWorkout = <DropdownMenuItem<String>>[
+    final List<DropdownMenuItem<String>> typesWorkout =
+        <DropdownMenuItem<String>>[
       const DropdownMenuItem<String>(
         value: 'none',
         child: Text(
@@ -87,7 +93,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
         children: <Widget>[
           Flexible(
             child: Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: FitnessNcColors.blue100,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(5),
@@ -103,15 +109,15 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                       padding: const EdgeInsets.only(top: 30.0, bottom: 30.0),
                       child: StorageFutureImageWidget(
                         radius: 80,
-                        onSaved: (StorageFile? file) => bloc.storageFile = file,
-                        onDeleted: (_) => bloc.storageFile = null,
-                        futureInitialStorageFile: bloc.getStorageFile(),
+                        onSaved: (StorageFile? file) => vm.storageFile = file,
+                        onDeleted: (_) => vm.storageFile = null,
+                        futureInitialStorageFile: vm.getStorageFile(),
                       ),
                     ),
                     FitnessDecorationTextFormField(
-                        initialValue: bloc.getWorkout()?.name,
+                        initialValue: vm.getWorkout()?.name,
                         autofocus: true,
-                        onChanged: (String value) => bloc.name = value,
+                        onChanged: (String value) => vm.name = value,
                         labelText: 'Nom du workout',
                         validator: (String? value) {
                           if (value == null || value.isEmpty) {
@@ -129,20 +135,21 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                           ),
                         ),
                         icon: const Icon(Icons.arrow_downward),
-                        onChanged: (String? value) => bloc.timerType = value,
-                        value: bloc.getWorkout()?.timerType,
+                        onChanged: (String? value) => vm.timerType = value,
+                        value: vm.getWorkout()?.timerType,
                         items: typesWorkout),
                     TextFormField(
-                      initialValue: bloc.getWorkout()?.description,
+                      initialValue: vm.getWorkout()?.description,
                       maxLength: 2000,
                       minLines: 10,
                       maxLines: 10,
-                      onChanged: (String value) => bloc.description = value,
-                      decoration: const InputDecoration(labelText: 'Instructions', hintText: 'Optionnel'),
+                      onChanged: (String value) => vm.description = value,
+                      decoration: const InputDecoration(
+                          labelText: 'Instructions', hintText: 'Optionnel'),
                     ),
                     ButtonBar(
-                      children: buttons,
                       alignment: MainAxisAlignment.start,
+                      children: buttons,
                     )
                   ],
                 ),
@@ -151,7 +158,8 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           ),
           Flexible(
             flex: 2,
-            child: SizedBox(height: 800, child: WorkoutComposePage(workout: widget.workout)),
+            child: SizedBox(
+                height: 800, child: WorkoutSetPage(workout: widget.workout)),
           ),
         ],
       ),
