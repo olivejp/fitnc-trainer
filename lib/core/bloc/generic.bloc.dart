@@ -6,9 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
-import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:oktoast/oktoast.dart';
 import 'package:path/path.dart';
 
 ///
@@ -29,7 +28,7 @@ abstract class AbstractCrudService<T> {
 ///
 /// Classe abstraite dont on doit étendre pour récupérer les méthodes par défaut pour le CRUD Firebase.
 ///
-abstract class AbstractFirebaseCrudService<T extends AbstractDomain> implements AbstractCrudService<T> {
+abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends GetxService implements AbstractCrudService<T> {
   /// Méthode abstraite qui retournera la collectionReference.
   CollectionReference<Object?> getCollectionReference();
 
@@ -100,17 +99,13 @@ abstract class MixinFitnessStorageService<T extends AbstractFitnessStorageDomain
     if (user == null) {
       throw Exception('Utilisateur non connecté');
     }
-    return FirebaseStorage.instance
-        .ref(getStorageRef(user, domain))
-        .listAll()
-        .then((ListResult value) {
-          final List<Future<void>> listFuture = <Future<void>>[];
-          for (final Reference ref in value.items) {
-            listFuture.add(ref.delete());
-          }
-          return listFuture;
-        })
-        .then((List<Future<void>> listFuture) => Future.wait(listFuture));
+    return FirebaseStorage.instance.ref(getStorageRef(user, domain)).listAll().then((ListResult value) {
+      final List<Future<void>> listFuture = <Future<void>>[];
+      for (final Reference ref in value.items) {
+        listFuture.add(ref.delete());
+      }
+      return listFuture;
+    }).then((List<Future<void>> listFuture) => Future.wait(listFuture));
   }
 
   /// Envoi le StorageFile sur Firebase Storage et renvoie l'URL de l'image à partir du Storage Firebase.
@@ -151,5 +146,4 @@ abstract class MixinFitnessStorageService<T extends AbstractFitnessStorageDomain
 ///
 /// Classe Bloc spécifique à l'application Fitness NC pour implémenter les méthodes de base du CRUD
 ///
-abstract class AbstractFitnessCrudService<T extends AbstractDomain> extends AbstractFirebaseCrudService<T> {
-}
+abstract class AbstractFitnessCrudService<T extends AbstractDomain> extends AbstractFirebaseCrudService<T> {}

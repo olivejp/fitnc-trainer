@@ -1,62 +1,66 @@
-import 'package:fitnc_trainer/service/exercice.service.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
+import 'package:fitnc_trainer/service/exercice.service.dart';
+import 'package:fitnc_trainer/service/exerciceUpdate.controller.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
-import '../../constants.dart';
+import '../../constants/constants.dart';
 
-/// Classe ViewModel de la page générique.
-class ExerciceGenericPageVm with ChangeNotifier {
-  ExerciceGenericPageVm(BuildContext context, this.exercice) {
-    exerciceService = Provider.of<ExerciceService>(context, listen: false);
-    notifyListeners();
+/// Controller de la page mise à jour d'un exercice.
+class ExerciceGenericPageVm extends GetxController {
+  final ExerciceService exerciceService = Get.find();
+  final Rx<Exercice?> _exercice = Rx<Exercice?>(null);
+  final RxBool _sendStorage = false.obs;
+
+  set sendStorage(bool send) {
+    _sendStorage.value = send;
   }
 
-  late ExerciceService exerciceService;
-  Exercice exercice;
-  bool sendStorage = false;
+  bool get sendStorage => _sendStorage.value;
 
-  void changeExercice(Exercice exo) {
-    exercice = exo;
-    notifyListeners();
+  set exercice(Exercice? exo) {
+    _exercice.value = exo;
   }
+
+  Exercice? get exercice => _exercice.value;
 
   void changeStorageFile(StorageFile? storageFile) {
-    exercice.storageFile = storageFile;
-    sendStorage = true;
-    notifyListeners();
+    _exercice.value!.storageFile = storageFile;
+    _sendStorage.value = true;
   }
 
-  void changeVideoUrl(String? videoUrl) {
-    exercice.videoUrl = videoUrl;
-    notifyListeners();
+  set videoUrl(String? videoUrl) {
+    _exercice.value!.videoUrl = videoUrl;
   }
 
-  void changeYoutubeUrl(String? youtubeUrl) {
-    exercice.youtubeUrl = youtubeUrl;
-    notifyListeners();
+  String? get videoUrl => _exercice.value!.videoUrl;
+
+  set youtubeUrl(String? youtubeUrl) {
+    _exercice.value!.youtubeUrl = youtubeUrl;
   }
+
+  String? get youtubeUrl => _exercice.value!.youtubeUrl;
 
   Future<void> saveExercice() async {
-    final bool isUpdate = exercice.uid != null;
+    final bool isUpdate = exercice!.uid != null;
     if (isUpdate) {
-      if (sendStorage) {
-        return exerciceService.eraseAndReplaceStorage(exercice).then((_) => exerciceService.save(exercice));
+      if (_sendStorage.value) {
+        return exerciceService.eraseAndReplaceStorage(exercice!).then((_) => exerciceService.save(exercice!));
       } else {
-        return exerciceService.save(exercice);
+        return exerciceService.save(exercice!);
       }
     } else {
-      exercice.uid = exerciceService.getCollectionReference().doc().id;
-      return exerciceService.createStorage(exercice).then((_) => exerciceService.create(exercice));
+      exercice!.uid = exerciceService.getCollectionReference().doc().id;
+      return exerciceService.createStorage(exercice!).then((_) => exerciceService.create(exercice!));
     }
   }
 }
@@ -89,11 +93,11 @@ class ExerciceBuilderPage {
 
 /// Composant générique pour l'exercice (Mise à jour / Création).
 class ExerciceUpdateCreateGeneric extends StatefulWidget {
-  const ExerciceUpdateCreateGeneric({Key? key, required this.isCreation, required this.exercice, this.displayCloseButton = false}) : super(key: key);
+  ExerciceUpdateCreateGeneric({Key? key, required this.isCreation, this.displayCloseButton = false}) : super(key: key);
 
   final bool isCreation;
   final bool displayCloseButton;
-  final Exercice exercice;
+  final ExerciceUpdateController controller = Get.find();
 
   @override
   State<ExerciceUpdateCreateGeneric> createState() => _ExerciceUpdateCreateGenericState();
@@ -109,7 +113,7 @@ class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneri
     _formKey = GlobalKey<FormState>();
 
     return ChangeNotifierProvider<ExerciceGenericPageVm>(
-      create: (BuildContext context) => ExerciceGenericPageVm(context, widget.exercice),
+      create: (BuildContext context) => ExerciceGenericPageVm(widget.exercice),
       builder: (BuildContext context, Widget? child) {
         final ExerciceGenericPageVm vm = Provider.of<ExerciceGenericPageVm>(context, listen: false);
 

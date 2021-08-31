@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/bloc/login/sign-up.bloc.dart';
 import 'package:fitnc_trainer/main.dart';
-import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/bottom.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
-import '../../constants.dart';
+import '../../constants/constants.dart';
 
 typedef CallbackUserCredential = void Function(UserCredential userCredential);
 
@@ -64,8 +63,7 @@ class _SignUpPageState extends State<SignUpPage> {
             padding: const EdgeInsets.only(bottom: 30, left: 20),
             child: Text(
               FitnessConstants.appTitle,
-              style: GoogleFonts.alfaSlabOne(
-                  color: Theme.of(context).primaryColor, fontSize: 25),
+              style: GoogleFonts.alfaSlabOne(color: Theme.of(context).primaryColor, fontSize: 25),
             ),
           ),
         ),
@@ -74,12 +72,8 @@ class _SignUpPageState extends State<SignUpPage> {
 
     return MultiProvider(
       providers: <SingleChildWidget>[
-        Provider<TrainersService>(
-          create: (_) => TrainersService(),
-        ),
-        ChangeNotifierProvider<HidePasswordNotifier>(
-            create: (BuildContext context) => HidePasswordNotifier()),
-        Provider<SignUpVm>(create: (BuildContext context) => SignUpVm(context))
+        ChangeNotifierProvider<HidePasswordNotifier>(create: (BuildContext context) => HidePasswordNotifier()),
+        Provider<SignUpVm>(create: (BuildContext context) => SignUpVm())
       ],
       builder: (BuildContext context, __) {
         final SignUpVm bloc = Provider.of<SignUpVm>(context);
@@ -108,8 +102,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   children: <Widget>[
                     Card(
                       elevation: 20,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
                       child: Padding(
                         padding: const EdgeInsets.all(60.0),
                         child: Form(
@@ -119,11 +112,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             children: <Widget>[
                               Text(
                                 'Créez votre compte',
-                                style: GoogleFonts.robotoTextTheme()
-                                    .headline6!
-                                    .copyWith(
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.bold),
+                                style: GoogleFonts.robotoTextTheme().headline6!.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 30),
@@ -131,24 +120,19 @@ class _SignUpPageState extends State<SignUpPage> {
                                   children: <Widget>[
                                     Expanded(
                                       child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 5),
+                                        padding: const EdgeInsets.only(right: 5),
                                         child: TextFormField(
-                                            style: GoogleFonts.roboto(
-                                                fontSize: 15),
+                                            style: GoogleFonts.roboto(fontSize: 15),
                                             decoration: InputDecoration(
-                                              labelStyle: GoogleFonts.roboto(
-                                                  fontSize: 15),
+                                              labelStyle: GoogleFonts.roboto(fontSize: 15),
                                               focusedBorder: defaultBorder,
                                               border: defaultBorder,
                                               enabledBorder: defaultBorder,
                                               labelText: 'Nom',
                                             ),
-                                            onChanged: (String value) =>
-                                                bloc.nom = value,
+                                            onChanged: (String value) => bloc.nom = value,
                                             validator: (String? value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
+                                              if (value == null || value.isEmpty) {
                                                 return 'Merci de renseigner votre nom.';
                                               }
                                             }),
@@ -158,19 +142,16 @@ class _SignUpPageState extends State<SignUpPage> {
                                       child: Padding(
                                         padding: const EdgeInsets.only(left: 5),
                                         child: TextFormField(
-                                            style: GoogleFonts.roboto(
-                                                fontSize: 15),
+                                            style: GoogleFonts.roboto(fontSize: 15),
                                             decoration: InputDecoration(
                                               labelText: 'Prénom',
                                               focusedBorder: defaultBorder,
                                               border: defaultBorder,
                                               enabledBorder: defaultBorder,
                                             ),
-                                            onChanged: (String value) =>
-                                                bloc.prenom = value,
+                                            onChanged: (String value) => bloc.prenom = value,
                                             validator: (String? value) {
-                                              if (value == null ||
-                                                  value.isEmpty) {
+                                              if (value == null || value.isEmpty) {
                                                 return 'Merci de renseigner votre prénom.';
                                               }
                                             }),
@@ -190,8 +171,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     border: defaultBorder,
                                     enabledBorder: defaultBorder,
                                   ),
-                                  onChanged: (String value) =>
-                                      bloc.email = value,
+                                  onChanged: (String value) => bloc.email = value,
                                   validator: (String? value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Merci de renseigner votre adresse email.';
@@ -209,8 +189,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 padding: const EdgeInsets.only(top: 20),
                                 child: TextFormField(
                                   style: GoogleFonts.roboto(fontSize: 15),
-                                  onChanged: (String value) =>
-                                      bloc.telephone = value,
+                                  onChanged: (String value) => bloc.telephone = value,
                                   decoration: InputDecoration(
                                     suffixIcon: const Icon(Icons.phone_android),
                                     labelText: 'Téléphone',
@@ -223,99 +202,63 @@ class _SignUpPageState extends State<SignUpPage> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 60),
                                 child: Consumer<HidePasswordNotifier>(
-                                  builder: (_,
-                                          HidePasswordNotifier
-                                              hidePasswordNotifier,
-                                          __) =>
-                                      TextFormField(
-                                          style:
-                                              GoogleFonts.roboto(fontSize: 15),
-                                          onChanged: (String value) =>
-                                              bloc.password = value,
-                                          obscureText: hidePasswordNotifier
-                                              .hidePassword1,
-                                          decoration: InputDecoration(
-                                              labelText: 'Mot de passe',
-                                              focusedBorder: defaultBorder,
-                                              border: defaultBorder,
-                                              enabledBorder: defaultBorder,
-                                              suffixIcon: IconButton(
-                                                tooltip: hidePasswordNotifier
-                                                        .hidePassword1
-                                                    ? 'Afficher le mot de passe'
-                                                    : 'Masquer le mot de passe',
-                                                onPressed: hidePasswordNotifier
-                                                    .switchPassword1,
-                                                icon: hidePasswordNotifier
-                                                        .hidePassword1
-                                                    ? const Icon(Icons
-                                                        .visibility_outlined)
-                                                    : const Icon(Icons
-                                                        .visibility_off_outlined),
-                                              )),
-                                          validator: (String? value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Le mot de passe ne peut pas être vide.';
-                                            }
-                                          }),
+                                  builder: (_, HidePasswordNotifier hidePasswordNotifier, __) => TextFormField(
+                                      style: GoogleFonts.roboto(fontSize: 15),
+                                      onChanged: (String value) => bloc.password = value,
+                                      obscureText: hidePasswordNotifier.hidePassword1,
+                                      decoration: InputDecoration(
+                                          labelText: 'Mot de passe',
+                                          focusedBorder: defaultBorder,
+                                          border: defaultBorder,
+                                          enabledBorder: defaultBorder,
+                                          suffixIcon: IconButton(
+                                            tooltip: hidePasswordNotifier.hidePassword1 ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
+                                            onPressed: hidePasswordNotifier.switchPassword1,
+                                            icon: hidePasswordNotifier.hidePassword1
+                                                ? const Icon(Icons.visibility_outlined)
+                                                : const Icon(Icons.visibility_off_outlined),
+                                          )),
+                                      validator: (String? value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Le mot de passe ne peut pas être vide.';
+                                        }
+                                      }),
                                 ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 20),
                                 child: Consumer<HidePasswordNotifier>(
-                                  builder: (_,
-                                          HidePasswordNotifier
-                                              hidePasswordNotifier,
-                                          __) =>
-                                      TextFormField(
-                                          style:
-                                              GoogleFonts.roboto(fontSize: 15),
-                                          onChanged: (String value) =>
-                                              bloc.passwordCheck = value,
-                                          obscureText: hidePasswordNotifier
-                                              .hidePassword2,
-                                          decoration: InputDecoration(
-                                              focusedBorder: defaultBorder,
-                                              border: defaultBorder,
-                                              enabledBorder: defaultBorder,
-                                              labelText:
-                                                  'Retaper votre mot de passe',
-                                              suffixIcon: IconButton(
-                                                  tooltip: hidePasswordNotifier
-                                                          .hidePassword2
-                                                      ? 'Afficher le mot de passe'
-                                                      : 'Masquer le mot de passe',
-                                                  onPressed:
-                                                      hidePasswordNotifier
-                                                          .switchPassword2,
-                                                  icon: hidePasswordNotifier
-                                                          .hidePassword2
-                                                      ? const Icon(Icons.visibility_outlined)
-                                                      : const Icon(Icons.visibility_off_outlined))),
-                                          validator: (String? value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Le mot de passe ne peut pas être vide.';
-                                            }
-                                            if (bloc.password !=
-                                                bloc.passwordCheck) {
-                                              return "Le mot de passe n'est pas identique.";
-                                            }
-                                          }),
+                                  builder: (_, HidePasswordNotifier hidePasswordNotifier, __) => TextFormField(
+                                      style: GoogleFonts.roboto(fontSize: 15),
+                                      onChanged: (String value) => bloc.passwordCheck = value,
+                                      obscureText: hidePasswordNotifier.hidePassword2,
+                                      decoration: InputDecoration(
+                                          focusedBorder: defaultBorder,
+                                          border: defaultBorder,
+                                          enabledBorder: defaultBorder,
+                                          labelText: 'Retaper votre mot de passe',
+                                          suffixIcon: IconButton(
+                                              tooltip: hidePasswordNotifier.hidePassword2 ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
+                                              onPressed: hidePasswordNotifier.switchPassword2,
+                                              icon: hidePasswordNotifier.hidePassword2
+                                                  ? const Icon(Icons.visibility_outlined)
+                                                  : const Icon(Icons.visibility_off_outlined))),
+                                      validator: (String? value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Le mot de passe ne peut pas être vide.';
+                                        }
+                                        if (bloc.password != bloc.passwordCheck) {
+                                          return "Le mot de passe n'est pas identique.";
+                                        }
+                                      }),
                                 ),
                               ),
                               Padding(
                                   padding: const EdgeInsets.only(top: 20),
                                   child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        minimumSize:
-                                            const Size(double.infinity, 55)),
+                                    style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 55)),
                                     onPressed: () => onPressedEnter(),
-                                    child: Text('Créer un compte',
-                                        style: GoogleFonts.roboto(
-                                            color: Color(Colors.white.value),
-                                            fontSize: 15)),
+                                    child: Text('Créer un compte', style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15)),
                                   )),
                               Padding(
                                 padding: const EdgeInsets.only(top: 30),
@@ -324,8 +267,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                   children: <Widget>[
                                     const Text('Vous avez un compte ?'),
                                     TextButton(
-                                        onPressed: () => Navigator.pushNamed(
-                                            context, '/login'),
+                                        onPressed: () => Navigator.pushNamed(context, '/login'),
                                         child: const Text(
                                           'Connexion.',
                                         )),
@@ -334,10 +276,8 @@ class _SignUpPageState extends State<SignUpPage> {
                               ),
                               StreamBuilder<String?>(
                                 stream: bloc.errorsObservable,
-                                builder: (BuildContext context,
-                                    AsyncSnapshot<String?> snapshot) {
-                                  if (snapshot.hasData &&
-                                      snapshot.data?.isNotEmpty == true) {
+                                builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+                                  if (snapshot.hasData && snapshot.data?.isNotEmpty == true) {
                                     return Text(snapshot.data!);
                                   } else {
                                     return const Text('');
@@ -371,10 +311,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         gradient: LinearGradient(
                             begin: Alignment.bottomLeft,
                             end: Alignment.topRight,
-                            colors: <Color>[
-                          Colors.amber.withAlpha(100),
-                          Colors.amber.shade700
-                        ])),
+                            colors: <Color>[Colors.amber.withAlpha(100), Colors.amber.shade700])),
                   ),
                 ),
                 Transform(
@@ -387,10 +324,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         gradient: LinearGradient(
                             begin: Alignment.bottomLeft,
                             end: Alignment.topRight,
-                            colors: <Color>[
-                          Colors.amber.withAlpha(100),
-                          Colors.amber.shade700
-                        ])),
+                            colors: <Color>[Colors.amber.withAlpha(100), Colors.amber.shade700])),
                   ),
                 ),
                 Consumer<DisplayTypeNotifier>(

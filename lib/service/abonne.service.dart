@@ -5,17 +5,11 @@ import 'package:fitnc_trainer/domain/abonne.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/abonne/abonne.update.page.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
-class AbonneService extends AbstractFitnessCrudService<Abonne>
-    with MixinFitnessStorageService<Abonne> {
-  AbonneService(BuildContext context) {
-    trainersService = Provider.of<TrainersService>(context, listen: false);
-  }
-
+class AbonneService extends AbstractFitnessCrudService<Abonne> with MixinFitnessStorageService<Abonne> {
   final String pathWorkoutMainImage = 'mainImage';
-  late TrainersService trainersService;
-  late Abonne abonne;
+  final TrainersService trainersService = Get.find();
 
   @override
   CollectionReference<Object?> getCollectionReference() {

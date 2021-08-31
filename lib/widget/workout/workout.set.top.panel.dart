@@ -8,7 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:provider/provider.dart';
 
-import '../../constants.dart';
+import '../../constants/constants.dart';
 
 /// Panel supérieur proposant une liste d'exercice avec option de recherche.
 /// Les cards exerices sont "draggable".

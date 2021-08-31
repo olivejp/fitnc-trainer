@@ -4,18 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitnc_trainer/domain/abonne.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
-import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 class AbonneUpdateVm {
-  AbonneUpdateVm(BuildContext context) {
-    trainersService = Provider.of<TrainersService>(context, listen: false);
-  }
-
-  late TrainersService trainersService;
+  final TrainersService trainersService = Get.find();
   Abonne abonne = Abonne();
   Uint8List? _fileBytes;
 
@@ -24,6 +19,7 @@ class AbonneUpdateVm {
   String? _oldFileName;
 
   BehaviorSubject<Uint8List?>? _streamSelectedImage;
+
   Stream<Uint8List?>? get selectedImageObs => _streamSelectedImage?.stream;
 
   final String pathAbonneMainImage = 'mainImage';
@@ -58,11 +54,9 @@ class AbonneUpdateVm {
   }
 
   Future<void> createAbonne() async {
-    final CollectionReference<Object?> collectionReference =
-        trainersService.getAbonneReference();
+    final CollectionReference<Object?> collectionReference = trainersService.getAbonneReference();
 
-    abonne.uid =
-        collectionReference.doc().id; // Récupération d'une nouvelle ID.
+    abonne.uid = collectionReference.doc().id; // Récupération d'une nouvelle ID.
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (_fileBytes != null) {
@@ -72,8 +66,7 @@ class AbonneUpdateVm {
   }
 
   Future<void> updateAbonne() async {
-    CollectionReference<Object?> collectionReference =
-        trainersService.getAbonneReference();
+    CollectionReference<Object?> collectionReference = trainersService.getAbonneReference();
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (_fileBytes != null && _oldFileName != _fileName) {
@@ -88,13 +81,9 @@ class AbonneUpdateVm {
     return sendToFireStore(collectionReference);
   }
 
-  Future<void> sendToFireStore(
-      CollectionReference<Object?> collectionReference) {
+  Future<void> sendToFireStore(CollectionReference<Object?> collectionReference) {
     abonne.createDate = FieldValue.serverTimestamp();
-    return collectionReference
-        .doc(abonne.uid)
-        .set(abonne.toJson())
-        .then((value) {
+    return collectionReference.doc(abonne.uid).set(abonne.toJson()).then((value) {
       abonne = Abonne();
     });
   }
@@ -111,11 +100,7 @@ class AbonneUpdateVm {
   }
 
   Future<void> deleteAbonne(Abonne abonne) {
-    return trainersService
-        .getAbonneReference()
-        .doc(abonne.uid)
-        .delete()
-        .then((value) => deleteAbonneMainImage(abonne));
+    return trainersService.getAbonneReference().doc(abonne.uid).delete().then((value) => deleteAbonneMainImage(abonne));
   }
 
   Future<void> deleteAbonneMainImage(Abonne abonne) {
@@ -131,10 +116,7 @@ class AbonneUpdateVm {
   }
 
   Future<void> update(Abonne abonne) {
-    return trainersService
-        .getAbonneReference()
-        .doc(abonne.uid)
-        .set(abonne.toJson());
+    return trainersService.getAbonneReference().doc(abonne.uid).set(abonne.toJson());
   }
 
   void setImage(Uint8List? bytes, String? name) {

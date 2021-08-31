@@ -3,26 +3,21 @@ import 'dart:ui';
 import 'package:fitnc_trainer/bloc/home.page.vm.dart';
 import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/service/auth.service.dart';
-import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
-import 'package:provider/single_child_widget.dart';
 
-import '../constants.dart';
+import '../constants/constants.dart';
 import 'abonne/abonne.page.dart';
 import 'programme/programme.page.dart';
 import 'workout/workout.page.dart';
 
 class Destination {
-  Destination(
-      {required this.page,
-      required this.icon,
-      required this.pageName,
-      required this.index});
+  Destination({required this.page, required this.icon, required this.pageName, required this.index});
 
   final Icon icon;
   final String pageName;
@@ -35,48 +30,22 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: <SingleChildWidget>[
-        Provider<TrainersService>(
-          create: (_) => TrainersService(),
-        ),
-        ChangeNotifierProvider<HomePageVm>(
-          create: (_) => HomePageVm(),
-          lazy: true,
-        ),
-      ],
+    return ChangeNotifierProvider<HomePageVm>(
+      create: (_) => HomePageVm(),
       builder: (BuildContext context, __) {
         final HomePageVm vm = Provider.of<HomePageVm>(context, listen: false);
-        final DisplayTypeNotifier displayTypeNotifier =
-            Provider.of<DisplayTypeNotifier>(context);
+        final DisplayTypeNotifier displayTypeNotifier = Provider.of<DisplayTypeNotifier>(context);
 
         final List<Destination> destinations = <Destination>[
-          Destination(
-              icon: const Icon(Icons.account_tree_outlined),
-              pageName: 'Programme',
-              index: 0,
-              page: const ProgrammePage()),
-          Destination(
-              icon: const Icon(Icons.sports_volleyball_outlined),
-              pageName: 'Workout',
-              index: 1,
-              page: const WorkoutPage()),
-          Destination(
-              icon: const Icon(Icons.sports_handball_outlined),
-              pageName: 'Exercice',
-              index: 2,
-              page: const ExercicePage()),
-          Destination(
-              icon: const Icon(Icons.person),
-              pageName: 'Abonné',
-              index: 3,
-              page: AbonnePage()),
+          Destination(icon: const Icon(Icons.account_tree_outlined), pageName: 'Programme', index: 0, page: const ProgrammePage()),
+          Destination(icon: const Icon(Icons.sports_volleyball_outlined), pageName: 'Workout', index: 1, page: const WorkoutPage()),
+          Destination(icon: const Icon(Icons.sports_handball_outlined), pageName: 'Exercice', index: 2, page: ExercicePage()),
+          Destination(icon: const Icon(Icons.person), pageName: 'Abonné', index: 3, page: AbonnePage()),
         ];
 
         // Dans le cas d'un affichage Desktop.
         WidgetsBinding.instance?.addPostFrameCallback((Duration timeStamp) {
-          vm.isExpanded =
-              displayTypeNotifier.displayType == DisplayType.desktop;
+          vm.isExpanded = displayTypeNotifier.displayType == DisplayType.desktop;
         });
 
         return Scaffold(
@@ -90,9 +59,7 @@ class MyHomePage extends StatelessWidget {
               Expanded(
                 child: Consumer<HomePageVm>(
                   builder: (_, HomePageVm consumeVm, __) {
-                    final Iterable<Destination> destinationsFiltered =
-                        destinations.where((Destination dest) =>
-                            dest.index == consumeVm.currentPage);
+                    final Iterable<Destination> destinationsFiltered = destinations.where((Destination dest) => dest.index == consumeVm.currentPage);
                     if (destinationsFiltered.isNotEmpty) {
                       return destinationsFiltered.first.page;
                     } else {
@@ -119,23 +86,27 @@ class FitnessDrawer extends StatefulWidget {
   State<FitnessDrawer> createState() => _FitnessDrawerState();
 }
 
-class _FitnessDrawerState extends State<FitnessDrawer>
-    with SingleTickerProviderStateMixin {
+class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProviderStateMixin {
   late AnimationController _iconAnimation;
   late Animation<double> _animation;
+
+
+  @override
+  void dispose() {
+    _iconAnimation.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
-    _iconAnimation = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
+    _iconAnimation = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
     _animation = Tween<double>(begin: 1.0, end: 0.0).animate(_iconAnimation);
   }
 
   @override
   Widget build(BuildContext context) {
-    final AuthService authService =
-        Provider.of<AuthService>(context, listen: false);
+    final AuthService authService = Get.find();
 
     final HomePageVm vm = Provider.of<HomePageVm>(context, listen: true);
 
@@ -163,8 +134,7 @@ class _FitnessDrawerState extends State<FitnessDrawer>
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: TextButton.icon(
                 onPressed: () {
-                  WidgetsBinding.instance
-                      ?.addPostFrameCallback((Duration timeStamp) {
+                  WidgetsBinding.instance?.addPostFrameCallback((Duration timeStamp) {
                     vm.isExpanded = !vm.isExpanded;
                   });
                 },
@@ -213,8 +183,7 @@ class _FitnessDrawerState extends State<FitnessDrawer>
 }
 
 class _NavigationFolder {
-  _NavigationFolder(
-      {required this.label, required this.iconData, required this.onTap});
+  _NavigationFolder({required this.label, required this.iconData, required this.onTap});
 
   final IconData iconData;
   final String label;
@@ -229,10 +198,8 @@ class _NavigationRailFolderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final NavigationRailThemeData navigationRailTheme =
-        theme.navigationRailTheme;
-    final Animation<double> animation =
-        NavigationRail.extendedAnimation(context);
+    final NavigationRailThemeData navigationRailTheme = theme.navigationRailTheme;
+    final Animation<double> animation = NavigationRail.extendedAnimation(context);
 
     return AnimatedBuilder(
       animation: animation,
@@ -273,14 +240,12 @@ class _NavigationRailFolderSection extends StatelessWidget {
                                 const SizedBox(width: 12),
                                 Icon(
                                   folder.iconData,
-                                  color: navigationRailTheme
-                                      .unselectedLabelTextStyle!.color,
+                                  color: navigationRailTheme.unselectedLabelTextStyle!.color,
                                 ),
                                 const SizedBox(width: 24),
                                 Text(
                                   folder.label,
-                                  style: navigationRailTheme
-                                      .unselectedLabelTextStyle,
+                                  style: navigationRailTheme.unselectedLabelTextStyle,
                                 ),
                                 const SizedBox(height: 72),
                               ],

@@ -3,16 +3,11 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/domain/trainers.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 import 'package:rxdart/rxdart.dart';
 
 class SignUpVm {
-  SignUpVm(BuildContext context) {
-    trainersService = Provider.of<TrainersService>(context, listen: false);
-  }
-
-  late TrainersService trainersService;
+  final TrainersService trainersService = Get.find();
 
   String nom = '';
   String prenom = '';
@@ -34,10 +29,7 @@ class SignUpVm {
   Future<bool> disconnect() {
     final Completer<bool> completer = Completer<bool>();
 
-    FirebaseAuth.instance
-        .signOut()
-        .then((_) => completer.complete(true))
-        .catchError((Object error) => completer.completeError(false));
+    FirebaseAuth.instance.signOut().then((_) => completer.complete(true)).catchError((Object error) => completer.completeError(false));
 
     return completer.future;
   }
@@ -51,22 +43,13 @@ class SignUpVm {
   }
 
   Future<UserCredential> signUp() async {
-    final UserCredential credential = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword(email: email, password: password);
+    final UserCredential credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
 
-    final Trainers newTrainer = Trainers(
-        uid: credential.user!.uid,
-        email: email,
-        nom: nom,
-        prenom: prenom,
-        telephone: telephone);
+    final Trainers newTrainer = Trainers(uid: credential.user!.uid, email: email, nom: nom, prenom: prenom, telephone: telephone);
 
-    await trainersService.collectionReference
-        .doc(newTrainer.uid)
-        .set(newTrainer.toJson());
+    await trainersService.collectionReference.doc(newTrainer.uid).set(newTrainer.toJson());
 
-    final UserCredential credentialSigned = await FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password);
+    final UserCredential credentialSigned = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
 
     return credentialSigned;
   }

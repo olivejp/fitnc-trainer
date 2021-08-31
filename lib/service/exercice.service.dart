@@ -5,31 +5,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
-import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:get/get.dart';
 
-class ExerciceService extends AbstractFitnessCrudService<Exercice>
-    with MixinFitnessStorageService<Exercice> {
-  ExerciceService(BuildContext context) {
-    trainersService = Provider.of<TrainersService>(context, listen: false);
-  }
-
-  late TrainersService trainersService;
-  Exercice? exercice;
-  bool sendStorage = false;
-
-  final BehaviorSubject<StorageFile?> subjectStoragePair =
-      BehaviorSubject<StorageFile?>();
-  final BehaviorSubject<String?> _streamSelectedVideoUrl =
-      BehaviorSubject<String?>();
-  final BehaviorSubject<String?> _streamSelectedYoutubeUrl =
-      BehaviorSubject<String?>();
+class ExerciceService extends AbstractFitnessCrudService<Exercice> with MixinFitnessStorageService<Exercice> {
+  final TrainersService trainersService = Get.find();
 
   @override
   Stream<List<Exercice>> listenAll() {
-    return trainersService.listenToExercice();
+    return trainersService.getCurrentTrainerRef().collection('exercice').orderBy('createDate').snapshots().map(
+        (QuerySnapshot<Map<String, dynamic>> event) =>
+            event.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> doc) => Exercice.fromJson(doc.data())).toList());
   }
 
   @override
@@ -42,81 +27,17 @@ class ExerciceService extends AbstractFitnessCrudService<Exercice>
     return 'trainers/${user.uid}/exercices/${exercice.uid}';
   }
 
-  void init(Exercice? exerciceEntered) {
-    sendStorage = false;
-    subjectStoragePair.sink.add(null);
-
-    if (exerciceEntered != null) {
-      exercice = exerciceEntered;
-      exercice!.storageFile = StorageFile();
-      getFutureStorageFile(exercice!).then((StorageFile? value) {
-        exercice!.storageFile = value;
-        subjectStoragePair.sink.add(value);
-      });
-
-      if (exercice!.videoUrl != null) {
-        videoUrl = exercice!.videoUrl;
-      }
-      youtubeUrl = exercice!.youtubeUrl;
-    } else {
-      exercice = Exercice();
-      subjectStoragePair.sink.add(null);
-    }
-  }
-
-  Future<void> saveExercice() async {
-    if (exercice == null) {
-      return;
-    }
-
-    final bool isUpdate = exercice!.uid != null;
+  Future<void> saveExercice(Exercice exercice, {required bool sendStorage}) async {
+    final bool isUpdate = exercice.uid != null;
     if (isUpdate) {
       if (sendStorage) {
-        return eraseAndReplaceStorage(exercice!).then((_) => save(exercice!));
+        return eraseAndReplaceStorage(exercice).then((_) => save(exercice));
       } else {
-        return save(exercice!);
+        return save(exercice);
       }
     } else {
-      exercice!.uid = getCollectionReference().doc().id;
-      return createStorage(exercice!).then((_) => create(exercice!));
+      exercice.uid = getCollectionReference().doc().id;
+      return createStorage(exercice).then((_) => create(exercice));
     }
-  }
-
-  set typeExercice(String? value) {
-    exercice?.typeExercice = value;
-  }
-
-  String? get typeExercice => exercice?.typeExercice;
-
-  set name(String? value) {
-    exercice?.name = value;
-  }
-
-  String? get name => exercice?.name;
-
-  set description(String? value) {
-    exercice?.description = value;
-  }
-
-  String? get description => exercice?.description;
-
-  set videoUrl(String? value) {
-    exercice?.videoUrl = value;
-    _streamSelectedVideoUrl.sink.add(value);
-  }
-
-  String? get videoUrl => exercice?.videoUrl;
-
-  set youtubeUrl(String? value) {
-    exercice?.youtubeUrl = value;
-    _streamSelectedYoutubeUrl.sink.add(value);
-  }
-
-  String? get youtubeUrl => exercice?.youtubeUrl;
-
-  void setStoragePair(StorageFile? storageFile) {
-    sendStorage = true;
-    exercice?.storageFile = storageFile;
-    subjectStoragePair.sink.add(exercice?.storageFile);
   }
 }

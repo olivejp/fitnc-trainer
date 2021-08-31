@@ -9,25 +9,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../../constants.dart';
+import '../../constants/constants.dart';
 
 class WorkoutSetPageVm {
   WorkoutSetPageVm();
 
   final List<Exercice> listCompleteExercice = <Exercice>[];
-  final BehaviorSubject<List<Exercice>> streamListExercice =
-      BehaviorSubject<List<Exercice>>();
+  final BehaviorSubject<List<Exercice>> streamListExercice = BehaviorSubject<List<Exercice>>();
   final Subject<String?> subjectQuery = BehaviorSubject<String?>.seeded(null);
 }
 
 class WorkoutSetPage extends StatefulWidget {
-  const WorkoutSetPage(
-      {Key? key, required this.workout, this.maxWidthSearchField = 200})
-      : super(key: key);
+  const WorkoutSetPage({Key? key, required this.workout, this.maxWidthSearchField = 200}) : super(key: key);
 
   final Workout workout;
   final double maxWidthSearchField;
@@ -40,6 +38,7 @@ class WorkoutSetPage extends StatefulWidget {
 
 class _WorkoutSetPageState extends State<WorkoutSetPage> {
   String? _query;
+  final TrainersService trainersService = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -47,21 +46,17 @@ class _WorkoutSetPageState extends State<WorkoutSetPage> {
       create: (BuildContext context) => WorkoutSetPageVm(),
       builder: (BuildContext context, Widget? child) {
         final WorkoutSetPageVm vm = Provider.of<WorkoutSetPageVm>(context);
-        final TrainersService trainersService =
-            Provider.of<TrainersService>(context);
 
         trainersService.listenToExercice().listen((List<Exercice> event) {
           vm.listCompleteExercice.clear();
           vm.listCompleteExercice.addAll(event);
           vm.streamListExercice.sink.add(vm.listCompleteExercice);
-          UtilService.search(
-              _query, vm.listCompleteExercice, vm.streamListExercice);
+          UtilService.search(_query, vm.listCompleteExercice, vm.streamListExercice);
         });
 
         vm.subjectQuery.listen((String? value) {
           _query = value;
-          UtilService.search(
-              _query, vm.listCompleteExercice, vm.streamListExercice);
+          UtilService.search(_query, vm.listCompleteExercice, vm.streamListExercice);
         });
 
         return Column(
@@ -79,8 +74,7 @@ class _WorkoutSetPageState extends State<WorkoutSetPage> {
                 children: <Widget>[
                   Expanded(
                     child: Padding(
-                      padding:
-                          const EdgeInsets.only(top: 16, right: 16, left: 16),
+                      padding: const EdgeInsets.only(top: 16, right: 16, left: 16),
                       child: WorkoutSetTopPanel(
                         maxWidthSearchField: widget.maxWidthSearchField,
                         alignmentSearchField: MainAxisAlignment.end,
@@ -90,11 +84,9 @@ class _WorkoutSetPageState extends State<WorkoutSetPage> {
                   Expanded(
                     flex: 3,
                     child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 16, right: 16, bottom: 16, top: 8),
+                      padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16, top: 8),
                       child: Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         color: FitnessNcColors.blue50,
                         child: WorkoutSetBottomPanel(workout: widget.workout),
                       ),

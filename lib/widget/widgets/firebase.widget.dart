@@ -1,20 +1,38 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fitnc_trainer/service/abonne.service.dart';
+import 'package:fitnc_trainer/service/exercice.service.dart';
 import 'package:fitnc_trainer/service/firebase.service.dart';
+import 'package:fitnc_trainer/service/programme.service.dart';
+import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/service/workout.service.dart';
+import 'package:fitnc_trainer/service/workout_set.service.dart';
 import 'package:fitnc_trainer/widget/widgets/auth.widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 class FirebaseWidget extends StatelessWidget {
   const FirebaseWidget({Key? key}) : super(key: key);
 
+  void initDomainServices(){
+    Get.put(TrainersService());
+    Get.put(AbonneService());
+    Get.put(ExerciceService());
+    Get.put(ProgrammeService());
+    Get.put(WorkoutSetService());
+    Get.put(WorkoutService());
+  }
+
   @override
   Widget build(BuildContext context) {
-    final FirebaseService firebaseService =
-        Provider.of<FirebaseService>(context, listen: false);
+
+    final FirebaseService firebaseService = Get.find();
+
     return FutureBuilder<FirebaseApp>(
       future: firebaseService.initialize(),
       builder: (_, AsyncSnapshot<FirebaseApp> snapshot) {
         if (snapshot.hasData) {
+          initDomainServices();
           return const AuthWidget();
         }
         if (snapshot.hasError) {

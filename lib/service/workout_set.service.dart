@@ -6,14 +6,13 @@ import 'package:fitnc_trainer/domain/workout_set.dto.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-class WorkoutSetService {
-  WorkoutSetService(BuildContext context) {
-    trainersService = Provider.of<TrainersService>(context, listen: false);
-  }
+class WorkoutSetService extends GetxService {
+  WorkoutSetService();
 
-  late TrainersService trainersService;
+  final TrainersService trainersService= Get.find();
 
   CollectionReference getWorkoutReference() {
     return trainersService.getCurrentTrainerRef().collection('workout');

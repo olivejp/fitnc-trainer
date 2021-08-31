@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:oktoast/oktoast.dart';
@@ -20,7 +21,7 @@ import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart' as sf;
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-import '../../constants.dart';
+import '../../constants/constants.dart';
 
 class ProgrammeUpdatePage extends StatelessWidget {
   ProgrammeUpdatePage({Key? key, required this.programme}) : super(key: key);
@@ -67,18 +68,15 @@ class ProgrammeUpdatePage extends StatelessWidget {
               vm
                   .save()
                   .then(
-                    (_) => showToast('Exercice sauvegardé',
-                        backgroundColor: Colors.green),
+                    (_) => showToast('Exercice sauvegardé', backgroundColor: Colors.green),
                   )
                   .catchError(
-                    (_) => showToast('Erreur lors de la sauvegarde',
-                        backgroundColor: Colors.redAccent),
+                    (_) => showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent),
                   );
             }
           },
           icon: const Icon(Icons.save, color: Colors.white),
-          label:
-              const Text('Enregistrer', style: TextStyle(color: Colors.white))),
+          label: const Text('Enregistrer', style: TextStyle(color: Colors.white))),
       TextButton.icon(
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () => Navigator.pop(context),
@@ -96,11 +94,9 @@ class ProgrammeUpdatePage extends StatelessWidget {
               child: Row(
                 children: <Widget>[
                   StorageStreamImageWidget(
-                    onSaved: (StorageFile? storagePair) =>
-                        vm.setStoragePair(storagePair),
+                    onSaved: (StorageFile? storagePair) => vm.setStoragePair(storagePair),
                     streamInitialStorageFile: vm.obsStoragePair,
-                    onDeleted: (StorageFile? storagePair) =>
-                        vm.setStoragePair(null),
+                    onDeleted: (StorageFile? storagePair) => vm.setStoragePair(null),
                   ),
                   Flexible(
                     child: Column(
@@ -124,12 +120,10 @@ class ProgrammeUpdatePage extends StatelessWidget {
                                           child: FitnessDecorationTextFormField(
                                               initialValue: vm.programme.name,
                                               autofocus: true,
-                                              onChanged: (String value) =>
-                                                  vm.name = value,
+                                              onChanged: (String value) => vm.name = value,
                                               labelText: 'Nom',
                                               validator: (String? value) {
-                                                if (value == null ||
-                                                    value.isEmpty) {
+                                                if (value == null || value.isEmpty) {
                                                   return 'Merci de renseigner le nom du programme.';
                                                 }
                                                 return null;
@@ -143,18 +137,11 @@ class ProgrammeUpdatePage extends StatelessWidget {
                                             child: ParamDropdownButton(
                                                 paramName: 'number_weeks',
                                                 decoration: const InputDecoration(
-                                                    labelText:
-                                                        'Nombre de semaine',
-                                                    constraints: BoxConstraints(
-                                                        maxHeight: FitnessConstants
-                                                            .textFormFieldHeight),
-                                                    contentPadding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 10)),
-                                                initialValue:
-                                                    vm.programme.numberWeeks,
-                                                onChanged: (String? value) =>
-                                                    vm.numberWeeks = value),
+                                                    labelText: 'Nombre de semaine',
+                                                    constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
+                                                    contentPadding: EdgeInsets.symmetric(horizontal: 10)),
+                                                initialValue: vm.programme.numberWeeks,
+                                                onChanged: (String? value) => vm.numberWeeks = value),
                                           ),
                                         )
                                       ],
@@ -177,8 +164,7 @@ class ProgrammeUpdatePage extends StatelessWidget {
               minLines: 5,
               maxLines: 20,
               onChanged: (String value) => vm.description = value,
-              decoration: const InputDecoration(
-                  labelText: 'Description', helperText: 'Optionel'),
+              decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionel'),
             ),
             WorkoutSchedulePanel()
           ],
@@ -189,90 +175,64 @@ class ProgrammeUpdatePage extends StatelessWidget {
 }
 
 class _WorkoutChoicePanel extends StatelessWidget {
+  final TrainersService trainersService = Get.find();
+
   @override
   Widget build(BuildContext context) {
-    return Provider<TrainersService>(
-      create: (_) => TrainersService(),
-      builder: (_, __) {
-        final TrainersService trainersService =
-            Provider.of<TrainersService>(context, listen: false);
-        return StreamBuilder<List<Workout?>>(
-          stream: trainersService.listenToWorkout(),
-          builder:
-              (BuildContext context, AsyncSnapshot<List<Workout?>> snapshot) {
-            if (snapshot.hasData) {
-              final List<Workout?> list = snapshot.data!;
-              return ListView.separated(
-                separatorBuilder: (BuildContext context, int index) =>
-                    const Divider(height: 2.0),
-                itemCount: list.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final Workout? workout = list.elementAt(index);
-                  return ListTile(
-                    leading: Draggable<Workout>(
-                      feedback: SizedBox(
-                        width: 200,
-                        height: 50,
-                        child: Card(
-                            child: ListTile(
-                          title: Text(list[index]!.name!),
-                          leading: (workout?.imageUrl != null)
-                              ? CircleAvatar(
-                                  backgroundImage:
-                                      NetworkImage(workout!.imageUrl!),
-                                  radius: 10)
-                              : CircleAvatar(
-                                  backgroundColor:
-                                      Theme.of(context).primaryColor,
-                                  radius: 10),
-                        )),
-                      ),
-                      data: list[index],
-                      child: const MouseRegion(
-                        cursor: SystemMouseCursors.grab,
-                        child: Icon(Icons.view_headline),
-                      ),
+    return StreamBuilder<List<Workout?>>(
+      stream: trainersService.listenToWorkout(),
+      builder: (BuildContext context, AsyncSnapshot<List<Workout?>> snapshot) {
+        if (snapshot.hasData) {
+          final List<Workout?> list = snapshot.data!;
+          return ListView.separated(
+            separatorBuilder: (BuildContext context, int index) => const Divider(height: 2.0),
+            itemCount: list.length,
+            itemBuilder: (BuildContext context, int index) {
+              final Workout? workout = list.elementAt(index);
+              return ListTile(
+                leading: Draggable<Workout>(
+                  feedback: SizedBox(
+                    width: 200,
+                    height: 50,
+                    child: Card(
+                        child: ListTile(
+                      title: Text(list[index]!.name!),
+                      leading: (workout?.imageUrl != null)
+                          ? CircleAvatar(backgroundImage: NetworkImage(workout!.imageUrl!), radius: 10)
+                          : CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
+                    )),
+                  ),
+                  data: list[index],
+                  child: const MouseRegion(
+                    cursor: SystemMouseCursors.grab,
+                    child: Icon(Icons.view_headline),
+                  ),
+                ),
+                title: Row(
+                  children: <Widget>[
+                    if (workout?.imageUrl != null)
+                      CircleAvatar(backgroundImage: NetworkImage(workout!.imageUrl!), radius: 10)
+                    else
+                      CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: Text(list[index]!.name!),
                     ),
-                    title: Row(
-                      children: <Widget>[
-                        if (workout?.imageUrl != null)
-                          CircleAvatar(
-                              backgroundImage: NetworkImage(workout!.imageUrl!),
-                              radius: 10)
-                        else
-                          CircleAvatar(
-                              backgroundColor: Theme.of(context).primaryColor,
-                              radius: 10),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Text(list[index]!.name!),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                  ],
+                ),
               );
-            }
-            return LoadingBouncingGrid.circle();
-          },
-        );
+            },
+          );
+        }
+        return LoadingBouncingGrid.circle();
       },
     );
   }
 }
 
 class WorkoutSchedulePanel extends StatelessWidget {
-  static final TextStyle columnTextStyle =
-      GoogleFonts.roboto(fontSize: 10, fontWeight: FontWeight.bold);
-  static final List<String> columnNames = <String>[
-    'Lundi',
-    'Mardi',
-    'Mercredi',
-    'Jeudi',
-    'Vendredi',
-    'Samedi',
-    'Dimanche'
-  ];
+  static final TextStyle columnTextStyle = GoogleFonts.roboto(fontSize: 10, fontWeight: FontWeight.bold);
+  static final List<String> columnNames = <String>['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
   @override
   Widget build(BuildContext context) {
@@ -289,8 +249,7 @@ class WorkoutSchedulePanel extends StatelessWidget {
         .toList();
 
     /// Méthode permettant d'afficher l'affectation des Workouts à une date.
-    void popupDayDetails(sf.DataGridCellTapDetails details,
-        List<WorkoutScheduleDto> listAppointment) {
+    void popupDayDetails(sf.DataGridCellTapDetails details, List<WorkoutScheduleDto> listAppointment) {
       final int columnIndex = details.rowColumnIndex.columnIndex;
       final int rowIndex = details.rowColumnIndex.rowIndex;
       final int dayIndex = ((rowIndex - 1) * 7) + columnIndex + 1;
@@ -298,18 +257,13 @@ class WorkoutSchedulePanel extends StatelessWidget {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          final List<WorkoutScheduleDto> list = listAppointment
-              .where((WorkoutScheduleDto element) =>
-                  element.dateSchedule == dayIndex)
-              .toList();
+          final List<WorkoutScheduleDto> list = listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
 
           return ProgrammeProviders(
             builder: (BuildContext context) => AlertDialog(
               title: Text('Jour $dayIndex'),
               actions: <Widget>[
-                TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Sortir')),
+                TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Sortir')),
               ],
               content: PopupDayDetail(dayIndex: dayIndex, list: list),
             ),
@@ -320,18 +274,14 @@ class WorkoutSchedulePanel extends StatelessWidget {
 
     return FutureBuilder<List<DropdownMenuItem<Workout>>>(
         future: vm.getWorkoutDropdownItems(),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<DropdownMenuItem<Workout>>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<DropdownMenuItem<Workout>>> snapshot) {
           if (snapshot.hasData) {
-            final List<DropdownMenuItem<Workout>> listAvailableWorkout =
-                snapshot.data!;
+            final List<DropdownMenuItem<Workout>> listAvailableWorkout = snapshot.data!;
             return StreamBuilder<List<WorkoutScheduleDto>>(
               stream: vm.workoutScheduleObs,
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
+              builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
                 if (snapshot.hasData) {
-                  final List<WorkoutScheduleDto> listScheduledWorkouts =
-                      snapshot.data!;
+                  final List<WorkoutScheduleDto> listScheduledWorkouts = snapshot.data!;
                   return SizedBox(
                     height: 800,
                     child: Padding(
@@ -340,11 +290,8 @@ class WorkoutSchedulePanel extends StatelessWidget {
                         // decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
                         padding: const EdgeInsets.all(1),
                         child: Consumer<ProgrammeVm>(
-                          builder: (BuildContext context, ProgrammeVm consumeVm,
-                                  Widget? child) =>
-                              sf.SfDataGrid(
-                            onCellTap: (sf.DataGridCellTapDetails details) =>
-                                popupDayDetails(details, listScheduledWorkouts),
+                          builder: (BuildContext context, ProgrammeVm consumeVm, Widget? child) => sf.SfDataGrid(
+                            onCellTap: (sf.DataGridCellTapDetails details) => popupDayDetails(details, listScheduledWorkouts),
                             highlightRowOnHover: false,
                             headerGridLinesVisibility: GridLinesVisibility.both,
                             columnWidthMode: ColumnWidthMode.fill,
@@ -401,17 +348,14 @@ class PopupDayDetail extends StatelessWidget {
           Flexible(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child:
-                  _WorkoutSelectedPanel(vm: vm, dayIndex: dayIndex, list: list),
+              child: _WorkoutSelectedPanel(vm: vm, dayIndex: dayIndex, list: list),
             ),
           ),
           Flexible(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: const BorderRadius.all(Radius.circular(5))),
+                  decoration: BoxDecoration(border: Border.all(color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
                   child: _WorkoutChoicePanel()),
             ),
           ),
@@ -436,44 +380,29 @@ class _WorkoutSelectedPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DragTarget<Workout>(
-        onAccept: (Workout workout) =>
-            vm.addWorkoutSchedule(workout, dayIndex - 1),
+        onAccept: (Workout workout) => vm.addWorkoutSchedule(workout, dayIndex - 1),
         onWillAccept: (Workout? data) => data is Workout,
-        builder: (BuildContext context, List<Workout?> candidateData,
-            List<Object?> rejectedData) {
+        builder: (BuildContext context, List<Workout?> candidateData, List<Object?> rejectedData) {
           return Container(
-            decoration: BoxDecoration(
-                border: Border.all(width: 1, color: Colors.grey),
-                borderRadius: const BorderRadius.all(Radius.circular(5))),
+            decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
             child: Column(
               children: <Widget>[
                 const Text('Glisser ici les workout de la journée.'),
                 StreamBuilder<List<WorkoutScheduleDto>>(
                     initialData: list,
                     stream: vm.workoutScheduleObs,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
+                    builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
                       if (snapshot.hasData) {
-                        final List<WorkoutScheduleDto> listWorkout = snapshot
-                            .data!
-                            .where((WorkoutScheduleDto element) =>
-                                element.dateSchedule == dayIndex - 1)
-                            .toList();
+                        final List<WorkoutScheduleDto> listWorkout =
+                            snapshot.data!.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex - 1).toList();
                         return ListView.separated(
                           shrinkWrap: true,
                           itemBuilder: (BuildContext context, int index) {
-                            final WorkoutScheduleDto dto =
-                                listWorkout.elementAt(index);
+                            final WorkoutScheduleDto dto = listWorkout.elementAt(index);
                             return ListTile(
                               leading: (dto.imageUrlWorkout != null)
-                                  ? CircleAvatar(
-                                      backgroundImage:
-                                          NetworkImage(dto.imageUrlWorkout!),
-                                      radius: 10)
-                                  : CircleAvatar(
-                                      backgroundColor:
-                                          Theme.of(context).primaryColor,
-                                      radius: 10),
+                                  ? CircleAvatar(backgroundImage: NetworkImage(dto.imageUrlWorkout!), radius: 10)
+                                  : CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
                               title: Text(dto.nameWorkout!),
                               trailing: IconButton(
                                 onPressed: () => vm.deleteWorkoutSchedule(dto),
@@ -481,8 +410,7 @@ class _WorkoutSelectedPanel extends StatelessWidget {
                               ),
                             );
                           },
-                          separatorBuilder: (BuildContext context, int index) =>
-                              const Divider(height: 2.0),
+                          separatorBuilder: (BuildContext context, int index) => const Divider(height: 2.0),
                           itemCount: listWorkout.length,
                         );
                       } else {
@@ -527,20 +455,15 @@ class _WorkoutDataSource extends sf.DataGridSource {
   List<String> columnNames;
 
   /// Méthode pour générer une DataCell.
-  sf.DataGridCell<_DataCellData> getDataCell(String columnName, int dayIndex,
-      List<WorkoutScheduleDto> listAppointment) {
-    final List<WorkoutScheduleDto> list = listAppointment
-        .where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex)
-        .toList();
+  sf.DataGridCell<_DataCellData> getDataCell(String columnName, int dayIndex, List<WorkoutScheduleDto> listAppointment) {
+    final List<WorkoutScheduleDto> list = listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
     final _DataCellData data = _DataCellData(list: list, dayIndex: dayIndex);
     return sf.DataGridCell<_DataCellData>(value: data, columnName: columnName);
   }
 
   /// Méthode pour générer une DataRow.
-  sf.DataGridRow getDataRow(
-      int weekIndex, List<WorkoutScheduleDto> listAppointment) {
-    final List<sf.DataGridCell<_DataCellData>> list =
-        <sf.DataGridCell<_DataCellData>>[];
+  sf.DataGridRow getDataRow(int weekIndex, List<WorkoutScheduleDto> listAppointment) {
+    final List<sf.DataGridCell<_DataCellData>> list = <sf.DataGridCell<_DataCellData>>[];
     for (int i = 0; i < 7; i++) {
       final int dayIndex = (7 * weekIndex) + i;
       list.add(getDataCell(columnNames[i], dayIndex, listAppointment));
@@ -549,8 +472,7 @@ class _WorkoutDataSource extends sf.DataGridSource {
   }
 
   /// Méthode pour générer toutes les DataRow du tableau.
-  List<sf.DataGridRow> getListDataRows(
-      int numberWeeks, List<WorkoutScheduleDto> listAppointment) {
+  List<sf.DataGridRow> getListDataRows(int numberWeeks, List<WorkoutScheduleDto> listAppointment) {
     final List<sf.DataGridRow> list = <sf.DataGridRow>[];
 
     for (int i = 0; i < numberWeeks; i++) {
@@ -576,16 +498,9 @@ class _WorkoutDataSource extends sf.DataGridSource {
                 child: Row(
                   children: <Widget>[
                     if (dto.imageUrlWorkout != null)
-                      Expanded(
-                          child: CircleAvatar(
-                              backgroundImage:
-                                  NetworkImage(dto.imageUrlWorkout!),
-                              radius: 10))
+                      Expanded(child: CircleAvatar(backgroundImage: NetworkImage(dto.imageUrlWorkout!), radius: 10))
                     else
-                      Expanded(
-                          child: CircleAvatar(
-                              backgroundColor: Theme.of(context).primaryColor,
-                              radius: 10)),
+                      Expanded(child: CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10)),
                     Expanded(
                       flex: 5,
                       child: Padding(

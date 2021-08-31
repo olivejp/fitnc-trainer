@@ -1,13 +1,14 @@
-import 'package:fitnc_trainer/service/workout.service.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
+import 'package:fitnc_trainer/service/workout.service.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
 
-import '../../constants.dart';
+import '../../constants/constants.dart';
 
 class WorkoutUpdatePage extends StatefulWidget {
   const WorkoutUpdatePage({Key? key, required this.workout}) : super(key: key);
@@ -27,31 +28,25 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    final WorkoutService vm = WorkoutService(context);
+    final WorkoutService workoutService = Get.find();
 
     // Initialisation du bloc.
-    vm.init(widget.workout);
+    workoutService.init(widget.workout);
 
     final List<Widget> buttons = <Widget>[
       TextButton.icon(
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () {
             if (_formKey.currentState?.validate() == true) {
-              vm
-                  .saveWorkout()
-                  .then((_) => showToast('Workout sauvegardé',
-                      backgroundColor: Colors.green))
-                  .catchError(
+              workoutService.saveWorkout().then((_) => showToast('Workout sauvegardé', backgroundColor: Colors.green)).catchError(
                 (Object? error) {
-                  showToast('Erreur lors de la sauvegarde',
-                      backgroundColor: Colors.redAccent);
+                  showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent);
                 },
               );
             }
           },
           icon: const Icon(Icons.save, color: Colors.white),
-          label:
-              const Text('Enregistrer', style: TextStyle(color: Colors.white))),
+          label: const Text('Enregistrer', style: TextStyle(color: Colors.white))),
       TextButton.icon(
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () => Navigator.pop(context),
@@ -59,8 +54,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           label: const Text('Fermer', style: TextStyle(color: Colors.white))),
     ];
 
-    final List<DropdownMenuItem<String>> typesWorkout =
-        <DropdownMenuItem<String>>[
+    final List<DropdownMenuItem<String>> typesWorkout = <DropdownMenuItem<String>>[
       const DropdownMenuItem<String>(
         value: 'none',
         child: Text(
@@ -109,15 +103,15 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                       padding: const EdgeInsets.only(top: 30.0, bottom: 30.0),
                       child: StorageFutureImageWidget(
                         radius: 80,
-                        onSaved: (StorageFile? file) => vm.storageFile = file,
-                        onDeleted: (_) => vm.storageFile = null,
-                        futureInitialStorageFile: vm.getStorageFile(),
+                        onSaved: (StorageFile? file) => workoutService.storageFile = file,
+                        onDeleted: (_) => workoutService.storageFile = null,
+                        futureInitialStorageFile: workoutService.getStorageFile(),
                       ),
                     ),
                     FitnessDecorationTextFormField(
-                        initialValue: vm.getWorkout()?.name,
+                        initialValue: workoutService.getWorkout()?.name,
                         autofocus: true,
-                        onChanged: (String value) => vm.name = value,
+                        onChanged: (String value) => workoutService.name = value,
                         labelText: 'Nom du workout',
                         validator: (String? value) {
                           if (value == null || value.isEmpty) {
@@ -135,17 +129,16 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                           ),
                         ),
                         icon: const Icon(Icons.arrow_downward),
-                        onChanged: (String? value) => vm.timerType = value,
-                        value: vm.getWorkout()?.timerType,
+                        onChanged: (String? value) => workoutService.timerType = value,
+                        value: workoutService.getWorkout()?.timerType,
                         items: typesWorkout),
                     TextFormField(
-                      initialValue: vm.getWorkout()?.description,
+                      initialValue: workoutService.getWorkout()?.description,
                       maxLength: 2000,
                       minLines: 10,
                       maxLines: 10,
-                      onChanged: (String value) => vm.description = value,
-                      decoration: const InputDecoration(
-                          labelText: 'Instructions', hintText: 'Optionnel'),
+                      onChanged: (String value) => workoutService.description = value,
+                      decoration: const InputDecoration(labelText: 'Instructions', hintText: 'Optionnel'),
                     ),
                     ButtonBar(
                       alignment: MainAxisAlignment.start,
@@ -158,8 +151,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
           ),
           Flexible(
             flex: 2,
-            child: SizedBox(
-                height: 800, child: WorkoutSetPage(workout: widget.workout)),
+            child: SizedBox(height: 800, child: WorkoutSetPage(workout: widget.workout)),
           ),
         ],
       ),

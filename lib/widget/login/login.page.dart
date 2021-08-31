@@ -3,20 +3,19 @@ import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
-import '../../constants.dart';
+import '../../constants/constants.dart';
 import '../bottom.widget.dart';
 
 typedef CallbackUserCredential = void Function(UserCredential userCredential);
 
 class LoginPageVm with ChangeNotifier {
-  LoginPageVm(BuildContext context) {
-    authService = Provider.of<AuthService>(context, listen: false);
-  }
+  LoginPageVm();
 
-  late AuthService authService;
+  AuthService authService = Get.find();
   String? email;
   String? password;
   bool _hidePassword = true;
@@ -43,14 +42,11 @@ class LoginPageVm with ChangeNotifier {
     }
 
     if (password == null) {
-      return Future<UserCredential>.error(
-          "Le mot de passe ne peut pas être null.'");
+      return Future<UserCredential>.error("Le mot de passe ne peut pas être null.'");
     }
 
     if (formKey.currentState?.validate() == true) {
-      return authService
-          .signInWithEmailPassword(email!, password!)
-          .catchError((Object? error) {
+      return authService.signInWithEmailPassword(email!, password!).catchError((Object? error) {
         setError(error.toString());
       });
     } else {
@@ -82,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     return ChangeNotifierProvider<LoginPageVm>(
-      create: (BuildContext context) => LoginPageVm(context),
+      create: (BuildContext context) => LoginPageVm(),
       builder: (BuildContext context, _) {
         final LoginPageVm vm = Provider.of<LoginPageVm>(context, listen: false);
 
@@ -97,12 +93,7 @@ class _LoginPageState extends State<LoginPage> {
                   width: 200,
                   decoration: BoxDecoration(
                       gradient: LinearGradient(
-                          begin: Alignment.bottomLeft,
-                          end: Alignment.topRight,
-                          colors: [
-                        Colors.amber.withAlpha(100),
-                        Colors.amber.shade700
-                      ])),
+                          begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
                 ),
               ),
               Transform(
@@ -113,12 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                   width: 20,
                   decoration: BoxDecoration(
                       gradient: LinearGradient(
-                          begin: Alignment.bottomLeft,
-                          end: Alignment.topRight,
-                          colors: [
-                        Colors.amber.withAlpha(100),
-                        Colors.amber.shade700
-                      ])),
+                          begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
                 ),
               ),
               Column(
@@ -131,34 +117,25 @@ class _LoginPageState extends State<LoginPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Padding(
-                            padding:
-                                const EdgeInsets.only(bottom: 30, left: 20),
+                            padding: const EdgeInsets.only(bottom: 30, left: 20),
                             child: Text(
                               FitnessConstants.appTitle,
-                              style: GoogleFonts.alfaSlabOne(
-                                  color: Theme.of(context).primaryColor,
-                                  fontSize: 25),
+                              style: GoogleFonts.alfaSlabOne(color: Theme.of(context).primaryColor, fontSize: 25),
                             ),
                           ),
                           Card(
                             elevation: 20,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
                             child: Padding(
                               padding: const EdgeInsets.all(60.0),
                               child: Form(
                                 key: _formKey,
                                 child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: <Widget>[
                                     Text(
                                       'Connectez-vous à votre compte',
-                                      style: GoogleFonts.robotoTextTheme()
-                                          .headline6!
-                                          .copyWith(
-                                              fontSize: 28,
-                                              fontWeight: FontWeight.bold),
+                                      style: GoogleFonts.robotoTextTheme().headline6!.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 30),
@@ -166,16 +143,12 @@ class _LoginPageState extends State<LoginPage> {
                                         style: GoogleFonts.roboto(fontSize: 15),
                                         decoration: InputDecoration(
                                             labelText: 'Email',
-                                            hintStyle: GoogleFonts.roboto(
-                                                fontSize: 15),
+                                            hintStyle: GoogleFonts.roboto(fontSize: 15),
                                             focusedBorder: defaultBorder,
                                             border: defaultBorder,
                                             enabledBorder: defaultBorder),
-                                        onChanged: (String value) =>
-                                            vm.email = value,
-                                        onFieldSubmitted: (_) => vm
-                                            .onPressedEnter(_formKey)
-                                            .then((UserCredential value) {
+                                        onChanged: (String value) => vm.email = value,
+                                        onFieldSubmitted: (_) => vm.onPressedEnter(_formKey).then((UserCredential value) {
                                           if (widget.callback != null) {
                                             widget.callback!(value);
                                           }
@@ -197,17 +170,12 @@ class _LoginPageState extends State<LoginPage> {
                                     Padding(
                                       padding: const EdgeInsets.only(top: 30),
                                       child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
                                         children: <Widget>[
                                           Consumer<LoginPageVm>(
-                                            builder: (_, LoginPageVm consumeVm,
-                                                    __) =>
-                                                TextFormField(
-                                              style: GoogleFonts.roboto(
-                                                  fontSize: 15),
-                                              obscureText:
-                                                  consumeVm.hidePassword,
+                                            builder: (_, LoginPageVm consumeVm, __) => TextFormField(
+                                              style: GoogleFonts.roboto(fontSize: 15),
+                                              obscureText: consumeVm.hidePassword,
                                               enableSuggestions: false,
                                               autocorrect: false,
                                               decoration: InputDecoration(
@@ -215,25 +183,15 @@ class _LoginPageState extends State<LoginPage> {
                                                   focusedBorder: defaultBorder,
                                                   border: defaultBorder,
                                                   enabledBorder: defaultBorder,
-                                                  hintStyle: GoogleFonts.roboto(
-                                                      fontSize: 15),
+                                                  hintStyle: GoogleFonts.roboto(fontSize: 15),
                                                   suffixIcon: IconButton(
-                                                      tooltip: consumeVm
-                                                              .hidePassword
-                                                          ? 'Afficher le mot de passe'
-                                                          : 'Masquer le mot de passe',
-                                                      onPressed: consumeVm
-                                                          .switchHidePassword,
+                                                      tooltip: consumeVm.hidePassword ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
+                                                      onPressed: consumeVm.switchHidePassword,
                                                       icon: vm.hidePassword
-                                                          ? const Icon(Icons
-                                                              .visibility_outlined)
-                                                          : const Icon(Icons
-                                                              .visibility_off_outlined))),
-                                              onChanged: (String value) =>
-                                                  vm.password = value,
-                                              onFieldSubmitted: (_) => vm
-                                                  .onPressedEnter(_formKey)
-                                                  .then((UserCredential value) {
+                                                          ? const Icon(Icons.visibility_outlined)
+                                                          : const Icon(Icons.visibility_off_outlined))),
+                                              onChanged: (String value) => vm.password = value,
+                                              onFieldSubmitted: (_) => vm.onPressedEnter(_formKey).then((UserCredential value) {
                                                 if (widget.callback != null) {
                                                   widget.callback!(value);
                                                 }
@@ -251,29 +209,20 @@ class _LoginPageState extends State<LoginPage> {
                                     Padding(
                                       padding: const EdgeInsets.only(top: 30),
                                       child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            minimumSize: const Size(
-                                                double.infinity, 55)),
-                                        onPressed: () => vm
-                                            .onPressedEnter(_formKey)
-                                            .then((UserCredential value) {
+                                        style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 55)),
+                                        onPressed: () => vm.onPressedEnter(_formKey).then((UserCredential value) {
                                           if (widget.callback != null) {
                                             widget.callback!(value);
                                           }
                                         }),
                                         child: Text(
                                           'Continuer',
-                                          style: GoogleFonts.roboto(
-                                              color: Color(Colors.white.value),
-                                              fontSize: 15),
+                                          style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
                                         ),
                                       ),
                                     ),
                                     Consumer<LoginPageVm>(
-                                      builder: (_, LoginPageVm consumeVm, __) =>
-                                          (consumeVm.errors != null)
-                                              ? Text(consumeVm.errors!)
-                                              : Container(),
+                                      builder: (_, LoginPageVm consumeVm, __) => (consumeVm.errors != null) ? Text(consumeVm.errors!) : Container(),
                                     ),
                                   ],
                                 ),
@@ -286,8 +235,7 @@ class _LoginPageState extends State<LoginPage> {
                               children: <Widget>[
                                 const Text("Vous n'avez pas de compte ?"),
                                 TextButton(
-                                    onPressed: () => Navigator.pushNamed(
-                                        context, '/sign_up'),
+                                    onPressed: () => Navigator.pushNamed(context, '/sign_up'),
                                     child: const Text(
                                       "S'incrire",
                                       style: TextStyle(color: Colors.white),

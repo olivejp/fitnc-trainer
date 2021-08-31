@@ -9,36 +9,26 @@ import 'package:fitnc_trainer/service/programme.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ProgrammeVm with ChangeNotifier {
-  ProgrammeVm(BuildContext context) {
-    trainersService = Provider.of<TrainersService>(context, listen: false);
-    programmeService = Provider.of<ProgrammeService>(context, listen: false);
-  }
-  late TrainersService trainersService;
-  late ProgrammeService programmeService;
+  final TrainersService trainersService = Get.find();
+  final ProgrammeService programmeService = Get.find();
 
-  BehaviorSubject<StorageFile?> subjectStoragePair =
-      BehaviorSubject<StorageFile?>();
-  final BehaviorSubject<String?> _streamSelectedVideoUrl =
-      BehaviorSubject<String?>();
-  final BehaviorSubject<String?> _streamSelectedYoutubeUrl =
-      BehaviorSubject<String?>();
-  final BehaviorSubject<List<WorkoutScheduleDto>> _streamWorkoutScheduleDto =
-      BehaviorSubject<List<WorkoutScheduleDto>>();
+  BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
+  final BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject<String?>();
+  final BehaviorSubject<String?> _streamSelectedYoutubeUrl = BehaviorSubject<String?>();
+  final BehaviorSubject<List<WorkoutScheduleDto>> _streamWorkoutScheduleDto = BehaviorSubject<List<WorkoutScheduleDto>>();
 
   Stream<String?>? get selectedVideoUrlObs => _streamSelectedVideoUrl.stream;
 
-  Stream<String?>? get selectedYoutubeUrlObs =>
-      _streamSelectedYoutubeUrl.stream;
+  Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl.stream;
 
   Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
 
-  Stream<List<WorkoutScheduleDto>> get workoutScheduleObs =>
-      _streamWorkoutScheduleDto.stream;
+  Stream<List<WorkoutScheduleDto>> get workoutScheduleObs => _streamWorkoutScheduleDto.stream;
 
   final String pathProgrammeMainImage = 'mainImage';
   final List<WorkoutScheduleDto> listDtos = <WorkoutScheduleDto>[];
@@ -54,13 +44,11 @@ class ProgrammeVm with ChangeNotifier {
   }
 
   Future<void> publish() {
-    return programmeService.publishProgramme(programme,
-        sendStorage: sendStorage);
+    return programmeService.publishProgramme(programme, sendStorage: sendStorage);
   }
 
   Future<void> unpublish() {
-    return programmeService.unpublishProgramme(programme,
-        sendStorage: sendStorage);
+    return programmeService.unpublishProgramme(programme, sendStorage: sendStorage);
   }
 
   int getNumberWeeks(String? numberWeeks) {
@@ -78,9 +66,7 @@ class ProgrammeVm with ChangeNotifier {
     if (programmeEntered != null) {
       programme = programmeEntered;
       programme.storageFile = StorageFile();
-      programmeService.getFutureStorageFile(programme).then(
-          (StorageFile? storageFile) =>
-              subjectStoragePair.sink.add(storageFile));
+      programmeService.getFutureStorageFile(programme).then((StorageFile? storageFile) => subjectStoragePair.sink.add(storageFile));
 
       // On récupère une fois la liste des WorkoutScheduleDto
       trainersService
@@ -90,10 +76,8 @@ class ProgrammeVm with ChangeNotifier {
           .orderBy('dateSchedule')
           .get()
           .then((QuerySnapshot<Map<String, dynamic>> event) => event.docs
-              .map((QueryDocumentSnapshot<Map<String, dynamic>> e) =>
-                  WorkoutSchedule.fromJson(e.data()))
-              .map((WorkoutSchedule e) =>
-                  programmeService.mapToFutureWorkoutScheduleDto(e))
+              .map((QueryDocumentSnapshot<Map<String, dynamic>> e) => WorkoutSchedule.fromJson(e.data()))
+              .map((WorkoutSchedule e) => programmeService.mapToFutureWorkoutScheduleDto(e))
               .toList())
           .then((List<Future<WorkoutScheduleDto>> event) => Future.wait(event))
           .then((List<WorkoutScheduleDto> remoteList) {
@@ -120,9 +104,7 @@ class ProgrammeVm with ChangeNotifier {
 
   int get numberWeeksInt {
     if (programme.numberWeeks != null) {
-      final int indexUnderscore = programme.numberWeeks != null
-          ? programme.numberWeeks!.indexOf('_')
-          : 0;
+      final int indexUnderscore = programme.numberWeeks != null ? programme.numberWeeks!.indexOf('_') : 0;
       return int.parse(programme.numberWeeks!.substring(0, indexUnderscore));
     }
     return 0;
@@ -144,12 +126,7 @@ class ProgrammeVm with ChangeNotifier {
 
   void addWorkoutSchedule(Workout workout, int dayIndex) {
     final WorkoutScheduleDto dto = WorkoutScheduleDto.empty();
-    dto.uid = trainersService
-        .getProgrammeReference()
-        .doc(programme.uid)
-        .collection('workouts')
-        .doc()
-        .id;
+    dto.uid = trainersService.getProgrammeReference().doc(programme.uid).collection('workouts').doc().id;
     dto.uidWorkout = workout.uid;
     dto.nameWorkout = workout.name;
     dto.imageUrlWorkout = workout.imageUrl;
@@ -163,11 +140,9 @@ class ProgrammeVm with ChangeNotifier {
         .collection('workouts')
         .doc(dto.uid)
         .set(dto.toJson())
-        .then((_) => showToast('Workout ajouté au programme.',
-            duration: const Duration(seconds: 2)))
-        .catchError((_) => showToast(
-            "Une erreur est survenue lors de l'enregistrement du workout au programme.",
-            duration: const Duration(seconds: 2)));
+        .then((_) => showToast('Workout ajouté au programme.', duration: const Duration(seconds: 2)))
+        .catchError(
+            (_) => showToast("Une erreur est survenue lors de l'enregistrement du workout au programme.", duration: const Duration(seconds: 2)));
   }
 
   void deleteWorkoutSchedule(WorkoutScheduleDto workout) {

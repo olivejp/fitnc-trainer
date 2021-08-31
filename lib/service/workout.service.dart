@@ -10,17 +10,13 @@ import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/service/workout_set.service.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
-class WorkoutService extends AbstractFitnessCrudService<Workout>
-    with MixinFitnessStorageService<Workout> {
-  WorkoutService(BuildContext context) {
-    trainersService = Provider.of<TrainersService>(context, listen: false);
-    workoutSetService = Provider.of<WorkoutSetService>(context, listen: false);
-  }
+class WorkoutService extends AbstractFitnessCrudService<Workout> with MixinFitnessStorageService<Workout> {
+  WorkoutService();
 
-  late TrainersService trainersService;
-  late WorkoutSetService workoutSetService;
+  final TrainersService trainersService = Get.find();
+  final WorkoutSetService workoutSetService = Get.find();
 
   final GlobalKey<FormFieldState> consigneKey = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> dropdownKey = GlobalKey<FormFieldState>();
