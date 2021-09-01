@@ -90,7 +90,7 @@ class TrainersService extends AbstractAbsoluteFirestoreService<Trainers> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 10.0),
-                    child: Text(exercice.name!),
+                    child: Text(exercice.name),
                   ),
                 ]),
               );

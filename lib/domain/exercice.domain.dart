@@ -13,13 +13,13 @@ class Exercice extends AbstractFitnessStorageDomain implements InterfaceDomainSe
   String? typeExercice;
   String? videoUrl;
   String? youtubeUrl;
-  String? description;
+  String description = '';
 
   @override
   Map<String, dynamic> toJson() => _$ExerciceToJson(this);
 
   @override
   List<String> searchFields() {
-    return ['name', 'description'];
+    return <String>['name', 'description'];
   }
 }

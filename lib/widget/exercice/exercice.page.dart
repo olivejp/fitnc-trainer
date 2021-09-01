@@ -46,9 +46,7 @@ class ExercicePageVm extends GetxController {
   getRx.Rx<Exercice> exerciceSelected = Exercice().obs;
 
   void selectExercice(Exercice exercice) {
-    exerciceSelected.update((Exercice? val) {
-      val = exercice;
-    });
+    exerciceSelected.value = exercice;
   }
 }
 
@@ -63,14 +61,14 @@ class ExercicePage extends StatefulWidget {
 }
 
 class _ExercicePageState extends State<ExercicePage> {
-  final ExercicePageVm vm = Get.find();
   final ExerciceService service = Get.find();
   final List<Exercice> listCompleteExercice = <Exercice>[];
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
   void selectExercice(Exercice exercice) {
-    vm.selectExercice(exercice);
-    if (!vm.dualScreen.value) {
+    widget.vm.selectExercice(exercice);
+    widget.controller.exercice.value = exercice;
+    if (!widget.vm.dualScreen.value) {
       showDialog(
         context: context,
         builder: (BuildContext context) => AlertDialog(
@@ -89,19 +87,19 @@ class _ExercicePageState extends State<ExercicePage> {
     return RoutedPage(child: LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         WidgetsBinding.instance?.addPostFrameCallback((Duration timeStamp) {
-          vm.setDualScreen(isDualScreen: constraints.maxWidth > 800);
+          widget.vm.setDualScreen(isDualScreen: constraints.maxWidth > 800);
         });
 
         final List<Widget> list = <Widget>[
           Expanded(flex: 2, child: ExerciceListSearch()),
         ];
 
-        if (vm.dualScreen.value) {
+        if (widget.vm.dualScreen.value) {
           list.add(Expanded(
             flex: 3,
             child: Container(
               decoration: const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
-              child: (vm.exerciceSelected.value != null)
+              child: (widget.vm.exerciceSelected.value != null)
                   ? Padding(
                       padding: const EdgeInsets.all(60.0),
                       child: ExerciceUpdateCreateGeneric(
@@ -324,7 +322,7 @@ class ExerciceListViewSeparated extends StatelessWidget {
         shrinkWrap: true,
         itemBuilder: (BuildContext context, int index) {
           final Exercice exercice = list.elementAt(index);
-          return ExerciceListTile(vm: vm, exercice: exercice, bloc: bloc);
+          return ExerciceListTile(exercice: exercice);
         },
         separatorBuilder: (BuildContext context, int index) => const Divider(
               height: 2,
@@ -334,21 +332,21 @@ class ExerciceListViewSeparated extends StatelessWidget {
 }
 
 class ExerciceListTile extends StatelessWidget {
-  const ExerciceListTile({
+  ExerciceListTile({
     Key? key,
-    required this.vm,
     required this.exercice,
-    required this.bloc,
   }) : super(key: key);
 
-  final ExercicePageVm vm;
   final Exercice exercice;
-  final ExerciceService bloc;
+  final ExercicePageVm vm = Get.find();
+  final ExerciceService service = Get.find();
+  final ExerciceUpdateController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
     void selectExercice(Exercice exercice) {
       vm.selectExercice(exercice);
+      controller.init(exercice);
       if (!vm.dualScreen.value) {
         showDialog(
           context: context,
@@ -363,14 +361,16 @@ class ExerciceListTile extends StatelessWidget {
       }
     }
 
-    return ListTile(
-      contentPadding: const EdgeInsets.all(20),
-      selected: vm.exerciceSelected.value.uid == exercice.uid,
-      selectedTileColor: FitnessNcColors.blue50,
-      leading: CircleAvatar(foregroundImage: exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null),
-      title: Text(exercice.name!),
-      trailing: IconButton(onPressed: () => UtilService.showDeleteDialog(context, exercice, bloc), icon: const Icon(Icons.delete)),
-      onTap: () => selectExercice(exercice),
+    return Obx(
+      () => ListTile(
+        contentPadding: const EdgeInsets.all(20),
+        selected: vm.exerciceSelected.value.uid == exercice.uid,
+        selectedTileColor: FitnessNcColors.blue50,
+        leading: CircleAvatar(foregroundImage: exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null),
+        title: Text(exercice.name),
+        trailing: IconButton(onPressed: () => UtilService.showDeleteDialog(context, exercice, service), icon: const Icon(Icons.delete)),
+        onTap: () => selectExercice(exercice),
+      ),
     );
   }
 }

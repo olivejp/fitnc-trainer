@@ -196,7 +196,7 @@ class _WorkoutChoicePanel extends StatelessWidget {
                     height: 50,
                     child: Card(
                         child: ListTile(
-                      title: Text(list[index]!.name!),
+                      title: Text(list[index]!.name),
                       leading: (workout?.imageUrl != null)
                           ? CircleAvatar(backgroundImage: NetworkImage(workout!.imageUrl!), radius: 10)
                           : CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
@@ -216,7 +216,7 @@ class _WorkoutChoicePanel extends StatelessWidget {
                       CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
                     Padding(
                       padding: const EdgeInsets.only(left: 10),
-                      child: Text(list[index]!.name!),
+                      child: Text(list[index]!.name),
                     ),
                   ],
                 ),

@@ -9,7 +9,7 @@ part of 'workout.domain.dart';
 Workout _$WorkoutFromJson(Map<String, dynamic> json) {
   return Workout()
     ..uid = json['uid'] as String?
-    ..name = json['name'] as String?
+    ..name = json['name'] as String
     ..createDate = json['createDate']
     ..updateDate = json['updateDate']
     ..imageUrl = json['imageUrl'] as String?

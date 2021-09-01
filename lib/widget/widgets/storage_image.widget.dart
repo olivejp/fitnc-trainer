@@ -149,8 +149,11 @@ class StorageFutureImageWidget extends StatelessWidget {
             builder: builderWidget,
           );
         } else {
-          return LoadingRotating.square(
-            backgroundColor: Theme.of(context).primaryColor,
+          return SizedBox(
+            height: radius * 2,
+            child: LoadingRotating.square(
+              backgroundColor: Theme.of(context).primaryColor,
+            ),
           );
         }
       },

@@ -84,7 +84,7 @@ class HorizontalGridCard<T extends AbstractFitnessStorageDomain> extends Statele
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
-                    child: Text(domain.name!, style: const TextStyle(fontSize: 15)),
+                    child: Text(domain.name, style: const TextStyle(fontSize: 15)),
                   ),
                   IconButton(
                     tooltip: 'Supprimer',

@@ -76,7 +76,7 @@ class ProgrammeService extends AbstractFitnessCrudService<Programme> with MixinF
     final QuerySnapshot<Object?> query = await trainersService.getWorkoutReference().get();
     return query.docs
         .map((QueryDocumentSnapshot<Object?> e) => Workout.fromJson(e.data()! as Map<String, dynamic>))
-        .map((Workout workout) => DropdownMenuItem<Workout>(value: workout, child: Text(workout.name!)))
+        .map((Workout workout) => DropdownMenuItem<Workout>(value: workout, child: Text(workout.name)))
         .toList();
   }
 

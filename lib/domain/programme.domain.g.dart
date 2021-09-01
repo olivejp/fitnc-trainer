@@ -9,7 +9,7 @@ part of 'programme.domain.dart';
 Programme _$ProgrammeFromJson(Map<String, dynamic> json) {
   return Programme()
     ..uid = json['uid'] as String?
-    ..name = json['name'] as String?
+    ..name = json['name'] as String
     ..createDate = json['createDate']
     ..updateDate = json['updateDate']
     ..publishDate = json['publishDate']

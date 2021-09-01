@@ -95,7 +95,7 @@ class ProgrammeVm with ChangeNotifier {
     programme.name = value;
   }
 
-  String get name => programme.name!;
+  String get name => programme.name;
 
   set numberWeeks(String? value) {
     programme.numberWeeks = value;

@@ -75,11 +75,11 @@ class WorkoutService extends AbstractFitnessCrudService<Workout> with MixinFitne
     }
   }
 
-  set name(String? value) {
+  set name(String value) {
     _workout.name = value;
   }
 
-  String? get name => _workout.name;
+  String get name => _workout.name;
 
   set description(String? value) {
     _workout.description = value;

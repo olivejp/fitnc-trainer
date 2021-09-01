@@ -50,14 +50,13 @@ class ExerciceUpdateCreateGeneric extends StatefulWidget {
 
 class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneric> {
   late VideoPlayerController? _videoController;
-  late YoutubePlayerController? _youtubeController;
   late GlobalKey<FormState> _formKey;
   final ExerciceUpdateController controller = Get.find();
+  YoutubePlayerController? youtubeController;
 
   @override
   Widget build(BuildContext context) {
     _formKey = GlobalKey<FormState>();
-
     final Widget saveButton = Padding(
       padding: const EdgeInsets.only(right: 10),
       child: TextButton(
@@ -97,10 +96,12 @@ class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneri
               children: <Widget>[
                 Row(
                   children: <Widget>[
-                    StorageFutureImageWidget(
-                      futureInitialStorageFile: UtilService.getFutureStorageFile(controller.exercice.value),
-                      onSaved: controller.setStoragePair,
-                      onDeleted: controller.setStoragePair,
+                    Obx(
+                      () => StorageFutureImageWidget(
+                        futureInitialStorageFile: UtilService.getFutureStorageFile(controller.exercice.value),
+                        onSaved: controller.setStoragePair,
+                        onDeleted: controller.setStoragePair,
+                      ),
                     ),
                     Expanded(
                       child: Padding(
@@ -109,7 +110,6 @@ class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneri
                           () {
                             final TextEditingController ctrl = TextEditingController(text: controller.exercice.value.name);
                             return FitnessDecorationTextFormField(
-                              initialValue: controller.exercice.value.name,
                                 controller: ctrl,
                                 autofocus: true,
                                 onChanged: (String name) => controller.exercice.value.name = name,
@@ -132,26 +132,33 @@ class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneri
           Row(
             children: <Widget>[
               Expanded(
-                  child: ParamDropdownButton(
-                decoration: const InputDecoration(
-                    labelText: "Type d'exercice",
-                    constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10)),
-                paramName: 'type_exercice',
-                initialValue: controller.exercice.value.typeExercice,
-                onChanged: (String? onChangedValue) => controller.exercice.value.typeExercice = onChangedValue,
+                  child: Obx(
+                () => ParamDropdownButton(
+                  decoration: const InputDecoration(
+                      labelText: "Type d'exercice",
+                      constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10)),
+                  paramName: 'type_exercice',
+                  initialValue: controller.exercice.value.typeExercice,
+                  onChanged: (String? onChangedValue) => controller.exercice.value.typeExercice = onChangedValue,
+                ),
               ))
             ],
           ),
           Padding(
             padding: const EdgeInsets.only(top: 20),
-            child: TextFormField(
-              initialValue: controller.exercice.value.description,
-              maxLength: 2000,
-              minLines: 5,
-              maxLines: 20,
-              onChanged: (String description) => controller.exercice.value.description = description,
-              decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
+            child: Obx(
+              () {
+                final TextEditingController ctrlDescription = TextEditingController(text: controller.exercice.value.description);
+                return TextFormField(
+                  controller: ctrlDescription,
+                  maxLength: 2000,
+                  minLines: 5,
+                  maxLines: 20,
+                  onChanged: (String description) => controller.exercice.value.description = description,
+                  decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
+                );
+              },
             ),
           ),
           Padding(
@@ -161,23 +168,30 @@ class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneri
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(right: 5),
-                    child: FitnessDecorationTextFormField(
-                      initialValue: controller.exercice.value.videoUrl,
-                      onChanged: (String videoUrl) => controller.exercice.value.videoUrl = videoUrl,
-                      labelText: 'URL vidéo',
-                      hintText: 'Exemple : https://myStorage.com/squat_video.mp4',
-                    ),
+                    child: Obx(() {
+                      final TextEditingController ctrlVideoUrl = TextEditingController(text: controller.exercice.value.videoUrl);
+                      return FitnessDecorationTextFormField(
+                        controller: ctrlVideoUrl,
+                        onChanged: (String videoUrl) => controller.exercice.value.videoUrl = videoUrl,
+                        labelText: 'URL vidéo',
+                        hintText: 'Exemple : https://myStorage.com/squat_video.mp4',
+                      );
+                    }),
                   ),
                 ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 5),
-                    child: FitnessDecorationTextFormField(
-                      initialValue: controller.exercice.value.youtubeUrl,
-                      onChanged: (String youtubeUrl) => controller.exercice.value.youtubeUrl = youtubeUrl,
-                      hintText: 'Identifiant vidéo Youtube',
-                      labelText: 'Youtube',
-                    ),
+                    child: Obx(() {
+                      final String? youtube = controller.exercice.value.youtubeUrl;
+                      final TextEditingController ctrlYoutubeUrl = TextEditingController(text: youtube);
+                      return FitnessDecorationTextFormField(
+                        controller: ctrlYoutubeUrl,
+                        onChanged: (String youtubeUrl) => controller.exercice.value.youtubeUrl = youtubeUrl,
+                        hintText: 'Identifiant vidéo Youtube',
+                        labelText: 'Youtube',
+                      );
+                    }),
                   ),
                 )
               ],
@@ -196,54 +210,65 @@ class _ExerciceUpdateCreateGenericState extends State<ExerciceUpdateCreateGeneri
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Builder(builder: (_) {
-                if (controller.exercice.value.videoUrl != null) {
-                  _videoController = VideoPlayerController.network(controller.exercice.value.videoUrl!);
-                  return FutureBuilder<Object?>(
-                    builder: (BuildContext context, AsyncSnapshot<Object?> snapshot) {
-                      if (_videoController?.value.isInitialized == true) {
-                        return LimitedBox(
-                          maxWidth: 500,
-                          child: AspectRatio(
-                            aspectRatio: _videoController!.value.aspectRatio,
-                            child: VideoPlayer(_videoController!),
-                          ),
-                        );
-                      } else {
-                        return Container();
-                      }
-                    },
-                    future: _videoController!.initialize(),
-                  );
-                } else {
-                  return Container();
-                }
-              })
+              Obx(
+                () {
+                  if (controller.exercice.value.videoUrl != null) {
+                    _videoController = VideoPlayerController.network(controller.exercice.value.videoUrl!);
+                    return FutureBuilder<Object?>(
+                      builder: (BuildContext context, AsyncSnapshot<Object?> snapshot) {
+                        if (_videoController?.value.isInitialized == true) {
+                          return LimitedBox(
+                            maxWidth: 500,
+                            child: AspectRatio(
+                              aspectRatio: _videoController!.value.aspectRatio,
+                              child: VideoPlayer(_videoController!),
+                            ),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      },
+                      future: _videoController!.initialize(),
+                    );
+                  } else {
+                    return Container();
+                  }
+                },
+              )
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Builder(builder: (_) {
-                if (controller.exercice.value.youtubeUrl != null) {
-                  _youtubeController = YoutubePlayerController(
-                    initialVideoId: controller.exercice.value.youtubeUrl!,
-                    params: const YoutubePlayerParams(
-                      autoPlay: false,
-                      showFullscreenButton: true,
-                    ),
-                  );
-                  _youtubeController!.pause();
-                  return LimitedBox(
-                    maxWidth: 500,
-                    child: YoutubePlayerIFrame(
-                      controller: _youtubeController,
-                    ),
-                  );
-                } else {
-                  return Container();
-                }
-              })
+              Obx(
+                () {
+                  if (controller.exercice.value.youtubeUrl != null) {
+                    if (youtubeController == null) {
+                      youtubeController = YoutubePlayerController(
+                        initialVideoId: controller.exercice.value.youtubeUrl!,
+                        params: const YoutubePlayerParams(
+                          autoPlay: false,
+                        ),
+                      );
+                    } else {
+                      youtubeController!.cue(controller.exercice.value.youtubeUrl!);
+                    }
+                    youtubeController!.pause();
+                    return LimitedBox(
+                      maxWidth: 500,
+                      child: YoutubePlayerIFrame(
+                        controller: youtubeController,
+                      ),
+                    );
+                  } else {
+                    if (youtubeController != null) {
+                      youtubeController!.reset();
+                      youtubeController = null;
+                    }
+                    return Container();
+                  }
+                },
+              )
             ],
           ),
           Padding(

@@ -5,7 +5,7 @@ abstract class AbstractDomain extends InterfaceToJson {
   AbstractDomain();
 
   String? uid;
-  String? name;
+  String name = '';
   dynamic createDate;
   dynamic updateDate;
 }

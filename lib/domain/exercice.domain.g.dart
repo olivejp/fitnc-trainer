@@ -9,11 +9,11 @@ part of 'exercice.domain.dart';
 Exercice _$ExerciceFromJson(Map<String, dynamic> json) {
   return Exercice()
     ..uid = json['uid'] as String?
-    ..name = json['name'] as String?
+    ..name = (json['name'] != null) ? json['name'] as String : ''
     ..createDate = json['createDate']
     ..updateDate = json['updateDate']
     ..imageUrl = json['imageUrl'] as String?
-    ..description = json['description'] as String?
+    ..description = (json['description'] != null) ? json['description'] as String : ''
     ..typeExercice = json['typeExercice'] as String?
     ..videoUrl = json['videoUrl'] as String?
     ..youtubeUrl = json['youtubeUrl'] as String?;

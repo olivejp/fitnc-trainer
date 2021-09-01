@@ -149,7 +149,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
                     : Container(decoration: const BoxDecoration(color: Colors.amber)),
               ),
               Expanded(
-                child: Center(child: Text(programme.name!)),
+                child: Center(child: Text(programme.name)),
               )
             ]),
             if (programme.publishDate != null)

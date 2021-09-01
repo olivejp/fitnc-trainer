@@ -119,7 +119,7 @@ class _FitnessGridCard<T extends AbstractFitnessStorageDomain> extends Stateless
                     child: Padding(
                       padding: const EdgeInsets.only(left: 10),
                       child: Text(
-                        domain.name!,
+                        domain.name,
                         style: const TextStyle(fontSize: 15),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
