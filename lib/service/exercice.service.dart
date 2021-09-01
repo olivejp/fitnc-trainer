@@ -4,11 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
+import 'package:fitnc_trainer/service/firebase-storage.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:get/get.dart';
 
-class ExerciceService extends AbstractFitnessCrudService<Exercice> with MixinFitnessStorageService<Exercice> {
+class ExerciceService extends AbstractFitnessCrudService<Exercice> {
   final TrainersService trainersService = Get.find();
+  final FirebaseStorageService storageService = Get.find();
 
   @override
   Stream<List<Exercice>> listenAll() {
@@ -22,22 +24,26 @@ class ExerciceService extends AbstractFitnessCrudService<Exercice> with MixinFit
     return trainersService.getExerciceReference();
   }
 
-  @override
-  String getStorageRef(User user, Exercice exercice) {
-    return 'trainers/${user.uid}/exercices/${exercice.uid}';
+  String getExerciceStoragePath(Exercice exercice) {
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      return 'trainers/${user.uid}/exercices/${exercice.uid}/mainImage';
+    }
+    throw Exception('Aucun utilisateur connecté');
   }
 
-  Future<void> saveExercice(Exercice exercice, {required bool sendStorage}) async {
+  Future<void> saveExercice(Exercice exercice, {required bool sendStorage}) {
     final bool isUpdate = exercice.uid != null;
+    final String path = getExerciceStoragePath(exercice);
     if (isUpdate) {
       if (sendStorage) {
-        return eraseAndReplaceStorage(exercice).then((_) => save(exercice));
+        return storageService.eraseAndReplaceStorage(path, exercice.storageFile).then((_) => save(exercice));
       } else {
         return save(exercice);
       }
     } else {
       exercice.uid = getCollectionReference().doc().id;
-      return createStorage(exercice).then((_) => create(exercice));
+      return storageService.createStorage(path, exercice.storageFile).then((_) => create(exercice));
     }
   }
 }

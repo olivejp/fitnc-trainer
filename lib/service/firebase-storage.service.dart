@@ -15,8 +15,8 @@ class FirebaseStorageService extends GetxService {
   ///
   /// Méthode pour envoyer le document dans Firebase Storage.
   ///
-  Future<String> createStorage(String path, StorageFile storageFile) {
-    if (storageFile.fileBytes != null && storageFile.fileName != null) {
+  Future<String> createStorage(String path, StorageFile? storageFile) {
+    if (storageFile != null && storageFile.fileBytes != null && storageFile.fileName != null) {
       return _sendToStorage(storageFile, path);
     }
     return Future<String>.value('');

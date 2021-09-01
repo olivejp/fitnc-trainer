@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import '../../constants/constants.dart';
 
 class FitnessDecorationTextFormField extends StatelessWidget {
-  const FitnessDecorationTextFormField({Key? key, this.initialValue, this.labelText, this.onChanged, this.validator, this.autofocus = false, this.hintText}) : super(key: key);
+  const FitnessDecorationTextFormField(
+      {Key? key, this.initialValue, this.labelText, this.onChanged, this.validator, this.autofocus = false, this.hintText, this.controller})
+      : super(key: key);
 
   final bool autofocus;
   final String? initialValue;
@@ -13,10 +15,12 @@ class FitnessDecorationTextFormField extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final String? labelText;
   final String? hintText;
+  final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+        controller: controller,
         initialValue: initialValue,
         onChanged: onChanged,
         autofocus: autofocus,
@@ -30,13 +34,8 @@ class FitnessDecorationTextFormField extends StatelessWidget {
   }
 }
 
-
-
-class HorizontalGridView<T extends AbstractFitnessStorageDomain>
-    extends StatelessWidget {
-  const HorizontalGridView(
-      {Key? key, required this.listDomains, required this.onChanged})
-      : super(key: key);
+class HorizontalGridView<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
+  const HorizontalGridView({Key? key, required this.listDomains, required this.onChanged}) : super(key: key);
 
   final List<T> listDomains;
   final void Function(T domain) onChanged;
@@ -46,23 +45,16 @@ class HorizontalGridView<T extends AbstractFitnessStorageDomain>
     return LimitedBox(
       maxHeight: 300,
       child: GridView(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, mainAxisExtent: 200, childAspectRatio: 1 / 4),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisExtent: 200, childAspectRatio: 1 / 4),
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,
-          children: listDomains
-              .map((T e) =>
-              HorizontalGridCard<T>(domain: e, onChanged: onChanged))
-              .toList()),
+          children: listDomains.map((T e) => HorizontalGridCard<T>(domain: e, onChanged: onChanged)).toList()),
     );
   }
 }
 
-class HorizontalGridCard<T extends AbstractFitnessStorageDomain>
-    extends StatelessWidget {
-  const HorizontalGridCard(
-      {Key? key, required this.domain, required this.onChanged})
-      : super(key: key);
+class HorizontalGridCard<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
+  const HorizontalGridCard({Key? key, required this.domain, required this.onChanged}) : super(key: key);
 
   final T domain;
   final void Function(T domain) onChanged;
@@ -83,10 +75,8 @@ class HorizontalGridCard<T extends AbstractFitnessStorageDomain>
             Expanded(
               flex: 3,
               child: (domain.imageUrl?.isNotEmpty == true)
-                  ? Ink.image(
-                  image: NetworkImage(domain.imageUrl!), fit: BoxFit.cover)
-                  : Container(
-                  decoration: const BoxDecoration(color: Colors.amber)),
+                  ? Ink.image(image: NetworkImage(domain.imageUrl!), fit: BoxFit.cover)
+                  : Container(decoration: const BoxDecoration(color: Colors.amber)),
             ),
             Expanded(
               child: Row(
@@ -94,14 +84,12 @@ class HorizontalGridCard<T extends AbstractFitnessStorageDomain>
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(left: 10),
-                    child: Text(domain.name!,
-                        style: const TextStyle(fontSize: 15)),
+                    child: Text(domain.name!, style: const TextStyle(fontSize: 15)),
                   ),
                   IconButton(
                     tooltip: 'Supprimer',
                     onPressed: () {},
-                    icon:
-                    const Icon(Icons.delete, color: Colors.grey, size: 24),
+                    icon: const Icon(Icons.delete, color: Colors.grey, size: 24),
                   )
                 ],
               ),

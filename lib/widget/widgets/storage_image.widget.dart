@@ -185,7 +185,7 @@ class StorageFutureImageWidget extends StatelessWidget {
             tooltip: 'Supprimer la photo',
             onPressed: () {
               if (onDeleted != null) {
-                onDeleted!(_storagePair);
+                onDeleted!(null);
               }
               _storagePair.fileName = null;
               _storagePair.fileBytes = null;

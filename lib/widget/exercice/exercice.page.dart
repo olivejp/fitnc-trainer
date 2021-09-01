@@ -1,5 +1,6 @@
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/service/exercice.service.dart';
+import 'package:fitnc_trainer/service/exercice.update.controller.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
@@ -45,7 +46,9 @@ class ExercicePageVm extends GetxController {
   getRx.Rx<Exercice> exerciceSelected = Exercice().obs;
 
   void selectExercice(Exercice exercice) {
-    exerciceSelected.value = exercice;
+    exerciceSelected.update((Exercice? val) {
+      val = exercice;
+    });
   }
 }
 
@@ -53,6 +56,7 @@ class ExercicePage extends StatefulWidget {
   ExercicePage({Key? key}) : super(key: key);
 
   final ExercicePageVm vm = Get.put(ExercicePageVm());
+  final ExerciceUpdateController controller = Get.put(ExerciceUpdateController());
 
   @override
   State<ExercicePage> createState() => _ExercicePageState();
@@ -74,7 +78,6 @@ class _ExercicePageState extends State<ExercicePage> {
           content: ExerciceUpdateCreateGeneric(
             displayCloseButton: true,
             isCreation: false,
-            exercice: exercice,
           ),
         ),
       );
@@ -102,8 +105,8 @@ class _ExercicePageState extends State<ExercicePage> {
                   ? Padding(
                       padding: const EdgeInsets.all(60.0),
                       child: ExerciceUpdateCreateGeneric(
-                          isCreation: false,
-                        ),
+                        isCreation: false,
+                      ),
                     )
                   : null,
             ),
@@ -245,8 +248,6 @@ class _ExerciceListSearchState extends State<ExerciceListSearch> {
         Expanded(
             child: ExerciceStreamBuilder(
           streamListExercice: _streamListExercice,
-          bloc: widget.service,
-          vm: widget.vm,
         )),
       ],
     );
@@ -254,22 +255,21 @@ class _ExerciceListSearchState extends State<ExerciceListSearch> {
 }
 
 class ExerciceStreamBuilder extends StatelessWidget {
-  const ExerciceStreamBuilder({
+  ExerciceStreamBuilder({
     Key? key,
     required BehaviorSubject<List<Exercice>> streamListExercice,
-    required this.bloc,
-    required this.vm,
   })  : _streamListExercice = streamListExercice,
         super(key: key);
 
   final BehaviorSubject<List<Exercice>> _streamListExercice;
-  final ExerciceService bloc;
-  final ExercicePageVm vm;
+  final ExerciceService bloc = Get.find();
+  final ExercicePageVm vm = Get.find();
+  final ExerciceUpdateController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
     void selectExercice(Exercice exercice) {
-      vm.selectExercice(exercice);
+      controller.init(exercice);
       if (!vm.dualScreen.value) {
         showDialog(
           context: context,
@@ -278,7 +278,6 @@ class ExerciceStreamBuilder extends StatelessWidget {
             content: ExerciceUpdateCreateGeneric(
               displayCloseButton: true,
               isCreation: false,
-              exercice: exercice,
             ),
           ),
         );
@@ -358,7 +357,6 @@ class ExerciceListTile extends StatelessWidget {
             content: ExerciceUpdateCreateGeneric(
               displayCloseButton: true,
               isCreation: false,
-              exercice: exercice,
             ),
           ),
         );
