@@ -54,7 +54,9 @@ class ExercicePage extends StatefulWidget {
   ExercicePage({Key? key}) : super(key: key);
 
   final ExercicePageVm vm = Get.put(ExercicePageVm());
-  final ExerciceUpdateController controller = Get.put(ExerciceUpdateController());
+  final ExerciceUpdateController controller = Get.put(
+    ExerciceUpdateController(),
+  );
 
   @override
   State<ExercicePage> createState() => _ExercicePageState();
@@ -73,7 +75,7 @@ class _ExercicePageState extends State<ExercicePage> {
         context: context,
         builder: (BuildContext context) => AlertDialog(
           insetPadding: const EdgeInsets.all(10),
-          content: ExerciceUpdateCreateGeneric(
+          content: ExerciceUpdate(
             displayCloseButton: true,
             isCreation: false,
           ),
@@ -102,7 +104,7 @@ class _ExercicePageState extends State<ExercicePage> {
               child: (widget.vm.exerciceSelected.value != null)
                   ? Padding(
                       padding: const EdgeInsets.all(60.0),
-                      child: ExerciceUpdateCreateGeneric(
+                      child: ExerciceUpdate(
                         isCreation: false,
                       ),
                     )
@@ -273,7 +275,7 @@ class ExerciceStreamBuilder extends StatelessWidget {
           context: context,
           builder: (BuildContext context) => AlertDialog(
             insetPadding: const EdgeInsets.all(10),
-            content: ExerciceUpdateCreateGeneric(
+            content: ExerciceUpdate(
               displayCloseButton: true,
               isCreation: false,
             ),
@@ -352,7 +354,7 @@ class ExerciceListTile extends StatelessWidget {
           context: context,
           builder: (BuildContext context) => AlertDialog(
             insetPadding: const EdgeInsets.all(10),
-            content: ExerciceUpdateCreateGeneric(
+            content: ExerciceUpdate(
               displayCloseButton: true,
               isCreation: false,
             ),
