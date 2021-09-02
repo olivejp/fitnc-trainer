@@ -44,8 +44,13 @@ class ExerciceCreateController extends GetxController {
       exercice.value.storageFile = StorageFile();
     }
   }
-}
 
+  void deleteExercice(Exercice exerciceDeleted) {
+    if (exerciceDeleted.uid == exercice.value.uid) {
+      init(Exercice());
+    }
+  }
+}
 
 class ExerciceUpdateController extends GetxController {
   final TrainersService trainersService = Get.find();
@@ -54,10 +59,13 @@ class ExerciceUpdateController extends GetxController {
 
   Rx<Exercice> exercice = Exercice().obs;
 
+  RxBool isSet = false.obs;
   bool sendStorage = false;
 
   Future<void> init(Exercice? exerciceEntered) async {
     sendStorage = false;
+
+    isSet.value = exerciceEntered != null;
 
     if (exerciceEntered != null) {
       exercice.value = exerciceEntered;
@@ -82,5 +90,3 @@ class ExerciceUpdateController extends GetxController {
     }
   }
 }
-
-

@@ -75,10 +75,7 @@ class _ExercicePageState extends State<ExercicePage> {
         context: context,
         builder: (BuildContext context) => AlertDialog(
           insetPadding: const EdgeInsets.all(10),
-          content: ExerciceUpdate(
-            displayCloseButton: true,
-            isCreation: false,
-          ),
+          content: ExerciceUpdate(displayCloseButton: true),
         ),
       );
     }
@@ -104,9 +101,7 @@ class _ExercicePageState extends State<ExercicePage> {
               child: (widget.vm.exerciceSelected.value != null)
                   ? Padding(
                       padding: const EdgeInsets.all(60.0),
-                      child: ExerciceUpdate(
-                        isCreation: false,
-                      ),
+                      child: ExerciceUpdate(),
                     )
                   : null,
             ),
@@ -275,10 +270,7 @@ class ExerciceStreamBuilder extends StatelessWidget {
           context: context,
           builder: (BuildContext context) => AlertDialog(
             insetPadding: const EdgeInsets.all(10),
-            content: ExerciceUpdate(
-              displayCloseButton: true,
-              isCreation: false,
-            ),
+            content: ExerciceUpdate(displayCloseButton: true),
           ),
         );
       }
@@ -354,10 +346,7 @@ class ExerciceListTile extends StatelessWidget {
           context: context,
           builder: (BuildContext context) => AlertDialog(
             insetPadding: const EdgeInsets.all(10),
-            content: ExerciceUpdate(
-              displayCloseButton: true,
-              isCreation: false,
-            ),
+            content: ExerciceUpdate(displayCloseButton: true),
           ),
         );
       }

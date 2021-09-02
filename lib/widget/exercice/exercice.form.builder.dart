@@ -28,7 +28,7 @@ class ExerciceBuilderPage {
 
 /// Composant Création
 class ExerciceCreate extends StatefulWidget {
-  ExerciceCreate({Key? key, this.isCreation = true, this.displayCloseButton = false}) : super(key: key);
+  ExerciceCreate({Key? key, this.isCreation = true, this.displayCloseButton = true}) : super(key: key);
 
   final bool isCreation;
   final bool displayCloseButton;
@@ -272,9 +272,8 @@ class _ExerciceCreateState extends State<ExerciceCreate> {
 
 /// Composant Mise à jour
 class ExerciceUpdate extends StatefulWidget {
-  ExerciceUpdate({Key? key, this.isCreation = false, this.displayCloseButton = false}) : super(key: key);
+  ExerciceUpdate({Key? key, this.displayCloseButton = false}) : super(key: key);
 
-  final bool isCreation;
   final bool displayCloseButton;
 
   @override
@@ -297,14 +296,11 @@ class _ExerciceUpdateState extends State<ExerciceUpdate> {
         onPressed: () {
           if (_formKey.currentState?.validate() == true) {
             controller.saveExercice().then((_) {
-              showToast(widget.isCreation ? 'Exercice créé' : 'Exercice mis à jour', backgroundColor: Colors.green);
-              if (widget.isCreation) {
-                Navigator.of(context).pop();
-              }
+              showToast('Exercice mis à jour', backgroundColor: Colors.green);
             }).catchError((_) => showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent));
           }
         },
-        child: Text(widget.isCreation ? 'Créer' : 'Enregistrer', style: TextStyle(color: Colors.white)),
+        child: Text('Enregistrer', style: const TextStyle(color: Colors.white)),
       ),
     );
 
@@ -319,197 +315,205 @@ class _ExerciceUpdateState extends State<ExerciceUpdate> {
 
     final List<Widget> buttons = widget.displayCloseButton ? <Widget>[saveButton, closeButton] : <Widget>[saveButton];
 
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20.0),
+    return Obx(
+      () {
+        if (controller.isSet.value) {
+          return Form(
+            key: _formKey,
             child: Column(
               children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 20.0),
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Obx(
+                            () => StorageFutureImageWidget(
+                              futureInitialStorageFile: UtilService.getFutureStorageFile(controller.exercice.value),
+                              onSaved: controller.setStoragePair,
+                              onDeleted: controller.setStoragePair,
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Obx(
+                                () {
+                                  final TextEditingController ctrl = TextEditingController(text: controller.exercice.value.name);
+                                  return FitnessDecorationTextFormField(
+                                      controller: ctrl,
+                                      autofocus: true,
+                                      onChanged: (String name) => controller.exercice.value.name = name,
+                                      labelText: 'Nom',
+                                      validator: (String? value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Merci de renseigner le nom du exercice.';
+                                        }
+                                        return null;
+                                      });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
                 Row(
                   children: <Widget>[
-                    Obx(
-                      () => StorageFutureImageWidget(
-                        futureInitialStorageFile: UtilService.getFutureStorageFile(controller.exercice.value),
-                        onSaved: controller.setStoragePair,
-                        onDeleted: controller.setStoragePair,
-                      ),
-                    ),
                     Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20),
                         child: Obx(
-                          () {
-                            final TextEditingController ctrl = TextEditingController(text: controller.exercice.value.name);
-                            return FitnessDecorationTextFormField(
-                                controller: ctrl,
-                                autofocus: true,
-                                onChanged: (String name) => controller.exercice.value.name = name,
-                                labelText: 'Nom',
-                                validator: (String? value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Merci de renseigner le nom du exercice.';
-                                  }
-                                  return null;
-                                });
-                          },
-                        ),
+                      () => ParamDropdownButton(
+                        decoration: const InputDecoration(
+                            labelText: "Type d'exercice",
+                            constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 10)),
+                        paramName: 'type_exercice',
+                        initialValue: controller.exercice.value.typeExercice,
+                        onChanged: (String? onChangedValue) => controller.exercice.value.typeExercice = onChangedValue,
                       ),
-                    ),
+                    ))
                   ],
                 ),
-              ],
-            ),
-          ),
-          Row(
-            children: <Widget>[
-              Expanded(
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
                   child: Obx(
-                () => ParamDropdownButton(
-                  decoration: const InputDecoration(
-                      labelText: "Type d'exercice",
-                      constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 10)),
-                  paramName: 'type_exercice',
-                  initialValue: controller.exercice.value.typeExercice,
-                  onChanged: (String? onChangedValue) => controller.exercice.value.typeExercice = onChangedValue,
-                ),
-              ))
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: Obx(
-              () {
-                final TextEditingController ctrlDescription = TextEditingController(text: controller.exercice.value.description);
-                return TextFormField(
-                  controller: ctrlDescription,
-                  maxLength: 2000,
-                  minLines: 5,
-                  maxLines: 20,
-                  onChanged: (String description) => controller.exercice.value.description = description,
-                  decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 20),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 5),
-                    child: Obx(() {
-                      final TextEditingController ctrlVideoUrl = TextEditingController(text: controller.exercice.value.videoUrl);
-                      return FitnessDecorationTextFormField(
-                        controller: ctrlVideoUrl,
-                        onChanged: (String videoUrl) => controller.exercice.value.videoUrl = videoUrl,
-                        labelText: 'URL vidéo',
-                        hintText: 'Exemple : https://myStorage.com/squat_video.mp4',
+                    () {
+                      final TextEditingController ctrlDescription = TextEditingController(text: controller.exercice.value.description);
+                      return TextFormField(
+                        controller: ctrlDescription,
+                        maxLength: 2000,
+                        minLines: 5,
+                        maxLines: 20,
+                        onChanged: (String description) => controller.exercice.value.description = description,
+                        decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
                       );
-                    }),
+                    },
                   ),
                 ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 5),
-                    child: Obx(() {
-                      final String? youtube = controller.exercice.value.youtubeUrl;
-                      final TextEditingController ctrlYoutubeUrl = TextEditingController(text: youtube);
-                      return FitnessDecorationTextFormField(
-                        controller: ctrlYoutubeUrl,
-                        onChanged: (String youtubeUrl) => controller.exercice.value.youtubeUrl = youtubeUrl,
-                        hintText: 'Identifiant vidéo Youtube',
-                        labelText: 'Youtube',
-                      );
-                    }),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: Obx(() {
+                            final TextEditingController ctrlVideoUrl = TextEditingController(text: controller.exercice.value.videoUrl);
+                            return FitnessDecorationTextFormField(
+                              controller: ctrlVideoUrl,
+                              onChanged: (String videoUrl) => controller.exercice.value.videoUrl = videoUrl,
+                              labelText: 'URL vidéo',
+                              hintText: 'Exemple : https://myStorage.com/squat_video.mp4',
+                            );
+                          }),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 5),
+                          child: Obx(() {
+                            final String? youtube = controller.exercice.value.youtubeUrl;
+                            final TextEditingController ctrlYoutubeUrl = TextEditingController(text: youtube);
+                            return FitnessDecorationTextFormField(
+                              controller: ctrlYoutubeUrl,
+                              onChanged: (String youtubeUrl) => controller.exercice.value.youtubeUrl = youtubeUrl,
+                              hintText: 'Identifiant vidéo Youtube',
+                              labelText: 'Youtube',
+                            );
+                          }),
+                        ),
+                      )
+                    ],
                   ),
-                )
-              ],
-            ),
-          ),
-          Row(
-            children: const <Widget>[
-              Expanded(
-                child: Text(
-                  'Vous pouvez joindre ici un vidéo au format MP4, si celle ci est directement accessible depuis internet. Exemple : https://firebasestorage.googleapis.com/v0/b/fitnc-7be2e.appspot.com/o/YZBEpGXXvI.mp4',
-                  maxLines: 5,
                 ),
-              )
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Obx(
-                () {
-                  if (controller.exercice.value.videoUrl != null) {
-                    _videoController = VideoPlayerController.network(controller.exercice.value.videoUrl!);
-                    return FutureBuilder<Object?>(
-                      builder: (BuildContext context, AsyncSnapshot<Object?> snapshot) {
-                        if (_videoController?.value.isInitialized == true) {
-                          return LimitedBox(
-                            maxWidth: 500,
-                            child: AspectRatio(
-                              aspectRatio: _videoController!.value.aspectRatio,
-                              child: VideoPlayer(_videoController!),
-                            ),
+                Row(
+                  children: const <Widget>[
+                    Expanded(
+                      child: Text(
+                        'Vous pouvez joindre ici un vidéo au format MP4, si celle ci est directement accessible depuis internet. Exemple : https://firebasestorage.googleapis.com/v0/b/fitnc-7be2e.appspot.com/o/YZBEpGXXvI.mp4',
+                        maxLines: 5,
+                      ),
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Obx(
+                      () {
+                        if (controller.exercice.value.videoUrl != null) {
+                          _videoController = VideoPlayerController.network(controller.exercice.value.videoUrl!);
+                          return FutureBuilder<Object?>(
+                            builder: (BuildContext context, AsyncSnapshot<Object?> snapshot) {
+                              if (_videoController?.value.isInitialized == true) {
+                                return LimitedBox(
+                                  maxWidth: 500,
+                                  child: AspectRatio(
+                                    aspectRatio: _videoController!.value.aspectRatio,
+                                    child: VideoPlayer(_videoController!),
+                                  ),
+                                );
+                              } else {
+                                return Container();
+                              }
+                            },
+                            future: _videoController!.initialize(),
                           );
                         } else {
                           return Container();
                         }
                       },
-                      future: _videoController!.initialize(),
-                    );
-                  } else {
-                    return Container();
-                  }
-                },
-              )
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Obx(
-                () {
-                  if (controller.exercice.value.youtubeUrl != null) {
-                    if (youtubeController == null) {
-                      youtubeController = YoutubePlayerController(
-                        initialVideoId: controller.exercice.value.youtubeUrl!,
-                        params: const YoutubePlayerParams(
-                          autoPlay: false,
-                        ),
-                      );
-                    } else {
-                      youtubeController!.cue(controller.exercice.value.youtubeUrl!);
-                    }
-                    youtubeController!.pause();
-                    return LimitedBox(
-                      maxWidth: 500,
-                      child: YoutubePlayerIFrame(
-                        controller: youtubeController,
-                      ),
-                    );
-                  } else {
-                    if (youtubeController != null) {
-                      youtubeController!.reset();
-                      youtubeController = null;
-                    }
-                    return Container();
-                  }
-                },
-              )
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 20.0),
-            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: buttons),
-          ),
-        ],
-      ),
+                    )
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Obx(
+                      () {
+                        if (controller.exercice.value.youtubeUrl != null) {
+                          if (youtubeController == null) {
+                            youtubeController = YoutubePlayerController(
+                              initialVideoId: controller.exercice.value.youtubeUrl!,
+                              params: const YoutubePlayerParams(
+                                autoPlay: false,
+                              ),
+                            );
+                          } else {
+                            youtubeController!.cue(controller.exercice.value.youtubeUrl!);
+                          }
+                          youtubeController!.pause();
+                          return LimitedBox(
+                            maxWidth: 500,
+                            child: YoutubePlayerIFrame(
+                              controller: youtubeController,
+                            ),
+                          );
+                        } else {
+                          if (youtubeController != null) {
+                            youtubeController!.reset();
+                            youtubeController = null;
+                          }
+                          return Container();
+                        }
+                      },
+                    )
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Row(mainAxisAlignment: MainAxisAlignment.end, children: buttons),
+                ),
+              ],
+            ),
+          );
+        } else {
+          return Container();
+        }
+      },
     );
   }
 }
