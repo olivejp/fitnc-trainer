@@ -60,7 +60,7 @@ class UtilService {
     return http.readBytes(Uri.parse(imageUrl));
   }
 
-  static void showDeleteDialog(BuildContext context, AbstractDomain domain, AbstractFitnessCrudService<AbstractDomain> bloc) {
+  static void showDeleteDialog(BuildContext context, AbstractDomain domain, AbstractFitnessCrudService<AbstractDomain> service) {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
@@ -70,7 +70,7 @@ class UtilService {
           const TextSpan(text: ' ?'),
         ])),
         actions: <Widget>[
-          TextButton(onPressed: () => bloc.delete(domain).then((_) => Navigator.pop(context)), child: const Text('Oui')),
+          TextButton(onPressed: () => service.delete(domain).then((_) => Navigator.pop(context)), child: const Text('Oui')),
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
         ],
       ),

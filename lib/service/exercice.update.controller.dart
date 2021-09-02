@@ -10,17 +10,18 @@ import 'package:get/get_rx/get_rx.dart' as rx;
 import 'exercice.service.dart';
 
 
-class ExerciceCreateController extends GetxController {
-  final TrainersService trainersService = Get.find();
-  final FirebaseStorageService storageService = Get.find();
-  final ExerciceService exerciceService = Get.find();
+class ExerciceCreateController extends AbstractExerciceController {
+}
 
-  Rx<Exercice> exercice = Exercice().obs;
+class ExerciceUpdateController extends AbstractExerciceController {
 
-  bool sendStorage = false;
+  RxBool isSet = false.obs;
 
+  @override
   Future<void> init(Exercice? exerciceEntered) async {
     sendStorage = false;
+
+    isSet.value = exerciceEntered != null && exerciceEntered.uid != null;
 
     if (exerciceEntered != null) {
       exercice.value = exerciceEntered;
@@ -32,40 +33,25 @@ class ExerciceCreateController extends GetxController {
     }
   }
 
-  Future<void> saveExercice() async {
-    return exerciceService.saveExercice(exercice.value, sendStorage: sendStorage);
-  }
-
-  void setStoragePair(StorageFile? stFile) {
-    sendStorage = true;
-    if (stFile != null) {
-      exercice.value.storageFile = stFile;
-    } else {
-      exercice.value.storageFile = StorageFile();
-    }
-  }
-
   void deleteExercice(Exercice exerciceDeleted) {
     if (exerciceDeleted.uid == exercice.value.uid) {
-      init(Exercice());
+      init(null);
     }
   }
 }
 
-class ExerciceUpdateController extends GetxController {
+abstract class AbstractExerciceController extends GetxController {
   final TrainersService trainersService = Get.find();
   final FirebaseStorageService storageService = Get.find();
   final ExerciceService exerciceService = Get.find();
 
+
   Rx<Exercice> exercice = Exercice().obs;
 
-  RxBool isSet = false.obs;
   bool sendStorage = false;
 
   Future<void> init(Exercice? exerciceEntered) async {
     sendStorage = false;
-
-    isSet.value = exerciceEntered != null;
 
     if (exerciceEntered != null) {
       exercice.value = exerciceEntered;

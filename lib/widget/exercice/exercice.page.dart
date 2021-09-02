@@ -54,9 +54,6 @@ class ExercicePage extends StatefulWidget {
   ExercicePage({Key? key}) : super(key: key);
 
   final ExercicePageVm vm = Get.put(ExercicePageVm());
-  final ExerciceUpdateController controller = Get.put(
-    ExerciceUpdateController(),
-  );
 
   @override
   State<ExercicePage> createState() => _ExercicePageState();
@@ -69,13 +66,12 @@ class _ExercicePageState extends State<ExercicePage> {
 
   void selectExercice(Exercice exercice) {
     widget.vm.selectExercice(exercice);
-    widget.controller.exercice.value = exercice;
     if (!widget.vm.dualScreen.value) {
       showDialog(
         context: context,
         builder: (BuildContext context) => AlertDialog(
           insetPadding: const EdgeInsets.all(10),
-          content: ExerciceUpdate(displayCloseButton: true),
+          content: ExerciceUpdate(exercice: exercice, displayCloseButton: true),
         ),
       );
     }
@@ -97,14 +93,11 @@ class _ExercicePageState extends State<ExercicePage> {
           list.add(Expanded(
             flex: 3,
             child: Container(
-              decoration: const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
-              child: (widget.vm.exerciceSelected.value != null)
-                  ? Padding(
-                      padding: const EdgeInsets.all(60.0),
-                      child: ExerciceUpdate(),
-                    )
-                  : null,
-            ),
+                decoration: const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
+                child: Padding(
+                  padding: const EdgeInsets.all(60.0),
+                  child: ExerciceUpdate(exercice: widget.vm.exerciceSelected.value),
+                )),
           ));
         }
 
@@ -265,12 +258,13 @@ class ExerciceStreamBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     void selectExercice(Exercice exercice) {
       controller.init(exercice);
+
       if (!vm.dualScreen.value) {
         showDialog(
           context: context,
           builder: (BuildContext context) => AlertDialog(
             insetPadding: const EdgeInsets.all(10),
-            content: ExerciceUpdate(displayCloseButton: true),
+            content: ExerciceUpdate(exercice: exercice, displayCloseButton: true),
           ),
         );
       }
@@ -346,7 +340,7 @@ class ExerciceListTile extends StatelessWidget {
           context: context,
           builder: (BuildContext context) => AlertDialog(
             insetPadding: const EdgeInsets.all(10),
-            content: ExerciceUpdate(displayCloseButton: true),
+            content: ExerciceUpdate(exercice: exercice, displayCloseButton: true),
           ),
         );
       }
@@ -359,7 +353,24 @@ class ExerciceListTile extends StatelessWidget {
         selectedTileColor: FitnessNcColors.blue50,
         leading: CircleAvatar(foregroundImage: exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null),
         title: Text(exercice.name),
-        trailing: IconButton(onPressed: () => UtilService.showDeleteDialog(context, exercice, service), icon: const Icon(Icons.delete)),
+        trailing: IconButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: RichText(
+                      text: TextSpan(text: 'Êtes-vous sûr de vouloir supprimer : ', children: <InlineSpan>[
+                    TextSpan(text: exercice.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const TextSpan(text: ' ?'),
+                  ])),
+                  actions: <Widget>[
+                    TextButton(onPressed: () => service.delete(exercice).then((_) => Navigator.pop(context)), child: const Text('Oui')),
+                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
+                  ],
+                ),
+              );
+            },
+            icon: const Icon(Icons.delete)),
         onTap: () => selectExercice(exercice),
       ),
     );
