@@ -2,7 +2,7 @@ import 'package:fitnc_trainer/domain/line.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.dto.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../workout.set.bottom.panel.dart';
@@ -28,8 +28,9 @@ class ListTileDto extends StatefulWidget {
 }
 
 class _ListTileDtoState extends State<ListTileDto> {
-  late BehaviorSubject<List<Line>> streamLines =
-      BehaviorSubject<List<Line>>.seeded(widget.dto.lines);
+  late BehaviorSubject<List<Line>> streamLines = BehaviorSubject<List<Line>>.seeded(widget.dto.lines);
+
+  final WorkoutSetBottomPanelController controller = Get.find();
 
   @override
   void dispose() {
@@ -39,8 +40,6 @@ class _ListTileDtoState extends State<ListTileDto> {
 
   @override
   Widget build(BuildContext context) {
-    final WorkoutSetBottomPanelVm vm =
-        Provider.of<WorkoutSetBottomPanelVm>(context, listen: false);
     final Widget leading = widget.dto.imageUrlExercice != null
         ? CircleAvatar(
             foregroundImage: NetworkImage(widget.dto.imageUrlExercice!),
@@ -63,10 +62,7 @@ class _ListTileDtoState extends State<ListTileDto> {
             height: 80,
             child: Card(
               child: ListTile(
-                  leading: CircleAvatar(
-                      foregroundImage: widget.dto.imageUrlExercice != null
-                          ? NetworkImage(widget.dto.imageUrlExercice!)
-                          : null),
+                  leading: CircleAvatar(foregroundImage: widget.dto.imageUrlExercice != null ? NetworkImage(widget.dto.imageUrlExercice!) : null),
                   title: Text(widget.dto.nameExercice!)),
             ),
           ),
@@ -103,9 +99,7 @@ class _ListTileDtoState extends State<ListTileDto> {
                         streamLines.sink.add(widget.dto.lines);
                       },
                       child: const Text('Ajouter set')),
-                  TextButton(
-                      onPressed: () => vm.deleteWorkoutSet(widget.dto),
-                      child: const Text('Retirer'))
+                  TextButton(onPressed: () => controller.deleteWorkoutSet(widget.dto), child: const Text('Retirer'))
                 ],
               )
             ],
@@ -114,14 +108,12 @@ class _ListTileDtoState extends State<ListTileDto> {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: StreamBuilder<List<Line>>(
                 stream: streamLines,
-                builder:
-                    (BuildContext context, AsyncSnapshot<List<Line>> snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<List<Line>> snapshot) {
                   return ListView.builder(
                     shrinkWrap: true,
                     itemCount: widget.dto.lines.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return _LineDisplay(
-                          dto: widget.dto, index: index, stream: streamLines);
+                      return _LineDisplay(dto: widget.dto, index: index, stream: streamLines);
                     },
                   );
                 }),
@@ -133,21 +125,18 @@ class _ListTileDtoState extends State<ListTileDto> {
 }
 
 class _LineDisplay extends StatelessWidget {
-  const _LineDisplay(
-      {required this.dto, required this.index, required this.stream});
+  _LineDisplay({required this.dto, required this.index, required this.stream});
 
   final WorkoutSetDto dto;
   final int index;
   final Subject<List<Line>> stream;
+  final WorkoutSetBottomPanelController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    final WorkoutSetBottomPanelVm vm =
-        Provider.of<WorkoutSetBottomPanelVm>(context, listen: false);
     final List<Widget> listChildren = <Widget>[];
     final Line line = dto.lines.elementAt(index);
-    final GlobalKey<FormFieldState<String>> restTimeKey =
-        GlobalKey<FormFieldState<String>>();
+    final GlobalKey<FormFieldState<String>> restTimeKey = GlobalKey<FormFieldState<String>>();
     final GlobalKey iconButtonKey = GlobalKey();
     final GlobalKey lineKey = GlobalKey();
 
@@ -155,12 +144,10 @@ class _LineDisplay extends StatelessWidget {
 
     switch (dto.typeExercice) {
       case 'REPS_WEIGHT':
-        returnedWidget =
-            _RepsWeightLineBuilder(key: lineKey, line: line, dto: dto);
+        returnedWidget = _RepsWeightLineBuilder(key: lineKey, line: line, dto: dto);
         break;
       case 'REPS_ONLY':
-        returnedWidget =
-            _RepsOnlyLineBuilder(key: lineKey, line: line, dto: dto);
+        returnedWidget = _RepsOnlyLineBuilder(key: lineKey, line: line, dto: dto);
         break;
       case 'TIME':
         returnedWidget = _TimeLineBuilder(key: lineKey, line: line, dto: dto);
@@ -185,7 +172,7 @@ class _LineDisplay extends StatelessWidget {
         decoration: const InputDecoration(contentPadding: EdgeInsets.all(10)),
         style: const TextStyle(fontSize: 12),
         initialValue: line.restTime,
-        onChanged: (String? value) => vm.setRestTime(dto, line, value),
+        onChanged: (String? value) => controller.setRestTime(dto, line, value),
       ),
     );
     listChildren.add(reposDropdown);
@@ -197,7 +184,7 @@ class _LineDisplay extends StatelessWidget {
             if (dto.lines.length > 1) {
               dto.lines.removeAt(index);
               stream.sink.add(dto.lines);
-              vm.updateWorkoutSet(dto);
+              controller.updateWorkoutSet(dto);
             }
           },
           icon: const Icon(
@@ -215,18 +202,15 @@ class _LineDisplay extends StatelessWidget {
 
 /// Widget Line dans le cas d'un Time
 class _TimeLineBuilder extends StatelessWidget {
-  const _TimeLineBuilder({Key? key, required this.line, required this.dto})
-      : super(key: key);
+  _TimeLineBuilder({Key? key, required this.line, required this.dto}) : super(key: key);
 
   final WorkoutSetDto dto;
   final Line line;
+  final WorkoutSetBottomPanelController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    final WorkoutSetBottomPanelVm vm =
-        Provider.of<WorkoutSetBottomPanelVm>(context, listen: false);
-    final GlobalKey<FormFieldState<String>> timeKey =
-        GlobalKey<FormFieldState<String>>();
+    final GlobalKey<FormFieldState<String>> timeKey = GlobalKey<FormFieldState<String>>();
     return Row(
       children: <Widget>[
         LimitedBox(
@@ -239,12 +223,11 @@ class _TimeLineBuilder extends StatelessWidget {
               size: 12,
             ),
             onlyName: true,
-            decoration:
-                const InputDecoration(contentPadding: EdgeInsets.all(10)),
+            decoration: const InputDecoration(contentPadding: EdgeInsets.all(10)),
             style: const TextStyle(fontSize: 12),
             hint: const Text('Temps', style: TextStyle(fontSize: 10)),
             initialValue: line.time,
-            onChanged: (String? value) => vm.setTime(dto, line, value),
+            onChanged: (String? value) => controller.setTime(dto, line, value),
           ),
         ),
       ],
@@ -254,16 +237,14 @@ class _TimeLineBuilder extends StatelessWidget {
 
 /// Widget Line dans le cas d'un Reps Only
 class _RepsOnlyLineBuilder extends StatelessWidget {
-  const _RepsOnlyLineBuilder({Key? key, required this.dto, required this.line})
-      : super(key: key);
+  _RepsOnlyLineBuilder({Key? key, required this.dto, required this.line}) : super(key: key);
 
   final WorkoutSetDto dto;
   final Line line;
+  final WorkoutSetBottomPanelController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    final WorkoutSetBottomPanelVm vm =
-        Provider.of<WorkoutSetBottomPanelVm>(context, listen: false);
     const TextStyle textStyle = TextStyle(fontSize: 15);
     const TextStyle textStyleHint = TextStyle(fontSize: 12);
     return Row(
@@ -273,15 +254,11 @@ class _RepsOnlyLineBuilder extends StatelessWidget {
           maxWidth: _FitnessWorkoutDtoConstants.repsMaxWidth,
           child: TextFormField(
             initialValue: line.reps,
-            buildCounter: (BuildContext context,
-                    {required int currentLength,
-                    required bool isFocused,
-                    int? maxLength}) =>
-                null,
+            buildCounter: (BuildContext context, {required int currentLength, required bool isFocused, int? maxLength}) => null,
             maxLength: 3,
             textAlignVertical: TextAlignVertical.bottom,
             style: textStyle,
-            onChanged: (String value) => vm.setReps(dto, line, value),
+            onChanged: (String value) => controller.setReps(dto, line, value),
             decoration: const InputDecoration(
               hintText: 'Reps',
               hintStyle: textStyleHint,
@@ -295,16 +272,13 @@ class _RepsOnlyLineBuilder extends StatelessWidget {
 
 /// Widget Line dans le cas d'un Reps Weight
 class _RepsWeightLineBuilder extends StatelessWidget {
-  const _RepsWeightLineBuilder(
-      {Key? key, required this.dto, required this.line})
-      : super(key: key);
+  _RepsWeightLineBuilder({Key? key, required this.dto, required this.line}) : super(key: key);
   final WorkoutSetDto dto;
   final Line line;
+  final WorkoutSetBottomPanelController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    final WorkoutSetBottomPanelVm vm =
-        Provider.of<WorkoutSetBottomPanelVm>(context, listen: false);
     const TextStyle textStyle = TextStyle(fontSize: 15);
     const TextStyle textStyleHint = TextStyle(fontSize: 12);
     return Row(children: <Widget>[
@@ -313,15 +287,11 @@ class _RepsWeightLineBuilder extends StatelessWidget {
         maxWidth: _FitnessWorkoutDtoConstants.repsMaxWidth,
         child: TextFormField(
           initialValue: line.reps,
-          buildCounter: (BuildContext context,
-                  {required int currentLength,
-                  required bool isFocused,
-                  int? maxLength}) =>
-              null,
+          buildCounter: (BuildContext context, {required int currentLength, required bool isFocused, int? maxLength}) => null,
           maxLength: 3,
           textAlignVertical: TextAlignVertical.bottom,
           style: textStyle,
-          onChanged: (String value) => vm.setReps(dto, line, value),
+          onChanged: (String value) => controller.setReps(dto, line, value),
           decoration: const InputDecoration(
             hintText: 'Reps',
             hintStyle: textStyleHint,
@@ -340,7 +310,7 @@ class _RepsWeightLineBuilder extends StatelessWidget {
           initialValue: line.weight,
           textAlignVertical: TextAlignVertical.bottom,
           style: textStyle,
-          onChanged: (String value) => vm.setWeight(dto, line, value),
+          onChanged: (String value) => controller.setWeight(dto, line, value),
           decoration: const InputDecoration(
             hintText: 'Weight',
             hintStyle: textStyleHint,
