@@ -9,42 +9,10 @@ import 'package:get/get_rx/get_rx.dart' as rx;
 
 import 'exercice.service.dart';
 
-
-class ExerciceCreateController extends AbstractExerciceController {
-}
-
-class ExerciceUpdateController extends AbstractExerciceController {
-
-  RxBool isSet = false.obs;
-
-  @override
-  Future<void> init(Exercice? exerciceEntered) async {
-    sendStorage = false;
-
-    isSet.value = exerciceEntered != null && exerciceEntered.uid != null;
-
-    if (exerciceEntered != null) {
-      exercice.value = exerciceEntered;
-
-      if (exerciceEntered.imageUrl != null) {
-        final StorageFile? value = await storageService.getFutureStorageFile(exerciceEntered.imageUrl);
-        exercice.value.storageFile = value;
-      }
-    }
-  }
-
-  void deleteExercice(Exercice exerciceDeleted) {
-    if (exerciceDeleted.uid == exercice.value.uid) {
-      init(null);
-    }
-  }
-}
-
-abstract class AbstractExerciceController extends GetxController {
+class ExerciceController extends GetxController {
   final TrainersService trainersService = Get.find();
   final FirebaseStorageService storageService = Get.find();
   final ExerciceService exerciceService = Get.find();
-
 
   Rx<Exercice> exercice = Exercice().obs;
 
@@ -73,6 +41,32 @@ abstract class AbstractExerciceController extends GetxController {
       exercice.value.storageFile = stFile;
     } else {
       exercice.value.storageFile = StorageFile();
+    }
+  }
+}
+
+class ExerciceUpdateController extends ExerciceController {
+  RxBool isSet = false.obs;
+
+  @override
+  Future<void> init(Exercice? exerciceEntered) async {
+    sendStorage = false;
+
+    isSet.value = exerciceEntered != null && exerciceEntered.uid != null;
+
+    if (exerciceEntered != null) {
+      exercice.value = exerciceEntered;
+
+      if (exerciceEntered.imageUrl != null) {
+        final StorageFile? value = await storageService.getFutureStorageFile(exerciceEntered.imageUrl);
+        exercice.value.storageFile = value;
+      }
+    }
+  }
+
+  void deleteExercice(Exercice exerciceDeleted) {
+    if (exerciceDeleted.uid == exercice.value.uid) {
+      init(null);
     }
   }
 }

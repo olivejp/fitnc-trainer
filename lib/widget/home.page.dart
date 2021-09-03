@@ -34,7 +34,7 @@ class MyHomePage extends StatelessWidget {
       create: (_) => HomePageVm(),
       builder: (BuildContext context, __) {
         final HomePageVm vm = Provider.of<HomePageVm>(context, listen: false);
-        final DisplayTypeNotifier displayTypeNotifier = Provider.of<DisplayTypeNotifier>(context);
+        final DisplayTypeController displayTypeNotifier = Get.find();
 
         final List<Destination> destinations = <Destination>[
           Destination(icon: const Icon(Icons.account_tree_outlined), pageName: 'Programme', index: 0, page: const ProgrammePage()),
@@ -89,7 +89,6 @@ class FitnessDrawer extends StatefulWidget {
 class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProviderStateMixin {
   late AnimationController _iconAnimation;
   late Animation<double> _animation;
-
 
   @override
   void dispose() {

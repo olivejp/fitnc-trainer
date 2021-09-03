@@ -4,7 +4,7 @@ import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
 ///
 /// Classe Widget pour une GridView spécialisée pour un AbstractFitnessDomain.
@@ -39,10 +39,10 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
 
   @override
   Widget build(BuildContext context) {
-    final DisplayTypeNotifier displayTypeNotifier = Provider.of<DisplayTypeNotifier>(context, listen: true);
+    final DisplayTypeController displayTypeNotifier = Get.find();
 
     int nbColumns = 1;
-    switch (displayTypeNotifier.displayType) {
+    switch (displayTypeNotifier.displayType.value) {
       case DisplayType.mobile:
         nbColumns = defaultMobileColumns;
         break;

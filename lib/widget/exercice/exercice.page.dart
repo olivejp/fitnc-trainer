@@ -1,4 +1,5 @@
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
+import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/service/exercice.service.dart';
 import 'package:fitnc_trainer/service/exercice.update.controller.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
@@ -18,7 +19,7 @@ import 'package:rxdart/rxdart.dart';
 import '../../constants/constants.dart';
 import 'exercice.form.builder.dart';
 
-class ExercicePageVm extends GetxController {
+class ExerciceListController extends GetxController {
   final ExerciceService exerciceService = Get.find();
 
   RxList<bool> toggleSelections = <bool>[true, false].obs;
@@ -53,7 +54,7 @@ class ExercicePageVm extends GetxController {
 class ExercicePage extends StatefulWidget {
   ExercicePage({Key? key}) : super(key: key);
 
-  final ExercicePageVm vm = Get.put(ExercicePageVm());
+  final ExerciceListController vm = Get.put(ExerciceListController());
 
   @override
   State<ExercicePage> createState() => _ExercicePageState();
@@ -63,19 +64,6 @@ class _ExercicePageState extends State<ExercicePage> {
   final ExerciceService service = Get.find();
   final List<Exercice> listCompleteExercice = <Exercice>[];
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
-
-  void selectExercice(Exercice exercice) {
-    widget.vm.selectExercice(exercice);
-    if (!widget.vm.dualScreen.value) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-          insetPadding: const EdgeInsets.all(10),
-          content: ExerciceUpdate(exercice: exercice, displayCloseButton: true),
-        ),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +136,7 @@ class ExerciceListSearch extends StatefulWidget {
   }) : super(key: key);
 
   final ExerciceService service = Get.find();
-  final ExercicePageVm vm = Get.find();
+  final ExerciceListController vm = Get.find();
 
   @override
   State<ExerciceListSearch> createState() => _ExerciceListSearchState();
@@ -251,7 +239,7 @@ class ExerciceStreamBuilder extends StatelessWidget {
 
   final BehaviorSubject<List<Exercice>> _streamListExercice;
   final ExerciceService bloc = Get.find();
-  final ExercicePageVm vm = Get.find();
+  final ExerciceListController vm = Get.find();
   final ExerciceUpdateController controller = Get.find();
 
   @override
@@ -302,7 +290,7 @@ class ExerciceListViewSeparated extends StatelessWidget {
 
   final List<Exercice> list;
   final ExerciceService bloc = Get.find();
-  final ExercicePageVm vm = Get.find();
+  final ExerciceListController vm = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -326,7 +314,7 @@ class ExerciceListTile extends StatelessWidget {
   }) : super(key: key);
 
   final Exercice exercice;
-  final ExercicePageVm vm = Get.find();
+  final ExerciceListController vm = Get.find();
   final ExerciceService service = Get.find();
   final ExerciceUpdateController controller = Get.find();
 

@@ -5,6 +5,7 @@ import 'package:fitnc_trainer/widget/bottom.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -13,23 +14,17 @@ import '../../constants/constants.dart';
 
 typedef CallbackUserCredential = void Function(UserCredential userCredential);
 
-/// ChangeNotifier pour changer l'état des boutons 'Hide password'.
-class HidePasswordNotifier with ChangeNotifier {
-  bool _hidePassword1 = true;
-  bool _hidePassword2 = true;
-
-  bool get hidePassword1 => _hidePassword1;
-
-  bool get hidePassword2 => _hidePassword2;
+/// Controller pour changer l'état des boutons 'Hide password'.
+class HidePasswordController extends GetxController {
+  RxBool hidePassword1 = true.obs;
+  RxBool hidePassword2 = true.obs;
 
   void switchPassword1() {
-    _hidePassword1 = !_hidePassword1;
-    notifyListeners();
+    hidePassword1.value = !hidePassword1.value;
   }
 
   void switchPassword2() {
-    _hidePassword2 = !_hidePassword2;
-    notifyListeners();
+    hidePassword2.value = !hidePassword2.value;
   }
 }
 
@@ -47,6 +42,7 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   _SignUpPageState();
 
+  final HidePasswordController controller = Get.put(HidePasswordController());
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -71,10 +67,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
 
     return MultiProvider(
-      providers: <SingleChildWidget>[
-        ChangeNotifierProvider<HidePasswordNotifier>(create: (BuildContext context) => HidePasswordNotifier()),
-        Provider<SignUpVm>(create: (BuildContext context) => SignUpVm())
-      ],
+      providers: <SingleChildWidget>[Provider<SignUpVm>(create: (BuildContext context) => SignUpVm())],
       builder: (BuildContext context, __) {
         final SignUpVm bloc = Provider.of<SignUpVm>(context);
 
@@ -201,20 +194,20 @@ class _SignUpPageState extends State<SignUpPage> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 60),
-                                child: Consumer<HidePasswordNotifier>(
-                                  builder: (_, HidePasswordNotifier hidePasswordNotifier, __) => TextFormField(
+                                child: Obx(
+                                  () => TextFormField(
                                       style: GoogleFonts.roboto(fontSize: 15),
                                       onChanged: (String value) => bloc.password = value,
-                                      obscureText: hidePasswordNotifier.hidePassword1,
+                                      obscureText: controller.hidePassword1.value,
                                       decoration: InputDecoration(
                                           labelText: 'Mot de passe',
                                           focusedBorder: defaultBorder,
                                           border: defaultBorder,
                                           enabledBorder: defaultBorder,
                                           suffixIcon: IconButton(
-                                            tooltip: hidePasswordNotifier.hidePassword1 ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
-                                            onPressed: hidePasswordNotifier.switchPassword1,
-                                            icon: hidePasswordNotifier.hidePassword1
+                                            tooltip: controller.hidePassword1.value ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
+                                            onPressed: controller.switchPassword1,
+                                            icon: controller.hidePassword1.value
                                                 ? const Icon(Icons.visibility_outlined)
                                                 : const Icon(Icons.visibility_off_outlined),
                                           )),
@@ -227,20 +220,20 @@ class _SignUpPageState extends State<SignUpPage> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 20),
-                                child: Consumer<HidePasswordNotifier>(
-                                  builder: (_, HidePasswordNotifier hidePasswordNotifier, __) => TextFormField(
+                                child: Obx(
+                                  () => TextFormField(
                                       style: GoogleFonts.roboto(fontSize: 15),
                                       onChanged: (String value) => bloc.passwordCheck = value,
-                                      obscureText: hidePasswordNotifier.hidePassword2,
+                                      obscureText: controller.hidePassword2.value,
                                       decoration: InputDecoration(
                                           focusedBorder: defaultBorder,
                                           border: defaultBorder,
                                           enabledBorder: defaultBorder,
                                           labelText: 'Retaper votre mot de passe',
                                           suffixIcon: IconButton(
-                                              tooltip: hidePasswordNotifier.hidePassword2 ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
-                                              onPressed: hidePasswordNotifier.switchPassword2,
-                                              icon: hidePasswordNotifier.hidePassword2
+                                              tooltip: controller.hidePassword2.value ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
+                                              onPressed: controller.switchPassword2,
+                                              icon: controller.hidePassword2.value
                                                   ? const Icon(Icons.visibility_outlined)
                                                   : const Icon(Icons.visibility_off_outlined))),
                                       validator: (String? value) {
@@ -297,7 +290,7 @@ class _SignUpPageState extends State<SignUpPage> {
         );
 
         return LayoutDisplayNotifier(
-          child: Scaffold(
+          builder: (DisplayTypeController displayTypeController) => Scaffold(
             backgroundColor: FitnessNcColors.blue50,
             body: Stack(
               children: <Widget>[
@@ -327,23 +320,21 @@ class _SignUpPageState extends State<SignUpPage> {
                             colors: <Color>[Colors.amber.withAlpha(100), Colors.amber.shade700])),
                   ),
                 ),
-                Consumer<DisplayTypeNotifier>(
-                  builder: (_, DisplayTypeNotifier value, Widget? child) {
-                    Widget toShow;
-                    if (value.displayType == DisplayType.desktop) {
-                      toShow = Row(
-                        children: <Widget>[
-                          Expanded(child: columnLeft),
-                          Expanded(child: columnRight),
-                        ],
-                      );
-                    } else {
-                      toShow = columnRight;
-                    }
-                    return Stack(children: <Widget>[toShow, child!]);
-                  },
-                  child: const FitnessBottomCu(),
-                ),
+                Builder(builder: (_) {
+                  const Widget child = FitnessBottomCu();
+                  Widget toShow;
+                  if (displayTypeController.displayType.value == DisplayType.desktop) {
+                    toShow = Row(
+                      children: <Widget>[
+                        Expanded(child: columnLeft),
+                        Expanded(child: columnRight),
+                      ],
+                    );
+                  } else {
+                    toShow = columnRight;
+                  }
+                  return Stack(children: <Widget>[toShow, child]);
+                }),
               ],
             ),
           ),

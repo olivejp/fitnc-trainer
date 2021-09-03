@@ -46,7 +46,7 @@ class ExerciceCreate extends StatefulWidget {
 class _ExerciceCreateState extends State<ExerciceCreate> {
   late VideoPlayerController? _videoController;
   late GlobalKey<FormState> _formKey;
-  final ExerciceCreateController controller = Get.put(ExerciceCreateController());
+  final ExerciceController controller = Get.put(ExerciceController());
   YoutubePlayerController? youtubeController;
 
   @override

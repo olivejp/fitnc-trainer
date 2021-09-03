@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:provider/provider.dart';
 
 import 'constants/constants.dart';
 
@@ -18,12 +17,11 @@ import 'constants/constants.dart';
 enum DisplayType { mobile, tablet, desktop }
 
 /// Notifier qui permet de savoir quel est l'affichage courant
-class DisplayTypeNotifier with ChangeNotifier {
-  DisplayType displayType = DisplayType.mobile;
+class DisplayTypeController extends GetxController {
+  Rx<DisplayType> displayType = DisplayType.mobile.obs;
 
   void changeDisplay(DisplayType newDisplayType) {
-    displayType = newDisplayType;
-    notifyListeners();
+    displayType.value = newDisplayType;
   }
 }
 
@@ -54,7 +52,7 @@ class MyApp extends StatelessWidget {
                   callback: (UserCredential userCredential) => Navigator.pop(context),
                 ),
           },
-          home: const LayoutDisplayNotifier(child: FirebaseWidget())),
+          home: LayoutDisplayNotifier(builder: (DisplayTypeController displayTypeController) => const FirebaseWidget(), )),
     );
   }
 
@@ -84,37 +82,35 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class LayoutDisplayNotifier extends StatelessWidget {
-  const LayoutDisplayNotifier({Key? key, required this.child, this.desktopSize = 1280, this.tabletSize = 800}) : super(key: key);
-  final Widget child;
+class LayoutDisplayNotifier extends StatefulWidget {
+  const LayoutDisplayNotifier({Key? key, required this.builder, this.desktopSize = 1280, this.tabletSize = 800,}) : super(key: key);
   final int desktopSize;
   final int tabletSize;
+  final Widget Function(DisplayTypeController displayTypeController) builder;
+
+  @override
+  State<LayoutDisplayNotifier> createState() => _LayoutDisplayNotifierState();
+}
+
+class _LayoutDisplayNotifierState extends State<LayoutDisplayNotifier> {
+  final DisplayTypeController displayTypeController = Get.put(DisplayTypeController());
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<DisplayTypeNotifier>(
-      create: (_) => DisplayTypeNotifier(),
-      builder: (BuildContext context, Widget? child) {
-        final DisplayTypeNotifier displayNotifier = Provider.of<DisplayTypeNotifier>(context, listen: false);
-        return LayoutBuilder(
-          builder: (_, BoxConstraints constraints) {
-            /// Mise à jour du displayType selon la largeur de l'écran.
-            DisplayType displayType = DisplayType.desktop;
-            if (constraints.maxWidth >= desktopSize) {
-              displayType = DisplayType.desktop;
-            } else if (constraints.maxWidth >= tabletSize && constraints.maxWidth <= desktopSize - 1) {
-              displayType = DisplayType.tablet;
-            } else {
-              displayType = DisplayType.mobile;
-            }
-            WidgetsBinding.instance?.addPostFrameCallback((Duration timeStamp) {
-              displayNotifier.changeDisplay(displayType);
-            });
-            return child!;
-          },
-        );
+    return LayoutBuilder(
+      builder: (_, BoxConstraints constraints) {
+        /// Mise à jour du displayType selon la largeur de l'écran.
+        DisplayType displayType = DisplayType.desktop;
+        if (constraints.maxWidth >= widget.desktopSize) {
+          displayType = DisplayType.desktop;
+        } else if (constraints.maxWidth >= widget.tabletSize && constraints.maxWidth <= widget.desktopSize - 1) {
+          displayType = DisplayType.tablet;
+        } else {
+          displayType = DisplayType.mobile;
+        }
+        displayTypeController.changeDisplay(displayType);
+        return widget.builder(displayTypeController);
       },
-      child: child,
     );
   }
 }
