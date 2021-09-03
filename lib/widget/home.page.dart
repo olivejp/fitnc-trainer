@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'dart:ui';
 
-import 'package:fitnc_trainer/bloc/home.page.vm.dart';
+import 'package:fitnc_trainer/bloc/home.page.controller.dart';
 import 'package:fitnc_trainer/main.dart';
 import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.page.dart';
@@ -26,13 +27,9 @@ class Destination {
 
 class MyHomePage extends StatelessWidget {
   final HomePageController controller = Get.put(HomePageController());
-  final DisplayTypeController displayTypeNotifier = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    // Dans le cas d'un affichage Desktop.
-    controller.changeExpanded(displayTypeNotifier.displayType.value == DisplayType.desktop);
-
     final List<Destination> destinations = <Destination>[
       Destination(icon: const Icon(Icons.account_tree_outlined), pageName: 'Programme', index: 0, page: const ProgrammePage()),
       Destination(icon: const Icon(Icons.sports_volleyball_outlined), pageName: 'Workout', index: 1, page: const WorkoutPage()),
@@ -82,6 +79,7 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
   late Animation<double> _animation;
   final AuthService authService = Get.find();
   final HomePageController controller = Get.find();
+  final DisplayTypeController displayTypeController = Get.find();
 
   @override
   void dispose() {
@@ -92,6 +90,9 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
+    displayTypeController.displayType.listen((DisplayType displayType) {
+      controller.changeExpanded(displayType == DisplayType.desktop);
+    });
     _iconAnimation = AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
     _animation = Tween<double>(begin: 1.0, end: 0.0).animate(_iconAnimation);
   }

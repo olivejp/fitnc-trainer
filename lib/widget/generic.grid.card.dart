@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 /// Ce paramètre est optionnel et s'il n'est pas précisé une card par défaut sera dessiner.
 ///
 class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
-  const FitnessGridView(
+  FitnessGridView(
       {Key? key,
       required this.domains,
       required this.bloc,
@@ -36,48 +36,49 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
   final int defaultTabletColumns;
   final int defaultDesktopColumns;
   final Widget Function(T domain)? getCard;
+  final DisplayTypeController displayTypeController = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    final DisplayTypeController displayTypeNotifier = Get.find();
+    return Obx(() {
+      int nbColumns = 1;
+      switch (displayTypeController.displayType.value) {
+        case DisplayType.mobile:
+          nbColumns = defaultMobileColumns;
+          break;
+        case DisplayType.tablet:
+          nbColumns = defaultTabletColumns;
+          break;
+        case DisplayType.desktop:
+          nbColumns = defaultDesktopColumns;
+          break;
+      }
 
-    int nbColumns = 1;
-    switch (displayTypeNotifier.displayType.value) {
-      case DisplayType.mobile:
-        nbColumns = defaultMobileColumns;
-        break;
-      case DisplayType.tablet:
-        nbColumns = defaultTabletColumns;
-        break;
-      case DisplayType.desktop:
-        nbColumns = defaultDesktopColumns;
-        break;
-    }
-
-    return GridView.count(
-      shrinkWrap: true,
-      childAspectRatio: childAspectRatio,
-      padding: EdgeInsets.all(padding),
-      mainAxisSpacing: 10.0,
-      crossAxisSpacing: 10.0,
-      crossAxisCount: nbColumns,
-      children: domains.map((T domain) {
-        if (getCard != null) {
-          return getCard!(domain);
-        } else {
-          return _FitnessGridCard<T>(
-            bloc: bloc,
-            domain: domain,
-            onTap: (T domain) {
-              if (onTap != null) {
-                onTap!(domain);
-              }
-            },
-            onDelete: (T domain) => UtilService.showDeleteDialog(context, domain, bloc),
-          );
-        }
-      }).toList(),
-    );
+      return GridView.count(
+        shrinkWrap: true,
+        childAspectRatio: childAspectRatio,
+        padding: EdgeInsets.all(padding),
+        mainAxisSpacing: 10.0,
+        crossAxisSpacing: 10.0,
+        crossAxisCount: nbColumns,
+        children: domains.map((T domain) {
+          if (getCard != null) {
+            return getCard!(domain);
+          } else {
+            return _FitnessGridCard<T>(
+              bloc: bloc,
+              domain: domain,
+              onTap: (T domain) {
+                if (onTap != null) {
+                  onTap!(domain);
+                }
+              },
+              onDelete: (T domain) => UtilService.showDeleteDialog(context, domain, bloc),
+            );
+          }
+        }).toList(),
+      );
+    });
   }
 }
 
