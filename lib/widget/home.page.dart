@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 
 import '../constants/constants.dart';
 import 'abonne/abonne.page.dart';
@@ -26,52 +25,44 @@ class Destination {
 }
 
 class MyHomePage extends StatelessWidget {
-  const MyHomePage();
+  final HomePageController controller = Get.put(HomePageController());
+  final DisplayTypeController displayTypeNotifier = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<HomePageVm>(
-      create: (_) => HomePageVm(),
-      builder: (BuildContext context, __) {
-        final HomePageVm vm = Provider.of<HomePageVm>(context, listen: false);
-        final DisplayTypeController displayTypeNotifier = Get.find();
+    // Dans le cas d'un affichage Desktop.
+    controller.changeExpanded(displayTypeNotifier.displayType.value == DisplayType.desktop);
 
-        final List<Destination> destinations = <Destination>[
-          Destination(icon: const Icon(Icons.account_tree_outlined), pageName: 'Programme', index: 0, page: const ProgrammePage()),
-          Destination(icon: const Icon(Icons.sports_volleyball_outlined), pageName: 'Workout', index: 1, page: const WorkoutPage()),
-          Destination(icon: const Icon(Icons.sports_handball_outlined), pageName: 'Exercice', index: 2, page: ExercicePage()),
-          Destination(icon: const Icon(Icons.person), pageName: 'Abonné', index: 3, page: AbonnePage()),
-        ];
+    final List<Destination> destinations = <Destination>[
+      Destination(icon: const Icon(Icons.account_tree_outlined), pageName: 'Programme', index: 0, page: const ProgrammePage()),
+      Destination(icon: const Icon(Icons.sports_volleyball_outlined), pageName: 'Workout', index: 1, page: const WorkoutPage()),
+      Destination(icon: const Icon(Icons.sports_handball_outlined), pageName: 'Exercice', index: 2, page: ExercicePage()),
+      Destination(icon: const Icon(Icons.person), pageName: 'Abonné', index: 3, page: AbonnePage()),
+    ];
 
-        // Dans le cas d'un affichage Desktop.
-        WidgetsBinding.instance?.addPostFrameCallback((Duration timeStamp) {
-          vm.isExpanded = displayTypeNotifier.displayType == DisplayType.desktop;
-        });
-
-        return Scaffold(
-          body: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              FitnessDrawer(
-                destinations: destinations,
-                appName: FitnessConstants.appTitle,
-              ),
-              Expanded(
-                child: Consumer<HomePageVm>(
-                  builder: (_, HomePageVm consumeVm, __) {
-                    final Iterable<Destination> destinationsFiltered = destinations.where((Destination dest) => dest.index == consumeVm.currentPage);
-                    if (destinationsFiltered.isNotEmpty) {
-                      return destinationsFiltered.first.page;
-                    } else {
-                      throw Exception('Index ne correspond à aucune page.');
-                    }
-                  },
-                ),
-              ),
-            ],
+    return Scaffold(
+      body: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          FitnessDrawer(
+            destinations: destinations,
+            appName: FitnessConstants.appTitle,
           ),
-        );
-      },
+          Expanded(
+            child: Obx(
+              () {
+                final Iterable<Destination> destinationsFiltered =
+                    destinations.where((Destination dest) => dest.index == controller.currentPage.value);
+                if (destinationsFiltered.isNotEmpty) {
+                  return destinationsFiltered.first.page;
+                } else {
+                  throw Exception('Index ne correspond à aucune page.');
+                }
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -89,6 +80,8 @@ class FitnessDrawer extends StatefulWidget {
 class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProviderStateMixin {
   late AnimationController _iconAnimation;
   late Animation<double> _animation;
+  final AuthService authService = Get.find();
+  final HomePageController controller = Get.find();
 
   @override
   void dispose() {
@@ -105,79 +98,68 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    final AuthService authService = Get.find();
+    return Obx(() {
+      if (controller.isExpanded.value) {
+        _iconAnimation.reverse();
+      } else {
+        _iconAnimation.forward();
+      }
 
-    final HomePageVm vm = Provider.of<HomePageVm>(context, listen: true);
-
-    if (vm.isExpanded) {
-      _iconAnimation.reverse();
-    } else {
-      _iconAnimation.forward();
-    }
-
-    return NavigationRail(
-        elevation: 5,
-        extended: vm.isExpanded,
-        selectedIndex: vm.currentPage,
-        trailing: _NavigationRailFolderSection(folders: <_NavigationFolder>[
-          _NavigationFolder(
-            label: 'Déconnexion',
-            iconData: Icons.exit_to_app_outlined,
-            onTap: () => authService.signOut(),
-          )
-        ]),
-        leading: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: TextButton.icon(
-                onPressed: () {
-                  WidgetsBinding.instance?.addPostFrameCallback((Duration timeStamp) {
-                    vm.isExpanded = !vm.isExpanded;
-                  });
-                },
-                icon: AnimatedIcon(
-                  icon: AnimatedIcons.home_menu,
-                  color: Theme.of(context).primaryColor,
-                  progress: _iconAnimation,
-                ),
-                label: AnimatedBuilder(
-                  animation: _iconAnimation,
-                  builder: (BuildContext context, Widget? child) {
-                    return Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      widthFactor: _animation.value,
-                      child: Opacity(
-                        opacity: _animation.value,
-                        child: Text(
-                          widget.appName,
-                          style: Theme.of(context).textTheme.headline2,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
+      return NavigationRail(
+          elevation: 5,
+          extended: controller.isExpanded.value,
+          selectedIndex: controller.currentPage.value,
+          trailing: _NavigationRailFolderSection(folders: <_NavigationFolder>[
+            _NavigationFolder(
+              label: 'Déconnexion',
+              iconData: Icons.exit_to_app_outlined,
+              onTap: () => authService.signOut(),
             )
-          ],
-        ),
-        onDestinationSelected: (int value) {
-          WidgetsBinding.instance?.addPostFrameCallback((Duration timeStamp) {
-            vm.currentPage = value;
-          });
-        },
-        destinations: widget.destinations.map((Destination e) {
-          return NavigationRailDestination(
-            label: Text(e.pageName),
-            icon: Material(
-              key: ValueKey<String>('fit-${e.pageName}'),
-              color: Colors.transparent,
-              child: e.icon,
-            ),
-          );
-        }).toList());
-    ;
+          ]),
+          leading: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: TextButton.icon(
+                  onPressed: () => controller.changeExpanded(!controller.isExpanded.value),
+                  icon: AnimatedIcon(
+                    icon: AnimatedIcons.home_menu,
+                    color: Theme.of(context).primaryColor,
+                    progress: _iconAnimation,
+                  ),
+                  label: AnimatedBuilder(
+                    animation: _iconAnimation,
+                    builder: (BuildContext context, Widget? child) {
+                      return Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        widthFactor: _animation.value,
+                        child: Opacity(
+                          opacity: _animation.value,
+                          child: Text(
+                            widget.appName,
+                            style: Theme.of(context).textTheme.headline2,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              )
+            ],
+          ),
+          onDestinationSelected: (int value) => controller.changePage(value),
+          destinations: widget.destinations.map((Destination e) {
+            return NavigationRailDestination(
+              label: Text(e.pageName),
+              icon: Material(
+                key: ValueKey<String>('fit-${e.pageName}'),
+                color: Colors.transparent,
+                child: e.icon,
+              ),
+            );
+          }).toList());
+    });
   }
 }
 

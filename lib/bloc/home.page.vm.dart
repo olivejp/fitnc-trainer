@@ -1,22 +1,16 @@
-import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class HomePageVm with ChangeNotifier {
-  HomePageVm();
+class HomePageController extends GetxController {
+  HomePageController();
 
-  int _currentPage = 0;
-  bool _isExpanded = false;
+  RxInt currentPage = 0.obs;
+  RxBool isExpanded = false.obs;
 
-  set currentPage(int newPage) {
-    _currentPage = newPage;
-    notifyListeners();
+  void changePage(int newPage) {
+    currentPage.value = newPage;
   }
 
-  int get currentPage => _currentPage;
-
-  set isExpanded(bool isExpanded) {
-    _isExpanded = isExpanded;
-    notifyListeners();
+  void changeExpanded(bool isExpanded) {
+    this.isExpanded.value = isExpanded;
   }
-
-  bool get isExpanded => _isExpanded;
 }

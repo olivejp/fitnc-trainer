@@ -79,12 +79,12 @@ class _WorkoutPageState extends State<WorkoutPage> {
                     child: TextFormField(
                       onChanged: (String text) => query = text,
                       decoration: InputDecoration(
-                        constraints: BoxConstraints(maxHeight: 43),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(width: 1)),
+                        constraints: const BoxConstraints(maxHeight: 43),
+                        border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
                         focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(5)),
-                            borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor)),
-                        prefixIcon: Icon(Icons.search),
+                            borderRadius: const BorderRadius.all(Radius.circular(5)),
+                            borderSide: BorderSide(color: Theme.of(context).primaryColor)),
+                        prefixIcon: const Icon(Icons.search),
                         hintText: 'Recherche...',
                       ),
                       textAlignVertical: TextAlignVertical.bottom,

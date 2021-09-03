@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fitnc_trainer/constants/constants.dart';
 import 'package:fitnc_trainer/service/auth.service.dart';
 import 'package:fitnc_trainer/widget/home.page.dart';
 import 'package:fitnc_trainer/widget/login/login.page.dart';
@@ -19,7 +18,7 @@ class AuthWidget extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.active) {
           final User? user = snapshot.data;
           if (user != null) {
-            return Provider<User>.value(value: user, child: const MyHomePage());
+            return Provider<User>.value(value: user, child: MyHomePage());
           } else {
             return const LoginPage();
           }
