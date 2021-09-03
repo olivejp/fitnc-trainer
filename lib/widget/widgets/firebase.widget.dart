@@ -9,7 +9,6 @@ import 'package:fitnc_trainer/service/workout_set.service.dart';
 import 'package:fitnc_trainer/widget/widgets/auth.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 
 class FirebaseWidget extends StatelessWidget {
   const FirebaseWidget({Key? key}) : super(key: key);

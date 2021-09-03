@@ -10,21 +10,16 @@ import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/get_rx.dart' as getx;
 import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ProgrammeVm with ChangeNotifier {
+class ProgrammeController extends GetxController {
   final TrainersService trainersService = Get.find();
   final ProgrammeService programmeService = Get.find();
 
   BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
-  final BehaviorSubject<String?> _streamSelectedVideoUrl = BehaviorSubject<String?>();
-  final BehaviorSubject<String?> _streamSelectedYoutubeUrl = BehaviorSubject<String?>();
   final BehaviorSubject<List<WorkoutScheduleDto>> _streamWorkoutScheduleDto = BehaviorSubject<List<WorkoutScheduleDto>>();
-
-  Stream<String?>? get selectedVideoUrlObs => _streamSelectedVideoUrl.stream;
-
-  Stream<String?>? get selectedYoutubeUrlObs => _streamSelectedYoutubeUrl.stream;
 
   Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
 
@@ -34,6 +29,19 @@ class ProgrammeVm with ChangeNotifier {
   final List<WorkoutScheduleDto> listDtos = <WorkoutScheduleDto>[];
   late Programme programme;
   bool sendStorage = false;
+
+  RxInt numberWeekInt = 0.obs;
+
+  void changeNumberWeek(String? numberWeek) {
+    if (numberWeek != null) {
+      final int indexUnderscore = numberWeek.isNotEmpty ? numberWeek.indexOf('_') : 0;
+      if (indexUnderscore != 0) {
+        numberWeekInt.value = int.parse(numberWeek.substring(0, indexUnderscore));
+      }
+    } else {
+      numberWeekInt.value = 1;
+    }
+  }
 
   Future<List<DropdownMenuItem<Workout>>> getWorkoutDropdownItems() {
     return programmeService.getWorkoutDropdownItems();
@@ -51,14 +59,6 @@ class ProgrammeVm with ChangeNotifier {
     return programmeService.unpublishProgramme(programme, sendStorage: sendStorage);
   }
 
-  int getNumberWeeks(String? numberWeeks) {
-    if (numberWeeks != null) {
-      return int.parse(numberWeeks.substring(0, 1));
-    } else {
-      return 0;
-    }
-  }
-
   void init(Programme? programmeEntered) {
     sendStorage = false;
     subjectStoragePair.sink.add(null);
@@ -67,6 +67,13 @@ class ProgrammeVm with ChangeNotifier {
       programme = programmeEntered;
       programme.storageFile = StorageFile();
       programmeService.getFutureStorageFile(programme).then((StorageFile? storageFile) => subjectStoragePair.sink.add(storageFile));
+
+      if (programme.numberWeeks != null) {
+        final int indexUnderscore = programme.numberWeeks != null ? programme.numberWeeks!.indexOf('_') : 0;
+        numberWeekInt.value = int.parse(programme.numberWeeks!.substring(0, indexUnderscore));
+      } else {
+        numberWeekInt.value = 1;
+      }
 
       // On récupère une fois la liste des WorkoutScheduleDto
       trainersService
@@ -87,6 +94,7 @@ class ProgrammeVm with ChangeNotifier {
       });
     } else {
       programme = Programme();
+      numberWeekInt.value = 0;
       subjectStoragePair.sink.add(null);
     }
   }
@@ -96,21 +104,6 @@ class ProgrammeVm with ChangeNotifier {
   }
 
   String get name => programme.name;
-
-  set numberWeeks(String? value) {
-    programme.numberWeeks = value;
-    notifyListeners();
-  }
-
-  int get numberWeeksInt {
-    if (programme.numberWeeks != null) {
-      final int indexUnderscore = programme.numberWeeks != null ? programme.numberWeeks!.indexOf('_') : 0;
-      return int.parse(programme.numberWeeks!.substring(0, indexUnderscore));
-    }
-    return 0;
-  }
-
-  String? get numberWeeks => programme.numberWeeks;
 
   set description(String? value) {
     programme.description = value;

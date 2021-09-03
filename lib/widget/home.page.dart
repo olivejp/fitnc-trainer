@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:ui';
 
 import 'package:fitnc_trainer/bloc/home.page.controller.dart';

@@ -1,14 +1,12 @@
-import 'package:fitnc_trainer/bloc/programme/programme.vm.dart';
+import 'package:fitnc_trainer/bloc/programme/programme.controller.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants/constants.dart';
-import '../../main.dart';
 
 class ProgrammeFormBuilder {
-  static Widget getForm(GlobalKey<FormState> _formKey, ProgrammeVm bloc) {
+  static Widget getForm(GlobalKey<FormState> _formKey, ProgrammeController controller) {
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 800),
       child: Form(
@@ -22,11 +20,9 @@ class ProgrammeFormBuilder {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   StorageStreamImageWidget(
-                    onSaved: (StorageFile? storagePair) =>
-                        bloc.setStoragePair(storagePair),
-                    streamInitialStorageFile: bloc.obsStoragePair,
-                    onDeleted: (StorageFile? storagePair) =>
-                        bloc.setStoragePair(null),
+                    onSaved: (StorageFile? storagePair) => controller.setStoragePair(storagePair),
+                    streamInitialStorageFile: controller.obsStoragePair,
+                    onDeleted: (StorageFile? storagePair) => controller.setStoragePair(null),
                   ),
                   Expanded(
                     child: Padding(
@@ -35,11 +31,10 @@ class ProgrammeFormBuilder {
                         children: [
                           Expanded(
                             child: TextFormField(
-                                initialValue: bloc.programme.name,
+                                initialValue: controller.programme.name,
                                 autofocus: true,
-                                onChanged: (String value) => bloc.name = value,
-                                decoration:
-                                    const InputDecoration(labelText: 'Nom'),
+                                onChanged: (String value) => controller.name = value,
+                                decoration: const InputDecoration(labelText: 'Nom'),
                                 validator: (String? value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Merci de renseigner le nom du programme.';
@@ -52,14 +47,10 @@ class ProgrammeFormBuilder {
                               padding: const EdgeInsets.only(left: 8.0),
                               child: ParamDropdownButton(
                                   paramName: 'number_weeks',
-                                  initialValue: bloc.programme.numberWeeks,
+                                  initialValue: controller.programme.numberWeeks,
                                   decoration: const InputDecoration(
-                                      labelText: 'Nombre de semaine',
-                                      constraints: BoxConstraints(
-                                          maxHeight: FitnessConstants
-                                              .textFormFieldHeight)),
-                                  onChanged: (String? value) =>
-                                      bloc.numberWeeks = value),
+                                      labelText: 'Nombre de semaine', constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight)),
+                                  onChanged: (String? value) => controller.changeNumberWeek(value)),
                             ),
                           )
                         ],
@@ -70,13 +61,12 @@ class ProgrammeFormBuilder {
               ),
             ),
             TextFormField(
-              initialValue: bloc.programme.description,
+              initialValue: controller.programme.description,
               maxLength: 2000,
               minLines: 5,
               maxLines: 20,
-              onChanged: (String? value) => bloc.description = value,
-              decoration: const InputDecoration(
-                  labelText: 'Description', helperText: 'Optionnel'),
+              onChanged: (String? value) => controller.description = value,
+              decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
             ),
           ],
         ),

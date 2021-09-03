@@ -1,9 +1,8 @@
-import 'package:fitnc_trainer/bloc/programme/programme.vm.dart';
+import 'package:fitnc_trainer/bloc/programme/programme.controller.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_schedule.dto.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitnc_trainer/widget/programme/programme.page.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
@@ -17,7 +16,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart' as sf;
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -32,28 +30,28 @@ class ProgrammeUpdatePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Widget> buttons = <Widget>[];
-    final ProgrammeVm vm = Provider.of<ProgrammeVm>(context, listen: false);
+    final ProgrammeController controller = Get.put(ProgrammeController());
 
-    vm.init(programme);
+    controller.init(programme);
 
-    if (vm.programme.available == true) {
+    if (controller.programme.available == true) {
       buttons.add(TextButton.icon(
         style: TextButton.styleFrom(backgroundColor: Colors.red),
         onPressed: () {
           if (_formKey.currentState?.validate() == true) {
-            vm.unpublish().then((_) => Navigator.pop(context));
+            controller.unpublish().then((_) => Navigator.pop(context));
           }
         },
         label: const Text('Dépublier', style: TextStyle(color: Colors.white)),
         icon: const Icon(Icons.public, color: Colors.white),
       ));
     }
-    if (vm.programme.available == null || vm.programme.available == false) {
+    if (controller.programme.available == null || controller.programme.available == false) {
       buttons.add(TextButton.icon(
         style: TextButton.styleFrom(backgroundColor: Colors.green),
         onPressed: () {
           if (_formKey.currentState?.validate() == true) {
-            vm.publish().then((_) => Navigator.pop(context));
+            controller.publish().then((_) => Navigator.pop(context));
           }
         },
         label: const Text('Publier', style: TextStyle(color: Colors.white)),
@@ -65,7 +63,7 @@ class ProgrammeUpdatePage extends StatelessWidget {
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () {
             if (_formKey.currentState?.validate() == true) {
-              vm
+              controller
                   .save()
                   .then(
                     (_) => showToast('Exercice sauvegardé', backgroundColor: Colors.green),
@@ -94,9 +92,9 @@ class ProgrammeUpdatePage extends StatelessWidget {
               child: Row(
                 children: <Widget>[
                   StorageStreamImageWidget(
-                    onSaved: (StorageFile? storagePair) => vm.setStoragePair(storagePair),
-                    streamInitialStorageFile: vm.obsStoragePair,
-                    onDeleted: (StorageFile? storagePair) => vm.setStoragePair(null),
+                    onSaved: (StorageFile? storagePair) => controller.setStoragePair(storagePair),
+                    streamInitialStorageFile: controller.obsStoragePair,
+                    onDeleted: (StorageFile? storagePair) => controller.setStoragePair(null),
                   ),
                   Flexible(
                     child: Column(
@@ -118,9 +116,9 @@ class ProgrammeUpdatePage extends StatelessWidget {
                                       children: <Widget>[
                                         Expanded(
                                           child: FitnessDecorationTextFormField(
-                                              initialValue: vm.programme.name,
+                                              initialValue: controller.programme.name,
                                               autofocus: true,
-                                              onChanged: (String value) => vm.name = value,
+                                              onChanged: (String value) => controller.name = value,
                                               labelText: 'Nom',
                                               validator: (String? value) {
                                                 if (value == null || value.isEmpty) {
@@ -140,8 +138,8 @@ class ProgrammeUpdatePage extends StatelessWidget {
                                                     labelText: 'Nombre de semaine',
                                                     constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
                                                     contentPadding: EdgeInsets.symmetric(horizontal: 10)),
-                                                initialValue: vm.programme.numberWeeks,
-                                                onChanged: (String? value) => vm.numberWeeks = value),
+                                                initialValue: controller.programme.numberWeeks,
+                                                onChanged: (String? value) => controller.changeNumberWeek(value)),
                                           ),
                                         )
                                       ],
@@ -159,11 +157,11 @@ class ProgrammeUpdatePage extends StatelessWidget {
               ),
             ),
             TextFormField(
-              initialValue: vm.programme.description,
+              initialValue: controller.programme.description,
               maxLength: 2000,
               minLines: 5,
               maxLines: 20,
-              onChanged: (String value) => vm.description = value,
+              onChanged: (String value) => controller.description = value,
               decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionel'),
             ),
             WorkoutSchedulePanel()
@@ -233,11 +231,10 @@ class _WorkoutChoicePanel extends StatelessWidget {
 class WorkoutSchedulePanel extends StatelessWidget {
   static final TextStyle columnTextStyle = GoogleFonts.roboto(fontSize: 10, fontWeight: FontWeight.bold);
   static final List<String> columnNames = <String>['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+  final ProgrammeController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    final ProgrammeVm vm = Provider.of<ProgrammeVm>(context, listen: false);
-
     final List<sf.GridColumn> listHeadersColumn = columnNames
         .map((String columnName) => sf.GridColumn(
             columnName: columnName,
@@ -259,26 +256,24 @@ class WorkoutSchedulePanel extends StatelessWidget {
         builder: (BuildContext context) {
           final List<WorkoutScheduleDto> list = listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
 
-          return ProgrammeProviders(
-            builder: (BuildContext context) => AlertDialog(
-              title: Text('Jour $dayIndex'),
-              actions: <Widget>[
-                TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Sortir')),
-              ],
-              content: PopupDayDetail(dayIndex: dayIndex, list: list),
-            ),
+          return AlertDialog(
+            title: Text('Jour $dayIndex'),
+            actions: <Widget>[
+              TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Sortir')),
+            ],
+            content: PopupDayDetail(dayIndex: dayIndex, list: list),
           );
         },
       );
     }
 
     return FutureBuilder<List<DropdownMenuItem<Workout>>>(
-        future: vm.getWorkoutDropdownItems(),
+        future: controller.getWorkoutDropdownItems(),
         builder: (BuildContext context, AsyncSnapshot<List<DropdownMenuItem<Workout>>> snapshot) {
           if (snapshot.hasData) {
             final List<DropdownMenuItem<Workout>> listAvailableWorkout = snapshot.data!;
             return StreamBuilder<List<WorkoutScheduleDto>>(
-              stream: vm.workoutScheduleObs,
+              stream: controller.workoutScheduleObs,
               builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
                 if (snapshot.hasData) {
                   final List<WorkoutScheduleDto> listScheduledWorkouts = snapshot.data!;
@@ -289,28 +284,26 @@ class WorkoutSchedulePanel extends StatelessWidget {
                       child: Container(
                         // decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
                         padding: const EdgeInsets.all(1),
-                        child: Consumer<ProgrammeVm>(
-                          builder: (BuildContext context, ProgrammeVm consumeVm, Widget? child) => sf.SfDataGrid(
-                            onCellTap: (sf.DataGridCellTapDetails details) => popupDayDetails(details, listScheduledWorkouts),
-                            highlightRowOnHover: false,
-                            headerGridLinesVisibility: GridLinesVisibility.both,
-                            columnWidthMode: ColumnWidthMode.fill,
-                            headerRowHeight: 50,
-                            frozenRowsCount: 20,
-                            frozenColumnsCount: 20,
-                            navigationMode: GridNavigationMode.cell,
-                            gridLinesVisibility: GridLinesVisibility.both,
-                            selectionMode: SelectionMode.single,
-                            columns: listHeadersColumn,
-                            rowHeight: 150,
-                            source: _WorkoutDataSource(
-                                context: context,
-                                numberWeeks: consumeVm.numberWeeksInt,
-                                listAppointment: listScheduledWorkouts,
-                                listAvailableWorkout: listAvailableWorkout,
-                                columnNames: columnNames),
-                          ),
-                        ),
+                        child: Obx(() => sf.SfDataGrid(
+                              onCellTap: (sf.DataGridCellTapDetails details) => popupDayDetails(details, listScheduledWorkouts),
+                              highlightRowOnHover: false,
+                              headerGridLinesVisibility: GridLinesVisibility.both,
+                              columnWidthMode: ColumnWidthMode.fill,
+                              headerRowHeight: 50,
+                              frozenRowsCount: 20,
+                              frozenColumnsCount: 20,
+                              navigationMode: GridNavigationMode.cell,
+                              gridLinesVisibility: GridLinesVisibility.both,
+                              selectionMode: SelectionMode.single,
+                              columns: listHeadersColumn,
+                              rowHeight: 150,
+                              source: _WorkoutDataSource(
+                                  context: context,
+                                  numberWeeks: controller.numberWeekInt.value,
+                                  listAppointment: listScheduledWorkouts,
+                                  listAvailableWorkout: listAvailableWorkout,
+                                  columnNames: columnNames),
+                            )),
                       ),
                     ),
                   );
@@ -338,8 +331,6 @@ class PopupDayDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ProgrammeVm vm = Provider.of<ProgrammeVm>(context);
-
     return SizedBox(
       height: 800,
       width: 600,
@@ -348,7 +339,7 @@ class PopupDayDetail extends StatelessWidget {
           Flexible(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: _WorkoutSelectedPanel(vm: vm, dayIndex: dayIndex, list: list),
+              child: _WorkoutSelectedPanel(dayIndex: dayIndex, list: list),
             ),
           ),
           Flexible(
@@ -366,21 +357,20 @@ class PopupDayDetail extends StatelessWidget {
 }
 
 class _WorkoutSelectedPanel extends StatelessWidget {
-  const _WorkoutSelectedPanel({
+  _WorkoutSelectedPanel({
     Key? key,
-    required this.vm,
     required this.dayIndex,
     required this.list,
   }) : super(key: key);
 
-  final ProgrammeVm vm;
+  final ProgrammeController controller = Get.find();
   final int dayIndex;
   final List<WorkoutScheduleDto> list;
 
   @override
   Widget build(BuildContext context) {
     return DragTarget<Workout>(
-        onAccept: (Workout workout) => vm.addWorkoutSchedule(workout, dayIndex - 1),
+        onAccept: (Workout workout) => controller.addWorkoutSchedule(workout, dayIndex - 1),
         onWillAccept: (Workout? data) => data is Workout,
         builder: (BuildContext context, List<Workout?> candidateData, List<Object?> rejectedData) {
           return Container(
@@ -390,7 +380,7 @@ class _WorkoutSelectedPanel extends StatelessWidget {
                 const Text('Glisser ici les workout de la journée.'),
                 StreamBuilder<List<WorkoutScheduleDto>>(
                     initialData: list,
-                    stream: vm.workoutScheduleObs,
+                    stream: controller.workoutScheduleObs,
                     builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
                       if (snapshot.hasData) {
                         final List<WorkoutScheduleDto> listWorkout =
@@ -405,7 +395,7 @@ class _WorkoutSelectedPanel extends StatelessWidget {
                                   : CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
                               title: Text(dto.nameWorkout!),
                               trailing: IconButton(
-                                onPressed: () => vm.deleteWorkoutSchedule(dto),
+                                onPressed: () => controller.deleteWorkoutSchedule(dto),
                                 icon: const Icon(Icons.close),
                               ),
                             );

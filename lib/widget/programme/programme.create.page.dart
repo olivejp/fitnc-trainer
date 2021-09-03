@@ -1,4 +1,4 @@
-import 'package:fitnc_trainer/bloc/programme/programme.vm.dart';
+import 'package:fitnc_trainer/bloc/programme/programme.controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -8,7 +8,7 @@ import 'programme.form.builder.dart';
 
 class ProgrammeCreatePage {
   static void showCreate(BuildContext context) {
-    final ProgrammeVm bloc = Provider.of<ProgrammeVm>(context);
+    final ProgrammeController bloc = Provider.of<ProgrammeController>(context);
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     bloc.init(null);
     showDialog(

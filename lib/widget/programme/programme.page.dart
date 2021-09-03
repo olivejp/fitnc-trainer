@@ -1,4 +1,4 @@
-import 'package:fitnc_trainer/bloc/programme/programme.vm.dart';
+import 'package:fitnc_trainer/bloc/programme/programme.controller.dart';
 import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/service/programme.service.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
@@ -13,23 +13,9 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'programme.create.page.dart';
-
-class ProgrammeProviders extends StatelessWidget {
-  const ProgrammeProviders({Key? key, required this.builder}) : super(key: key);
-  final WidgetBuilder builder;
-
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider<ProgrammeVm>(
-      create: (BuildContext context) => ProgrammeVm(),
-      builder: (BuildContext context, __) => builder(context),
-    );
-  }
-}
 
 class ProgrammePage extends StatefulWidget {
   const ProgrammePage({Key? key}) : super(key: key);
@@ -42,6 +28,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
   final List<Programme> listCompleteProgramme = <Programme>[];
   final BehaviorSubject<List<Programme>> _streamListProgramme = BehaviorSubject<List<Programme>>();
+  final ProgrammeController controller = Get.put(ProgrammeController());
 
   String? _query;
 
@@ -177,9 +164,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
               contentPadding: const EdgeInsets.all(20),
               content: SizedBox(
                 width: 1280,
-                child: ProgrammeProviders(
-                  builder: (BuildContext context) => ProgrammeUpdatePage(programme: programme),
-                ),
+                child: ProgrammeUpdatePage(programme: programme),
               ),
             ));
   }

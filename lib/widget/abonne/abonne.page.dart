@@ -38,9 +38,9 @@ class _AbonnePageState extends State<AbonnePage> {
 
   @override
   Widget build(BuildContext context) {
-    final AbonneService vm = Get.find();
+    final AbonneService service = Get.find();
 
-    vm.listenAll().listen((List<Abonne> event) {
+    service.listenAll().listen((List<Abonne> event) {
       widget.listCompleteAbonne.clear();
       widget.listCompleteAbonne.addAll(event);
       UtilService.search(_query, widget.listCompleteAbonne, widget._streamListAbonne);
@@ -98,7 +98,7 @@ class _AbonnePageState extends State<AbonnePage> {
                     final List<Abonne> listAbonne = snapshot.data!;
                     return FitnessGridView<Abonne>(
                       domains: listAbonne,
-                      bloc: vm,
+                      bloc: service,
                     );
                   }
                 },
