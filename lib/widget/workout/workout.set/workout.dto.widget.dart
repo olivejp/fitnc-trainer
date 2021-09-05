@@ -17,11 +17,12 @@ class _FitnessWorkoutDtoConstants {
 }
 
 class ListTileDto extends StatefulWidget {
-  const ListTileDto({
+  ListTileDto({
     Key? key,
     required this.dto,
   }) : super(key: key);
   final WorkoutSetDto dto;
+  final ValueNotifier<bool> isOpen = ValueNotifier<bool>(false);
 
   @override
   State<ListTileDto> createState() => _ListTileDtoState();
@@ -50,75 +51,89 @@ class _ListTileDtoState extends State<ListTileDto> {
             size: 10,
             color: Theme.of(context).primaryColor,
           );
-    return ListTile(
-      dense: true,
-      minLeadingWidth: 20,
-      leading: MouseRegion(
-        cursor: SystemMouseCursors.grab,
-        child: Draggable<WorkoutSetDto>(
-          data: widget.dto,
-          feedback: SizedBox(
-            width: 200,
-            height: 80,
-            child: Card(
-              child: ListTile(
-                  leading: CircleAvatar(foregroundImage: widget.dto.imageUrlExercice != null ? NetworkImage(widget.dto.imageUrlExercice!) : null),
-                  title: Text(widget.dto.nameExercice!)),
-            ),
-          ),
-          child: const Icon(Icons.view_headline),
-        ),
-      ),
-      title: Column(
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Flexible(
-                child: Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: leading,
+    return ValueListenableBuilder<bool>(
+      valueListenable: widget.isOpen,
+      builder: (BuildContext context, bool isOpen, Widget? child) => ExpansionPanelList(
+        expansionCallback: (_, __) => widget.isOpen.value = !widget.isOpen.value,
+        children: <ExpansionPanel>[
+          ExpansionPanel(
+            headerBuilder: (BuildContext context, bool isExpanded) => ListTile(
+              dense: true,
+              minLeadingWidth: 20,
+              leading: MouseRegion(
+                cursor: SystemMouseCursors.grab,
+                child: Draggable<WorkoutSetDto>(
+                  data: widget.dto,
+                  feedback: SizedBox(
+                    width: 200,
+                    height: 80,
+                    child: Card(
+                      child: ListTile(
+                          leading:
+                              CircleAvatar(foregroundImage: widget.dto.imageUrlExercice != null ? NetworkImage(widget.dto.imageUrlExercice!) : null),
+                          title: Text(widget.dto.nameExercice!)),
                     ),
-                    Flexible(
-                      child: Text(
-                        widget.dto.nameExercice!,
-                        style: const TextStyle(fontSize: 14),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
+                  ),
+                  child: const Icon(Icons.view_headline),
                 ),
               ),
-              ButtonBar(
+              title: Column(
                 children: <Widget>[
-                  TextButton(
-                      onPressed: () {
-                        widget.dto.lines.add(Line());
-                        streamLines.sink.add(widget.dto.lines);
-                      },
-                      child: const Text('Ajouter set')),
-                  TextButton(onPressed: () => controller.deleteWorkoutSet(widget.dto), child: const Text('Retirer'))
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Flexible(
+                        child: Row(
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: leading,
+                            ),
+                            Flexible(
+                              child: Text(
+                                widget.dto.nameExercice!,
+                                style: const TextStyle(fontSize: 14),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      ButtonBar(
+                        children: <Widget>[
+                          TextButton(
+                              onPressed: () {
+                                widget.dto.lines.add(Line());
+                                streamLines.sink.add(widget.dto.lines);
+                              },
+                              child: const Text('Ajouter set')),
+                          TextButton(onPressed: () => controller.deleteWorkoutSet(widget.dto), child: const Text('Retirer'))
+                        ],
+                      )
+                    ],
+                  ),
                 ],
-              )
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: StreamBuilder<List<Line>>(
-                stream: streamLines,
-                builder: (BuildContext context, AsyncSnapshot<List<Line>> snapshot) {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: widget.dto.lines.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return _LineDisplay(dto: widget.dto, index: index, stream: streamLines);
-                    },
-                  );
-                }),
-          ),
+              ),
+            ),
+            body: child!,
+            canTapOnHeader: true,
+            isExpanded: isOpen,
+          )
         ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: StreamBuilder<List<Line>>(
+            stream: streamLines,
+            builder: (BuildContext context, AsyncSnapshot<List<Line>> snapshot) {
+              return ListView.builder(
+                shrinkWrap: true,
+                itemCount: widget.dto.lines.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return _LineDisplay(dto: widget.dto, index: index, stream: streamLines);
+                },
+              );
+            }),
       ),
     );
   }

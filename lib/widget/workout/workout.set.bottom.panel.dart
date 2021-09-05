@@ -40,12 +40,6 @@ class WorkoutSetBottomPanel extends StatelessWidget {
         builder: (BuildContext context, AsyncSnapshot<List<WorkoutSetDto>> snapshot) {
           if (snapshot.hasData) {
             final List<WorkoutSetDto?> listWorkoutSetDto = snapshot.data!;
-            final Widget liste = ListView.separated(
-              shrinkWrap: true,
-              separatorBuilder: (BuildContext context, int index) => const Divider(height: 2),
-              itemCount: listWorkoutSetDto.length,
-              itemBuilder: (BuildContext context, int index) => _DragTargetDto(dto: listWorkoutSetDto.elementAt(index)!),
-            );
             final Widget mainColumn = Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -61,7 +55,13 @@ class WorkoutSetBottomPanel extends StatelessWidget {
                     ],
                   ),
                 ),
-                Expanded(child: liste),
+                Expanded(
+                    child: ListView.separated(
+                  shrinkWrap: true,
+                  separatorBuilder: (BuildContext context, int index) => const Divider(height: 2),
+                  itemCount: listWorkoutSetDto.length,
+                  itemBuilder: (BuildContext context, int index) => _DragTargetDto(dto: listWorkoutSetDto.elementAt(index)!),
+                )),
               ],
             );
             return DragTarget<Exercice>(
@@ -93,7 +93,7 @@ class _DragTargetDto extends StatelessWidget {
   _DragTargetDto({required this.dto});
 
   final WorkoutSetDto dto;
-  final WorkoutSetBottomPanelController controller =Get.find();
+  final WorkoutSetBottomPanelController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
