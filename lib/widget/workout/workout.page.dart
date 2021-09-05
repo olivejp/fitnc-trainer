@@ -28,6 +28,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
   final List<Workout> listCompleteWorkout = <Workout>[];
   final BehaviorSubject<List<Workout>> _streamListWorkout = BehaviorSubject<List<Workout>>();
+  final WorkoutService workoutService = Get.find();
   String? _query;
 
   set query(String? text) {
@@ -39,9 +40,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   @override
   Widget build(BuildContext context) {
-    final WorkoutService bloc = Get.find();
-
-    bloc.listenAll().listen((List<Workout> event) {
+    workoutService.listenAll().listen((List<Workout> event) {
       listCompleteWorkout.clear();
       listCompleteWorkout.addAll(event);
       UtilService.search(_query, listCompleteWorkout, _streamListWorkout);
@@ -103,7 +102,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                     final List<Workout> listWorkout = snapshot.data!;
                     return FitnessGridView<Workout>(
                       domains: listWorkout,
-                      bloc: bloc,
+                      bloc: workoutService,
                       onTap: (Workout domain) {
                         showDialog(
                             context: context,

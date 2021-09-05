@@ -37,11 +37,12 @@ class ExerciceController extends GetxController {
 
   void setStoragePair(StorageFile? stFile) {
     sendStorage = true;
-    if (stFile != null) {
-      exercice.value.storageFile = stFile;
-    } else {
-      exercice.value.storageFile = StorageFile();
-    }
+    exercice.update((Exercice? exo) {
+      if (exo != null) {
+        exo.storageFile = stFile ?? StorageFile();
+        exo.imageUrl = null;
+      }
+    });
   }
 }
 

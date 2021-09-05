@@ -20,13 +20,13 @@ class FitnessBottomCu extends StatelessWidget {
             children: [
               TextButton(
                   onPressed: () => print('hello'),
-                  child: Text(
+                  child: const Text(
                     'Copyrigth @Deveo.nc',
                     style: TextStyle(color: Colors.grey),
                   )),
               TextButton(
                   onPressed: () => print('hello'),
-                  child: Text(
+                  child: const Text(
                     'Conditions d\'utilisation',
                     style: TextStyle(color: Colors.grey),
                   )),

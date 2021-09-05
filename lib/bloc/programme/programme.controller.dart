@@ -18,16 +18,13 @@ class ProgrammeController extends GetxController {
   final TrainersService trainersService = Get.find();
   final ProgrammeService programmeService = Get.find();
 
-  BehaviorSubject<StorageFile?> subjectStoragePair = BehaviorSubject<StorageFile?>();
   final BehaviorSubject<List<WorkoutScheduleDto>> _streamWorkoutScheduleDto = BehaviorSubject<List<WorkoutScheduleDto>>();
-
-  Stream<StorageFile?> get obsStoragePair => subjectStoragePair.stream;
 
   Stream<List<WorkoutScheduleDto>> get workoutScheduleObs => _streamWorkoutScheduleDto.stream;
 
   final String pathProgrammeMainImage = 'mainImage';
   final List<WorkoutScheduleDto> listDtos = <WorkoutScheduleDto>[];
-  late Programme programme;
+  getx.Rx<Programme> programme = Programme().obs;
   bool sendStorage = false;
 
   RxInt numberWeekInt = 0.obs;
@@ -48,29 +45,27 @@ class ProgrammeController extends GetxController {
   }
 
   Future<void> save() {
-    return programmeService.save(programme);
+    return programmeService.save(programme.value);
   }
 
   Future<void> publish() {
-    return programmeService.publishProgramme(programme, sendStorage: sendStorage);
+    return programmeService.publishProgramme(programme.value, sendStorage: sendStorage);
   }
 
   Future<void> unpublish() {
-    return programmeService.unpublishProgramme(programme, sendStorage: sendStorage);
+    return programmeService.unpublishProgramme(programme.value, sendStorage: sendStorage);
   }
 
   void init(Programme? programmeEntered) {
     sendStorage = false;
-    subjectStoragePair.sink.add(null);
 
     if (programmeEntered != null) {
-      programme = programmeEntered;
-      programme.storageFile = StorageFile();
-      programmeService.getFutureStorageFile(programme).then((StorageFile? storageFile) => subjectStoragePair.sink.add(storageFile));
+      programme.value = programmeEntered;
+      programme.value.storageFile = StorageFile();
 
-      if (programme.numberWeeks != null) {
-        final int indexUnderscore = programme.numberWeeks != null ? programme.numberWeeks!.indexOf('_') : 0;
-        numberWeekInt.value = int.parse(programme.numberWeeks!.substring(0, indexUnderscore));
+      if (programme.value.numberWeeks != null) {
+        final int indexUnderscore = programme.value.numberWeeks != null ? programme.value.numberWeeks!.indexOf('_') : 0;
+        numberWeekInt.value = int.parse(programme.value.numberWeeks!.substring(0, indexUnderscore));
       } else {
         numberWeekInt.value = 1;
       }
@@ -93,33 +88,38 @@ class ProgrammeController extends GetxController {
         _streamWorkoutScheduleDto.sink.add(listDtos);
       });
     } else {
-      programme = Programme();
+      programme.value = Programme();
       numberWeekInt.value = 0;
-      subjectStoragePair.sink.add(null);
     }
   }
 
   set name(String value) {
-    programme.name = value;
+    programme.value.name = value;
   }
 
-  String get name => programme.name;
+  String get name => programme.value.name;
 
   set description(String? value) {
-    programme.description = value;
+    programme.value.description = value;
   }
 
-  String? get description => programme.description;
+  String? get description => programme.value.description;
 
-  void setStoragePair(StorageFile? storagePair) {
+  void setStoragePair(StorageFile? stFile) {
     sendStorage = true;
-    programme.storageFile = storagePair;
-    subjectStoragePair.sink.add(programme.storageFile);
+    programme.update((Programme? val) {
+      if (val == null) return;
+      if (stFile != null) {
+        val.storageFile = stFile;
+      } else {
+        val.storageFile = StorageFile();
+      }
+    });
   }
 
   void addWorkoutSchedule(Workout workout, int dayIndex) {
     final WorkoutScheduleDto dto = WorkoutScheduleDto.empty();
-    dto.uid = trainersService.getProgrammeReference().doc(programme.uid).collection('workouts').doc().id;
+    dto.uid = trainersService.getProgrammeReference().doc(programme.value.uid).collection('workouts').doc().id;
     dto.uidWorkout = workout.uid;
     dto.nameWorkout = workout.name;
     dto.imageUrlWorkout = workout.imageUrl;
@@ -129,7 +129,7 @@ class ProgrammeController extends GetxController {
 
     trainersService
         .getProgrammeReference()
-        .doc(programme.uid)
+        .doc(programme.value.uid)
         .collection('workouts')
         .doc(dto.uid)
         .set(dto.toJson())
@@ -144,7 +144,7 @@ class ProgrammeController extends GetxController {
 
     trainersService
         .getProgrammeReference()
-        .doc(programme.uid)
+        .doc(programme.value.uid)
         .collection('workouts')
         .doc(workout.uid)
         .delete()

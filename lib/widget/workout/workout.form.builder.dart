@@ -22,7 +22,7 @@ class WorkoutFormBuilder {
                         bloc.storageFile = storagePair,
                     onDeleted: (StorageFile? storagePair) =>
                         bloc.storageFile = null,
-                    futureInitialStorageFile: bloc.getStorageFile(),
+                    future: bloc.getStorageFile(),
                   ),
                   Expanded(
                     child: Padding(

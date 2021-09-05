@@ -41,7 +41,7 @@ class UtilService {
     stream.sink.add(listFiltered);
   }
 
-  /// Permet de récupérer le StorageFile à partir du Domain.
+  /// Permet de récupérer le StorageFile à partir de l'imageUrl du domain.
   static Future<StorageFile?> getFutureStorageFile(AbstractFitnessStorageDomain domain) {
     final Completer<StorageFile?> completer = Completer<StorageFile?>();
     if (domain.imageUrl != null && domain.imageUrl!.isNotEmpty) {
@@ -50,7 +50,7 @@ class UtilService {
         domain.storageFile!.fileBytes = bytes;
         completer.complete(domain.storageFile);
       });
-    } else {
+    } else if (domain.storageFile != null){
       completer.complete(null);
     }
     return completer.future;

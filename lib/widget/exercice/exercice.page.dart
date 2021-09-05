@@ -19,7 +19,7 @@ import 'package:rxdart/rxdart.dart';
 import '../../constants/constants.dart';
 import 'exercice.form.builder.dart';
 
-class ExerciceListController extends GetxController {
+class ExercicePageController extends GetxController {
   final ExerciceService exerciceService = Get.find();
 
   RxList<bool> toggleSelections = <bool>[true, false].obs;
@@ -54,7 +54,8 @@ class ExerciceListController extends GetxController {
 class ExercicePage extends StatefulWidget {
   ExercicePage({Key? key}) : super(key: key);
 
-  final ExerciceListController vm = Get.put(ExerciceListController());
+  final ExercicePageController controller = Get.put(ExercicePageController());
+  final DisplayTypeController displayTypeController = Get.find();
 
   @override
   State<ExercicePage> createState() => _ExercicePageState();
@@ -67,28 +68,12 @@ class _ExercicePageState extends State<ExercicePage> {
 
   @override
   Widget build(BuildContext context) {
+    widget.displayTypeController.displayType.listen((DisplayType displayType) {
+      widget.controller.setDualScreen(isDualScreen: displayType == DisplayType.desktop);
+    });
+
     return RoutedPage(child: LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        WidgetsBinding.instance?.addPostFrameCallback((Duration timeStamp) {
-          widget.vm.setDualScreen(isDualScreen: constraints.maxWidth > 800);
-        });
-
-        final List<Widget> list = <Widget>[
-          Expanded(flex: 2, child: ExerciceListSearch()),
-        ];
-
-        if (widget.vm.dualScreen.value) {
-          list.add(Expanded(
-            flex: 3,
-            child: Container(
-                decoration: const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
-                child: Padding(
-                  padding: const EdgeInsets.all(60.0),
-                  child: ExerciceUpdate(exercice: widget.vm.exerciceSelected.value),
-                )),
-          ));
-        }
-
         return Scaffold(
           backgroundColor: Colors.transparent,
           body: Column(
@@ -117,10 +102,27 @@ class _ExercicePageState extends State<ExercicePage> {
                 ),
               ),
               Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: list,
-                ),
+                child: Obx(() {
+                  final List<Widget> list = <Widget>[
+                    Expanded(flex: 2, child: ExerciceListSearch()),
+                  ];
+
+                  if (widget.controller.dualScreen.value) {
+                    list.add(Expanded(
+                      flex: 3,
+                      child: Container(
+                          decoration: const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
+                          child: Padding(
+                            padding: const EdgeInsets.all(60.0),
+                            child: ExerciceUpdate(exercice: widget.controller.exerciceSelected.value),
+                          )),
+                    ));
+                  }
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: list,
+                  );
+                }),
               ),
             ],
           ),
@@ -136,7 +138,7 @@ class ExerciceListSearch extends StatefulWidget {
   }) : super(key: key);
 
   final ExerciceService service = Get.find();
-  final ExerciceListController vm = Get.find();
+  final ExercicePageController vm = Get.find();
 
   @override
   State<ExerciceListSearch> createState() => _ExerciceListSearchState();
@@ -239,7 +241,7 @@ class ExerciceStreamBuilder extends StatelessWidget {
 
   final BehaviorSubject<List<Exercice>> _streamListExercice;
   final ExerciceService bloc = Get.find();
-  final ExerciceListController vm = Get.find();
+  final ExercicePageController vm = Get.find();
   final ExerciceUpdateController controller = Get.find();
 
   @override
@@ -290,7 +292,7 @@ class ExerciceListViewSeparated extends StatelessWidget {
 
   final List<Exercice> list;
   final ExerciceService bloc = Get.find();
-  final ExerciceListController vm = Get.find();
+  final ExercicePageController vm = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -314,7 +316,7 @@ class ExerciceListTile extends StatelessWidget {
   }) : super(key: key);
 
   final Exercice exercice;
-  final ExerciceListController vm = Get.find();
+  final ExercicePageController vm = Get.find();
   final ExerciceService service = Get.find();
   final ExerciceUpdateController controller = Get.find();
 

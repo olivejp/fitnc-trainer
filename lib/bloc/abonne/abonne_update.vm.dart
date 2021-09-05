@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
 
-class AbonneUpdateVm {
+class AbonneUpdateController {
   final TrainersService trainersService = Get.find();
   Abonne abonne = Abonne();
   Uint8List? _fileBytes;

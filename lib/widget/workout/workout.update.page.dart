@@ -105,7 +105,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                         radius: 80,
                         onSaved: (StorageFile? file) => workoutService.storageFile = file,
                         onDeleted: (_) => workoutService.storageFile = null,
-                        futureInitialStorageFile: workoutService.getStorageFile(),
+                        future: workoutService.getStorageFile(),
                       ),
                     ),
                     FitnessDecorationTextFormField(

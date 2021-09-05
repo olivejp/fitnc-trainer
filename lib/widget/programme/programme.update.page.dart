@@ -3,6 +3,7 @@ import 'package:fitnc_trainer/domain/programme.domain.dart';
 import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_schedule.dto.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
@@ -26,15 +27,15 @@ class ProgrammeUpdatePage extends StatelessWidget {
 
   final Programme programme;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final ProgrammeController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
     final List<Widget> buttons = <Widget>[];
-    final ProgrammeController controller = Get.put(ProgrammeController());
 
     controller.init(programme);
 
-    if (controller.programme.available == true) {
+    if (controller.programme.value.available == true) {
       buttons.add(TextButton.icon(
         style: TextButton.styleFrom(backgroundColor: Colors.red),
         onPressed: () {
@@ -46,7 +47,7 @@ class ProgrammeUpdatePage extends StatelessWidget {
         icon: const Icon(Icons.public, color: Colors.white),
       ));
     }
-    if (controller.programme.available == null || controller.programme.available == false) {
+    if (controller.programme.value.available == null || controller.programme.value.available == false) {
       buttons.add(TextButton.icon(
         style: TextButton.styleFrom(backgroundColor: Colors.green),
         onPressed: () {
@@ -91,11 +92,11 @@ class ProgrammeUpdatePage extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 20),
               child: Row(
                 children: <Widget>[
-                  StorageStreamImageWidget(
-                    onSaved: (StorageFile? storagePair) => controller.setStoragePair(storagePair),
-                    streamInitialStorageFile: controller.obsStoragePair,
-                    onDeleted: (StorageFile? storagePair) => controller.setStoragePair(null),
-                  ),
+                  Obx(() => StorageFutureImageWidget(
+                        future: UtilService.getFutureStorageFile(controller.programme.value),
+                        onSaved: controller.setStoragePair,
+                        onDeleted: controller.setStoragePair,
+                      )),
                   Flexible(
                     child: Column(
                       children: <Widget>[
@@ -116,7 +117,7 @@ class ProgrammeUpdatePage extends StatelessWidget {
                                       children: <Widget>[
                                         Expanded(
                                           child: FitnessDecorationTextFormField(
-                                              initialValue: controller.programme.name,
+                                              initialValue: controller.programme.value.name,
                                               autofocus: true,
                                               onChanged: (String value) => controller.name = value,
                                               labelText: 'Nom',
@@ -138,7 +139,7 @@ class ProgrammeUpdatePage extends StatelessWidget {
                                                     labelText: 'Nombre de semaine',
                                                     constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
                                                     contentPadding: EdgeInsets.symmetric(horizontal: 10)),
-                                                initialValue: controller.programme.numberWeeks,
+                                                initialValue: controller.programme.value.numberWeeks,
                                                 onChanged: (String? value) => controller.changeNumberWeek(value)),
                                           ),
                                         )
@@ -157,7 +158,7 @@ class ProgrammeUpdatePage extends StatelessWidget {
               ),
             ),
             TextFormField(
-              initialValue: controller.programme.description,
+              initialValue: controller.programme.value.description,
               maxLength: 2000,
               minLines: 5,
               maxLines: 20,
@@ -374,7 +375,7 @@ class _WorkoutSelectedPanel extends StatelessWidget {
         onWillAccept: (Workout? data) => data is Workout,
         builder: (BuildContext context, List<Workout?> candidateData, List<Object?> rejectedData) {
           return Container(
-            decoration: BoxDecoration(border: Border.all(width: 1, color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
+            decoration: BoxDecoration(border: Border.all(color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
             child: Column(
               children: <Widget>[
                 const Text('Glisser ici les workout de la journée.'),

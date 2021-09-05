@@ -18,7 +18,6 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 ///

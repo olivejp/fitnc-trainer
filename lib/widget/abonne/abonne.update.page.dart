@@ -9,12 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 class AbonneUpdatePage extends StatefulWidget {
-  const AbonneUpdatePage({Key? key, this.abonne}) : super(key: key);
+  AbonneUpdatePage({Key? key, this.abonne}) : super(key: key);
 
+  final AbonneUpdateController controller = Get.put(AbonneUpdateController());
   final Abonne? abonne;
 
   @override
@@ -29,35 +30,24 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    final AbonneUpdateVm vm = Provider.of<AbonneUpdateVm>(context);
-
     void deletePhoto() {
-      vm.setImage(null, null);
+      widget.controller.setImage(null, null);
     }
 
     void callPhotoPicker() {
-      FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: [
-        'jpg',
-        'png',
-        'gif'
-      ]).then((FilePickerResult? result) {
+      FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['jpg', 'png', 'gif']).then((FilePickerResult? result) {
         if (result != null) {
-          vm.setImage(result.files.first.bytes, result.files.first.name);
+          widget.controller.setImage(result.files.first.bytes, result.files.first.name);
         }
       });
     }
 
-    vm.init(widget.abonne);
-    final String appBarTitle =
-        vm.abonne.uid != null ? '${vm.nom!} ${vm.prenom!}' : 'Nouveau abonné';
+    widget.controller.init(widget.abonne);
+    final String appBarTitle = widget.controller.abonne.uid != null ? '${widget.controller.nom!} ${widget.controller.prenom!}' : 'Nouveau abonné';
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Text(appBarTitle,
-            style: Theme.of(context)
-                .appBarTheme
-                .titleTextStyle
-                ?.copyWith(fontSize: 30)),
+        title: Text(appBarTitle, style: Theme.of(context).appBarTheme.titleTextStyle?.copyWith(fontSize: 30)),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
@@ -75,9 +65,8 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   StreamBuilder<Uint8List?>(
-                      stream: vm.selectedImageObs,
-                      builder: (BuildContext context,
-                          AsyncSnapshot<Uint8List?> snapshot) {
+                      stream: widget.controller.selectedImageObs,
+                      builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
                         ImageProvider? provider;
                         if (snapshot.hasData && snapshot.data != null) {
                           provider = MemoryImage(snapshot.data!);
@@ -85,8 +74,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
 
                         return InkWell(
                           onTap: callPhotoPicker,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(50)),
+                          borderRadius: const BorderRadius.all(Radius.circular(50)),
                           child: CircleAvatar(
                               radius: 50,
                               foregroundImage: provider,
@@ -114,11 +102,10 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                       child: Padding(
                         padding: const EdgeInsets.only(right: 5),
                         child: DropdownButtonFormField<String>(
-                            decoration:
-                                const InputDecoration(labelText: 'Genre'),
+                            decoration: const InputDecoration(labelText: 'Genre'),
                             icon: const Icon(Icons.transgender_rounded),
-                            onChanged: (String? value) => vm.sexe = value,
-                            value: vm.sexe,
+                            onChanged: (String? value) => widget.controller.sexe = value,
+                            value: widget.controller.sexe,
                             validator: (String? value) {
                               if (value == null || value.isEmpty) {
                                 return "Merci de renseigner le genre de l'abonné";
@@ -142,9 +129,9 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                       child: Padding(
                         padding: const EdgeInsets.only(right: 5),
                         child: TextFormField(
-                            initialValue: vm.nom,
+                            initialValue: widget.controller.nom,
                             autofocus: true,
-                            onChanged: (String value) => vm.nom = value,
+                            onChanged: (String value) => widget.controller.nom = value,
                             decoration: const InputDecoration(labelText: 'Nom'),
                             validator: (String? value) {
                               if (value == null || value.isEmpty) {
@@ -159,12 +146,10 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 5),
                         child: TextFormField(
-                            autovalidateMode:
-                                AutovalidateMode.onUserInteraction,
-                            initialValue: vm.prenom,
-                            onChanged: (String? value) => vm.prenom = value,
-                            decoration:
-                                const InputDecoration(labelText: 'Prénom'),
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            initialValue: widget.controller.prenom,
+                            onChanged: (String? value) => widget.controller.prenom = value,
+                            decoration: const InputDecoration(labelText: 'Prénom'),
                             validator: (String? value) {
                               if (value == null || value.isEmpty) {
                                 return "Merci de renseigner le prénom de l'abonné.";
@@ -178,17 +163,15 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                         padding: const EdgeInsets.only(left: 5),
                         child: TextFormField(
                           maxLength: 10,
-                          initialValue: vm.dateNaissance,
-                          onChanged: (String? value) =>
-                              vm.dateNaissance = value,
+                          initialValue: widget.controller.dateNaissance,
+                          onChanged: (String? value) => widget.controller.dateNaissance = value,
                           autovalidateMode: AutovalidateMode.always,
                           validator: (String? value) {
                             if (value?.length != null && value!.length >= 8) {
                               DateTime time;
                               final DateTime today = DateTime.now();
                               try {
-                                time =
-                                    DateFormat('dd/MM/yyyy').parseStrict(value);
+                                time = DateFormat('dd/MM/yyyy').parseStrict(value);
                               } on Exception {
                                 return 'Date incorrecte. Format accepté dd/mm/aaaa.';
                               }
@@ -198,10 +181,8 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                               return null;
                             }
                           },
-                          decoration: const InputDecoration(
-                              suffixIcon: Icon(Icons.event_note),
-                              hintText: 'dd/mm/aaaa',
-                              labelText: 'Date de naissance'),
+                          decoration:
+                              const InputDecoration(suffixIcon: Icon(Icons.event_note), hintText: 'dd/mm/aaaa', labelText: 'Date de naissance'),
                         ),
                       ),
                     ),
@@ -216,9 +197,9 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                       padding: const EdgeInsets.only(right: 5),
                       child: TextFormField(
                           keyboardType: TextInputType.emailAddress,
-                          initialValue: vm.email,
+                          initialValue: widget.controller.email,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
-                          onChanged: (String? value) => vm.email = value,
+                          onChanged: (String? value) => widget.controller.email = value,
                           decoration: const InputDecoration(labelText: 'Email'),
                           validator: (String? value) {
                             if (value == null || value.isEmpty) {
@@ -235,16 +216,10 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                       child: TextFormField(
                         maxLength: 10,
                         keyboardType: TextInputType.phone,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        initialValue: (vm.telephone1) != null
-                            ? vm.telephone1.toString()
-                            : '',
-                        onChanged: (String value) =>
-                            vm.telephone1 = int.tryParse(value),
-                        decoration:
-                            const InputDecoration(labelText: 'Téléphone fixe'),
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        initialValue: (widget.controller.telephone1) != null ? widget.controller.telephone1.toString() : '',
+                        onChanged: (String value) => widget.controller.telephone1 = int.tryParse(value),
+                        decoration: const InputDecoration(labelText: 'Téléphone fixe'),
                       ),
                     ),
                   ),
@@ -255,16 +230,10 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
                       child: TextFormField(
                         maxLength: 10,
                         keyboardType: TextInputType.phone,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        initialValue: (vm.telephone2) != null
-                            ? vm.telephone2.toString()
-                            : '',
-                        onChanged: (value) =>
-                            vm.telephone2 = int.tryParse(value),
-                        decoration:
-                            InputDecoration(labelText: 'Téléphone mobile'),
+                        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                        initialValue: (widget.controller.telephone2) != null ? widget.controller.telephone2.toString() : '',
+                        onChanged: (value) => widget.controller.telephone2 = int.tryParse(value),
+                        decoration: InputDecoration(labelText: 'Téléphone mobile'),
                       ),
                     ),
                   ),
@@ -273,24 +242,21 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
               Column(children: [
                 TextFormField(
                   maxLength: 50,
-                  initialValue: vm.adresse1,
-                  onChanged: (String value) => vm.adresse1 = value,
-                  decoration: const InputDecoration(
-                      alignLabelWithHint: true, labelText: 'Adresse ligne 1'),
+                  initialValue: widget.controller.adresse1,
+                  onChanged: (String value) => widget.controller.adresse1 = value,
+                  decoration: const InputDecoration(alignLabelWithHint: true, labelText: 'Adresse ligne 1'),
                 ),
                 TextFormField(
                   maxLength: 50,
-                  initialValue: vm.adresse2,
-                  onChanged: (String value) => vm.adresse2 = value,
-                  decoration: const InputDecoration(
-                      alignLabelWithHint: true, labelText: 'Adresse ligne 2'),
+                  initialValue: widget.controller.adresse2,
+                  onChanged: (String value) => widget.controller.adresse2 = value,
+                  decoration: const InputDecoration(alignLabelWithHint: true, labelText: 'Adresse ligne 2'),
                 ),
                 TextFormField(
                   maxLength: 50,
-                  initialValue: vm.adresse3,
-                  onChanged: (String value) => vm.adresse3 = value,
-                  decoration: const InputDecoration(
-                      alignLabelWithHint: true, labelText: 'Adresse ligne 3'),
+                  initialValue: widget.controller.adresse3,
+                  onChanged: (String value) => widget.controller.adresse3 = value,
+                  decoration: const InputDecoration(alignLabelWithHint: true, labelText: 'Adresse ligne 3'),
                 ),
               ]),
             ],
@@ -300,10 +266,7 @@ class _AbonneUpdatePageState extends State<AbonneUpdatePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (_formKey.currentState?.validate() == true) {
-            vm
-                .saveAbonne()
-                .then((value) async => Navigator.pop(context))
-                .catchError((error) async => print(error.toString()));
+            widget.controller.saveAbonne().then((value) async => Navigator.pop(context)).catchError((error) async => print(error.toString()));
           }
         },
         child: const Icon(Icons.check),

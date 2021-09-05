@@ -17,7 +17,7 @@ class ExerciceBuilderPage {
   /// Permet de créer une AlertDialog pour la création d'un exercice.
   static void create(BuildContext context) {
     showDialog(
-        context: context, builder: (BuildContext context) => AlertDialog(title: const Text("Création d'un exercice"), content: ExerciceCreate()));
+        context: context, builder: (BuildContext context) => const AlertDialog(title: Text("Création d'un exercice"), content: ExerciceCreate()));
   }
 
   /// Permet de créer une AlertDialog pour la mise à jour d'un exercice.
@@ -34,7 +34,7 @@ class ExerciceBuilderPage {
 
 /// Composant Création
 class ExerciceCreate extends StatefulWidget {
-  ExerciceCreate({Key? key, this.isCreation = true, this.displayCloseButton = true}) : super(key: key);
+  const ExerciceCreate({Key? key, this.isCreation = true, this.displayCloseButton = true}) : super(key: key);
 
   final bool isCreation;
   final bool displayCloseButton;
@@ -44,7 +44,6 @@ class ExerciceCreate extends StatefulWidget {
 }
 
 class _ExerciceCreateState extends State<ExerciceCreate> {
-  late VideoPlayerController? _videoController;
   late GlobalKey<FormState> _formKey;
   final ExerciceController controller = Get.put(ExerciceController());
   YoutubePlayerController? youtubeController;
@@ -173,10 +172,11 @@ class _FormExerciceState extends State<FormExercice> {
                 Row(
                   children: <Widget>[
                     Obx(
-                      () => StorageFutureImageWidget(
-                        futureInitialStorageFile: UtilService.getFutureStorageFile(controller.exercice.value),
+                      () => StorageImageWidget(
+                        imageUrl: controller.exercice.value.imageUrl,
+                        storageFile: controller.exercice.value.storageFile,
                         onSaved: controller.setStoragePair,
-                        onDeleted: controller.setStoragePair,
+                        onDeleted: () => controller.setStoragePair(null),
                       ),
                     ),
                     Expanded(

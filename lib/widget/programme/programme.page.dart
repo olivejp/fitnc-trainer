@@ -18,7 +18,8 @@ import 'package:rxdart/rxdart.dart';
 import 'programme.create.page.dart';
 
 class ProgrammePage extends StatefulWidget {
-  const ProgrammePage({Key? key}) : super(key: key);
+  ProgrammePage({Key? key}) : super(key: key);
+  final ProgrammeController controller = Get.put(ProgrammeController());
 
   @override
   State<ProgrammePage> createState() => _ProgrammePageState();
@@ -28,7 +29,6 @@ class _ProgrammePageState extends State<ProgrammePage> {
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
   final List<Programme> listCompleteProgramme = <Programme>[];
   final BehaviorSubject<List<Programme>> _streamListProgramme = BehaviorSubject<List<Programme>>();
-  final ProgrammeController controller = Get.put(ProgrammeController());
 
   String? _query;
 

@@ -4,10 +4,7 @@ import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.domain.dart';
 import 'package:fitnc_trainer/domain/workout_set.dto.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 
 class WorkoutSetService extends GetxService {
   WorkoutSetService();

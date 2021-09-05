@@ -3,18 +3,18 @@ import 'package:fitnc_trainer/widget/abonne/abonne.update.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
 class AbonneCreatePage {
   static void showCreate(BuildContext context) {
-    final AbonneUpdateVm bloc = Provider.of<AbonneUpdateVm>(context);
+    final AbonneUpdateController controller = Get.find();
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-    bloc.init(null);
+    controller.init(null);
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: const AbonneUpdatePage(),
+          content: AbonneUpdatePage(),
           actionsPadding: const EdgeInsets.all(20),
           actions: <Widget>[
             FloatingActionButton(
@@ -26,7 +26,7 @@ class AbonneCreatePage {
               tooltip: 'Créer',
               onPressed: () {
                 if (_formKey.currentState?.validate() == true) {
-                  bloc.saveAbonne().then((_) => Navigator.of(context).pop());
+                  controller.saveAbonne().then((_) => Navigator.of(context).pop());
                 }
               },
               child: const Icon(Icons.check),

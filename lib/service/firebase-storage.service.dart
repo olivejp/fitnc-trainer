@@ -13,23 +13,11 @@ class FirebaseStorageService extends GetxService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   ///
-  /// Méthode pour envoyer le document dans Firebase Storage.
-  ///
-  Future<String> createStorage(String path, StorageFile? storageFile) {
-    if (storageFile != null && storageFile.fileBytes != null && storageFile.fileName != null) {
-      return _sendToStorage(storageFile, path);
-    }
-    return Future<String>.value('');
-  }
-
-  ///
   /// Supprime tous les documents présents dans Firebase Storage à l'adresse indiquée puis pousse le nouveau StorageFile.
   ///
-  Future<void> eraseAndReplaceStorage(String path, StorageFile? storageFile) async {
+  Future<String> eraseAndReplaceStorage(String path, StorageFile storageFile) async {
     await deleteAllFiles(path);
-    if (storageFile != null && storageFile.fileBytes != null && storageFile.fileName != null) {
-      await createStorage(path, storageFile);
-    }
+    return sendToStorage(path, storageFile);
   }
 
   ///
@@ -52,7 +40,7 @@ class FirebaseStorageService extends GetxService {
   ///
   /// Envoi le StorageFile sur Firebase Storage et renvoie l'URL de l'image à partir du Storage Firebase.
   ///
-  Future<String> _sendToStorage(StorageFile storageFile, String path) async {
+  Future<String> sendToStorage(String path, StorageFile storageFile) async {
     final User? user = _firebaseAuth.currentUser;
     if (user == null) {
       return Future<String>.error('Aucun utilisateur connecté.');

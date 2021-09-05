@@ -32,18 +32,17 @@ class ExerciceService extends AbstractFitnessCrudService<Exercice> {
     throw Exception('Aucun utilisateur connecté');
   }
 
-  Future<void> saveExercice(Exercice exercice, {required bool sendStorage}) {
+  Future<void> saveExercice(Exercice exercice, {required bool sendStorage}) async {
     final bool isUpdate = exercice.uid != null;
     final String path = getExerciceStoragePath(exercice);
-    if (isUpdate) {
-      if (sendStorage) {
-        return storageService.eraseAndReplaceStorage(path, exercice.storageFile).then((_) => save(exercice));
-      } else {
-        return save(exercice);
-      }
-    } else {
-      exercice.uid = getCollectionReference().doc().id;
-      return storageService.createStorage(path, exercice.storageFile).then((_) => create(exercice));
+    final bool shouldSendToStorage =
+        sendStorage && exercice.storageFile != null && exercice.storageFile!.fileBytes != null && exercice.storageFile!.fileName != null;
+
+    if (shouldSendToStorage) {
+      final String imageUrl = await storageService.eraseAndReplaceStorage(path, exercice.storageFile!);
+      exercice.imageUrl = imageUrl;
     }
+
+    return isUpdate ? save(exercice) : create(exercice);
   }
 }
