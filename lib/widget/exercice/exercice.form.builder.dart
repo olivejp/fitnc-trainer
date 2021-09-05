@@ -1,6 +1,5 @@
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
-import 'package:fitnc_trainer/service/exercice.update.controller.dart';
-import 'package:fitnc_trainer/service/util.service.dart';
+import 'package:fitnc_trainer/service/exercice.controller.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
@@ -17,27 +16,35 @@ class ExerciceBuilderPage {
   /// Permet de créer une AlertDialog pour la création d'un exercice.
   static void create(BuildContext context) {
     showDialog(
-        context: context, builder: (BuildContext context) => const AlertDialog(title: Text("Création d'un exercice"), content: ExerciceCreate()));
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text("Création d'un exercice"),
+        content: ExerciceCreate(),
+      ),
+    );
   }
 
   /// Permet de créer une AlertDialog pour la mise à jour d'un exercice.
   static void update({required BuildContext context, required Exercice exercice}) {
     showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-            title: const Text('Mise à jour'),
-            content: ExerciceUpdate(
-              exercice: exercice,
-            )));
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Mise à jour'),
+        content: ExerciceUpdate(
+          exercice: exercice,
+        ),
+      ),
+    );
   }
 }
 
 /// Composant Création
 class ExerciceCreate extends StatefulWidget {
-  const ExerciceCreate({Key? key, this.isCreation = true, this.displayCloseButton = true}) : super(key: key);
+  ExerciceCreate({Key? key, this.isCreation = true, this.displayCloseButton = true}) : super(key: key);
 
   final bool isCreation;
   final bool displayCloseButton;
+  final ExerciceCreateController controller = Get.put(ExerciceCreateController());
 
   @override
   State<ExerciceCreate> createState() => _ExerciceCreateState();
@@ -45,7 +52,6 @@ class ExerciceCreate extends StatefulWidget {
 
 class _ExerciceCreateState extends State<ExerciceCreate> {
   late GlobalKey<FormState> _formKey;
-  final ExerciceController controller = Get.put(ExerciceController());
   YoutubePlayerController? youtubeController;
 
   @override
@@ -57,7 +63,7 @@ class _ExerciceCreateState extends State<ExerciceCreate> {
         style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
         onPressed: () {
           if (_formKey.currentState?.validate() == true) {
-            controller.saveExercice().then((_) {
+            widget.controller.saveExercice().then((_) {
               showToast(widget.isCreation ? 'Exercice créé' : 'Exercice mis à jour', backgroundColor: Colors.green);
               if (widget.isCreation) {
                 Navigator.of(context).pop();
@@ -80,7 +86,11 @@ class _ExerciceCreateState extends State<ExerciceCreate> {
 
     final List<Widget> buttons = widget.displayCloseButton ? <Widget>[saveButton, closeButton] : <Widget>[saveButton];
 
-    return FormExercice(buttons: buttons, formKey: _formKey);
+    return FormExercice(
+      buttons: buttons,
+      formKey: _formKey,
+      controller: widget.controller,
+    );
   }
 }
 
@@ -98,11 +108,10 @@ class ExerciceUpdate extends StatefulWidget {
 
 class _ExerciceUpdateState extends State<ExerciceUpdate> {
   late GlobalKey<FormState> _formKey;
-  final ExerciceUpdateController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    controller.init(widget.exercice);
+    widget.controller.init(widget.exercice);
 
     _formKey = GlobalKey<FormState>();
 
@@ -112,7 +121,7 @@ class _ExerciceUpdateState extends State<ExerciceUpdate> {
         style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
         onPressed: () {
           if (_formKey.currentState?.validate() == true) {
-            controller.saveExercice().then((_) {
+            widget.controller.saveExercice().then((_) {
               showToast('Exercice mis à jour', backgroundColor: Colors.green);
             }).catchError((_) => showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent));
           }
@@ -134,8 +143,12 @@ class _ExerciceUpdateState extends State<ExerciceUpdate> {
 
     return Obx(
       () {
-        if (controller.isSet.value) {
-          return FormExercice(buttons: buttons, formKey: _formKey);
+        if (widget.controller.isSet.value) {
+          return FormExercice(
+            buttons: buttons,
+            formKey: _formKey,
+            controller: widget.controller,
+          );
         } else {
           return Container();
         }
@@ -145,17 +158,17 @@ class _ExerciceUpdateState extends State<ExerciceUpdate> {
 }
 
 class FormExercice extends StatefulWidget {
-  const FormExercice({Key? key, required this.buttons, required this.formKey}) : super(key: key);
+  const FormExercice({Key? key, required this.buttons, required this.formKey, required this.controller}) : super(key: key);
 
   final GlobalKey<FormState> formKey;
   final List<Widget> buttons;
+  final AbstractExerciceController controller;
 
   @override
   State<FormExercice> createState() => _FormExerciceState();
 }
 
 class _FormExerciceState extends State<FormExercice> {
-  final ExerciceUpdateController controller = Get.find();
   VideoPlayerController? _videoController;
   YoutubePlayerController? youtubeController;
 
@@ -173,10 +186,10 @@ class _FormExerciceState extends State<FormExercice> {
                   children: <Widget>[
                     Obx(
                       () => StorageImageWidget(
-                        imageUrl: controller.exercice.value.imageUrl,
-                        storageFile: controller.exercice.value.storageFile,
-                        onSaved: controller.setStoragePair,
-                        onDeleted: () => controller.setStoragePair(null),
+                        imageUrl: widget.controller.exercice.value.imageUrl,
+                        storageFile: widget.controller.exercice.value.storageFile,
+                        onSaved: widget.controller.setStoragePair,
+                        onDeleted: () => widget.controller.setStoragePair(null),
                       ),
                     ),
                     Expanded(
@@ -184,11 +197,11 @@ class _FormExerciceState extends State<FormExercice> {
                         padding: const EdgeInsets.only(left: 20),
                         child: Obx(
                           () {
-                            final TextEditingController ctrl = TextEditingController(text: controller.exercice.value.name);
+                            final TextEditingController ctrl = TextEditingController(text: widget.controller.exercice.value.name);
                             return FitnessDecorationTextFormField(
                                 controller: ctrl,
                                 autofocus: true,
-                                onChanged: (String name) => controller.exercice.value.name = name,
+                                onChanged: (String name) => widget.controller.exercice.value.name = name,
                                 labelText: 'Nom',
                                 validator: (String? value) {
                                   if (value == null || value.isEmpty) {
@@ -215,8 +228,8 @@ class _FormExerciceState extends State<FormExercice> {
                       constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
                       contentPadding: EdgeInsets.symmetric(horizontal: 10)),
                   paramName: 'type_exercice',
-                  initialValue: controller.exercice.value.typeExercice,
-                  onChanged: (String? onChangedValue) => controller.exercice.value.typeExercice = onChangedValue,
+                  initialValue: widget.controller.exercice.value.typeExercice,
+                  onChanged: (String? onChangedValue) => widget.controller.exercice.value.typeExercice = onChangedValue,
                 ),
               ))
             ],
@@ -225,13 +238,13 @@ class _FormExerciceState extends State<FormExercice> {
             padding: const EdgeInsets.only(top: 20),
             child: Obx(
               () {
-                final TextEditingController ctrlDescription = TextEditingController(text: controller.exercice.value.description);
+                final TextEditingController ctrlDescription = TextEditingController(text: widget.controller.exercice.value.description);
                 return TextFormField(
                   controller: ctrlDescription,
                   maxLength: 2000,
                   minLines: 5,
                   maxLines: 20,
-                  onChanged: (String description) => controller.exercice.value.description = description,
+                  onChanged: (String description) => widget.controller.exercice.value.description = description,
                   decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
                 );
               },
@@ -245,10 +258,10 @@ class _FormExerciceState extends State<FormExercice> {
                   child: Padding(
                     padding: const EdgeInsets.only(right: 5),
                     child: Obx(() {
-                      final TextEditingController ctrlVideoUrl = TextEditingController(text: controller.exercice.value.videoUrl);
+                      final TextEditingController ctrlVideoUrl = TextEditingController(text: widget.controller.exercice.value.videoUrl);
                       return FitnessDecorationTextFormField(
                         controller: ctrlVideoUrl,
-                        onChanged: (String videoUrl) => controller.exercice.value.videoUrl = videoUrl,
+                        onChanged: (String videoUrl) => widget.controller.exercice.value.videoUrl = videoUrl,
                         labelText: 'URL vidéo',
                         hintText: 'Exemple : https://myStorage.com/squat_video.mp4',
                       );
@@ -259,11 +272,17 @@ class _FormExerciceState extends State<FormExercice> {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 5),
                     child: Obx(() {
-                      final String? youtube = controller.exercice.value.youtubeUrl;
+                      final String? youtube = widget.controller.exercice.value.youtubeUrl;
                       final TextEditingController ctrlYoutubeUrl = TextEditingController(text: youtube);
                       return FitnessDecorationTextFormField(
                         controller: ctrlYoutubeUrl,
-                        onChanged: (String youtubeUrl) => controller.exercice.value.youtubeUrl = youtubeUrl,
+                        onChanged: (String youtubeUrl) {
+                          widget.controller.exercice.update((Exercice? val) {
+                            if (val != null) {
+                              val.youtubeUrl = youtubeUrl;
+                            }
+                          });
+                        },
                         hintText: 'Identifiant vidéo Youtube',
                         labelText: 'Youtube',
                       );
@@ -288,8 +307,8 @@ class _FormExerciceState extends State<FormExercice> {
             children: <Widget>[
               Obx(
                 () {
-                  if (controller.exercice.value.videoUrl != null) {
-                    _videoController = VideoPlayerController.network(controller.exercice.value.videoUrl!);
+                  if (widget.controller.exercice.value.videoUrl != null) {
+                    _videoController = VideoPlayerController.network(widget.controller.exercice.value.videoUrl!);
                     return FutureBuilder<Object?>(
                       builder: (BuildContext context, AsyncSnapshot<Object?> snapshot) {
                         if (_videoController?.value.isInitialized == true) {
@@ -318,16 +337,16 @@ class _FormExerciceState extends State<FormExercice> {
             children: <Widget>[
               Obx(
                 () {
-                  if (controller.exercice.value.youtubeUrl != null) {
+                  if (widget.controller.exercice.value.youtubeUrl != null) {
                     if (youtubeController == null) {
                       youtubeController = YoutubePlayerController(
-                        initialVideoId: controller.exercice.value.youtubeUrl!,
+                        initialVideoId: widget.controller.exercice.value.youtubeUrl!,
                         params: const YoutubePlayerParams(
                           autoPlay: false,
                         ),
                       );
                     } else {
-                      youtubeController!.cue(controller.exercice.value.youtubeUrl!);
+                      youtubeController!.cue(widget.controller.exercice.value.youtubeUrl!);
                     }
                     youtubeController!.pause();
                     return LimitedBox(

@@ -9,7 +9,7 @@ import 'package:get/get_rx/get_rx.dart' as rx;
 
 import 'exercice.service.dart';
 
-class ExerciceController extends GetxController {
+abstract class AbstractExerciceController {
   final TrainersService trainersService = Get.find();
   final FirebaseStorageService storageService = Get.find();
   final ExerciceService exerciceService = Get.find();
@@ -46,7 +46,10 @@ class ExerciceController extends GetxController {
   }
 }
 
-class ExerciceUpdateController extends ExerciceController {
+class ExerciceCreateController extends GetxController with AbstractExerciceController {
+}
+
+class ExerciceUpdateController extends GetxController with AbstractExerciceController {
   RxBool isSet = false.obs;
 
   @override
