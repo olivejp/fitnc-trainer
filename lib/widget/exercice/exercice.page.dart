@@ -111,10 +111,11 @@ class _ExercicePageState extends State<ExercicePage> {
                     list.add(Expanded(
                       flex: 3,
                       child: Container(
-                          decoration: const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
+                          decoration:
+                              const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
                           child: Padding(
                             padding: const EdgeInsets.all(60.0),
-                            child: ExerciceUpdate(exercice: widget.controller.exerciceSelected.value),
+                            child: Obx(() => ExerciceUpdate(exercice: widget.controller.exerciceSelected.value)),
                           )),
                     ));
                   }
@@ -240,8 +241,8 @@ class ExerciceStreamBuilder extends StatelessWidget {
         super(key: key);
 
   final BehaviorSubject<List<Exercice>> _streamListExercice;
-  final ExerciceService bloc = Get.find();
-  final ExercicePageController vm = Get.find();
+  final ExerciceService service = Get.find();
+  final ExercicePageController pageController = Get.find();
   final ExerciceUpdateController controller = Get.find();
 
   @override
@@ -249,7 +250,7 @@ class ExerciceStreamBuilder extends StatelessWidget {
     void selectExercice(Exercice exercice) {
       controller.init(exercice);
 
-      if (!vm.dualScreen.value) {
+      if (!pageController.dualScreen.value) {
         showDialog(
           context: context,
           builder: (BuildContext context) => AlertDialog(
@@ -268,12 +269,12 @@ class ExerciceStreamBuilder extends StatelessWidget {
         } else {
           final List<Exercice> list = snapshot.data!;
           return Obx(() {
-            return (vm.display.value == 0)
+            return (pageController.display.value == 0)
                 ? FitnessGridView<Exercice>(
                     defaultDesktopColumns: 3,
                     defaultTabletColumns: 2,
                     domains: list,
-                    bloc: bloc,
+                    bloc: service,
                     onTap: (Exercice exercice) => selectExercice(exercice),
                   )
                 : ExerciceListViewSeparated(list: list);
@@ -316,16 +317,16 @@ class ExerciceListTile extends StatelessWidget {
   }) : super(key: key);
 
   final Exercice exercice;
-  final ExercicePageController vm = Get.find();
+  final ExercicePageController pageController = Get.find();
   final ExerciceService service = Get.find();
   final ExerciceUpdateController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
     void selectExercice(Exercice exercice) {
-      vm.selectExercice(exercice);
+      pageController.selectExercice(exercice);
       controller.init(exercice);
-      if (!vm.dualScreen.value) {
+      if (!pageController.dualScreen.value) {
         showDialog(
           context: context,
           builder: (BuildContext context) => AlertDialog(
@@ -339,7 +340,7 @@ class ExerciceListTile extends StatelessWidget {
     return Obx(
       () => ListTile(
         contentPadding: const EdgeInsets.all(20),
-        selected: vm.exerciceSelected.value.uid == exercice.uid,
+        selected: pageController.exerciceSelected.value.uid == exercice.uid,
         selectedTileColor: FitnessNcColors.blue50,
         leading: CircleAvatar(foregroundImage: exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null),
         title: Text(exercice.name),
