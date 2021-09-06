@@ -68,67 +68,63 @@ class _ExercicePageState extends State<ExercicePage> {
 
   @override
   Widget build(BuildContext context) {
-    widget.displayTypeController.displayType.listen((DisplayType displayType) {
-      widget.controller.setDualScreen(isDualScreen: displayType == DisplayType.desktop);
-    });
+    // widget.displayTypeController.displayType.listen((DisplayType displayType) {
+    //   widget.controller.setDualScreen(isDualScreen: displayType == DisplayType.desktop);
+    // });
 
-    return RoutedPage(child: LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        return Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    SelectableText(
-                      'Exercice',
-                      style: Theme.of(context).textTheme.headline1,
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(100, 50),
-                        maximumSize: const Size(200, 50),
-                      ),
-                      onPressed: () => ExerciceBuilderPage.create(context),
-                      child: Text(
-                        'Créer un exercice',
-                        style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
-                      ),
-                    )
-                  ],
+    return RoutedPage(
+        child: Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                SelectableText(
+                  'Exercice',
+                  style: Theme.of(context).textTheme.headline1,
                 ),
-              ),
-              Expanded(
-                child: Obx(() {
-                  final List<Widget> list = <Widget>[
-                    Expanded(flex: 2, child: ExerciceListSearch()),
-                  ];
-
-                  if (widget.controller.dualScreen.value) {
-                    list.add(Expanded(
-                      flex: 3,
-                      child: Container(
-                          decoration:
-                              const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
-                          child: Padding(
-                            padding: const EdgeInsets.all(60.0),
-                            child: Obx(() => ExerciceUpdate(exercice: widget.controller.exerciceSelected.value)),
-                          )),
-                    ));
-                  }
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: list,
-                  );
-                }),
-              ),
-            ],
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(100, 50),
+                    maximumSize: const Size(200, 50),
+                  ),
+                  onPressed: () => ExerciceBuilderPage.create(context),
+                  child: Text(
+                    'Créer un exercice',
+                    style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
+                  ),
+                )
+              ],
+            ),
           ),
-        );
-      },
+          Expanded(
+            child: Obx(() {
+              final List<Widget> list = <Widget>[
+                Expanded(flex: 2, child: ExerciceListSearch()),
+              ];
+
+              if (widget.controller.dualScreen.value) {
+                list.add(Expanded(
+                  flex: 3,
+                  child: Container(
+                      decoration: const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
+                      child: Padding(
+                        padding: const EdgeInsets.all(60.0),
+                        child: Obx(() => ExerciceUpdate(exercice: widget.controller.exerciceSelected.value)),
+                      )),
+                ));
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: list,
+              );
+            }),
+          ),
+        ],
+      ),
     ));
   }
 }
