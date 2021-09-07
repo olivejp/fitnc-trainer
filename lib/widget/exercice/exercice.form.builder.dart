@@ -100,7 +100,7 @@ class ExerciceUpdate extends StatefulWidget {
 
   final bool displayCloseButton;
   final Exercice exercice;
-  final ExerciceUpdateController controller = Get.put(ExerciceUpdateController());
+  final ExerciceUpdateController controller = Get.find();
 
   @override
   State<ExerciceUpdate> createState() => _ExerciceUpdateState();

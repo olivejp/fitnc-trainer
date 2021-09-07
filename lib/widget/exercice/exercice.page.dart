@@ -1,7 +1,7 @@
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/main.dart';
-import 'package:fitnc_trainer/service/exercice.service.dart';
 import 'package:fitnc_trainer/service/exercice.controller.dart';
+import 'package:fitnc_trainer/service/exercice.service.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
@@ -51,25 +51,18 @@ class ExercicePageController extends GetxController {
   }
 }
 
-class ExercicePage extends StatefulWidget {
-  ExercicePage({Key? key}) : super(key: key);
-
-  final ExercicePageController controller = Get.put(ExercicePageController());
-  final DisplayTypeController displayTypeController = Get.find();
-
-  @override
-  State<ExercicePage> createState() => _ExercicePageState();
-}
-
-class _ExercicePageState extends State<ExercicePage> {
-  final ExerciceService service = Get.find();
+class ExercicePage extends StatelessWidget {
   final List<Exercice> listCompleteExercice = <Exercice>[];
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
+  final ExerciceService service = Get.find();
+  final DisplayTypeController displayTypeController = Get.find();
+  final ExercicePageController controller = Get.put(ExercicePageController());
+  final ExerciceUpdateController updateController = Get.put(ExerciceUpdateController());
 
   @override
   Widget build(BuildContext context) {
-    widget.displayTypeController.displayType.listen((DisplayType displayType) {
-      widget.controller.setDualScreen(isDualScreen: displayType == DisplayType.desktop);
+    displayTypeController.displayType.listen((DisplayType displayType) {
+      controller.setDualScreen(isDualScreen: displayType == DisplayType.desktop);
     });
 
     return RoutedPage(
@@ -106,14 +99,14 @@ class _ExercicePageState extends State<ExercicePage> {
                 Expanded(flex: 2, child: ExerciceListSearch()),
               ];
 
-              if (widget.controller.dualScreen.value) {
+              if (controller.dualScreen.value) {
                 list.add(Expanded(
                   flex: 3,
                   child: Container(
                       decoration: const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
                       child: Padding(
                         padding: const EdgeInsets.all(60.0),
-                        child: Obx(() => ExerciceUpdate(exercice: widget.controller.exerciceSelected.value)),
+                        child: Obx(() => ExerciceUpdate(exercice: controller.exerciceSelected.value)),
                       )),
                 ));
               }
