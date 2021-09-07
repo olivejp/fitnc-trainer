@@ -42,6 +42,7 @@ class ExercicePageController extends GetxController {
 
   void changeDisplay(int newDisplay) {
     display.value = newDisplay;
+    update();
   }
 
   getRx.Rx<Exercice> exerciceSelected = Exercice().obs;
@@ -99,7 +100,7 @@ class ExercicePage extends StatelessWidget {
                 init: controller,
                 builder: (ExercicePageController controller) {
                   final List<Widget> list = <Widget>[
-                    Expanded(flex: 2, child: ExerciceListSearch()),
+                    Expanded(flex: 2, child: _ExerciceListSearch()),
                   ];
 
                   if (controller.dualScreen.value) {
@@ -129,19 +130,19 @@ class ExercicePage extends StatelessWidget {
   }
 }
 
-class ExerciceListSearch extends StatefulWidget {
-  ExerciceListSearch({
+class _ExerciceListSearch extends StatefulWidget {
+  _ExerciceListSearch({
     Key? key,
   }) : super(key: key);
 
   final ExerciceService service = Get.find();
-  final ExercicePageController vm = Get.find();
+  final ExercicePageController controller = Get.find();
 
   @override
-  State<ExerciceListSearch> createState() => _ExerciceListSearchState();
+  State<_ExerciceListSearch> createState() => _ExerciceListSearchState();
 }
 
-class _ExerciceListSearchState extends State<ExerciceListSearch> {
+class _ExerciceListSearchState extends State<_ExerciceListSearch> {
   final BehaviorSubject<List<Exercice>> _streamListExercice = BehaviorSubject<List<Exercice>>();
   final List<Exercice> listCompleteExercice = <Exercice>[];
 
@@ -182,10 +183,10 @@ class _ExerciceListSearchState extends State<ExerciceListSearch> {
                       selectedBorderColor: FitnessNcColors.orange400,
                       constraints: const BoxConstraints(minHeight: 40, maxHeight: 40),
                       borderRadius: BorderRadius.circular(5),
-                      isSelected: widget.vm.toggleSelections,
+                      isSelected: widget.controller.toggleSelections,
                       onPressed: (int index) {
-                        widget.vm.toggleSelection(index);
-                        widget.vm.changeDisplay(index);
+                        widget.controller.toggleSelection(index);
+                        widget.controller.changeDisplay(index);
                       },
                       children: const <Widget>[
                         Padding(
@@ -221,7 +222,7 @@ class _ExerciceListSearchState extends State<ExerciceListSearch> {
           ),
         ),
         Expanded(
-            child: ExerciceStreamBuilder(
+            child: _ExerciceStreamBuilder(
           streamListExercice: _streamListExercice,
         )),
       ],
@@ -229,8 +230,8 @@ class _ExerciceListSearchState extends State<ExerciceListSearch> {
   }
 }
 
-class ExerciceStreamBuilder extends StatelessWidget {
-  ExerciceStreamBuilder({
+class _ExerciceStreamBuilder extends StatelessWidget {
+  _ExerciceStreamBuilder({
     Key? key,
     required BehaviorSubject<List<Exercice>> streamListExercice,
   })  : _streamListExercice = streamListExercice,
@@ -264,25 +265,27 @@ class ExerciceStreamBuilder extends StatelessWidget {
           return const Center(child: Text('Aucun exercice trouvé.'));
         } else {
           final List<Exercice> list = snapshot.data!;
-          return Obx(() {
-            return (pageController.display.value == 0)
-                ? FitnessGridView<Exercice>(
-                    defaultDesktopColumns: 3,
-                    defaultTabletColumns: 2,
-                    domains: list,
-                    bloc: service,
-                    onTap: (Exercice exercice) => selectExercice(exercice),
-                  )
-                : ExerciceListViewSeparated(list: list);
-          });
+          return GetBuilder<ExercicePageController>(
+              init: pageController,
+              builder: (ExercicePageController controller) {
+                return (pageController.display.value == 0)
+                    ? FitnessGridView<Exercice>(
+                        defaultDesktopColumns: 3,
+                        defaultTabletColumns: 2,
+                        domains: list,
+                        bloc: service,
+                        onTap: (Exercice exercice) => selectExercice(exercice),
+                      )
+                    : _ExerciceListViewSeparated(list: list);
+              });
         }
       },
     );
   }
 }
 
-class ExerciceListViewSeparated extends StatelessWidget {
-  ExerciceListViewSeparated({
+class _ExerciceListViewSeparated extends StatelessWidget {
+  _ExerciceListViewSeparated({
     Key? key,
     required this.list,
   }) : super(key: key);
