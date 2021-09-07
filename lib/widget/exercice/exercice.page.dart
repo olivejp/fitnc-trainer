@@ -68,9 +68,9 @@ class _ExercicePageState extends State<ExercicePage> {
 
   @override
   Widget build(BuildContext context) {
-    // widget.displayTypeController.displayType.listen((DisplayType displayType) {
-    //   widget.controller.setDualScreen(isDualScreen: displayType == DisplayType.desktop);
-    // });
+    widget.displayTypeController.displayType.listen((DisplayType displayType) {
+      widget.controller.setDualScreen(isDualScreen: displayType == DisplayType.desktop);
+    });
 
     return RoutedPage(
         child: Scaffold(
