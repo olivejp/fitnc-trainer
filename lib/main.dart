@@ -17,7 +17,7 @@ import 'constants/constants.dart';
 enum DisplayType { mobile, tablet, desktop }
 
 /// Notifier qui permet de savoir quel est l'affichage courant
-class DisplayTypeController extends GetxController {
+class DisplayTypeService extends GetxService {
   Rx<DisplayType> displayType = DisplayType.mobile.obs;
 
   void changeDisplay(DisplayType newDisplayType) {
@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
                   callback: (UserCredential userCredential) => Navigator.pop(context),
                 ),
           },
-          home: LayoutDisplayNotifier(builder: (DisplayTypeController displayTypeController) => const FirebaseWidget(), )),
+          home: LayoutDisplayNotifier(builder: (DisplayTypeService displayTypeController) => const FirebaseWidget(), )),
     );
   }
 
@@ -86,14 +86,14 @@ class LayoutDisplayNotifier extends StatefulWidget {
   const LayoutDisplayNotifier({Key? key, required this.builder, this.desktopSize = 1280, this.tabletSize = 800,}) : super(key: key);
   final int desktopSize;
   final int tabletSize;
-  final Widget Function(DisplayTypeController displayTypeController) builder;
+  final Widget Function(DisplayTypeService displayTypeController) builder;
 
   @override
   State<LayoutDisplayNotifier> createState() => _LayoutDisplayNotifierState();
 }
 
 class _LayoutDisplayNotifierState extends State<LayoutDisplayNotifier> {
-  final DisplayTypeController displayTypeController = Get.put(DisplayTypeController());
+  final DisplayTypeService displayTypeController = Get.put(DisplayTypeService());
 
   @override
   Widget build(BuildContext context) {

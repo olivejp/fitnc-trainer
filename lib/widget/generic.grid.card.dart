@@ -36,7 +36,7 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
   final int defaultTabletColumns;
   final int defaultDesktopColumns;
   final Widget Function(T domain)? getCard;
-  final DisplayTypeController displayTypeController = Get.find();
+  final DisplayTypeService displayTypeController = Get.find();
 
   @override
   Widget build(BuildContext context) {

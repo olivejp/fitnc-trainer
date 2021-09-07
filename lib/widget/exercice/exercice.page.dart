@@ -57,7 +57,7 @@ class ExercicePage extends StatelessWidget {
   final List<Exercice> listCompleteExercice = <Exercice>[];
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
   final ExerciceService service = Get.find();
-  final DisplayTypeController displayTypeController = Get.find();
+  final DisplayTypeService displayTypeController = Get.find();
   final ExercicePageController controller = Get.put(ExercicePageController());
   final ExerciceUpdateController updateController = Get.put(ExerciceUpdateController());
 

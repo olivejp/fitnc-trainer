@@ -290,7 +290,7 @@ class _SignUpPageState extends State<SignUpPage> {
         );
 
         return LayoutDisplayNotifier(
-          builder: (DisplayTypeController displayTypeController) => Scaffold(
+          builder: (DisplayTypeService displayTypeController) => Scaffold(
             backgroundColor: FitnessNcColors.blue50,
             body: Stack(
               children: <Widget>[
