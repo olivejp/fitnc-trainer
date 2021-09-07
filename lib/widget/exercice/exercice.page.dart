@@ -61,6 +61,7 @@ class ExercicePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    controller.setDualScreen(isDualScreen: displayTypeController.displayType.value == DisplayType.desktop);
     displayTypeController.displayType.listen((DisplayType displayType) {
       controller.setDualScreen(isDualScreen: displayType == DisplayType.desktop);
     });
@@ -94,27 +95,33 @@ class ExercicePage extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Obx(() {
-              final List<Widget> list = <Widget>[
-                Expanded(flex: 2, child: ExerciceListSearch()),
-              ];
+            child: GetX<ExercicePageController>(
+                init: controller,
+                builder: (ExercicePageController controller) {
+                  final List<Widget> list = <Widget>[
+                    Expanded(flex: 2, child: ExerciceListSearch()),
+                  ];
 
-              if (controller.dualScreen.value) {
-                list.add(Expanded(
-                  flex: 3,
-                  child: Container(
-                      decoration: const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
-                      child: Padding(
-                        padding: const EdgeInsets.all(60.0),
-                        child: Obx(() => ExerciceUpdate(exercice: controller.exerciceSelected.value)),
-                      )),
-                ));
-              }
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: list,
-              );
-            }),
+                  if (controller.dualScreen.value) {
+                    list.add(
+                      Expanded(
+                        flex: 3,
+                        child: Container(
+                          decoration:
+                              const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
+                          child: Padding(
+                            padding: const EdgeInsets.all(60.0),
+                            child: ExerciceUpdate(exercice: controller.exerciceSelected.value),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: list,
+                  );
+                }),
           ),
         ],
       ),
