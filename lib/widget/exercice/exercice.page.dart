@@ -96,32 +96,33 @@ class ExercicePage extends StatelessWidget {
               ],
             ),
           ),
-          Expanded(
-            child: Obx(() {
-              final List<Widget> list = <Widget>[
-                Expanded(flex: 2, child: _ExerciceListSearch()),
-              ];
-
-              if (controller.dualScreen.value) {
-                list.add(
-                  Expanded(
-                    flex: 3,
-                    child: Container(
-                      decoration: const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
-                      child: Padding(
-                        padding: const EdgeInsets.all(60.0),
-                        child: Obx(() => ExerciceUpdate(exercice: controller.exerciceSelected.value)),
-                      ),
-                    ),
-                  ),
-                );
-              }
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: list,
-              );
-            }),
-          ),
+          // TODO Test à décommenter
+          // Expanded(
+          //   child: Obx(() {
+          //     final List<Widget> list = <Widget>[
+          //       Expanded(flex: 2, child: _ExerciceListSearch()),
+          //     ];
+          //
+          //     if (controller.dualScreen.value) {
+          //       list.add(
+          //         Expanded(
+          //           flex: 3,
+          //           child: Container(
+          //             decoration: const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
+          //             child: Padding(
+          //               padding: const EdgeInsets.all(60.0),
+          //               child: Obx(() => ExerciceUpdate(exercice: controller.exerciceSelected.value)),
+          //             ),
+          //           ),
+          //         ),
+          //       );
+          //     }
+          //     return Row(
+          //       crossAxisAlignment: CrossAxisAlignment.start,
+          //       children: list,
+          //     );
+          //   }),
+          // ),
         ],
       ),
     ));
@@ -161,6 +162,8 @@ class _ExerciceListSearchState extends State<_ExerciceListSearch> {
       _streamListExercice.sink.add(listCompleteExercice);
       UtilService.search(_query, listCompleteExercice, _streamListExercice);
     });
+
+    return Text('test');
 
     return Column(
       children: <Widget>[
