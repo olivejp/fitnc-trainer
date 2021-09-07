@@ -141,13 +141,14 @@ class _ExerciceUpdateState extends State<ExerciceUpdate> {
 
     final List<Widget> buttons = widget.displayCloseButton ? <Widget>[saveButton, closeButton] : <Widget>[saveButton];
 
-    return Obx(
-      () {
-        if (widget.controller.isSet.value) {
+    return GetBuilder<ExerciceUpdateController>(
+      init: widget.controller,
+      builder: (ExerciceUpdateController controller) {
+        if (controller.isSet.value) {
           return FormExercice(
             buttons: buttons,
             formKey: _formKey,
-            controller: widget.controller,
+            controller: controller,
           );
         } else {
           return Container();
@@ -196,20 +197,17 @@ class _FormExerciceState extends State<FormExercice> {
                       child: Padding(
                         padding: const EdgeInsets.only(left: 20),
                         child: Obx(
-                          () {
-                            final TextEditingController ctrl = TextEditingController(text: widget.controller.exercice.value.name);
-                            return FitnessDecorationTextFormField(
-                                controller: ctrl,
-                                autofocus: true,
-                                onChanged: (String name) => widget.controller.exercice.value.name = name,
-                                labelText: 'Nom',
-                                validator: (String? value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Merci de renseigner le nom du exercice.';
-                                  }
-                                  return null;
-                                });
-                          },
+                          () => FitnessDecorationTextFormField(
+                              controller: TextEditingController(text: widget.controller.exercice.value.name),
+                              autofocus: true,
+                              onChanged: (String name) => widget.controller.exercice.value.name = name,
+                              labelText: 'Nom',
+                              validator: (String? value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Merci de renseigner le nom du exercice.';
+                                }
+                                return null;
+                              }),
                         ),
                       ),
                     ),
@@ -237,17 +235,14 @@ class _FormExerciceState extends State<FormExercice> {
           Padding(
             padding: const EdgeInsets.only(top: 20),
             child: Obx(
-              () {
-                final TextEditingController ctrlDescription = TextEditingController(text: widget.controller.exercice.value.description);
-                return TextFormField(
-                  controller: ctrlDescription,
-                  maxLength: 2000,
-                  minLines: 5,
-                  maxLines: 20,
-                  onChanged: (String description) => widget.controller.exercice.value.description = description,
-                  decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
-                );
-              },
+              () => TextFormField(
+                controller: TextEditingController(text: widget.controller.exercice.value.description),
+                maxLength: 2000,
+                minLines: 5,
+                maxLines: 20,
+                onChanged: (String description) => widget.controller.exercice.value.description = description,
+                decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
+              ),
             ),
           ),
           Padding(
@@ -257,15 +252,14 @@ class _FormExerciceState extends State<FormExercice> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(right: 5),
-                    child: Obx(() {
-                      final TextEditingController ctrlVideoUrl = TextEditingController(text: widget.controller.exercice.value.videoUrl);
-                      return FitnessDecorationTextFormField(
-                        controller: ctrlVideoUrl,
+                    child: Obx(
+                      () => FitnessDecorationTextFormField(
+                        controller: TextEditingController(text: widget.controller.exercice.value.videoUrl),
                         onChanged: (String videoUrl) => widget.controller.exercice.value.videoUrl = videoUrl,
                         labelText: 'URL vidéo',
                         hintText: 'Exemple : https://myStorage.com/squat_video.mp4',
-                      );
-                    }),
+                      ),
+                    ),
                   ),
                 ),
                 Expanded(
@@ -337,7 +331,7 @@ class _FormExerciceState extends State<FormExercice> {
             children: <Widget>[
               Obx(
                 () {
-                  if (widget.controller.exercice.value.youtubeUrl != null) {
+                  if (widget.controller.exercice.value.youtubeUrl != null && widget.controller.exercice.value.youtubeUrl!.isNotEmpty) {
                     if (youtubeController == null) {
                       youtubeController = YoutubePlayerController(
                         initialVideoId: widget.controller.exercice.value.youtubeUrl!,

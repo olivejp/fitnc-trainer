@@ -66,6 +66,7 @@ class ExerciceUpdateController extends GetxController with AbstractExerciceContr
         exercice.value.storageFile = value;
       }
     }
+    update();
   }
 
   void deleteExercice(Exercice exerciceDeleted) {

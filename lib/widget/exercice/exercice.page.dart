@@ -49,6 +49,7 @@ class ExercicePageController extends GetxController {
 
   void selectExercice(Exercice exercice) {
     exerciceSelected.value = exercice;
+    update();
   }
 }
 
@@ -336,10 +337,11 @@ class ExerciceListTile extends StatelessWidget {
       }
     }
 
-    return Obx(
-      () => ListTile(
+    return GetBuilder<ExercicePageController>(
+      init: pageController,
+      builder: (ExercicePageController controller) => ListTile(
         contentPadding: const EdgeInsets.all(20),
-        selected: pageController.exerciceSelected.value.uid == exercice.uid,
+        selected: controller.exerciceSelected.value.uid == exercice.uid,
         selectedTileColor: FitnessNcColors.blue50,
         leading: CircleAvatar(foregroundImage: exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null),
         title: Text(exercice.name),
