@@ -167,8 +167,6 @@ class _ExerciceListSearchState extends State<_ExerciceListSearch> {
       UtilService.search(_query, listCompleteExercice, _streamListExercice);
     });
 
-    return Text('test');
-
     return Column(
       children: <Widget>[
         Padding(
