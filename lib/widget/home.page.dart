@@ -32,7 +32,7 @@ class MyHomePage extends StatelessWidget {
     final List<Destination> destinations = <Destination>[
       Destination(icon: const Icon(Icons.account_tree_outlined), pageName: 'Programme', index: 0, page: ProgrammePage()),
       Destination(icon: const Icon(Icons.sports_volleyball_outlined), pageName: 'Workout', index: 1, page: const WorkoutPage()),
-      Destination(icon: const Icon(Icons.sports_handball_outlined), pageName: 'Exercice', index: 2, page: ExercicePage()),
+      Destination(icon: const Icon(Icons.sports_handball_outlined), pageName: 'Exercice', index: 2, page: Container()), // JPO test
       Destination(icon: const Icon(Icons.person), pageName: 'Abonné', index: 3, page: AbonnePage()),
     ];
 
