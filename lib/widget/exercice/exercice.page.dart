@@ -69,63 +69,67 @@ class ExercicePage extends StatelessWidget {
     });
 
     return RoutedPage(
-        child: Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                SelectableText(
-                  'Exercice',
-                  style: Theme.of(context).textTheme.headline1,
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(100, 50),
-                    maximumSize: const Size(200, 50),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  SelectableText(
+                    'Exercice',
+                    style: Theme.of(context).textTheme.headline1,
                   ),
-                  onPressed: () => ExerciceBuilderPage.create(context),
-                  child: Text(
-                    'Créer un exercice',
-                    style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
-                  ),
-                )
-              ],
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(100, 50),
+                      maximumSize: const Size(200, 50),
+                    ),
+                    onPressed: () => ExerciceBuilderPage.create(context),
+                    child: Text(
+                      'Créer un exercice',
+                      style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
-          // TODO Test à décommenter
-          // Expanded(
-          //   child: Obx(() {
-          //     final List<Widget> list = <Widget>[
-          //       Expanded(flex: 2, child: _ExerciceListSearch()),
-          //     ];
-          //
-          //     if (controller.dualScreen.value) {
-          //       list.add(
-          //         Expanded(
-          //           flex: 3,
-          //           child: Container(
-          //             decoration: const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
-          //             child: Padding(
-          //               padding: const EdgeInsets.all(60.0),
-          //               child: Obx(() => ExerciceUpdate(exercice: controller.exerciceSelected.value)),
-          //             ),
-          //           ),
-          //         ),
-          //       );
-          //     }
-          //     return Row(
-          //       crossAxisAlignment: CrossAxisAlignment.start,
-          //       children: list,
-          //     );
-          //   }),
-          // ),
-        ],
+            Expanded(
+              child: StreamBuilder<bool>(
+                  stream: controller.dualScreen.stream,
+                  initialData: controller.dualScreen.value,
+                  builder: (_, AsyncSnapshot<bool> snapshot) {
+                    final List<Widget> list = <Widget>[
+                      Expanded(flex: 2, child: _ExerciceListSearch()),
+                    ];
+
+                    if (snapshot.data!) {
+                      list.add(
+                        Expanded(
+                          flex: 3,
+                          child: Container(
+                            decoration:
+                                const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
+                            child: Padding(
+                              padding: const EdgeInsets.all(60.0),
+                              child: Obx(() => ExerciceUpdate(exercice: controller.exerciceSelected.value)),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: list,
+                    );
+                  }),
+            ),
+          ],
+        ),
       ),
-    ));
+    );
   }
 }
 
