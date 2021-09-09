@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/bloc/login/sign-up.bloc.dart';
-import 'package:fitnc_trainer/main.dart';
+import 'package:fitnc_trainer/service/display.service.dart';
 import 'package:fitnc_trainer/widget/bottom.widget.dart';
+import 'package:fitnc_trainer/widget/layout-display.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -43,6 +44,7 @@ class _SignUpPageState extends State<SignUpPage> {
   _SignUpPageState();
 
   final HidePasswordController controller = Get.put(HidePasswordController());
+  final DisplayTypeService displayTypeService = Get.find();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -290,7 +292,7 @@ class _SignUpPageState extends State<SignUpPage> {
         );
 
         return LayoutDisplayNotifier(
-          builder: (DisplayTypeService displayTypeController) => Scaffold(
+          child: Scaffold(
             backgroundColor: FitnessNcColors.blue50,
             body: Stack(
               children: <Widget>[
@@ -323,7 +325,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 Builder(builder: (_) {
                   const Widget child = FitnessBottomCu();
                   Widget toShow;
-                  if (displayTypeController.displayType.value == DisplayType.desktop) {
+                  if (displayTypeService.displayType.value == DisplayType.desktop) {
                     toShow = Row(
                       children: <Widget>[
                         Expanded(child: columnLeft),

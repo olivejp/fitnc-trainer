@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/service/auth.service.dart';
+import 'package:fitnc_trainer/service/display.service.dart';
 import 'package:fitnc_trainer/service/firebase-storage.service.dart';
 import 'package:fitnc_trainer/service/firebase.service.dart';
+import 'package:fitnc_trainer/widget/layout-display.widget.dart';
 import 'package:fitnc_trainer/widget/login/login.page.dart';
 import 'package:fitnc_trainer/widget/login/sign-up.page.dart';
 import 'package:fitnc_trainer/widget/widgets/firebase.widget.dart';
@@ -13,17 +15,7 @@ import 'package:oktoast/oktoast.dart';
 
 import 'constants/constants.dart';
 
-/// Enumération des différents types d'affichage possibles
-enum DisplayType { mobile, tablet, desktop }
 
-/// Notifier qui permet de savoir quel est l'affichage courant
-class DisplayTypeService extends GetxService {
-  Rx<DisplayType> displayType = DisplayType.mobile.obs;
-
-  void changeDisplay(DisplayType newDisplayType) {
-    displayType.value = newDisplayType;
-  }
-}
 
 void main() {
   initServices();
@@ -34,6 +26,7 @@ void initServices() {
   Get.put(AuthService());
   Get.put(FirebaseService());
   Get.put(FirebaseStorageService());
+  Get.put(DisplayTypeService());
 }
 
 class MyApp extends StatelessWidget {
@@ -42,17 +35,20 @@ class MyApp extends StatelessWidget {
     return OKToast(
       position: ToastPosition.bottom,
       child: GetMaterialApp(
-          title: FitnessConstants.appTitle,
-          theme: getThemeData(),
-          routes: {
-            '/login': (BuildContext context) => LoginPage(
-                  callback: (UserCredential userCredential) => Navigator.of(context).pushNamed('/'),
-                ),
-            '/sign_up': (BuildContext context) => SignUpPage(
-                  callback: (UserCredential userCredential) => Navigator.pop(context),
-                ),
-          },
-          home: LayoutDisplayNotifier(builder: (DisplayTypeService displayTypeController) => const FirebaseWidget(), )),
+        title: FitnessConstants.appTitle,
+        theme: getThemeData(),
+        routes: {
+          '/login': (BuildContext context) => LoginPage(
+                callback: (UserCredential userCredential) => Navigator.of(context).pushNamed('/'),
+              ),
+          '/sign_up': (BuildContext context) => SignUpPage(
+                callback: (UserCredential userCredential) => Navigator.pop(context),
+              ),
+        },
+        home: const LayoutDisplayNotifier(
+          child: FirebaseWidget(),
+        ),
+      ),
     );
   }
 
@@ -78,39 +74,6 @@ class MyApp extends StatelessWidget {
       ),
       inputDecorationTheme: InputDecorationTheme(border: OutlineInputBorder(borderRadius: BorderRadius.circular(5))),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(foregroundColor: FitnessNcColors.white50),
-    );
-  }
-}
-
-class LayoutDisplayNotifier extends StatefulWidget {
-  const LayoutDisplayNotifier({Key? key, required this.builder, this.desktopSize = 1280, this.tabletSize = 800,}) : super(key: key);
-  final int desktopSize;
-  final int tabletSize;
-  final Widget Function(DisplayTypeService displayTypeController) builder;
-
-  @override
-  State<LayoutDisplayNotifier> createState() => _LayoutDisplayNotifierState();
-}
-
-class _LayoutDisplayNotifierState extends State<LayoutDisplayNotifier> {
-  final DisplayTypeService displayTypeController = Get.put(DisplayTypeService());
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (_, BoxConstraints constraints) {
-        /// Mise à jour du displayType selon la largeur de l'écran.
-        DisplayType displayType = DisplayType.desktop;
-        if (constraints.maxWidth >= widget.desktopSize) {
-          displayType = DisplayType.desktop;
-        } else if (constraints.maxWidth >= widget.tabletSize && constraints.maxWidth <= widget.desktopSize - 1) {
-          displayType = DisplayType.tablet;
-        } else {
-          displayType = DisplayType.mobile;
-        }
-        displayTypeController.changeDisplay(displayType);
-        return widget.builder(displayTypeController);
-      },
     );
   }
 }

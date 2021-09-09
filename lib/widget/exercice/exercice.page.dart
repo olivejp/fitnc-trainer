@@ -1,5 +1,6 @@
 import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/main.dart';
+import 'package:fitnc_trainer/service/display.service.dart';
 import 'package:fitnc_trainer/service/exercice.controller.dart';
 import 'package:fitnc_trainer/service/exercice.service.dart';
 import 'package:fitnc_trainer/service/util.service.dart';
@@ -167,8 +168,6 @@ class _ExerciceListSearchState extends State<_ExerciceListSearch> {
       UtilService.search(_query, listCompleteExercice, _streamListExercice);
     });
 
-    return Text('test');
-
     return Column(
       children: <Widget>[
         Padding(
@@ -188,7 +187,7 @@ class _ExerciceListSearchState extends State<_ExerciceListSearch> {
                       selectedBorderColor: FitnessNcColors.orange400,
                       constraints: const BoxConstraints(minHeight: 40, maxHeight: 40),
                       borderRadius: BorderRadius.circular(5),
-                      isSelected: widget.controller.toggleSelections,
+                      isSelected: widget.controller.toggleSelections.toList(),
                       onPressed: (int index) {
                         widget.controller.toggleSelection(index);
                         widget.controller.changeDisplay(index);

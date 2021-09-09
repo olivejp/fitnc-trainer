@@ -48,7 +48,7 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
             }).toList());
   }
 
-  DropdownMenuItem<String?> mapParamToDropdownItem(Param param, bool onlyName) {
+  DropdownMenuItem<String?> mapParamToDropdownItem(Param param, {required bool onlyName}) {
     return DropdownMenuItem<String?>(
       value: param.valeur,
       child: getRowFromParam(param, onlyName),
@@ -56,7 +56,7 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
   }
 
   List<DropdownMenuItem<String?>> getParamAsDropdown(List<Param> params, bool onlyName, bool insertNull, String? nullElement) {
-    final List<DropdownMenuItem<String?>> list = params.map((param) => mapParamToDropdownItem(param, onlyName)).toList();
+    final List<DropdownMenuItem<String?>> list = params.map((param) => mapParamToDropdownItem(param, onlyName: onlyName)).toList();
 
     if (insertNull) {
       list.add(DropdownMenuItem<String?>(
@@ -68,7 +68,8 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
   }
 
   Future<List<DropdownMenuItem<String?>>> getFutureParamAsDropdown(String paramName, bool onlyName, bool insertNull, String? nullElement) async {
-    final List<DropdownMenuItem<String?>> list = (await getListParam(paramName)).map((param) => mapParamToDropdownItem(param, onlyName)).toList();
+    final List<DropdownMenuItem<String?>> list =
+        (await getListParam(paramName)).map((param) => mapParamToDropdownItem(param, onlyName: onlyName)).toList();
 
     if (insertNull) {
       list.add(DropdownMenuItem<String?>(
@@ -83,7 +84,7 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
     if (onlyName) {
       return Text(param.nom!);
     } else {
-      return Row(children: [
+      return Row(children: <Widget>[
         Text('${param.nom!}  -  '),
         Text(
           param.libelle!,
