@@ -1,6 +1,6 @@
 import 'package:fitnc_trainer/service/workout.service.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
-import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
+import 'package:fitness_domain/widget/storage_image.widget.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.page.dart';
 import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';

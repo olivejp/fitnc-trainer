@@ -34,7 +34,7 @@ class MyHomePage extends StatelessWidget {
       Destination(icon: const Icon(Icons.account_tree_outlined), pageName: 'Programme', index: 0, page: ProgrammePage()),
       Destination(icon: const Icon(Icons.sports_volleyball_outlined), pageName: 'Workout', index: 1, page: const WorkoutPage()),
       Destination(icon: const Icon(Icons.sports_handball_outlined), pageName: 'Exercice', index: 2, page: ExercicePage()),
-      Destination(icon: const Icon(Icons.person), pageName: 'Abonné', index: 3, page: AbonnePage()),
+      Destination(icon: const Icon(Icons.group), pageName: 'Abonné', index: 3, page: AbonnePage()),
     ];
 
     return Scaffold(
@@ -112,10 +112,15 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
           selectedIndex: controller.currentPage.value,
           trailing: _NavigationRailFolderSection(folders: <_NavigationFolder>[
             _NavigationFolder(
+              label: 'Profil',
+              iconData: Icons.person,
+              onTap: () => authService.signOut(),
+            ),
+            _NavigationFolder(
               label: 'Déconnexion',
               iconData: Icons.exit_to_app_outlined,
               onTap: () => authService.signOut(),
-            )
+            ),
           ]),
           leading: Row(
             mainAxisAlignment: MainAxisAlignment.center,

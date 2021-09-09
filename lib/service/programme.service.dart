@@ -2,17 +2,18 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitness_domain/domain/programme.domain.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/domain/workout_schedule.domain.dart';
 import 'package:fitness_domain/domain/workout_schedule.dto.dart';
+import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ProgrammeService extends AbstractFitnessCrudService<Programme> with MixinFitnessStorageService<Programme> {
   final TrainersService trainersService = Get.find();
+  final String publishedProgrammeCollectionName = 'publishedProgrammes';
 
   @override
   Stream<List<Programme>> listenAll() {
@@ -84,27 +85,30 @@ class ProgrammeService extends AbstractFitnessCrudService<Programme> with MixinF
   /// Publication du programme dans une collection où tous les utilisateurs pourront les trouver.
   ///
   Future<void> publishProgramme(Programme programme, {required bool sendStorage}) async {
-    programme.available = true;
-    programme.publishDate = FieldValue.serverTimestamp();
     await saveProgramme(programme, sendStorage: sendStorage);
 
     // Ouverture d'un batch.
     final WriteBatch batch = FirebaseFirestore.instance.batch();
 
-    final DocumentReference<Map<String, dynamic>> programmeRef = FirebaseFirestore.instance.collection('publishedProgrammes').doc(programme.uid);
+    final DocumentReference<Map<String, dynamic>> publishedProgrammeRef =
+        FirebaseFirestore.instance.collection(publishedProgrammeCollectionName).doc(programme.uid);
 
-    batch.set(programmeRef, programme.toJson());
+    batch.set(publishedProgrammeRef, programme.toJson());
 
     // Lecture de tous les workouts.
     final QuerySnapshot<Map<String, dynamic>> mapWorkouts =
         await trainersService.getProgrammeReference().doc(programme.uid).collection('workouts').get();
 
     for (final QueryDocumentSnapshot<Map<String, dynamic>> docs in mapWorkouts.docs) {
-      final DocumentReference<Map<String, dynamic>> docRef = programmeRef.collection('workouts').doc(docs.id);
+      final DocumentReference<Map<String, dynamic>> docRef = publishedProgrammeRef.collection('workouts').doc(docs.id);
       batch.set(docRef, docs.data());
     }
 
-    batch.commit();
+    batch.commit().then((_) {
+      programme.available = true;
+      programme.publishDate = FieldValue.serverTimestamp();
+      return saveProgramme(programme, sendStorage: false);
+    });
   }
 
   ///
@@ -114,7 +118,8 @@ class ProgrammeService extends AbstractFitnessCrudService<Programme> with MixinF
     programme.available = false;
     await saveProgramme(programme, sendStorage: sendStorage);
 
-    final DocumentReference<Map<String, dynamic>> programmeRef = FirebaseFirestore.instance.collection('publishedProgrammes').doc(programme.uid);
+    final DocumentReference<Map<String, dynamic>> programmeRef =
+        FirebaseFirestore.instance.collection(publishedProgrammeCollectionName).doc(programme.uid);
 
     // Ouverture d'un batch.
     final WriteBatch batch = FirebaseFirestore.instance.batch();
