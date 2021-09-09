@@ -1,5 +1,6 @@
-import 'package:fitnc_trainer/domain/workout_schedule.domain.dart';
 import 'package:json_annotation/json_annotation.dart';
+
+import 'workout_schedule.domain.dart';
 
 part 'workout_schedule.dto.g.dart';
 

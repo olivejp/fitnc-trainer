@@ -1,10 +1,10 @@
-import 'package:fitnc_trainer/domain/workout.domain.dart';
-import 'package:fitnc_trainer/service/util.service.dart';
+import 'package:fitness_domain/service/util.service.dart';
 import 'package:fitnc_trainer/service/workout.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:fitnc_trainer/widget/workout/workout.create.page.dart';
 import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
+import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -81,8 +81,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                         constraints: const BoxConstraints(maxHeight: 43),
                         border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
                         focusedBorder: OutlineInputBorder(
-                            borderRadius: const BorderRadius.all(Radius.circular(5)),
-                            borderSide: BorderSide(color: Theme.of(context).primaryColor)),
+                            borderRadius: const BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(color: Theme.of(context).primaryColor)),
                         prefixIcon: const Icon(Icons.search),
                         hintText: 'Recherche...',
                       ),

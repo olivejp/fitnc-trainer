@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:fitnc_trainer/domain/exercice.domain.dart';
-import 'package:fitnc_trainer/domain/line.domain.dart';
-import 'package:fitnc_trainer/domain/workout.domain.dart';
-import 'package:fitnc_trainer/domain/workout_set.domain.dart';
-import 'package:fitnc_trainer/domain/workout_set.dto.dart';
 import 'package:fitnc_trainer/service/workout_set.service.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set/workout.dto.widget.dart';
+import 'package:fitness_domain/domain/exercice.domain.dart';
+import 'package:fitness_domain/domain/line.domain.dart';
+import 'package:fitness_domain/domain/workout.domain.dart';
+import 'package:fitness_domain/domain/workout_set.domain.dart';
+import 'package:fitness_domain/domain/workout_set.dto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';

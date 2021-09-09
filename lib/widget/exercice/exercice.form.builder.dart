@@ -1,8 +1,8 @@
-import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/service/exercice.controller.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
+import 'package:fitness_domain/domain/exercice.domain.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fitnc_trainer/service/auth.service.dart';
+import 'package:fitness_domain/service/auth.service.dart';
 import 'package:fitnc_trainer/widget/home.page.dart';
 import 'package:fitnc_trainer/widget/login/login.page.dart';
 import 'package:flutter/material.dart';

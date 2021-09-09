@@ -8,8 +8,6 @@ part 'exercice.domain.g.dart';
 class Exercice extends AbstractFitnessStorageDomain implements InterfaceDomainSearchable {
   Exercice() : super();
 
-  factory Exercice.fromJson(Map<String, dynamic> data) => _$ExerciceFromJson(data);
-
   String? typeExercice;
   String? videoUrl;
   String? youtubeUrl;
@@ -21,5 +19,18 @@ class Exercice extends AbstractFitnessStorageDomain implements InterfaceDomainSe
   @override
   List<String> searchFields() {
     return <String>['name', 'description'];
+  }
+
+  static Exercice fromJson(Map<String, dynamic> json) {
+    return Exercice()
+      ..uid = json['uid'] as String?
+      ..name = json['name'] as String? ?? ''
+      ..createDate = json['createDate']
+      ..updateDate = json['updateDate']
+      ..imageUrl = json['imageUrl'] as String?
+      ..typeExercice = json['typeExercice'] as String?
+      ..videoUrl = json['videoUrl'] as String?
+      ..youtubeUrl = json['youtubeUrl'] as String?
+      ..description = json['description'] as String? ?? '';
   }
 }

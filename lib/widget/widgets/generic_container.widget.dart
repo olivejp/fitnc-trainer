@@ -1,4 +1,5 @@
-import 'package:fitnc_trainer/domain/abstract.domain.dart';
+
+import 'package:fitness_domain/domain/abstract.domain.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants/constants.dart';

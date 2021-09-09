@@ -1,4 +1,4 @@
-import 'package:fitnc_trainer/service/rest/rest-http.service.dart';
+import 'package:fitness_domain/service/rest/rest-http.service.dart';
 import 'package:http/http.dart' as http;
 import 'package:tuple/tuple.dart';
 

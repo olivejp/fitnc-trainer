@@ -1,13 +1,14 @@
-import 'package:fitnc_trainer/domain/abstract.domain.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'abonne.domain.g.dart';
+import 'abstract.domain.dart';
+
+part 'fitness-user.domain.g.dart';
 
 @JsonSerializable()
-class Abonne extends AbstractFitnessStorageDomain implements InterfaceDomainSearchable {
-  Abonne();
+class FitnessUser extends AbstractFitnessStorageDomain implements InterfaceDomainSearchable {
+  FitnessUser();
 
-  factory Abonne.fromJson(Map<String, dynamic> data) =>_$AbonneFromJson(data);
+  factory FitnessUser.fromJson(Map<String, dynamic> data) =>_$FitnessUserFromJson(data);
 
   String? nom;
   String? prenom;
@@ -21,7 +22,7 @@ class Abonne extends AbstractFitnessStorageDomain implements InterfaceDomainSear
   String? adresse3;
 
   @override
-  Map<String, dynamic> toJson() => _$AbonneToJson(this);
+  Map<String, dynamic> toJson() => _$FitnessUserToJson(this);
 
   @override
   List<String> searchFields() {

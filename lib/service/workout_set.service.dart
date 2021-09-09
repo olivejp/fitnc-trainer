@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fitnc_trainer/domain/exercice.domain.dart';
-import 'package:fitnc_trainer/domain/workout.domain.dart';
-import 'package:fitnc_trainer/domain/workout_set.domain.dart';
-import 'package:fitnc_trainer/domain/workout_set.dto.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitness_domain/domain/exercice.domain.dart';
+import 'package:fitness_domain/domain/workout.domain.dart';
+import 'package:fitness_domain/domain/workout_set.domain.dart';
+import 'package:fitness_domain/domain/workout_set.dto.dart';
 import 'package:get/get.dart';
 
 class WorkoutSetService extends GetxService {

@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fitnc_trainer/service/abonne.service.dart';
 import 'package:fitnc_trainer/service/exercice.service.dart';
-import 'package:fitnc_trainer/service/firebase.service.dart';
+import 'package:fitness_domain/service/firebase.service.dart';
 import 'package:fitnc_trainer/service/programme.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/service/workout.service.dart';

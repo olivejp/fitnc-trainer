@@ -1,9 +1,10 @@
-import 'package:fitnc_trainer/domain/exercice.domain.dart';
-import 'package:fitnc_trainer/domain/workout.domain.dart';
+
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitnc_trainer/service/util.service.dart';
+import 'package:fitness_domain/service/util.service.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.bottom.panel.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.top.panel.dart';
+import 'package:fitness_domain/domain/exercice.domain.dart';
+import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';

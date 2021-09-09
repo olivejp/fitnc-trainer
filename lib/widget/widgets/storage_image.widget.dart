@@ -1,15 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:rxdart/rxdart.dart';
-
-class StorageFile {
-  Uint8List? fileBytes;
-  String? fileName;
-}
 
 ///
 /// Classe permettant d'afficher une image.

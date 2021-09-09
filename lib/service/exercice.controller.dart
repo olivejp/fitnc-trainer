@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:fitnc_trainer/domain/exercice.domain.dart';
-import 'package:fitnc_trainer/service/firebase-storage.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
+import 'package:fitness_domain/domain/exercice.domain.dart';
+import 'package:fitness_domain/domain/storage-file.dart';
+import 'package:fitness_domain/service/firebase-storage.service.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart' as rx;
 
@@ -46,8 +46,7 @@ abstract class AbstractExerciceController {
   }
 }
 
-class ExerciceCreateController extends GetxController with AbstractExerciceController {
-}
+class ExerciceCreateController extends GetxController with AbstractExerciceController {}
 
 class ExerciceUpdateController extends GetxController with AbstractExerciceController {
   RxBool isSet = false.obs;

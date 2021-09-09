@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
+import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';

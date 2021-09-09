@@ -1,5 +1,6 @@
 import 'package:fitnc_trainer/service/workout.service.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
+import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

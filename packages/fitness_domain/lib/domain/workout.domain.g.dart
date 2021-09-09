@@ -13,8 +13,8 @@ Workout _$WorkoutFromJson(Map<String, dynamic> json) {
     ..createDate = json['createDate']
     ..updateDate = json['updateDate']
     ..imageUrl = json['imageUrl'] as String?
-    ..description = json['description'] as String?
-    ..timerType = json['timerType'] as String?;
+    ..timerType = json['timerType'] as String?
+    ..description = json['description'] as String?;
 }
 
 Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
@@ -23,6 +23,6 @@ Map<String, dynamic> _$WorkoutToJson(Workout instance) => <String, dynamic>{
       'createDate': instance.createDate,
       'updateDate': instance.updateDate,
       'imageUrl': instance.imageUrl,
-      'description': instance.description,
       'timerType': instance.timerType,
+      'description': instance.description,
     };

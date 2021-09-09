@@ -1,5 +1,7 @@
-import 'package:fitnc_trainer/domain/line.domain.dart';
+
 import 'package:json_annotation/json_annotation.dart';
+
+import 'line.domain.dart';
 
 part 'workout_set.domain.g.dart';
 

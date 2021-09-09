@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
-import 'package:fitnc_trainer/domain/abstract.domain.dart';
-import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
+import 'package:fitness_domain/domain/abstract.domain.dart';
+import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
+
+import 'abstract.service.dart';
 
 class UtilService {
   ///
@@ -50,7 +51,7 @@ class UtilService {
         domain.storageFile!.fileBytes = bytes;
         completer.complete(domain.storageFile);
       });
-    } else if (domain.storageFile != null){
+    } else if (domain.storageFile != null) {
       completer.complete(null);
     }
     return completer.future;

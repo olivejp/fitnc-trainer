@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
-import 'package:fitnc_trainer/domain/exercice.domain.dart';
-import 'package:fitnc_trainer/domain/workout.domain.dart';
-import 'package:fitnc_trainer/domain/workout_set.domain.dart';
+import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/service/workout_set.service.dart';
-import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
+import 'package:fitness_domain/domain/exercice.domain.dart';
+import 'package:fitness_domain/domain/storage-file.dart';
+import 'package:fitness_domain/domain/workout.domain.dart';
+import 'package:fitness_domain/domain/workout_set.domain.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

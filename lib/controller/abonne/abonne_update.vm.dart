@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:fitnc_trainer/domain/abonne.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitness_domain/domain/abonne.domain.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';

@@ -1,10 +1,10 @@
-import 'package:fitnc_trainer/bloc/programme/programme.controller.dart';
-import 'package:fitnc_trainer/domain/programme.domain.dart';
+import 'package:fitnc_trainer/controller/programme/programme.controller.dart';
 import 'package:fitnc_trainer/service/programme.service.dart';
-import 'package:fitnc_trainer/service/util.service.dart';
+import 'package:fitness_domain/service/util.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/programme/programme.update.page.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
+import 'package:fitness_domain/domain/programme.domain.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -20,6 +20,7 @@ import 'programme.create.page.dart';
 class ProgrammePage extends StatefulWidget {
   ProgrammePage({Key? key}) : super(key: key);
   final ProgrammeController controller = Get.put(ProgrammeController());
+  final ProgrammeService service = Get.find();
 
   @override
   State<ProgrammePage> createState() => _ProgrammePageState();
@@ -41,10 +42,8 @@ class _ProgrammePageState extends State<ProgrammePage> {
 
   @override
   Widget build(BuildContext context) {
-    final ProgrammeService service = Get.find();
-
     /// Ecoute tous les programmes et met à jour la liste locale des programmes.
-    service.listenAll().listen((List<Programme> event) {
+    widget.service.listenAll().listen((List<Programme> event) {
       listCompleteProgramme.clear();
       listCompleteProgramme.addAll(event);
       _streamListProgramme.sink.add(listCompleteProgramme);
@@ -108,7 +107,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
                     defaultDesktopColumns: 6,
                     childAspectRatio: 15 / 16,
                     domains: programmes,
-                    bloc: service,
+                    bloc: widget.service,
                     getCard: (Programme pgm) => getProgrammeCard(pgm, context),
                   );
                 }
@@ -136,20 +135,64 @@ class _ProgrammePageState extends State<ProgrammePage> {
                     : Container(decoration: const BoxDecoration(color: Colors.amber)),
               ),
               Expanded(
-                child: Center(child: Text(programme.name)),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Flexible(child: Text(programme.name)),
+                      PopupMenuButton<dynamic>(
+                        iconSize: 24,
+                        tooltip: 'Voir plus',
+                        icon: const Icon(Icons.more_vert, color: Colors.grey),
+                        itemBuilder: (_) => <PopupMenuItem<dynamic>>[
+                          PopupMenuItem<dynamic>(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: const <Widget>[
+                                Text('Supprimer'),
+                                Icon(
+                                  Icons.delete,
+                                  color: Colors.grey,
+                                ),
+                              ],
+                            ),
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  title: RichText(
+                                      text: TextSpan(text: 'Êtes-vous sûr de vouloir supprimer : ', children: <InlineSpan>[
+                                    TextSpan(text: programme.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    const TextSpan(text: ' ?'),
+                                  ])),
+                                  actions: <Widget>[
+                                    TextButton(
+                                        onPressed: () => widget.service.delete(programme).then((_) => Navigator.pop(context)),
+                                        child: const Text('Oui')),
+                                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               )
             ]),
-            if (programme.publishDate != null)
+            if (programme.available == true && programme.publishDate != null)
               const Positioned(
-                  top: 5,
-                  right: 5,
-                  child: Chip(
-                    backgroundColor: Colors.green,
-                    label: Text('Publié'),
-                    avatar: Icon(Icons.public),
-                  ))
-            else
-              Container()
+                top: 5,
+                right: 5,
+                child: Chip(
+                  backgroundColor: Colors.green,
+                  label: Text('Publié'),
+                  avatar: Icon(Icons.public),
+                ),
+              )
           ],
         ),
         onTap: () => onTap(context, programme),

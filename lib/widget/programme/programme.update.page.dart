@@ -1,12 +1,12 @@
-import 'package:fitnc_trainer/bloc/programme/programme.controller.dart';
-import 'package:fitnc_trainer/domain/programme.domain.dart';
-import 'package:fitnc_trainer/domain/workout.domain.dart';
-import 'package:fitnc_trainer/domain/workout_schedule.dto.dart';
+import 'package:fitnc_trainer/controller/programme/programme.controller.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitnc_trainer/service/util.service.dart';
+import 'package:fitness_domain/service/util.service.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
+import 'package:fitness_domain/domain/programme.domain.dart';
+import 'package:fitness_domain/domain/workout.domain.dart';
+import 'package:fitness_domain/domain/workout_schedule.dto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -247,7 +247,7 @@ class WorkoutSchedulePanel extends StatelessWidget {
         .toList();
 
     /// Méthode permettant d'afficher l'affectation des Workouts à une date.
-    void popupDayDetails(sf.DataGridCellTapDetails details, List<WorkoutScheduleDto> listAppointment) {
+    void onCellTap(sf.DataGridCellTapDetails details, List<WorkoutScheduleDto> listAppointment) {
       final int columnIndex = details.rowColumnIndex.columnIndex;
       final int rowIndex = details.rowColumnIndex.rowIndex;
       final int dayIndex = ((rowIndex - 1) * 7) + columnIndex + 1;
@@ -268,55 +268,47 @@ class WorkoutSchedulePanel extends StatelessWidget {
       );
     }
 
-    return FutureBuilder<List<DropdownMenuItem<Workout>>>(
-        future: controller.getWorkoutDropdownItems(),
-        builder: (BuildContext context, AsyncSnapshot<List<DropdownMenuItem<Workout>>> snapshot) {
-          if (snapshot.hasData) {
-            final List<DropdownMenuItem<Workout>> listAvailableWorkout = snapshot.data!;
-            return StreamBuilder<List<WorkoutScheduleDto>>(
-              stream: controller.workoutScheduleObs,
-              builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
-                if (snapshot.hasData) {
-                  final List<WorkoutScheduleDto> listScheduledWorkouts = snapshot.data!;
-                  return SizedBox(
-                    height: 800,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 125),
-                      child: Container(
-                        // decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-                        padding: const EdgeInsets.all(1),
-                        child: Obx(() => sf.SfDataGrid(
-                              onCellTap: (sf.DataGridCellTapDetails details) => popupDayDetails(details, listScheduledWorkouts),
-                              highlightRowOnHover: false,
-                              headerGridLinesVisibility: GridLinesVisibility.both,
-                              columnWidthMode: ColumnWidthMode.fill,
-                              headerRowHeight: 50,
-                              frozenRowsCount: 20,
-                              frozenColumnsCount: 20,
-                              navigationMode: GridNavigationMode.cell,
-                              gridLinesVisibility: GridLinesVisibility.both,
-                              selectionMode: SelectionMode.single,
-                              columns: listHeadersColumn,
-                              rowHeight: 150,
-                              source: _WorkoutDataSource(
-                                  context: context,
-                                  numberWeeks: controller.numberWeekInt.value,
-                                  listAppointment: listScheduledWorkouts,
-                                  listAvailableWorkout: listAvailableWorkout,
-                                  columnNames: columnNames),
-                            )),
-                      ),
-                    ),
-                  );
-                } else {
-                  return LoadingBouncingGrid.circle();
-                }
-              },
-            );
-          } else {
-            return LoadingBouncingGrid.circle();
-          }
-        });
+    return StreamBuilder<List<WorkoutScheduleDto>>(
+      stream: controller.workoutScheduleObs,
+      builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
+        if (snapshot.hasData) {
+          final List<WorkoutScheduleDto> listScheduledWorkouts = snapshot.data!;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 125),
+            child: Obx(
+              () => SizedBox(
+                height: (controller.numberWeekInt.value * 150) + 55,
+                child: Container(
+                  decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+                  padding: const EdgeInsets.all(1),
+                  child: sf.SfDataGrid(
+                    onCellTap: (sf.DataGridCellTapDetails details) => onCellTap(details, listScheduledWorkouts),
+                    highlightRowOnHover: false,
+                    headerGridLinesVisibility: GridLinesVisibility.both,
+                    columnWidthMode: ColumnWidthMode.fill,
+                    headerRowHeight: 50,
+                    frozenRowsCount: 20,
+                    frozenColumnsCount: 20,
+                    navigationMode: GridNavigationMode.cell,
+                    gridLinesVisibility: GridLinesVisibility.both,
+                    selectionMode: SelectionMode.single,
+                    columns: listHeadersColumn,
+                    rowHeight: 150,
+                    source: _WorkoutDataSource(
+                        context: context,
+                        numberWeeks: controller.numberWeekInt.value,
+                        listAppointment: listScheduledWorkouts,
+                        columnNames: columnNames),
+                  ),
+                ),
+              ),
+            ),
+          );
+        } else {
+          return LoadingBouncingGrid.circle();
+        }
+      },
+    );
   }
 }
 
@@ -429,19 +421,13 @@ class _DataCellData {
 /// DataSource du GridData
 ///
 class _WorkoutDataSource extends sf.DataGridSource {
-  _WorkoutDataSource(
-      {required this.context,
-      required this.numberWeeks,
-      required this.listAppointment,
-      required this.listAvailableWorkout,
-      required this.columnNames}) {
+  _WorkoutDataSource({required this.context, required this.numberWeeks, required this.listAppointment, required this.columnNames}) {
     _workoutData = getListDataRows(numberWeeks, listAppointment);
   }
 
   BuildContext context;
   int numberWeeks;
   List<WorkoutScheduleDto> listAppointment;
-  List<DropdownMenuItem<Workout>> listAvailableWorkout;
   List<DataGridRow> _workoutData = <DataGridRow>[];
   List<String> columnNames;
 

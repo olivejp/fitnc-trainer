@@ -1,5 +1,5 @@
-import 'package:fitnc_trainer/domain/exercice.domain.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.page.dart';
+import 'package:fitness_domain/domain/exercice.domain.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -25,8 +25,7 @@ class WorkoutSetTopPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final WorkoutSetPageVm vm =
-        Provider.of<WorkoutSetPageVm>(context, listen: false);
+    final WorkoutSetPageVm vm = Provider.of<WorkoutSetPageVm>(context, listen: false);
     return Column(
       children: <Widget>[
         Row(
@@ -37,14 +36,11 @@ class WorkoutSetTopPanel extends StatelessWidget {
               child: TextFormField(
                 controller: _searchTextController,
                 decoration: InputDecoration(
-                  constraints: BoxConstraints(
-                      maxWidth: maxWidthSearchField, maxHeight: 30),
-                  border: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5))),
+                  constraints: BoxConstraints(maxWidth: maxWidthSearchField, maxHeight: 30),
+                  border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: const BorderRadius.all(Radius.circular(5)),
-                      borderSide: BorderSide(
-                          width: 1, color: Theme.of(context).primaryColor)),
+                      borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor)),
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: IconButton(
                       iconSize: 15,
@@ -65,14 +61,11 @@ class WorkoutSetTopPanel extends StatelessWidget {
         Expanded(
           child: StreamBuilder<List<Exercice?>>(
             stream: vm.streamListExercice,
-            builder: (BuildContext context,
-                AsyncSnapshot<List<Exercice?>> snapshot) {
-              if (!snapshot.hasData ||
-                  (snapshot.hasData && snapshot.data!.isEmpty)) {
+            builder: (BuildContext context, AsyncSnapshot<List<Exercice?>> snapshot) {
+              if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
                 return const Center(child: Text('Aucun exercice trouvé.'));
               } else {
-                return _WorkoutSetExerciceGridView(
-                    listExercice: snapshot.data!);
+                return _WorkoutSetExerciceGridView(listExercice: snapshot.data!);
               }
             },
           ),
@@ -83,8 +76,7 @@ class WorkoutSetTopPanel extends StatelessWidget {
 }
 
 class _WorkoutSetExerciceGridView extends StatelessWidget {
-  _WorkoutSetExerciceGridView({Key? key, required this.listExercice})
-      : super(key: key);
+  _WorkoutSetExerciceGridView({Key? key, required this.listExercice}) : super(key: key);
 
   final List<Exercice?> listExercice;
   final ScrollController _scrollController = ScrollController();
@@ -113,9 +105,7 @@ class _WorkoutSetExerciceGridView extends StatelessWidget {
               childAspectRatio: 0.7,
               crossAxisSpacing: 5,
               mainAxisSpacing: 5,
-              children: listExercice
-                  .where((Exercice? exercice) => exercice != null)
-                  .map((Exercice? exercice) {
+              children: listExercice.where((Exercice? exercice) => exercice != null).map((Exercice? exercice) {
                 final Widget gridCard = _WorkoutSetExerciceCard(
                   exercice: exercice!,
                 );
@@ -139,9 +129,7 @@ class _WorkoutSetExerciceGridView extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                   color: FitnessNcColors.blue50Alpha060,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(radiusButtonStep),
-                      bottomLeft: Radius.circular(radiusButtonStep))),
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(radiusButtonStep), bottomLeft: Radius.circular(radiusButtonStep))),
               width: 30,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -164,9 +152,7 @@ class _WorkoutSetExerciceGridView extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                   color: FitnessNcColors.blue50Alpha060,
-                  borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(radiusButtonStep),
-                      bottomRight: Radius.circular(radiusButtonStep))),
+                  borderRadius: BorderRadius.only(topRight: Radius.circular(radiusButtonStep), bottomRight: Radius.circular(radiusButtonStep))),
               width: 30,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -188,8 +174,7 @@ class _WorkoutSetExerciceGridView extends StatelessWidget {
 }
 
 class _WorkoutSetExerciceCard extends StatelessWidget {
-  const _WorkoutSetExerciceCard({Key? key, required this.exercice})
-      : super(key: key);
+  const _WorkoutSetExerciceCard({Key? key, required this.exercice}) : super(key: key);
 
   final Exercice exercice;
 
@@ -200,8 +185,7 @@ class _WorkoutSetExerciceCard extends StatelessWidget {
       firstChild = Image.network(
         exercice.imageUrl!,
         fit: BoxFit.cover,
-        loadingBuilder: (BuildContext context, Widget child,
-            ImageChunkEvent? loadingProgress) {
+        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
           if (loadingProgress == null) {
             return child;
           }

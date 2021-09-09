@@ -1,6 +1,6 @@
-import 'package:fitnc_trainer/bloc/programme/programme.controller.dart';
+import 'package:fitnc_trainer/controller/programme/programme.controller.dart';
 import 'package:fitnc_trainer/constants/constants.dart';
-import 'package:fitnc_trainer/service/util.service.dart';
+import 'package:fitness_domain/service/util.service.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';

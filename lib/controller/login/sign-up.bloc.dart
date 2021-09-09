@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fitnc_trainer/domain/trainers.domain.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitness_domain/domain/trainers.domain.dart';
 import 'package:get/get.dart';
 import 'package:rxdart/rxdart.dart';
 

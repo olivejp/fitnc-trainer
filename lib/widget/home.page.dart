@@ -1,9 +1,9 @@
 import 'dart:ui';
 
-import 'package:fitnc_trainer/bloc/home.page.controller.dart';
+import 'package:fitnc_trainer/controller/home.page.controller.dart';
 import 'package:fitnc_trainer/main.dart';
-import 'package:fitnc_trainer/service/auth.service.dart';
-import 'package:fitnc_trainer/service/display.service.dart';
+import 'package:fitness_domain/service/auth.service.dart';
+import 'package:fitness_domain/service/display.service.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

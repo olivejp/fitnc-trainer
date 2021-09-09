@@ -1,7 +1,8 @@
-import 'package:fitnc_trainer/domain/abonne.domain.dart';
+
 import 'package:fitnc_trainer/service/abonne.service.dart';
-import 'package:fitnc_trainer/service/util.service.dart';
+import 'package:fitness_domain/service/util.service.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
+import 'package:fitness_domain/domain/abonne.domain.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';

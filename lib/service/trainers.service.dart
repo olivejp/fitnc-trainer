@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase/service/abstract.absolute-firestore.service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fitnc_trainer/domain/abonne.domain.dart';
-import 'package:fitnc_trainer/domain/exercice.domain.dart';
-import 'package:fitnc_trainer/domain/programme.domain.dart';
-import 'package:fitnc_trainer/domain/trainers.domain.dart';
-import 'package:fitnc_trainer/domain/workout.domain.dart';
+import 'package:fitness_domain/domain/abonne.domain.dart';
+import 'package:fitness_domain/domain/exercice.domain.dart';
+import 'package:fitness_domain/domain/programme.domain.dart';
+import 'package:fitness_domain/domain/trainers.domain.dart';
+import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

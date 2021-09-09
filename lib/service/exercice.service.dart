@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fitnc_trainer/core/bloc/generic.bloc.dart';
-import 'package:fitnc_trainer/domain/exercice.domain.dart';
-import 'package:fitnc_trainer/service/firebase-storage.service.dart';
+import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitness_domain/domain/exercice.domain.dart';
+import 'package:fitness_domain/service/firebase-storage.service.dart';
 import 'package:get/get.dart';
 
 class ExerciceService extends AbstractFitnessCrudService<Exercice> {

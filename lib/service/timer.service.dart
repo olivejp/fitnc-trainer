@@ -1,8 +1,6 @@
-import 'package:fitnc_trainer/domain/param.domain.dart';
 import 'package:fitnc_trainer/service/param.service.dart';
-import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
+import 'package:fitness_domain/domain/param.domain.dart';
 import 'package:flutter/material.dart';
-import 'package:rxdart/rxdart.dart';
 
 class TimerService {
   final ParamService paramService = ParamService.getInstance();

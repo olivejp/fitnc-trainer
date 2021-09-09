@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fitnc_trainer/service/auth.service.dart';
-import 'package:fitnc_trainer/service/display.service.dart';
-import 'package:fitnc_trainer/service/firebase-storage.service.dart';
-import 'package:fitnc_trainer/service/firebase.service.dart';
 import 'package:fitnc_trainer/widget/layout-display.widget.dart';
 import 'package:fitnc_trainer/widget/login/login.page.dart';
 import 'package:fitnc_trainer/widget/login/sign-up.page.dart';
 import 'package:fitnc_trainer/widget/widgets/firebase.widget.dart';
+import 'package:fitness_domain/service/auth.service.dart';
+import 'package:fitness_domain/service/display.service.dart';
+import 'package:fitness_domain/service/firebase-storage.service.dart';
+import 'package:fitness_domain/service/firebase.service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

@@ -1,6 +1,6 @@
-import 'package:fitnc_trainer/domain/line.domain.dart';
-import 'package:fitnc_trainer/domain/workout_set.dto.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
+import 'package:fitness_domain/domain/line.domain.dart';
+import 'package:fitness_domain/domain/workout_set.dto.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rxdart/rxdart.dart';

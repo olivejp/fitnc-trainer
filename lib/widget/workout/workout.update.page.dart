@@ -1,8 +1,9 @@
-import 'package:fitnc_trainer/domain/workout.domain.dart';
 import 'package:fitnc_trainer/service/workout.service.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.page.dart';
+import 'package:fitness_domain/domain/storage-file.dart';
+import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,7 +31,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
   Widget build(BuildContext context) {
     final WorkoutService workoutService = Get.find();
 
-    // Initialisation du bloc.
+    // Initialisation du controller.
     workoutService.init(widget.workout);
 
     final List<Widget> buttons = <Widget>[

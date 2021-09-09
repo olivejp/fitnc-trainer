@@ -1,4 +1,4 @@
-import 'package:fitnc_trainer/widget/widgets/storage_image.widget.dart';
+import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 abstract class AbstractDomain extends InterfaceToJson {

@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fitnc_trainer/bloc/login/sign-up.bloc.dart';
-import 'package:fitnc_trainer/service/display.service.dart';
+import 'package:fitnc_trainer/controller/login/sign-up.bloc.dart';
+import 'package:fitness_domain/service/display.service.dart';
 import 'package:fitnc_trainer/widget/bottom.widget.dart';
 import 'package:fitnc_trainer/widget/layout-display.widget.dart';
 import 'package:flutter/cupertino.dart';
