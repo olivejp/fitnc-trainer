@@ -8,13 +8,14 @@ import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/domain/workout_schedule.domain.dart';
 import 'package:fitness_domain/domain/workout_schedule.dto.dart';
+import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart' as getx;
 import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ProgrammeController extends GetxController {
+class ProgrammeController extends SearchControllerMixin<Programme, ProgrammeService> {
   final TrainersService trainersService = Get.find();
   final ProgrammeService programmeService = Get.find();
 
@@ -30,7 +31,7 @@ class ProgrammeController extends GetxController {
 
   void changeNumberWeek(String? numberWeek) {
     programme.update((Programme? programme) {
-      if (programme==null) return;
+      if (programme == null) return;
       programme.numberWeeks = numberWeek;
     });
 

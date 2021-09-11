@@ -5,7 +5,6 @@ import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:fitnc_trainer/widget/workout/workout.create.page.dart';
 import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
-import 'package:fitness_domain/service/util.service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -14,7 +13,6 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:rxdart/rxdart.dart';
 
 class WorkoutPage extends StatefulWidget {
   WorkoutPage({Key? key}) : super(key: key);
@@ -28,26 +26,10 @@ class WorkoutPage extends StatefulWidget {
 
 class _WorkoutPageState extends State<WorkoutPage> {
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
-  final List<Workout> listCompleteWorkout = <Workout>[];
-  final BehaviorSubject<List<Workout>> _streamListWorkout = BehaviorSubject<List<Workout>>();
   final WorkoutService workoutService = Get.find();
-  String? _query;
-
-  set query(String? text) {
-    _query = text;
-    UtilService.search(_query, listCompleteWorkout, _streamListWorkout);
-  }
-
-  String? get query => _query;
 
   @override
   Widget build(BuildContext context) {
-    workoutService.listenAll().listen((List<Workout> event) {
-      listCompleteWorkout.clear();
-      listCompleteWorkout.addAll(event);
-      UtilService.search(_query, listCompleteWorkout, _streamListWorkout);
-    });
-
     return RoutedPage(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -78,7 +60,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                       )),
                   Expanded(
                     child: TextFormField(
-                      onChanged: (String text) => query = text,
+                      onChanged: (String text) => widget.controller.query.value = text,
                       decoration: InputDecoration(
                         constraints: const BoxConstraints(maxHeight: 43),
                         border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
@@ -95,7 +77,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
             ),
             Expanded(
               child: StreamBuilder<List<Workout>>(
-                stream: _streamListWorkout,
+                stream: widget.controller.streamList,
                 builder: (BuildContext context, AsyncSnapshot<List<Workout>> snapshot) {
                   if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
                     return const Center(child: Text('Aucun workout trouvé.'));
@@ -106,11 +88,15 @@ class _WorkoutPageState extends State<WorkoutPage> {
                       bloc: workoutService,
                       onTap: (Workout domain) {
                         showDialog(
-                            context: context,
-                            builder: (BuildContext context) => AlertDialog(
-                                  contentPadding: const EdgeInsets.all(0),
-                                  content: SizedBox(width: 1280, child: WorkoutUpdatePage(workout: domain)),
-                                ));
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            contentPadding: const EdgeInsets.all(0),
+                            content: SizedBox(
+                              width: 1280,
+                              child: WorkoutUpdatePage(workout: domain),
+                            ),
+                          ),
+                        );
                       },
                     );
                   }

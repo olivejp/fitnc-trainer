@@ -6,9 +6,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitness_domain/domain/abstract.domain.dart';
 import 'package:fitness_domain/domain/storage-file.dart';
+import 'package:fitness_domain/service/util.service.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
+import 'package:rxdart/rxdart.dart';
 
 ///
 /// Interface de haut niveau pour les opérations CRUD
@@ -208,4 +210,25 @@ abstract class AbstractFitnessStorageService<T extends AbstractFitnessStorageDom
   Future<void> delete(T domain) {
     return deleteAllFiles(domain).then((_) => super.delete(domain));
   }
+}
+
+
+abstract class SearchControllerMixin<T extends InterfaceDomainSearchable, U extends AbstractCrudService<T>> extends GetxController {
+  SearchControllerMixin() {
+    service.listenAll().listen((List<T> event) {
+      listComplete.clear();
+      listComplete.addAll(event);
+      streamList.sink.add(listComplete);
+      UtilService.search(query.value, listComplete, streamList);
+    });
+
+    query.listen((String queryValue) {
+      UtilService.search(queryValue, listComplete, streamList);
+    });
+  }
+
+  final U service = Get.find();
+  final BehaviorSubject<List<T>> streamList = BehaviorSubject<List<T>>();
+  final List<T> listComplete = <T>[];
+  final RxString query = ''.obs;
 }

@@ -1,10 +1,10 @@
-import 'package:fitness_domain/service/display.service.dart';
 import 'package:fitnc_trainer/service/exercice.controller.dart';
 import 'package:fitnc_trainer/service/exercice.service.dart';
-import 'package:fitness_domain/service/util.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:fitness_domain/domain/exercice.domain.dart';
+import 'package:fitness_domain/service/abstract.service.dart';
+import 'package:fitness_domain/service/display.service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -19,9 +19,7 @@ import 'package:rxdart/rxdart.dart';
 import '../../constants/constants.dart';
 import 'exercice.form.builder.dart';
 
-class ExercicePageController extends GetxController {
-  final ExerciceService exerciceService = Get.find();
-
+class ExercicePageController extends SearchControllerMixin<Exercice, ExerciceService> {
   RxList<bool> toggleSelections = <bool>[true, false].obs;
 
   void toggleSelection(int index) {
@@ -146,27 +144,8 @@ class _ExerciceListSearch extends StatefulWidget {
 }
 
 class _ExerciceListSearchState extends State<_ExerciceListSearch> {
-  final BehaviorSubject<List<Exercice>> _streamListExercice = BehaviorSubject<List<Exercice>>();
-  final List<Exercice> listCompleteExercice = <Exercice>[];
-
-  String? _query;
-
-  set query(String? text) {
-    _query = text;
-    UtilService.search(_query, listCompleteExercice, _streamListExercice);
-  }
-
-  String? get query => _query;
-
   @override
   Widget build(BuildContext context) {
-    widget.service.listenAll().listen((List<Exercice> event) {
-      listCompleteExercice.clear();
-      listCompleteExercice.addAll(event);
-      _streamListExercice.sink.add(listCompleteExercice);
-      UtilService.search(_query, listCompleteExercice, _streamListExercice);
-    });
-
     return Column(
       children: <Widget>[
         Padding(
@@ -215,9 +194,7 @@ class _ExerciceListSearchState extends State<_ExerciceListSearch> {
                     prefixIcon: const Icon(Icons.search),
                     hintText: 'Recherche...',
                   ),
-                  onChanged: (String value) {
-                    query = value;
-                  },
+                  onChanged: (String value) => widget.controller.query.value = value,
                   textAlignVertical: TextAlignVertical.bottom,
                 ),
               ),
@@ -226,7 +203,7 @@ class _ExerciceListSearchState extends State<_ExerciceListSearch> {
         ),
         Expanded(
             child: _ExerciceStreamBuilder(
-          streamListExercice: _streamListExercice,
+          streamListExercice: widget.controller.streamList,
         )),
       ],
     );

@@ -1,6 +1,5 @@
 import 'package:fitnc_trainer/controller/programme/programme.controller.dart';
 import 'package:fitnc_trainer/service/programme.service.dart';
-import 'package:fitness_domain/service/util.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/programme/programme.update.page.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
@@ -13,7 +12,6 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:rxdart/rxdart.dart';
 
 import 'programme.create.page.dart';
 
@@ -28,28 +26,9 @@ class ProgrammePage extends StatefulWidget {
 
 class _ProgrammePageState extends State<ProgrammePage> {
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
-  final List<Programme> listCompleteProgramme = <Programme>[];
-  final BehaviorSubject<List<Programme>> _streamListProgramme = BehaviorSubject<List<Programme>>();
-
-  String? _query;
-
-  set query(String? text) {
-    _query = text;
-    UtilService.search(_query, listCompleteProgramme, _streamListProgramme);
-  }
-
-  String? get query => _query;
 
   @override
   Widget build(BuildContext context) {
-    /// Ecoute tous les programmes et met à jour la liste locale des programmes.
-    widget.service.listenAll().listen((List<Programme> event) {
-      listCompleteProgramme.clear();
-      listCompleteProgramme.addAll(event);
-      _streamListProgramme.sink.add(listCompleteProgramme);
-      UtilService.search(_query, listCompleteProgramme, _streamListProgramme);
-    });
-
     return RoutedPage(
         child: Scaffold(
       backgroundColor: Colors.transparent,
@@ -80,7 +59,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
                     )),
                 Expanded(
                   child: TextFormField(
-                    onChanged: (String text) => query = text,
+                    onChanged: (String text) => widget.controller.query.value = text,
                     decoration: InputDecoration(
                       constraints: const BoxConstraints(maxHeight: 43),
                       border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
@@ -97,7 +76,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
           ),
           Expanded(
             child: StreamBuilder<List<Programme>>(
-              stream: _streamListProgramme,
+              stream: widget.controller.streamList,
               builder: (BuildContext context, AsyncSnapshot<List<Programme>> snapshot) {
                 if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
                   return const Center(child: Text('Aucun programme trouvé.'));
@@ -189,8 +168,14 @@ class _ProgrammePageState extends State<ProgrammePage> {
                 right: 5,
                 child: Chip(
                   backgroundColor: Colors.green,
-                  label: Text('Publié', style: TextStyle(color: Colors.white),),
-                  avatar: Icon(Icons.public, color: Colors.white,),
+                  label: Text(
+                    'Publié',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  avatar: Icon(
+                    Icons.public,
+                    color: Colors.white,
+                  ),
                 ),
               )
           ],

@@ -175,7 +175,18 @@ class ProfilPage extends StatelessWidget {
                   decoration: const InputDecoration(labelText: 'Téléphone'),
                 ),
               ),
-            )
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: TextFormField(
+                initialValue: controller.trainer.value?.biopic,
+                maxLength: 2000,
+                minLines: 5,
+                maxLines: 20,
+                onChanged: (String value) => controller.trainer.value?.biopic = value,
+                decoration: const InputDecoration(labelText: 'Biopic', helperText: 'Optionnel'),
+              ),
+            ),
           ],
         ),
       ),

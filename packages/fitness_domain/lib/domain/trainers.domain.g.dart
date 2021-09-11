@@ -16,7 +16,8 @@ Trainers _$TrainersFromJson(Map<String, dynamic> json) {
     ..name = json['name'] as String
     ..createDate = json['createDate']
     ..updateDate = json['updateDate']
-    ..imageUrl = json['imageUrl'] as String?;
+    ..imageUrl = json['imageUrl'] as String?
+    ..biopic = json['biopic'] as String?;
 }
 
 Map<String, dynamic> _$TrainersToJson(Trainers instance) => <String, dynamic>{
@@ -28,4 +29,5 @@ Map<String, dynamic> _$TrainersToJson(Trainers instance) => <String, dynamic>{
       'email': instance.email,
       'prenom': instance.prenom,
       'telephone': instance.telephone,
+      'biopic': instance.biopic,
     };
