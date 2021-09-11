@@ -12,6 +12,11 @@ class AbonneService extends AbstractFitnessCrudService<Abonne> with MixinFitness
   final TrainersService trainersService = Get.find();
 
   @override
+  Abonne fromJson(Map<String, dynamic> map) {
+    return Abonne.fromJson(map);
+  }
+
+  @override
   CollectionReference<Object?> getCollectionReference() {
     return trainersService.getAbonneReference();
   }

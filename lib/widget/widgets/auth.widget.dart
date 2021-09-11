@@ -12,7 +12,7 @@ class AuthWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final AuthService authService = Get.find();
     return StreamBuilder<User?>(
-      stream: authService.getUserConnected(),
+      stream: authService.listenUserConnected(),
       builder: (_, AsyncSnapshot<User?> snapshot) {
         if (snapshot.connectionState == ConnectionState.active) {
           final User? user = snapshot.data;

@@ -1,9 +1,9 @@
-import 'package:fitnc_trainer/service/workout.service.dart';
+import 'package:fitnc_trainer/controller/workout/workout.controller.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
-import 'package:fitness_domain/widget/storage_image.widget.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.page.dart';
 import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
+import 'package:fitness_domain/widget/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -25,23 +25,24 @@ class WorkoutUpdatePage extends StatefulWidget {
 class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
   _WorkoutUpdatePageState();
 
+  final WorkoutController controller = Get.find();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    final WorkoutService workoutService = Get.find();
 
     // Initialisation du controller.
-    workoutService.init(widget.workout);
+    controller.init(widget.workout);
 
     final List<Widget> buttons = <Widget>[
       TextButton.icon(
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () {
             if (_formKey.currentState?.validate() == true) {
-              workoutService.saveWorkout().then((_) => showToast('Workout sauvegardé', backgroundColor: Colors.green)).catchError(
+              controller.saveWorkout().then((_) => showToast('Workout sauvegardé', backgroundColor: Colors.green)).catchError(
                 (Object? error) {
                   showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent);
+                  return Future<ToastFuture>.error(error.toString());
                 },
               );
             }
@@ -102,17 +103,20 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.only(top: 30.0, bottom: 30.0),
-                      child: StorageFutureImageWidget(
-                        radius: 80,
-                        onSaved: (StorageFile? file) => workoutService.storageFile = file,
-                        onDeleted: (_) => workoutService.storageFile = null,
-                        future: workoutService.getStorageFile(),
+                      child: Obx(
+                        () => StorageImageWidget(
+                          radius: 80,
+                          onSaved: (StorageFile? file) => controller.setStorageFile(file),
+                          onDeleted: () => controller.setStorageFile(null),
+                          storageFile: controller.workout.value.storageFile,
+                          imageUrl: controller.workout.value.imageUrl,
+                        ),
                       ),
                     ),
                     FitnessDecorationTextFormField(
-                        initialValue: workoutService.getWorkout()?.name,
+                        initialValue: controller.workout.value.name,
                         autofocus: true,
-                        onChanged: (String value) => workoutService.name = value,
+                        onChanged: (String value) => controller.name = value,
                         labelText: 'Nom du workout',
                         validator: (String? value) {
                           if (value == null || value.isEmpty) {
@@ -130,15 +134,15 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                           ),
                         ),
                         icon: const Icon(Icons.arrow_downward),
-                        onChanged: (String? value) => workoutService.timerType = value,
-                        value: workoutService.getWorkout()?.timerType,
+                        onChanged: (String? value) => controller.timerType = value,
+                        value: controller.workout.value.timerType,
                         items: typesWorkout),
                     TextFormField(
-                      initialValue: workoutService.getWorkout()?.description,
+                      initialValue: controller.workout.value.description,
                       maxLength: 2000,
                       minLines: 10,
                       maxLines: 10,
-                      onChanged: (String value) => workoutService.description = value,
+                      onChanged: (String value) => controller.description = value,
                       decoration: const InputDecoration(labelText: 'Instructions', hintText: 'Optionnel'),
                     ),
                     ButtonBar(

@@ -11,9 +11,15 @@ import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class ProgrammeService extends AbstractFitnessCrudService<Programme> with MixinFitnessStorageService<Programme> {
+class ProgrammeService extends AbstractFitnessStorageService<Programme> {
+  final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
   final TrainersService trainersService = Get.find();
   final String publishedProgrammeCollectionName = 'publishedProgrammes';
+
+  @override
+  Programme fromJson(Map<String, dynamic> map) {
+    return Programme.fromJson(map);
+  }
 
   @override
   Stream<List<Programme>> listenAll() {
@@ -28,29 +34,6 @@ class ProgrammeService extends AbstractFitnessCrudService<Programme> with MixinF
   @override
   String getStorageRef(User user, Programme programme) {
     return 'trainers/${user.uid}/programmes/${programme.uid}';
-  }
-
-  ///
-  ///Sauvegarde un programme dans Firebase
-  ///
-  Future<void> saveProgramme(Programme programme, {required bool sendStorage}) {
-    if (programme.uid != null) {
-      if (sendStorage) {
-        return eraseAndReplaceStorage(programme).then((_) => save(programme));
-      } else {
-        return save(programme);
-      }
-    } else {
-      programme.uid = getCollectionReference().doc().id;
-      return createStorage(programme).then((_) => create(programme));
-    }
-  }
-
-  ///
-  /// Supprime un programme de Firebase et supprime tous les fichiers associés dans le Firestorage.
-  ///
-  Future<void> deleteProgramme(Programme programme) {
-    return delete(programme).then((_) => deleteAllFiles(programme));
   }
 
   ///
@@ -85,13 +68,13 @@ class ProgrammeService extends AbstractFitnessCrudService<Programme> with MixinF
   /// Publication du programme dans une collection où tous les utilisateurs pourront les trouver.
   ///
   Future<void> publishProgramme(Programme programme, {required bool sendStorage}) async {
-    await saveProgramme(programme, sendStorage: sendStorage);
+    await save(programme);
 
     // Ouverture d'un batch.
-    final WriteBatch batch = FirebaseFirestore.instance.batch();
+    final WriteBatch batch = firestoreInstance.batch();
 
     final DocumentReference<Map<String, dynamic>> publishedProgrammeRef =
-        FirebaseFirestore.instance.collection(publishedProgrammeCollectionName).doc(programme.uid);
+        firestoreInstance.collection(publishedProgrammeCollectionName).doc(programme.uid);
 
     batch.set(publishedProgrammeRef, programme.toJson());
 
@@ -107,7 +90,7 @@ class ProgrammeService extends AbstractFitnessCrudService<Programme> with MixinF
     batch.commit().then((_) {
       programme.available = true;
       programme.publishDate = FieldValue.serverTimestamp();
-      return saveProgramme(programme, sendStorage: false);
+      return save(programme);
     });
   }
 
@@ -116,13 +99,13 @@ class ProgrammeService extends AbstractFitnessCrudService<Programme> with MixinF
   ///
   Future<void> unpublishProgramme(Programme programme, {required bool sendStorage}) async {
     programme.available = false;
-    await saveProgramme(programme, sendStorage: sendStorage);
+    await save(programme);
 
     final DocumentReference<Map<String, dynamic>> programmeRef =
-        FirebaseFirestore.instance.collection(publishedProgrammeCollectionName).doc(programme.uid);
+        firestoreInstance.collection(publishedProgrammeCollectionName).doc(programme.uid);
 
     // Ouverture d'un batch.
-    final WriteBatch batch = FirebaseFirestore.instance.batch();
+    final WriteBatch batch = firestoreInstance.batch();
 
     // Suppression du programme publié.
     batch.delete(programmeRef);

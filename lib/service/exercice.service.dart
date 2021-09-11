@@ -8,9 +8,14 @@ import 'package:fitness_domain/domain/exercice.domain.dart';
 import 'package:fitness_domain/service/firebase-storage.service.dart';
 import 'package:get/get.dart';
 
-class ExerciceService extends AbstractFitnessCrudService<Exercice> {
+class ExerciceService extends AbstractFitnessCrudService<Exercice> with MixinFitnessStorageService<Exercice> {
   final TrainersService trainersService = Get.find();
   final FirebaseStorageService storageService = Get.find();
+
+  @override
+  Exercice fromJson(Map<String, dynamic> map) {
+    return Exercice.fromJson(map);
+  }
 
   @override
   Stream<List<Exercice>> listenAll() {
@@ -44,5 +49,11 @@ class ExerciceService extends AbstractFitnessCrudService<Exercice> {
     }
 
     return isUpdate ? save(exercice) : create(exercice);
+  }
+
+  @override
+  String getStorageRef(User user, Exercice domain) {
+    // TODO: implement getStorageRef
+    throw UnimplementedError();
   }
 }

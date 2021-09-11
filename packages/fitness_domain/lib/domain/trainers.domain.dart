@@ -1,16 +1,27 @@
 import 'package:json_annotation/json_annotation.dart';
 
+import 'abstract.domain.dart';
+
 part 'trainers.domain.g.dart';
 
 @JsonSerializable()
-class Trainers {
-  Trainers({this.uid = '', this.email = '', this.nom = '', this.prenom = '', this.telephone = ''});
+class Trainers extends AbstractFitnessStorageDomain {
+  Trainers({this.email = '', this.prenom = '', this.telephone = ''}):super();
 
-  factory Trainers.fromJson(Map<String, dynamic> data) => _$TrainersFromJson(data);
+  factory Trainers.fromJson(Map<String, dynamic> json) {
+    return Trainers(
+      email: json['email'] ?? '',
+      prenom: json['prenom'] ?? '',
+      telephone: json['telephone'] as String?,
+    )
+      ..uid = json['uid'] as String?
+      ..name = json['name'] ?? ''
+      ..createDate = json['createDate']
+      ..updateDate = json['updateDate']
+      ..imageUrl = json['imageUrl'] as String?;
+  }
 
-  String uid;
   String email;
-  String nom;
   String prenom;
   String? telephone;
 

@@ -9,9 +9,16 @@ import 'package:rxdart/rxdart.dart';
 /// On peut lui passer une ImageUrl (String?) ou un StorageFile?
 /// Par défaut c'est l'ImageUrl qui prime et c'est celle là qu'on affichera.
 /// Si l'ImageUrl est null, on affichera le StorageFile.
+/// Sinon on affichera aucune image mais uniquement un background de la couleur primaire de l'application.
+///
 class StorageImageWidget extends StatelessWidget {
   const StorageImageWidget(
-      {required this.imageUrl, this.storageFile, this.allowedExtensions = defaultAllowedExtensions, required this.onSaved, this.onDeleted});
+      {required this.imageUrl,
+      this.storageFile,
+      this.allowedExtensions = defaultAllowedExtensions,
+      required this.onSaved,
+      this.onDeleted,
+      this.radius = 50});
 
   static const List<String> defaultAllowedExtensions = <String>['jpg', 'jpeg', 'png', 'gif'];
 
@@ -20,6 +27,7 @@ class StorageImageWidget extends StatelessWidget {
   final List<String> allowedExtensions;
   final String? imageUrl;
   final StorageFile? storageFile;
+  final double radius;
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +35,6 @@ class StorageImageWidget extends StatelessWidget {
       Icons.add_photo_alternate,
       color: Colors.white,
     );
-
-    const double radius = 50;
 
     final Color color = Theme.of(context).primaryColor;
 
@@ -40,7 +46,7 @@ class StorageImageWidget extends StatelessWidget {
         backgroundColor: color,
         child: icon,
       );
-    } else if (storageFile != null && storageFile!.fileBytes != null) {
+    } else if (storageFile?.fileBytes != null) {
       child = CircleAvatar(
         radius: radius,
         backgroundImage: MemoryImage(storageFile!.fileBytes!),

@@ -1,10 +1,10 @@
 import 'dart:ui';
 
 import 'package:fitnc_trainer/controller/home.page.controller.dart';
-import 'package:fitnc_trainer/main.dart';
+import 'package:fitnc_trainer/widget/exercice/exercice.page.dart';
+import 'package:fitnc_trainer/widget/profil/profil.page.dart';
 import 'package:fitness_domain/service/auth.service.dart';
 import 'package:fitness_domain/service/display.service.dart';
-import 'package:fitnc_trainer/widget/exercice/exercice.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -32,9 +32,10 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Destination> destinations = <Destination>[
       Destination(icon: const Icon(Icons.account_tree_outlined), pageName: 'Programme', index: 0, page: ProgrammePage()),
-      Destination(icon: const Icon(Icons.sports_volleyball_outlined), pageName: 'Workout', index: 1, page: const WorkoutPage()),
+      Destination(icon: const Icon(Icons.sports_volleyball_outlined), pageName: 'Workout', index: 1, page: WorkoutPage()),
       Destination(icon: const Icon(Icons.sports_handball_outlined), pageName: 'Exercice', index: 2, page: ExercicePage()),
       Destination(icon: const Icon(Icons.group), pageName: 'Abonné', index: 3, page: AbonnePage()),
+      Destination(icon: const Icon(Icons.person), pageName: 'Profil', index: 4, page: ProfilPage()),
     ];
 
     return Scaffold(
@@ -111,11 +112,6 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
           extended: controller.isExpanded.value,
           selectedIndex: controller.currentPage.value,
           trailing: _NavigationRailFolderSection(folders: <_NavigationFolder>[
-            _NavigationFolder(
-              label: 'Profil',
-              iconData: Icons.person,
-              onTap: () => authService.signOut(),
-            ),
             _NavigationFolder(
               label: 'Déconnexion',
               iconData: Icons.exit_to_app_outlined,

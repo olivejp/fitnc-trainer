@@ -6,11 +6,19 @@ import 'package:get/get.dart';
 class AuthService extends GetxService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  Stream<User?> getUserConnected() {
+  User? getCurrentUser() {
+    return _firebaseAuth.currentUser;
+  }
+
+  bool isConnected() {
+    return _firebaseAuth.currentUser != null;
+  }
+
+  Stream<User?> listenUserConnected() {
     return _firebaseAuth.authStateChanges();
   }
 
-  Future<bool> isConnected() {
+  Future<bool> isFutureConnected() {
     final Completer<bool> completer = Completer<bool>();
     completer.complete(_firebaseAuth.currentUser != null);
     return completer.future;

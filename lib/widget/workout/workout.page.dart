@@ -1,10 +1,11 @@
-import 'package:fitness_domain/service/util.service.dart';
+import 'package:fitnc_trainer/controller/workout/workout.controller.dart';
 import 'package:fitnc_trainer/service/workout.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:fitnc_trainer/widget/workout/workout.create.page.dart';
 import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
+import 'package:fitness_domain/service/util.service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -16,7 +17,8 @@ import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
 
 class WorkoutPage extends StatefulWidget {
-  const WorkoutPage({Key? key}) : super(key: key);
+  WorkoutPage({Key? key}) : super(key: key);
+  final WorkoutController controller = Get.put(WorkoutController());
 
   @override
   _WorkoutPageState createState() {

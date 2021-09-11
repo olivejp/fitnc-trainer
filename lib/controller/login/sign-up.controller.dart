@@ -6,10 +6,11 @@ import 'package:fitness_domain/domain/trainers.domain.dart';
 import 'package:get/get.dart';
 import 'package:rxdart/rxdart.dart';
 
-class SignUpVm {
+class SignUpController extends GetxController {
   final TrainersService trainersService = Get.find();
+  final FirebaseAuth authInstance = FirebaseAuth.instance;
 
-  String nom = '';
+  String name = '';
   String prenom = '';
   String email = '';
   String telephone = '';
@@ -22,14 +23,14 @@ class SignUpVm {
 
   Future<bool> isConnected() {
     final Completer<bool> completer = Completer<bool>();
-    completer.complete(FirebaseAuth.instance.currentUser != null);
+    completer.complete(authInstance.currentUser != null);
     return completer.future;
   }
 
   Future<bool> disconnect() {
     final Completer<bool> completer = Completer<bool>();
 
-    FirebaseAuth.instance.signOut().then((_) => completer.complete(true)).catchError((Object error) => completer.completeError(false));
+    authInstance.signOut().then((_) => completer.complete(true)).catchError((Object error) => completer.completeError(false));
 
     return completer.future;
   }
@@ -43,13 +44,15 @@ class SignUpVm {
   }
 
   Future<UserCredential> signUp() async {
-    final UserCredential credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+    final UserCredential credential = await authInstance.createUserWithEmailAndPassword(email: email, password: password);
 
-    final Trainers newTrainer = Trainers(uid: credential.user!.uid, email: email, nom: nom, prenom: prenom, telephone: telephone);
+    final Trainers trainer = Trainers( email: email, prenom: prenom, telephone: telephone);
+    trainer.uid = credential.user!.uid;
+    trainer.name = name;
 
-    await trainersService.collectionReference.doc(newTrainer.uid).set(newTrainer.toJson());
+    await trainersService.collectionReference.doc(trainer.uid).set(trainer.toJson());
 
-    final UserCredential credentialSigned = await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
+    final UserCredential credentialSigned = await authInstance.signInWithEmailAndPassword(email: email, password: password);
 
     return credentialSigned;
   }
