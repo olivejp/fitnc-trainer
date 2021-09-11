@@ -50,7 +50,7 @@ class SignUpController extends GetxController {
     trainer.uid = credential.user!.uid;
     trainer.name = name;
 
-    await trainersService.collectionReference.doc(trainer.uid).set(trainer.toJson());
+    await trainersService.getCollectionReference().doc(trainer.uid).set(trainer.toJson());
 
     final UserCredential credentialSigned = await authInstance.signInWithEmailAndPassword(email: email, password: password);
 

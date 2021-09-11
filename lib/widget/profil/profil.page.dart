@@ -8,6 +8,7 @@ import 'package:fitness_domain/service/auth.service.dart';
 import 'package:fitness_domain/service/firebase-storage.service.dart';
 import 'package:fitness_domain/widget/storage_image.widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
 
@@ -18,7 +19,18 @@ class ProfilPageController extends GetxController {
           .getCurrentTrainerRef()
           .get()
           .then((DocumentSnapshot<Object?> value) => Trainers.fromJson(value.data() as Map<String, dynamic>))
-          .then((Trainers trainerRead) => trainer.value = trainerRead);
+          .then((Trainers trainerRead) {
+        trainer.update((Trainers? val) {
+          if (val != null) {
+            val.uid = trainerRead.uid;
+            val.name = trainerRead.name;
+            val.prenom = trainerRead.prenom;
+            val.telephone = trainerRead.telephone;
+            val.email = trainerRead.email;
+            val.imageUrl = trainerRead.imageUrl;
+          }
+        });
+      });
     } else {
       throw Exception('Aucun utilisateur connecté. Impossible de construire le ProfilePageController.');
     }
@@ -28,10 +40,8 @@ class ProfilPageController extends GetxController {
   final TrainersService trainersService = Get.find();
   final AuthService authService = Get.find();
   final Rx<Trainers?> trainer = Trainers().obs;
-  bool sendStorage = false;
 
   void setStoragePair(StorageFile? stFile) {
-    sendStorage = true;
     trainer.update((Trainers? user) {
       if (user != null) {
         user.storageFile = stFile ?? StorageFile();
@@ -42,7 +52,7 @@ class ProfilPageController extends GetxController {
 
   Future<void> save() async {
     if (trainer.value != null) {
-      return trainersService.getCurrentTrainerRef().update(trainer.value!.toJson());
+      return trainersService.save(trainer.value!);
     } else {
       throw Exception('Aucun domain Trainer a sauvegardé');
     }
@@ -52,44 +62,117 @@ class ProfilPageController extends GetxController {
 class ProfilPage extends StatelessWidget {
   ProfilPage({Key? key}) : super(key: key);
   final ProfilPageController controller = Get.put(ProfilPageController());
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Row(
+    return Form(
+      key: _formKey,
+      child: Padding(
+        padding: const EdgeInsets.all(30.0),
+        child: Column(
           children: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
-              onPressed: () {
-                controller.save().then((_) {
-                  showToast('Vos informations ont été mises à jour', backgroundColor: Colors.green);
-                }).catchError((_) => showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent));
-              },
-              child: const Text('Enregistrer', style: TextStyle(color: Colors.white)),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      Obx(
+                        () => StorageImageWidget(
+                          imageUrl: controller.trainer.value?.imageUrl,
+                          storageFile: controller.trainer.value?.storageFile,
+                          onSaved: controller.setStoragePair,
+                          onDeleted: () => controller.setStoragePair(null),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      TextButton(
+                        style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
+                        onPressed: () {
+                          if (_formKey.currentState?.validate() == true) {
+                            controller.save().then((_) {
+                              showToast('Vos informations ont été mises à jour', backgroundColor: Colors.green);
+                            }).catchError(
+                              (_) => showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent),
+                            );
+                          }
+                        },
+                        child: const Text('Enregistrer', style: TextStyle(color: Colors.white)),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Obx(
+                () => FitnessDecorationTextFormField(
+                    controller: TextEditingController(text: controller.trainer.value?.email),
+                    autofocus: true,
+                    onChanged: (String email) => controller.trainer.value?.email = email,
+                    labelText: 'Email',
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Merci de renseigner votre adresse mail.';
+                      }
+                      return null;
+                    }),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Obx(
+                () => FitnessDecorationTextFormField(
+                    controller: TextEditingController(text: controller.trainer.value?.name),
+                    autofocus: true,
+                    onChanged: (String name) => controller.trainer.value?.name = name,
+                    labelText: 'Nom',
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Merci de renseigner votre nom.';
+                      }
+                      return null;
+                    }),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Obx(
+                () => FitnessDecorationTextFormField(
+                    controller: TextEditingController(text: controller.trainer.value?.prenom),
+                    autofocus: true,
+                    onChanged: (String prenom) => controller.trainer.value?.prenom = prenom,
+                    labelText: 'Prénom',
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Merci de renseigner votre prénom.';
+                      }
+                      return null;
+                    }),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Obx(
+                () => TextFormField(
+                  maxLength: 6,
+                  keyboardType: TextInputType.phone,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  initialValue: (controller.trainer.value?.telephone) != null ? controller.trainer.value!.telephone.toString() : '',
+                  onChanged: (String value) => controller.trainer.value?.telephone = value,
+                  decoration: const InputDecoration(labelText: 'Téléphone'),
+                ),
+              ),
             )
           ],
         ),
-        Obx(
-          () => StorageImageWidget(
-            imageUrl: controller.trainer.value?.imageUrl,
-            storageFile: controller.trainer.value?.storageFile,
-            onSaved: controller.setStoragePair,
-            onDeleted: () => controller.setStoragePair(null),
-          ),
-        ),
-        FitnessDecorationTextFormField(
-            controller: TextEditingController(text: controller.trainer.value?.name),
-            autofocus: true,
-            onChanged: (String name) => controller.trainer.value?.name = name,
-            labelText: 'Nom',
-            validator: (String? value) {
-              if (value == null || value.isEmpty) {
-                return 'Merci de renseigner votre nom.';
-              }
-              return null;
-            })
-      ],
+      ),
     );
   }
 }
