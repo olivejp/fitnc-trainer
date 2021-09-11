@@ -198,6 +198,6 @@ abstract class AbstractFitnessStorageService<T extends AbstractFitnessStorageDom
 
   @override
   Future<void> delete(T domain) {
-    return deleteAllFiles(domain).then((_) => delete(domain));
+    return deleteAllFiles(domain).then((_) => super.delete(domain));
   }
 }

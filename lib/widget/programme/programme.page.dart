@@ -202,13 +202,14 @@ class _ProgrammePageState extends State<ProgrammePage> {
 
   Future<dynamic> onTap(BuildContext context, Programme programme) {
     return showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-              contentPadding: const EdgeInsets.all(20),
-              content: SizedBox(
-                width: 1280,
-                child: ProgrammeUpdatePage(programme: programme),
-              ),
-            ));
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        contentPadding: const EdgeInsets.all(20),
+        content: SizedBox(
+          width: 1280,
+          child: ProgrammeUpdatePage(programme: programme),
+        ),
+      ),
+    );
   }
 }

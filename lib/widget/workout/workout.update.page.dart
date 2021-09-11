@@ -101,17 +101,22 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 30.0, bottom: 30.0),
-                      child: Obx(
-                        () => StorageImageWidget(
-                          radius: 80,
-                          onSaved: (StorageFile? file) => controller.setStorageFile(file),
-                          onDeleted: () => controller.setStorageFile(null),
-                          storageFile: controller.workout.value.storageFile,
-                          imageUrl: controller.workout.value.imageUrl,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 30.0, bottom: 30.0),
+                          child: Obx(
+                            () => StorageImageWidget(
+                              radius: 80,
+                              onSaved: (StorageFile? file) => controller.setStorageFile(file),
+                              onDeleted: () => controller.setStorageFile(null),
+                              storageFile: controller.workout.value.storageFile,
+                              imageUrl: controller.workout.value.imageUrl,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                     FitnessDecorationTextFormField(
                         initialValue: controller.workout.value.name,

@@ -114,6 +114,7 @@ class ProgrammeController extends GetxController {
       } else {
         val.storageFile = StorageFile();
       }
+      val.imageUrl = null;
     });
   }
 

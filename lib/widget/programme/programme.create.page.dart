@@ -1,6 +1,5 @@
-import 'package:fitnc_trainer/controller/programme/programme.controller.dart';
 import 'package:fitnc_trainer/constants/constants.dart';
-import 'package:fitness_domain/service/util.service.dart';
+import 'package:fitnc_trainer/controller/programme/programme.controller.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitness_domain/widget/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,10 +29,11 @@ class ProgrammeCreatePage {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
                         Obx(
-                              () => StorageFutureImageWidget(
-                            future: UtilService.getFutureStorageFile(controller.programme.value),
+                          () => StorageImageWidget(
                             onSaved: controller.setStoragePair,
-                            onDeleted: controller.setStoragePair,
+                            onDeleted: () => controller.setStoragePair(null),
+                            storageFile: controller.programme.value.storageFile,
+                            imageUrl: controller.programme.value.imageUrl,
                           ),
                         ),
                         Expanded(
@@ -61,7 +61,8 @@ class ProgrammeCreatePage {
                                         paramName: 'number_weeks',
                                         initialValue: controller.programme.value.numberWeeks,
                                         decoration: const InputDecoration(
-                                            labelText: 'Nombre de semaine', constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight)),
+                                            labelText: 'Nombre de semaine',
+                                            constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight)),
                                         onChanged: (String? value) => controller.changeNumberWeek(value)),
                                   ),
                                 )

@@ -92,11 +92,14 @@ class ProgrammeUpdatePage extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 20),
               child: Row(
                 children: <Widget>[
-                  Obx(() => StorageFutureImageWidget(
-                        future: UtilService.getFutureStorageFile(controller.programme.value),
-                        onSaved: controller.setStoragePair,
-                        onDeleted: controller.setStoragePair,
-                      )),
+                  Obx(
+                    () => StorageImageWidget(
+                      imageUrl: controller.programme.value.imageUrl,
+                      storageFile: controller.programme.value.storageFile,
+                      onSaved: controller.setStoragePair,
+                      onDeleted: () => controller.setStoragePair(null),
+                    ),
+                  ),
                   Flexible(
                     child: Column(
                       children: <Widget>[
