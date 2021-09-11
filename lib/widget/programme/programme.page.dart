@@ -189,8 +189,8 @@ class _ProgrammePageState extends State<ProgrammePage> {
                 right: 5,
                 child: Chip(
                   backgroundColor: Colors.green,
-                  label: Text('Publié'),
-                  avatar: Icon(Icons.public),
+                  label: Text('Publié', style: TextStyle(color: Colors.white),),
+                  avatar: Icon(Icons.public, color: Colors.white,),
                 ),
               )
           ],

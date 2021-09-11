@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitnc_trainer/constants/constants.dart';
+import 'package:fitnc_trainer/service/programme.service.dart';
+import 'package:fitnc_trainer/service/published_programme.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
+import 'package:fitness_domain/domain/programme.domain.dart';
+import 'package:fitness_domain/domain/published_programme.domain.dart';
 import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:fitness_domain/domain/trainers.domain.dart';
 import 'package:fitness_domain/service/auth.service.dart';
@@ -38,6 +42,7 @@ class ProfilPageController extends GetxController {
 
   final FirebaseStorageService storageService = Get.find();
   final TrainersService trainersService = Get.find();
+  final ProgrammeService programmeService = Get.find();
   final AuthService authService = Get.find();
   final Rx<Trainers?> trainer = Trainers().obs;
 
@@ -52,7 +57,8 @@ class ProfilPageController extends GetxController {
 
   Future<void> save() async {
     if (trainer.value != null) {
-      return trainersService.save(trainer.value!);
+      await trainersService.save(trainer.value!);
+      await programmeService.refreshAllPublished();
     } else {
       throw Exception('Aucun domain Trainer a sauvegardé');
     }

@@ -16,11 +16,7 @@ abstract class AbstractExerciceController {
 
   Rx<Exercice> exercice = Exercice().obs;
 
-  bool sendStorage = false;
-
   Future<void> init(Exercice? exerciceEntered) async {
-    sendStorage = false;
-
     if (exerciceEntered != null) {
       exercice.value = exerciceEntered;
 
@@ -32,11 +28,10 @@ abstract class AbstractExerciceController {
   }
 
   Future<void> saveExercice() async {
-    return exerciceService.saveExercice(exercice.value, sendStorage: sendStorage);
+    return exerciceService.save(exercice.value);
   }
 
   void setStoragePair(StorageFile? stFile) {
-    sendStorage = true;
     exercice.update((Exercice? exo) {
       if (exo != null) {
         exo.storageFile = stFile ?? StorageFile();
@@ -53,8 +48,6 @@ class ExerciceUpdateController extends GetxController with AbstractExerciceContr
 
   @override
   Future<void> init(Exercice? exerciceEntered) async {
-    sendStorage = false;
-
     isSet.value = exerciceEntered != null && exerciceEntered.uid != null;
 
     if (exerciceEntered != null) {

@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fitnc_trainer/service/published_programme.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitness_domain/domain/programme.domain.dart';
+import 'package:fitness_domain/domain/published_programme.domain.dart';
+import 'package:fitness_domain/domain/trainers.domain.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/domain/workout_schedule.domain.dart';
 import 'package:fitness_domain/domain/workout_schedule.dto.dart';
@@ -14,7 +17,7 @@ import 'package:get/get.dart';
 class ProgrammeService extends AbstractFitnessStorageService<Programme> {
   final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
   final TrainersService trainersService = Get.find();
-  final String publishedProgrammeCollectionName = 'publishedProgrammes';
+  final PublishedProgrammeService publishedProgrammeService = Get.find();
 
   @override
   Programme fromJson(Map<String, dynamic> map) {
@@ -34,6 +37,43 @@ class ProgrammeService extends AbstractFitnessStorageService<Programme> {
   @override
   String getStorageRef(User user, Programme programme) {
     return 'trainers/${user.uid}/programmes/${programme.uid}';
+  }
+
+  @override
+  Future<void> save(Programme programme) async {
+    if (programme.available == true) {
+      return super.save(programme).then((_) => refreshPublished(programme));
+    } else {
+      return super.save(programme);
+    }
+  }
+
+  Future<void> refreshAllPublished() async {
+    final List<Programme> listProgramme = (await getCollectionReference().where('available', isEqualTo: true).get())
+        .docs
+        .map((QueryDocumentSnapshot<Object?> e) => fromJson(e.data() as Map<String, dynamic>))
+        .toList();
+
+    for (final Programme programme in listProgramme) {
+      await refreshPublished(programme);
+    }
+  }
+
+  Future<void> refreshPublished(Programme programme) async {
+    if (programme.available == true) {
+      final Trainers? trainers = await trainersService.getCurrentTrainer();
+      if (trainers == null) throw Exception('Aucun utilisateur connecté');
+      return publishedProgrammeService.save(PublishedProgramme.fromProgramme(programme, trainers));
+    }
+  }
+
+  @override
+  Future<void> delete(Programme programme) {
+    if (programme.available == true) {
+      return unpublishProgramme(programme);
+    } else {
+      return super.delete(programme);
+    }
   }
 
   ///
@@ -67,27 +107,9 @@ class ProgrammeService extends AbstractFitnessStorageService<Programme> {
   ///
   /// Publication du programme dans une collection où tous les utilisateurs pourront les trouver.
   ///
-  Future<void> publishProgramme(Programme programme, {required bool sendStorage}) async {
+  Future<void> publishProgramme(Programme programme) async {
     await save(programme);
-
-    // Ouverture d'un batch.
-    final WriteBatch batch = firestoreInstance.batch();
-
-    final DocumentReference<Map<String, dynamic>> publishedProgrammeRef =
-        firestoreInstance.collection(publishedProgrammeCollectionName).doc(programme.uid);
-
-    batch.set(publishedProgrammeRef, programme.toJson());
-
-    // Lecture de tous les workouts.
-    final QuerySnapshot<Map<String, dynamic>> mapWorkouts =
-        await trainersService.getProgrammeReference().doc(programme.uid).collection('workouts').get();
-
-    for (final QueryDocumentSnapshot<Map<String, dynamic>> docs in mapWorkouts.docs) {
-      final DocumentReference<Map<String, dynamic>> docRef = publishedProgrammeRef.collection('workouts').doc(docs.id);
-      batch.set(docRef, docs.data());
-    }
-
-    batch.commit().then((_) {
+    publishedProgrammeService.publish(programme).then((_) {
       programme.available = true;
       programme.publishDate = FieldValue.serverTimestamp();
       return save(programme);
@@ -97,26 +119,9 @@ class ProgrammeService extends AbstractFitnessStorageService<Programme> {
   ///
   /// Dépublication du programme dans une collection.
   ///
-  Future<void> unpublishProgramme(Programme programme, {required bool sendStorage}) async {
+  Future<void> unpublishProgramme(Programme programme) async {
     programme.available = false;
     await save(programme);
-
-    final DocumentReference<Map<String, dynamic>> programmeRef =
-        firestoreInstance.collection(publishedProgrammeCollectionName).doc(programme.uid);
-
-    // Ouverture d'un batch.
-    final WriteBatch batch = firestoreInstance.batch();
-
-    // Suppression du programme publié.
-    batch.delete(programmeRef);
-
-    // Suppression de tous les Workouts.
-    final QuerySnapshot<Map<String, dynamic>> values = await programmeRef.collection('workouts').get();
-
-    for (final QueryDocumentSnapshot<Map<String, dynamic>> element in values.docs) {
-      batch.delete(element.reference);
-    }
-
-    batch.commit();
+    publishedProgrammeService.unpublish(programme);
   }
 }

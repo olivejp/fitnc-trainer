@@ -8,7 +8,7 @@ import 'package:fitness_domain/domain/exercice.domain.dart';
 import 'package:fitness_domain/service/firebase-storage.service.dart';
 import 'package:get/get.dart';
 
-class ExerciceService extends AbstractFitnessCrudService<Exercice> with MixinFitnessStorageService<Exercice> {
+class ExerciceService extends AbstractFitnessStorageService<Exercice> {
   final TrainersService trainersService = Get.find();
   final FirebaseStorageService storageService = Get.find();
 
@@ -29,31 +29,16 @@ class ExerciceService extends AbstractFitnessCrudService<Exercice> with MixinFit
     return trainersService.getExerciceReference();
   }
 
+  @override
+  String getStorageRef(User user, Exercice exercice) {
+    return 'trainers/${user.uid}/exercices/${exercice.uid}/mainImage';
+  }
+
   String getExerciceStoragePath(Exercice exercice) {
     final User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       return 'trainers/${user.uid}/exercices/${exercice.uid}/mainImage';
     }
     throw Exception('Aucun utilisateur connecté');
-  }
-
-  Future<void> saveExercice(Exercice exercice, {required bool sendStorage}) async {
-    final bool isUpdate = exercice.uid != null;
-    final String path = getExerciceStoragePath(exercice);
-    final bool shouldSendToStorage =
-        sendStorage && exercice.storageFile != null && exercice.storageFile!.fileBytes != null && exercice.storageFile!.fileName != null;
-
-    if (shouldSendToStorage) {
-      final String imageUrl = await storageService.eraseAndReplaceStorage(path, exercice.storageFile!);
-      exercice.imageUrl = imageUrl;
-    }
-
-    return isUpdate ? save(exercice) : create(exercice);
-  }
-
-  @override
-  String getStorageRef(User user, Exercice domain) {
-    // TODO: implement getStorageRef
-    throw UnimplementedError();
   }
 }

@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:fitnc_trainer/service/abonne.service.dart';
 import 'package:fitnc_trainer/service/exercice.service.dart';
 import 'package:fitnc_trainer/service/fitness-user.service.dart';
+import 'package:fitnc_trainer/service/published_programme.service.dart';
 import 'package:fitness_domain/service/firebase.service.dart';
 import 'package:fitnc_trainer/service/programme.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
@@ -18,6 +19,7 @@ class FirebaseWidget extends StatelessWidget {
     Get.put(TrainersService());
     Get.put(AbonneService());
     Get.put(ExerciceService());
+    Get.put(PublishedProgrammeService());
     Get.put(ProgrammeService());
     Get.put(WorkoutSetService());
     Get.put(WorkoutService());

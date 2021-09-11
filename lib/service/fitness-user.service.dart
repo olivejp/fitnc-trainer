@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness_domain/domain/fitness-user.domain.dart';
 import 'package:fitness_domain/service/abstract.service.dart';
 
-class FitnessUserService extends AbstractFitnessCrudService<FitnessUser> with MixinFitnessStorageService<FitnessUser> {
+class FitnessUserService extends AbstractFitnessStorageService<FitnessUser> {
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   final String collectionName = 'users';
 

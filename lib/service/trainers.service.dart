@@ -39,6 +39,12 @@ class TrainersService extends AbstractFitnessStorageService<Trainers> {
     return Trainers.fromJson(snapshot.data()!);
   }
 
+  Future<Trainers?> getCurrentTrainer() {
+    final User? user = authInstance.currentUser;
+    if (user == null) throw Exception('Aucun utilisateur connecté');
+    return read(user.uid);
+  }
+
   DocumentReference<Object?> getCurrentTrainerRef() {
     return getCollectionReference().doc(authInstance.currentUser?.uid);
   }

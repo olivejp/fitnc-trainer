@@ -7,7 +7,7 @@ import 'package:fitness_domain/domain/abonne.domain.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class AbonneService extends AbstractFitnessCrudService<Abonne> with MixinFitnessStorageService<Abonne> {
+class AbonneService extends AbstractFitnessStorageService<Abonne> {
   final String pathWorkoutMainImage = 'mainImage';
   final TrainersService trainersService = Get.find();
 

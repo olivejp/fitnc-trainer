@@ -18,6 +18,8 @@ abstract class AbstractCrudService<T> {
 
   Stream<List<T>> listenAll();
 
+  Future<List<T>> getAll();
+
   Future<void> save(T domain);
 
   Future<void> create(T domain);
@@ -177,10 +179,16 @@ abstract class AbstractFitnessCrudService<T extends AbstractDomain> extends Abst
 ///
 abstract class AbstractFitnessStorageService<T extends AbstractFitnessStorageDomain> extends AbstractFitnessCrudService<T>
     with MixinFitnessStorageService<T> {
-
-  Future<void> callUpdateOrCreate(T domain){
+  Future<void> callUpdateOrCreate(T domain) {
     final bool isUpdate = domain.uid != null;
     return isUpdate ? update(domain) : create(domain);
+  }
+
+  @override
+  Future<List<T>> getAll() {
+    return getCollectionReference()
+        .get()
+        .then((QuerySnapshot<Object?> value) => value.docs.map((QueryDocumentSnapshot<Object?> e) => fromJson(e as Map<String, dynamic>)).toList());
   }
 
   @override

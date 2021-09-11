@@ -25,11 +25,15 @@ class ProgrammeController extends GetxController {
   final String pathProgrammeMainImage = 'mainImage';
   final List<WorkoutScheduleDto> listDtos = <WorkoutScheduleDto>[];
   getx.Rx<Programme> programme = Programme().obs;
-  bool sendStorage = false;
 
   RxInt numberWeekInt = 0.obs;
 
   void changeNumberWeek(String? numberWeek) {
+    programme.update((Programme? programme) {
+      if (programme==null) return;
+      programme.numberWeeks = numberWeek;
+    });
+
     if (numberWeek != null) {
       final int indexUnderscore = numberWeek.isNotEmpty ? numberWeek.indexOf('_') : 0;
       if (indexUnderscore != 0) {
@@ -49,16 +53,14 @@ class ProgrammeController extends GetxController {
   }
 
   Future<void> publish() {
-    return programmeService.publishProgramme(programme.value, sendStorage: sendStorage);
+    return programmeService.publishProgramme(programme.value);
   }
 
   Future<void> unpublish() {
-    return programmeService.unpublishProgramme(programme.value, sendStorage: sendStorage);
+    return programmeService.unpublishProgramme(programme.value);
   }
 
   void init(Programme? programmeEntered) {
-    sendStorage = false;
-
     if (programmeEntered != null) {
       programme.value = programmeEntered;
       programme.value.storageFile = StorageFile();
@@ -106,7 +108,6 @@ class ProgrammeController extends GetxController {
   String? get description => programme.value.description;
 
   void setStoragePair(StorageFile? stFile) {
-    sendStorage = true;
     programme.update((Programme? val) {
       if (val == null) return;
       if (stFile != null) {
