@@ -8,9 +8,24 @@ part 'fitness-user.domain.g.dart';
 class FitnessUser extends AbstractFitnessStorageDomain implements InterfaceDomainSearchable {
   FitnessUser();
 
-  factory FitnessUser.fromJson(Map<String, dynamic> data) =>_$FitnessUserFromJson(data);
+  static FitnessUser fromJson(Map<String, dynamic> json) {
+    return FitnessUser()
+      ..uid = json['uid'] as String?
+      ..name = (json['name'] as String?) ?? ''
+      ..createDate = json['createDate']
+      ..updateDate = json['updateDate']
+      ..imageUrl = json['imageUrl'] as String?
+      ..prenom = json['prenom'] as String?
+      ..sexe = json['sexe'] as String?
+      ..dateNaissance = json['dateNaissance'] as String?
+      ..telephone1 = json['telephone1'] as int?
+      ..telephone2 = json['telephone2'] as int?
+      ..email = json['email'] as String?
+      ..adresse1 = json['adresse1'] as String?
+      ..adresse2 = json['adresse2'] as String?
+      ..adresse3 = json['adresse3'] as String?;
+  }
 
-  String? nom;
   String? prenom;
   String? sexe;
   String? dateNaissance;

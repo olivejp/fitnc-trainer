@@ -4,6 +4,7 @@ import 'package:fitnc_trainer/widget/layout-display.widget.dart';
 import 'package:fitnc_trainer/widget/login/login.page.dart';
 import 'package:fitnc_trainer/widget/login/sign-up.page.dart';
 import 'package:fitnc_trainer/widget/widgets/firebase.widget.dart';
+import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/service/auth.service.dart';
 import 'package:fitness_domain/service/display.service.dart';
 import 'package:fitness_domain/service/firebase-storage.service.dart';
@@ -14,7 +15,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oktoast/oktoast.dart';
 
-import 'constants/constants.dart';
 
 
 

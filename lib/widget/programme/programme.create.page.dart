@@ -1,4 +1,4 @@
-import 'package:fitnc_trainer/constants/constants.dart';
+import 'package:fitness_domain/constants.dart';
 import 'package:fitnc_trainer/controller/programme/programme.controller.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
 import 'package:fitness_domain/widget/storage_image.widget.dart';

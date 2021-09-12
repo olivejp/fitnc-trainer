@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fitnc_trainer/constants/constants.dart';
+import 'package:fitness_domain/constants.dart';
 import 'package:fitnc_trainer/service/programme.service.dart';
 import 'package:fitnc_trainer/service/published_programme.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
+import 'package:fitness_domain/widget/generic_container.widget.dart';
 import 'package:fitness_domain/domain/programme.domain.dart';
 import 'package:fitness_domain/domain/published_programme.domain.dart';
 import 'package:fitness_domain/domain/storage-file.dart';

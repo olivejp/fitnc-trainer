@@ -41,8 +41,28 @@ abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends Get
   T fromJson(Map<String, dynamic> map);
 
   @override
-  Future<T?> read(String uid) {
-    return getCollectionReference().doc(uid).get().then((DocumentSnapshot<Object?> value) => fromJson(value.data()! as Map<String, dynamic>));
+  Future<T?> read(String uid) async {
+    DocumentSnapshot<Object?> documentSnapshot;
+    T doc;
+
+    // Récupération de la référence du document.
+    try {
+      documentSnapshot = await getCollectionReference().doc(uid).get();
+    } catch (e) {
+      throw Exception('Soucis lors de la récupération de la référence du document. ${e.toString()}');
+    }
+
+    // Si le snapshot ne ramène rien, je renvoie null.
+    Object? obj = documentSnapshot.data();
+    if (obj == null) return null;
+
+    // Je tente de désérialiser les infos.
+    try {
+      doc = fromJson(obj as Map<String, dynamic>);
+    } catch (e) {
+      throw Exception('Soucis lors de la transformation fromJson. ${e.toString()}');
+    }
+    return doc;
   }
 
   /// Méthode de sauvegarde l'entité passée.
@@ -211,7 +231,6 @@ abstract class AbstractFitnessStorageService<T extends AbstractFitnessStorageDom
     return deleteAllFiles(domain).then((_) => super.delete(domain));
   }
 }
-
 
 abstract class SearchControllerMixin<T extends InterfaceDomainSearchable, U extends AbstractCrudService<T>> extends GetxController {
   SearchControllerMixin() {

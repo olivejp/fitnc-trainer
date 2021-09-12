@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/service/auth.service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,6 @@ import 'package:flutter/painting.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../constants/constants.dart';
 import '../bottom.widget.dart';
 
 typedef CallbackUserCredential = void Function(UserCredential userCredential);

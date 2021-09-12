@@ -1,5 +1,6 @@
 
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/service/util.service.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.bottom.panel.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.top.panel.dart';
@@ -15,7 +16,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../../constants/constants.dart';
 
 class WorkoutSetPageVm {
   WorkoutSetPageVm();

@@ -1,5 +1,6 @@
 import 'package:fitnc_trainer/controller/workout/workout.controller.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
+import 'package:fitness_domain/constants.dart';
+import 'package:fitness_domain/widget/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.page.dart';
 import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
@@ -8,8 +9,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
-
-import '../../constants/constants.dart';
 
 class WorkoutUpdatePage extends StatefulWidget {
   const WorkoutUpdatePage({Key? key, required this.workout}) : super(key: key);

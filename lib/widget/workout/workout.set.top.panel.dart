@@ -1,4 +1,5 @@
 import 'package:fitnc_trainer/widget/workout/workout.set.page.dart';
+import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/domain/exercice.domain.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +8,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:loading_animations/loading_animations.dart';
 import 'package:provider/provider.dart';
-
-import '../../constants/constants.dart';
 
 /// Panel supérieur proposant une liste d'exercice avec option de recherche.
 /// Les cards exerices sont "draggable".

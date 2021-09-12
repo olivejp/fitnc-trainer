@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:fitnc_trainer/controller/home.page.controller.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.page.dart';
 import 'package:fitnc_trainer/widget/profil/profil.page.dart';
+import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/service/auth.service.dart';
 import 'package:fitness_domain/service/display.service.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,7 +12,6 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 
-import '../constants/constants.dart';
 import 'abonne/abonne.page.dart';
 import 'programme/programme.page.dart';
 import 'workout/workout.page.dart';

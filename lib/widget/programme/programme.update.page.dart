@@ -1,12 +1,12 @@
 import 'package:fitnc_trainer/controller/programme/programme.controller.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitness_domain/service/util.service.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
-import 'package:fitness_domain/widget/storage_image.widget.dart';
+import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/domain/programme.domain.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/domain/workout_schedule.dto.dart';
+import 'package:fitness_domain/widget/generic_container.widget.dart';
+import 'package:fitness_domain/widget/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +19,6 @@ import 'package:loading_animations/loading_animations.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart' as sf;
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-
-import '../../constants/constants.dart';
 
 class ProgrammeUpdatePage extends StatelessWidget {
   ProgrammeUpdatePage({Key? key, required this.programme}) : super(key: key);

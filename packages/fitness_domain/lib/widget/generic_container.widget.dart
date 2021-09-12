@@ -2,7 +2,8 @@
 import 'package:fitness_domain/domain/abstract.domain.dart';
 import 'package:flutter/material.dart';
 
-import '../../constants/constants.dart';
+import '../constants.dart';
+
 
 class FitnessDecorationTextFormField extends StatelessWidget {
   const FitnessDecorationTextFormField(

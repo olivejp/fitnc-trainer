@@ -1,16 +1,15 @@
 import 'package:fitnc_trainer/service/exercice.controller.dart';
 import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
-import 'package:fitnc_trainer/widget/widgets/generic_container.widget.dart';
-import 'package:fitness_domain/widget/storage_image.widget.dart';
+import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/domain/exercice.domain.dart';
+import 'package:fitness_domain/widget/generic_container.widget.dart';
+import 'package:fitness_domain/widget/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:video_player/video_player.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
-
-import '../../constants/constants.dart';
 
 class ExerciceBuilderPage {
   /// Permet de créer une AlertDialog pour la création d'un exercice.

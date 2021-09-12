@@ -2,6 +2,7 @@ import 'package:fitnc_trainer/service/exercice.controller.dart';
 import 'package:fitnc_trainer/service/exercice.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
+import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/domain/exercice.domain.dart';
 import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:fitness_domain/service/display.service.dart';
@@ -16,7 +17,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../../constants/constants.dart';
 import 'exercice.form.builder.dart';
 
 class ExercicePageController extends SearchControllerMixin<Exercice, ExerciceService> {
