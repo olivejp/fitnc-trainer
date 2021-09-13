@@ -3,12 +3,15 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitness_domain/domain/trainers.domain.dart';
+import 'package:fitness_domain/service/auth.service.dart';
 import 'package:get/get.dart';
 import 'package:rxdart/rxdart.dart';
 
 class SignUpController extends GetxController {
   final TrainersService trainersService = Get.find();
+  final AuthService authService = Get.find();
   final FirebaseAuth authInstance = FirebaseAuth.instance;
+  final BehaviorSubject<String?> _streamError = BehaviorSubject<String?>();
 
   String name = '';
   String prenom = '';
@@ -17,9 +20,7 @@ class SignUpController extends GetxController {
   String password = '';
   String passwordCheck = '';
 
-  BehaviorSubject<String?>? _streamError;
-
-  Stream<String?>? get errorsObservable => _streamError?.stream;
+  Stream<String?> get errorsObservable => _streamError.stream;
 
   Future<bool> isConnected() {
     final Completer<bool> completer = Completer<bool>();
@@ -36,11 +37,11 @@ class SignUpController extends GetxController {
   }
 
   void setError(String error) {
-    _streamError?.sink.add(error);
+    _streamError.sink.add(error);
   }
 
   void cleanError() {
-    _streamError?.sink.add('');
+    _streamError.sink.add('');
   }
 
   Future<UserCredential> signUp() async {

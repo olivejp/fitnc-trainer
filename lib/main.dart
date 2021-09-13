@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/service/fitness-user.service.dart';
+import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/widget/layout-display.widget.dart';
 import 'package:fitnc_trainer/widget/login/login.page.dart';
 import 'package:fitnc_trainer/widget/login/sign-up.page.dart';
@@ -29,6 +30,7 @@ void initServices() {
   Get.put(FirebaseStorageService());
   Get.put(DisplayTypeService());
   Get.put(FitnessUserService());
+  Get.put(TrainersService());
 }
 
 class MyApp extends StatelessWidget {

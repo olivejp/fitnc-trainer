@@ -10,7 +10,6 @@ import 'package:flutter/painting.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 typedef CallbackUserCredential = void Function(UserCredential userCredential);
 
 class SignUpPage extends StatefulWidget {
@@ -61,7 +60,11 @@ class _SignUpPageState extends State<SignUpPage> {
             widget.callback!(value);
           }
         }).catchError((Object? error) {
-          controller.setError(error.toString());
+          if (error is FirebaseAuthException) {
+            controller.setError(error.message!);
+          } else {
+            controller.setError(error.toString());
+          }
         });
       }
     }
@@ -254,7 +257,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             stream: controller.errorsObservable,
                             builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
                               if (snapshot.hasData && snapshot.data?.isNotEmpty == true) {
-                                return Text(snapshot.data!);
+                                return Text(snapshot.data!, style: const TextStyle(color: Colors.red),);
                               } else {
                                 return const Text('');
                               }

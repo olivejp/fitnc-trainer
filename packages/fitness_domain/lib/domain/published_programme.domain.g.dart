@@ -18,11 +18,12 @@ PublishedProgramme _$PublishedProgrammeFromJson(Map<String, dynamic> json) {
     ..description = json['description'] as String?
     ..publishDate = json['publishDate']
     ..creatorUid = json['creatorUid'] as String?
-    ..creatorImageUrl = json['creatorImageUrl'] as String?;
+    ..creatorImageUrl = json['creatorImageUrl'] as String?
+    ..creatorName = json['creatorName'] as String?
+    ..creatorPrenom = json['creatorPrenom'] as String?;
 }
 
-Map<String, dynamic> _$PublishedProgrammeToJson(PublishedProgramme instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$PublishedProgrammeToJson(PublishedProgramme instance) => <String, dynamic>{
       'uid': instance.uid,
       'name': instance.name,
       'createDate': instance.createDate,
@@ -34,4 +35,6 @@ Map<String, dynamic> _$PublishedProgrammeToJson(PublishedProgramme instance) =>
       'publishDate': instance.publishDate,
       'creatorUid': instance.creatorUid,
       'creatorImageUrl': instance.creatorImageUrl,
+      'creatorName': instance.creatorName,
+      'creatorPrenom': instance.creatorPrenom,
     };

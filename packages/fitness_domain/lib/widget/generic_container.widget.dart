@@ -1,13 +1,19 @@
-
 import 'package:fitness_domain/domain/abstract.domain.dart';
 import 'package:flutter/material.dart';
 
 import '../constants.dart';
 
-
 class FitnessDecorationTextFormField extends StatelessWidget {
   const FitnessDecorationTextFormField(
-      {Key? key, this.initialValue, this.labelText, this.onChanged, this.validator, this.autofocus = false, this.hintText, this.controller})
+      {Key? key,
+      this.initialValue,
+      this.labelText,
+      this.onChanged,
+      this.validator,
+      this.autofocus = false,
+      this.hintText,
+      this.controller,
+      this.inputBorder})
       : super(key: key);
 
   final bool autofocus;
@@ -17,6 +23,7 @@ class FitnessDecorationTextFormField extends StatelessWidget {
   final String? labelText;
   final String? hintText;
   final TextEditingController? controller;
+  final InputBorder? inputBorder;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +33,7 @@ class FitnessDecorationTextFormField extends StatelessWidget {
         onChanged: onChanged,
         autofocus: autofocus,
         decoration: InputDecoration(
+          border: inputBorder,
           hintText: hintText,
           labelText: labelText,
           constraints: const BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),

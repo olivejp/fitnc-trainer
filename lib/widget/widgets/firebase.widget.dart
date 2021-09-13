@@ -16,7 +16,6 @@ class FirebaseWidget extends StatelessWidget {
   const FirebaseWidget({Key? key}) : super(key: key);
 
   void initDomainServices(){
-    Get.put(TrainersService());
     Get.put(AbonneService());
     Get.put(ExerciceService());
     Get.put(PublishedProgrammeService());
