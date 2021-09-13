@@ -30,6 +30,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
 
   @override
   Widget build(BuildContext context) {
+    widget.controller.refreshSearchController();
     return RoutedPage(
       child: Scaffold(
         backgroundColor: Colors.transparent,

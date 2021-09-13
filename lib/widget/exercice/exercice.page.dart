@@ -3,8 +3,8 @@ import 'package:fitnc_trainer/service/exercice.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:fitness_domain/constants.dart';
+import 'package:fitness_domain/controller/abstract.controller.dart';
 import 'package:fitness_domain/domain/exercice.domain.dart';
-import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:fitness_domain/service/display.service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +61,7 @@ class ExercicePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    controller.refreshSearchController();
     controller.setDualScreen(isDualScreen: displayTypeController.displayType.value == DisplayType.desktop);
     displayTypeController.displayType.listen((DisplayType displayType) {
       controller.setDualScreen(isDualScreen: displayType == DisplayType.desktop);

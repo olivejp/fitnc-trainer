@@ -253,13 +253,15 @@ class _SignUpPageState extends State<SignUpPage> {
                               ],
                             ),
                           ),
-                          StreamBuilder<String?>(
-                            stream: controller.errorsObservable,
-                            builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-                              if (snapshot.hasData && snapshot.data?.isNotEmpty == true) {
-                                return Text(snapshot.data!, style: const TextStyle(color: Colors.red),);
+                          Obx(
+                            () {
+                              if (controller.errors.value.isNotEmpty == true) {
+                                return Text(
+                                  controller.errors.value,
+                                  style: const TextStyle(color: Colors.red),
+                                );
                               } else {
-                                return const Text('');
+                                return Container();
                               }
                             },
                           ),

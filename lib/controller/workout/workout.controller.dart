@@ -1,9 +1,9 @@
 import 'package:fitnc_trainer/service/workout.service.dart';
+import 'package:fitness_domain/controller/abstract.controller.dart';
 import 'package:fitness_domain/domain/exercice.domain.dart';
 import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/domain/workout_set.domain.dart';
-import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

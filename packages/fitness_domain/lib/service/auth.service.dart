@@ -29,7 +29,7 @@ class AuthService extends GetxService {
   }
 
   Future<UserCredential> signUp(String email, String password) {
-    return FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
+    return _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
   }
 
   Future<void> signOut() {

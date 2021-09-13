@@ -5,13 +5,10 @@ import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitness_domain/domain/trainers.domain.dart';
 import 'package:fitness_domain/service/auth.service.dart';
 import 'package:get/get.dart';
-import 'package:rxdart/rxdart.dart';
 
 class SignUpController extends GetxController {
   final TrainersService trainersService = Get.find();
   final AuthService authService = Get.find();
-  final FirebaseAuth authInstance = FirebaseAuth.instance;
-  final BehaviorSubject<String?> _streamError = BehaviorSubject<String?>();
 
   String name = '';
   String prenom = '';
@@ -20,41 +17,42 @@ class SignUpController extends GetxController {
   String password = '';
   String passwordCheck = '';
 
-  Stream<String?> get errorsObservable => _streamError.stream;
+  RxString errors = ''.obs;
 
   Future<bool> isConnected() {
     final Completer<bool> completer = Completer<bool>();
-    completer.complete(authInstance.currentUser != null);
+    completer.complete(authService.isConnected());
     return completer.future;
   }
 
   Future<bool> disconnect() {
     final Completer<bool> completer = Completer<bool>();
 
-    authInstance.signOut().then((_) => completer.complete(true)).catchError((Object error) => completer.completeError(false));
+    authService.signOut().then((_) => completer.complete(true)).catchError((Object error) => completer.completeError(false));
 
     return completer.future;
   }
 
   void setError(String error) {
-    _streamError.sink.add(error);
+    errors.value = error;
   }
 
   void cleanError() {
-    _streamError.sink.add('');
+    errors.value = '';
   }
 
   Future<UserCredential> signUp() async {
-    final UserCredential credential = await authInstance.createUserWithEmailAndPassword(email: email, password: password);
+    // Méthode pour s'enregistrer sur Firebase.
+    final UserCredential credential = await authService.signUp(email, password);
 
-    final Trainers trainer = Trainers( email: email, prenom: prenom, telephone: telephone);
+    // Création et sauvegarde d'un Trainer
+    final Trainers trainer = Trainers(email: email, prenom: prenom, telephone: telephone);
     trainer.uid = credential.user!.uid;
     trainer.name = name;
-
     await trainersService.getCollectionReference().doc(trainer.uid).set(trainer.toJson());
 
-    final UserCredential credentialSigned = await authInstance.signInWithEmailAndPassword(email: email, password: password);
-
-    return credentialSigned;
+    // On se log pour la première fois avec le compte et on renvoie le credential.
+    await authService.signInWithEmailPassword(email, password);
+    return credential;
   }
 }

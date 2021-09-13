@@ -1,15 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fitness_domain/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/service/programme.service.dart';
-import 'package:fitnc_trainer/service/published_programme.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitness_domain/widget/generic_container.widget.dart';
-import 'package:fitness_domain/domain/programme.domain.dart';
-import 'package:fitness_domain/domain/published_programme.domain.dart';
+import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:fitness_domain/domain/trainers.domain.dart';
 import 'package:fitness_domain/service/auth.service.dart';
 import 'package:fitness_domain/service/firebase-storage.service.dart';
+import 'package:fitness_domain/widget/generic_container.widget.dart';
 import 'package:fitness_domain/widget/storage_image.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +16,7 @@ import 'package:oktoast/oktoast.dart';
 
 class ProfilPageController extends GetxController {
   ProfilPageController() {
-    if (authService.isConnected()) {
+    authService.listenUserConnected().listen((User? user) {
       trainersService
           .getCurrentTrainerRef()
           .get()
@@ -35,9 +33,7 @@ class ProfilPageController extends GetxController {
           }
         });
       });
-    } else {
-      throw Exception('Aucun utilisateur connecté. Impossible de construire le ProfilePageController.');
-    }
+    });
   }
 
   final FirebaseStorageService storageService = Get.find();

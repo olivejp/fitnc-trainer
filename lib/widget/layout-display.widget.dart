@@ -34,7 +34,10 @@ class _LayoutDisplayNotifierState extends State<LayoutDisplayNotifier> {
         } else {
           displayType = DisplayType.mobile;
         }
-        displayTypeController.changeDisplay(displayType);
+        WidgetsBinding.instance!.addPostFrameCallback((Duration timeStamp) {
+          displayTypeController.changeDisplay(displayType);
+        });
+
         return widget.child;
       },
     );

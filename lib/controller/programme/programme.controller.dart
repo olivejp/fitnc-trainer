@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitnc_trainer/service/programme.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitness_domain/controller/abstract.controller.dart';
 import 'package:fitness_domain/domain/programme.domain.dart';
 import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/domain/workout_schedule.domain.dart';
 import 'package:fitness_domain/domain/workout_schedule.dto.dart';
-import 'package:fitness_domain/service/abstract.service.dart';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart' as getx;
@@ -17,7 +18,6 @@ import 'package:rxdart/rxdart.dart';
 
 class ProgrammeController extends SearchControllerMixin<Programme, ProgrammeService> {
   final TrainersService trainersService = Get.find();
-  final ProgrammeService programmeService = Get.find();
 
   final BehaviorSubject<List<WorkoutScheduleDto>> _streamWorkoutScheduleDto = BehaviorSubject<List<WorkoutScheduleDto>>();
 
@@ -46,19 +46,19 @@ class ProgrammeController extends SearchControllerMixin<Programme, ProgrammeServ
   }
 
   Future<List<DropdownMenuItem<Workout>>> getWorkoutDropdownItems() {
-    return programmeService.getWorkoutDropdownItems();
+    return service.getWorkoutDropdownItems();
   }
 
   Future<void> save() {
-    return programmeService.save(programme.value);
+    return service.save(programme.value);
   }
 
   Future<void> publish() {
-    return programmeService.publishProgramme(programme.value);
+    return service.publishProgramme(programme.value);
   }
 
   Future<void> unpublish() {
-    return programmeService.unpublishProgramme(programme.value);
+    return service.unpublishProgramme(programme.value);
   }
 
   void init(Programme? programmeEntered) {
@@ -82,7 +82,7 @@ class ProgrammeController extends SearchControllerMixin<Programme, ProgrammeServ
           .get()
           .then((QuerySnapshot<Map<String, dynamic>> event) => event.docs
               .map((QueryDocumentSnapshot<Map<String, dynamic>> e) => WorkoutSchedule.fromJson(e.data()))
-              .map((WorkoutSchedule e) => programmeService.mapToFutureWorkoutScheduleDto(e))
+              .map((WorkoutSchedule e) => service.mapToFutureWorkoutScheduleDto(e))
               .toList())
           .then((List<Future<WorkoutScheduleDto>> event) => Future.wait(event))
           .then((List<WorkoutScheduleDto> remoteList) {
