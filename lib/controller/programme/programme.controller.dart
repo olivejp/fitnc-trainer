@@ -80,11 +80,13 @@ class ProgrammeController extends LocalSearchControllerMixin<Programme, Programm
           .collection('workouts')
           .orderBy('dateSchedule')
           .get()
-          .then((QuerySnapshot<Map<String, dynamic>> event) => event.docs
-              .map((QueryDocumentSnapshot<Map<String, dynamic>> e) => WorkoutSchedule.fromJson(e.data()))
-              .map((WorkoutSchedule e) => service.mapToFutureWorkoutScheduleDto(e))
+          .then((QuerySnapshot<Map<String, dynamic>> event) =>
+          event.docs
+              .map((QueryDocumentSnapshot<Map<String, dynamic>> queryDoc) => WorkoutSchedule.fromJson(queryDoc.data()))
+              .map((WorkoutSchedule workoutSchedule) => service.mapToFutureWorkoutScheduleDto(workoutSchedule))
               .toList())
           .then((List<Future<WorkoutScheduleDto>> event) => Future.wait(event))
+          .catchError((Object? error) => throw Exception('Erreur lors de la récupération du programme ${programmeEntered.uid} : ${error.toString()}'))
           .then((List<WorkoutScheduleDto> remoteList) {
         listDtos.clear();
         listDtos.addAll(remoteList);
@@ -122,7 +124,12 @@ class ProgrammeController extends LocalSearchControllerMixin<Programme, Programm
 
   void addWorkoutSchedule(Workout workout, int dayIndex) {
     final WorkoutScheduleDto dto = WorkoutScheduleDto.empty();
-    dto.uid = trainersService.getProgrammeReference().doc(programme.value.uid).collection('workouts').doc().id;
+    dto.uid = trainersService
+        .getProgrammeReference()
+        .doc(programme.value.uid)
+        .collection('workouts')
+        .doc()
+        .id;
     dto.uidWorkout = workout.uid;
     dto.nameWorkout = workout.name;
     dto.imageUrlWorkout = workout.imageUrl;

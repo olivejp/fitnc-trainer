@@ -120,7 +120,12 @@ class _ProgrammePageState extends State<ProgrammePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Flexible(child: Text(programme.name)),
+                      Flexible(
+                          child: Text(
+                        programme.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      )),
                       PopupMenuButton<dynamic>(
                         iconSize: 24,
                         tooltip: 'Voir plus',

@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fitnc_trainer/service/programme.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitness_domain/domain/programme.domain.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:get/get.dart';
@@ -11,6 +13,7 @@ class WorkoutService extends AbstractFitnessStorageService<Workout> {
   WorkoutService();
 
   final TrainersService trainersService = Get.find();
+  final ProgrammeService programmeService = Get.find();
   final String pathWorkoutMainImage = 'mainImage';
 
   @override
@@ -31,5 +34,15 @@ class WorkoutService extends AbstractFitnessStorageService<Workout> {
   @override
   CollectionReference<Object?> getCollectionReference() {
     return trainersService.getWorkoutReference();
+  }
+
+  @override
+  Future<void> delete(Workout domain) async {
+    // Vérification s'il y a des programmes qui utilisent ce Workout.
+    // final List<Workout> listWorkout = await programmeService.getAllWorkout(uidProgramme);
+    // listProgramme.forEach((element) {
+    //
+    // })
+    return super.delete(domain);
   }
 }

@@ -48,6 +48,11 @@ class ProgrammeService extends AbstractFitnessStorageService<Programme> {
     }
   }
 
+  Future<List<Workout>> getAllWorkout(String uidProgramme) {
+    return getCollectionReference().doc(uidProgramme).collection('workouts').get().then((QuerySnapshot<Map<String, dynamic>> value) =>
+        value.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> e) => Workout.fromJson(e.data())).toList());
+  }
+
   Future<void> refreshAllPublished() async {
     final List<Programme> listProgramme = (await getCollectionReference().where('available', isEqualTo: true).get())
         .docs
@@ -79,18 +84,24 @@ class ProgrammeService extends AbstractFitnessStorageService<Programme> {
   ///
   /// Mapping d'un WorkoutSchedule en Future<WorkoutScheduleDto>
   ///
-  Future<WorkoutScheduleDto> mapToFutureWorkoutScheduleDto(WorkoutSchedule e) {
-    return trainersService
-        .getWorkoutReference()
-        .doc(e.uidWorkout)
-        .get()
-        .then((DocumentSnapshot<Object?> value) => Workout.fromJson(value.data()! as Map<String, dynamic>))
-        .then((Workout value) {
-      final WorkoutScheduleDto dto = WorkoutScheduleDto.fromSchedule(e);
-      dto.nameWorkout = value.name;
-      dto.imageUrlWorkout = value.imageUrl;
+  Future<WorkoutScheduleDto> mapToFutureWorkoutScheduleDto(WorkoutSchedule workoutSchedule) async {
+    DocumentSnapshot<Map<String, dynamic>> getWorkoutReference;
+    try {
+      getWorkoutReference = await trainersService.getWorkoutReference().doc(workoutSchedule.uidWorkout).get();
+    } catch (exception) {
+      throw Exception("Le workout avec l'uid ${workoutSchedule.uidWorkout} n'a pas été trouvé.");
+    }
+
+    final Map<String, dynamic>? workoutData = getWorkoutReference.data();
+    if (workoutData != null) {
+      final Workout workout = Workout.fromJson(workoutData);
+      final WorkoutScheduleDto dto = WorkoutScheduleDto.fromSchedule(workoutSchedule);
+      dto.nameWorkout = workout.name;
+      dto.imageUrlWorkout = workout.imageUrl;
       return dto;
-    });
+    }
+    return Future<WorkoutScheduleDto>.error(
+        'Impossible de mapper les données du workoutSchedule ${workoutSchedule.uidWorkout} pour en faire un DTO.');
   }
 
   ///
