@@ -1,7 +1,7 @@
 import 'package:fitnc_trainer/service/exercice.controller.dart';
-import 'package:fitness_domain/widget/firestore_param_dropdown.widget.dart';
 import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/domain/exercice.domain.dart';
+import 'package:fitness_domain/widget/firestore_param_dropdown.widget.dart';
 import 'package:fitness_domain/widget/generic_container.widget.dart';
 import 'package:fitness_domain/widget/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -150,7 +150,20 @@ class _ExerciceUpdateState extends State<ExerciceUpdate> {
             controller: controller,
           );
         } else {
-          return Container();
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Icon(
+                  Icons.mouse,
+                  color: Theme.of(context).primaryColor,
+                  size: 50,
+                ),
+              ),
+              const Text('Cliquez sur un exercice pour le mettre à jour.')
+            ],
+          );
         }
       },
     );
