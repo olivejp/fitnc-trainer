@@ -1,10 +1,11 @@
 import 'package:fitnc_trainer/controller/programme/programme.controller.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitness_domain/widget/firestore_param_dropdown.widget.dart';
+import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
 import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/domain/programme.domain.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/domain/workout_schedule.dto.dart';
+import 'package:fitness_domain/widget/firestore_param_dropdown.widget.dart';
 import 'package:fitness_domain/widget/generic_container.widget.dart';
 import 'package:fitness_domain/widget/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -261,7 +262,24 @@ class WorkoutSchedulePanel extends StatelessWidget {
           return AlertDialog(
             title: Text('Jour $dayIndex'),
             actions: <Widget>[
-              TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Sortir')),
+              TextButton(
+                  onPressed: () => showDialog(
+                        context: context,
+                        builder: (BuildContext context) => AlertDialog(
+                          contentPadding: const EdgeInsets.all(0),
+                          content: SizedBox(
+                            width: 1280,
+                            child: WorkoutUpdatePage(
+                              workout: Workout(),
+                            ),
+                          ),
+                        ),
+                      ),
+                  child: const Text('Créer un workout')),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Sortir'),
+              ),
             ],
             content: PopupDayDetail(dayIndex: dayIndex, list: list),
           );

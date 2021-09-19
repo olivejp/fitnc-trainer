@@ -1,14 +1,8 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitness_domain/domain/abstract.domain.dart';
-import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
 
 import 'abstract-crud.service.dart';
 import 'abstract.mixin.dart';
@@ -22,6 +16,19 @@ abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends Get
 
   /// Méthode abstraite pour savoir comment désérialiser un objet T à partir d'un JSON.
   T fromJson(Map<String, dynamic> map);
+
+  /// Méthode d'écoute d'un objet à partir de son UID.
+  @override
+  Stream<T> listen(String uid) {
+    try {
+      return getCollectionReference()
+          .doc(uid)
+          .snapshots()
+          .map((DocumentSnapshot<Object?> event) => fromJson(event.data() as Map<String, dynamic>));
+    } catch (e) {
+      throw Exception('Soucis lors de la récupération de la référence du document. ${e.toString()}');
+    }
+  }
 
   /// Méthode de lecture d'un objet à partir de son UID.
   @override

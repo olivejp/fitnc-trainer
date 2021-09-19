@@ -72,118 +72,123 @@ class ProfilPage extends StatelessWidget {
       key: _formKey,
       child: Padding(
         padding: const EdgeInsets.all(30.0),
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Column(
+        child: Align(
+          child: SizedBox(
+            width: 800,
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Obx(
-                        () => StorageImageWidget(
-                          imageUrl: controller.trainer.value?.imageUrl,
-                          storageFile: controller.trainer.value?.storageFile,
-                          onSaved: controller.setStoragePair,
-                          onDeleted: () => controller.setStoragePair(null),
-                        ),
+                      Column(
+                        children: <Widget>[
+                          Obx(
+                            () => StorageImageWidget(
+                              imageUrl: controller.trainer.value?.imageUrl,
+                              storageFile: controller.trainer.value?.storageFile,
+                              onSaved: controller.setStoragePair,
+                              onDeleted: () => controller.setStoragePair(null),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: <Widget>[
+                          TextButton(
+                            style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
+                            onPressed: () {
+                              if (_formKey.currentState?.validate() == true) {
+                                controller.save().then((_) {
+                                  showToast('Vos informations ont été mises à jour', backgroundColor: Colors.green);
+                                }).catchError(
+                                  (_) => showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent),
+                                );
+                              }
+                            },
+                            child: const Text('Enregistrer', style: TextStyle(color: Colors.white)),
+                          )
+                        ],
                       ),
                     ],
                   ),
-                  Row(
-                    children: <Widget>[
-                      TextButton(
-                        style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
-                        onPressed: () {
-                          if (_formKey.currentState?.validate() == true) {
-                            controller.save().then((_) {
-                              showToast('Vos informations ont été mises à jour', backgroundColor: Colors.green);
-                            }).catchError(
-                              (_) => showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent),
-                            );
-                          }
-                        },
-                        child: const Text('Enregistrer', style: TextStyle(color: Colors.white)),
-                      )
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Obx(
-                () => FitnessDecorationTextFormField(
-                    controller: TextEditingController(text: controller.trainer.value?.email),
-                    autofocus: true,
-                    onChanged: (String email) => controller.trainer.value?.email = email,
-                    labelText: 'Email',
-                    validator: (String? value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Merci de renseigner votre adresse mail.';
-                      }
-                      return null;
-                    }),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Obx(
-                () => FitnessDecorationTextFormField(
-                    controller: TextEditingController(text: controller.trainer.value?.name),
-                    autofocus: true,
-                    onChanged: (String name) => controller.trainer.value?.name = name,
-                    labelText: 'Nom',
-                    validator: (String? value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Merci de renseigner votre nom.';
-                      }
-                      return null;
-                    }),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Obx(
-                () => FitnessDecorationTextFormField(
-                    controller: TextEditingController(text: controller.trainer.value?.prenom),
-                    autofocus: true,
-                    onChanged: (String prenom) => controller.trainer.value?.prenom = prenom,
-                    labelText: 'Prénom',
-                    validator: (String? value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Merci de renseigner votre prénom.';
-                      }
-                      return null;
-                    }),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Obx(
-                () => TextFormField(
-                  maxLength: 6,
-                  keyboardType: TextInputType.phone,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  initialValue: (controller.trainer.value?.telephone) != null ? controller.trainer.value!.telephone.toString() : '',
-                  onChanged: (String value) => controller.trainer.value?.telephone = value,
-                  decoration: const InputDecoration(labelText: 'Téléphone'),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Obx(
+                    () => FitnessDecorationTextFormField(
+                        controller: TextEditingController(text: controller.trainer.value?.email),
+                        autofocus: true,
+                        onChanged: (String email) => controller.trainer.value?.email = email,
+                        labelText: 'Email',
+                        validator: (String? value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Merci de renseigner votre adresse mail.';
+                          }
+                          return null;
+                        }),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Obx(
+                    () => FitnessDecorationTextFormField(
+                        controller: TextEditingController(text: controller.trainer.value?.name),
+                        autofocus: true,
+                        onChanged: (String name) => controller.trainer.value?.name = name,
+                        labelText: 'Nom',
+                        validator: (String? value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Merci de renseigner votre nom.';
+                          }
+                          return null;
+                        }),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Obx(
+                    () => FitnessDecorationTextFormField(
+                        controller: TextEditingController(text: controller.trainer.value?.prenom),
+                        autofocus: true,
+                        onChanged: (String prenom) => controller.trainer.value?.prenom = prenom,
+                        labelText: 'Prénom',
+                        validator: (String? value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Merci de renseigner votre prénom.';
+                          }
+                          return null;
+                        }),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Obx(
+                    () => TextFormField(
+                      maxLength: 6,
+                      keyboardType: TextInputType.phone,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      initialValue: (controller.trainer.value?.telephone) != null ? controller.trainer.value!.telephone.toString() : '',
+                      onChanged: (String value) => controller.trainer.value?.telephone = value,
+                      decoration: const InputDecoration(labelText: 'Téléphone'),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: TextFormField(
+                    initialValue: controller.trainer.value?.biopic,
+                    maxLength: 2000,
+                    minLines: 5,
+                    maxLines: 20,
+                    onChanged: (String value) => controller.trainer.value?.biopic = value,
+                    decoration: const InputDecoration(labelText: 'Biopic', helperText: 'Optionnel'),
+                  ),
+                ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: TextFormField(
-                initialValue: controller.trainer.value?.biopic,
-                maxLength: 2000,
-                minLines: 5,
-                maxLines: 20,
-                onChanged: (String value) => controller.trainer.value?.biopic = value,
-                decoration: const InputDecoration(labelText: 'Biopic', helperText: 'Optionnel'),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

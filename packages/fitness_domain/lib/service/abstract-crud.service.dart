@@ -10,6 +10,8 @@ abstract class AbstractCrudService<T> {
 
   Future<List<T>> getAll();
 
+  Stream<T> listen(String uid);
+
   Future<void> save(T domain);
 
   Future<void> create(T domain);

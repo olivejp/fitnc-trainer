@@ -35,7 +35,7 @@ class FirebaseWidget extends StatelessWidget {
       builder: (_, AsyncSnapshot<FirebaseApp> snapshot) {
         if (snapshot.hasData) {
           initDomainServices();
-          return const AuthWidget();
+          return AuthWidget();
         }
         if (snapshot.hasError) {
           return const Scaffold(
