@@ -1,5 +1,5 @@
-import 'package:fitnc_trainer/service/param.service.dart';
-import 'package:fitnc_trainer/service/timer.service.dart';
+import 'package:fitness_domain/service/param.service.dart';
+import 'package:fitness_domain/service/timer.service.dart';
 import 'package:flutter/material.dart';
 
 class TimerDropdownButton extends StatelessWidget {

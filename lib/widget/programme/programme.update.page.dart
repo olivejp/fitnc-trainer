@@ -1,6 +1,6 @@
 import 'package:fitnc_trainer/controller/programme/programme.controller.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
+import 'package:fitness_domain/widget/firestore_param_dropdown.widget.dart';
 import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/domain/programme.domain.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';

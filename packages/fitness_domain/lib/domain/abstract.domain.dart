@@ -11,7 +11,6 @@ abstract class AbstractDomain implements InterfaceToJson {
 }
 
 abstract class AbstractFitnessStorageDomain extends AbstractDomain {
-
   AbstractFitnessStorageDomain();
 
   String? imageUrl;

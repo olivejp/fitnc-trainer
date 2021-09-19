@@ -23,7 +23,8 @@ PublishedProgramme _$PublishedProgrammeFromJson(Map<String, dynamic> json) {
     ..creatorPrenom = json['creatorPrenom'] as String?;
 }
 
-Map<String, dynamic> _$PublishedProgrammeToJson(PublishedProgramme instance) => <String, dynamic>{
+Map<String, dynamic> _$PublishedProgrammeToJson(PublishedProgramme instance) =>
+    <String, dynamic>{
       'uid': instance.uid,
       'name': instance.name,
       'createDate': instance.createDate,

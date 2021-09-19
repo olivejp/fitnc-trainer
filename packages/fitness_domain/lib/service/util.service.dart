@@ -24,17 +24,17 @@ class UtilService {
     List<T> listFiltered;
     if (text != null && text.isNotEmpty) {
       listFiltered = listCompleteDomain.where((T element) {
-        bool finded = false;
+        bool found = false;
         for (final String searchField in element.searchFields()) {
           final Object? field = element.toJson()[searchField];
           if (field != null && field is String) {
             if (field.toUpperCase().contains(text)) {
-              finded = true;
+              found = true;
               break;
             }
           }
         }
-        return finded;
+        return found;
       }).toList();
     } else {
       listFiltered = listCompleteDomain;
@@ -42,7 +42,9 @@ class UtilService {
     stream.sink.add(listFiltered);
   }
 
+  ///
   /// Permet de récupérer le StorageFile à partir de l'imageUrl du domain.
+  ///
   static Future<StorageFile?> getFutureStorageFile(AbstractFitnessStorageDomain domain) {
     final Completer<StorageFile?> completer = Completer<StorageFile?>();
     if (domain.imageUrl != null && domain.imageUrl!.isNotEmpty) {

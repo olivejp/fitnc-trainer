@@ -1,4 +1,4 @@
-import 'package:fitnc_trainer/widget/widgets/firestore_param_dropdown.widget.dart';
+import 'package:fitness_domain/widget/firestore_param_dropdown.widget.dart';
 import 'package:fitness_domain/domain/line.domain.dart';
 import 'package:fitness_domain/domain/workout_set.dto.dart';
 import 'package:flutter/material.dart';

@@ -7,7 +7,7 @@ import 'package:fitness_domain/domain/workout_set.domain.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class WorkoutController extends SearchControllerMixin<Workout, WorkoutService> {
+class WorkoutController extends LocalSearchControllerMixin<Workout, WorkoutService> {
   final GlobalKey<FormFieldState> consigneKey = GlobalKey<FormFieldState>();
   final GlobalKey<FormFieldState> dropdownKey = GlobalKey<FormFieldState>();
   final WorkoutService workoutService = Get.find();

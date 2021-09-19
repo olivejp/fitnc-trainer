@@ -23,4 +23,9 @@ class Programme extends AbstractFitnessStorageDomain implements InterfaceDomainS
   List<String> searchFields() {
     return ['name', 'description'];
   }
+
+  @override
+  Programme fromJson(Map<String, dynamic> map) {
+    return Programme.fromJson(map);
+  }
 }

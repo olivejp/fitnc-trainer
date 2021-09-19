@@ -16,7 +16,7 @@ import 'package:get/get_rx/get_rx.dart' as getx;
 import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ProgrammeController extends SearchControllerMixin<Programme, ProgrammeService> {
+class ProgrammeController extends LocalSearchControllerMixin<Programme, ProgrammeService> {
   final TrainersService trainersService = Get.find();
 
   final BehaviorSubject<List<WorkoutScheduleDto>> _streamWorkoutScheduleDto = BehaviorSubject<List<WorkoutScheduleDto>>();

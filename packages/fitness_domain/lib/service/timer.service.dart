@@ -1,4 +1,4 @@
-import 'package:fitnc_trainer/service/param.service.dart';
+import 'package:fitness_domain/service/param.service.dart';
 import 'package:fitness_domain/domain/param.domain.dart';
 import 'package:flutter/material.dart';
 

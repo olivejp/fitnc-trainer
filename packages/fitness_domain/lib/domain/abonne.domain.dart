@@ -6,6 +6,7 @@ part 'abonne.domain.g.dart';
 
 @JsonSerializable()
 class Abonne extends AbstractFitnessStorageDomain implements InterfaceDomainSearchable {
+
   Abonne();
 
   factory Abonne.fromJson(Map<String, dynamic> data) =>_$AbonneFromJson(data);

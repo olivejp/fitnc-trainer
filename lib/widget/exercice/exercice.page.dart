@@ -19,7 +19,7 @@ import 'package:rxdart/rxdart.dart';
 
 import 'exercice.form.builder.dart';
 
-class ExercicePageController extends SearchControllerMixin<Exercice, ExerciceService> {
+class ExercicePageController extends LocalSearchControllerMixin<Exercice, ExerciceService> {
   RxList<bool> toggleSelections = <bool>[true, false].obs;
 
   void toggleSelection(int index) {
