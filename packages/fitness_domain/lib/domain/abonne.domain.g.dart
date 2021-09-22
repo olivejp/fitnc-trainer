@@ -12,7 +12,9 @@ Abonne _$AbonneFromJson(Map<String, dynamic> json) {
     ..name = json['name'] as String
     ..createDate = json['createDate']
     ..updateDate = json['updateDate']
+    ..creatorUid = json['creatorUid'] as String?
     ..imageUrl = json['imageUrl'] as String?
+    ..imageName = json['imageName'] as String?
     ..nom = json['nom'] as String?
     ..prenom = json['prenom'] as String?
     ..sexe = json['sexe'] as String?
@@ -30,7 +32,9 @@ Map<String, dynamic> _$AbonneToJson(Abonne instance) => <String, dynamic>{
       'name': instance.name,
       'createDate': instance.createDate,
       'updateDate': instance.updateDate,
+      'creatorUid': instance.creatorUid,
       'imageUrl': instance.imageUrl,
+      'imageName': instance.imageName,
       'nom': instance.nom,
       'prenom': instance.prenom,
       'sexe': instance.sexe,

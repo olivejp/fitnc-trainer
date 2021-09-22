@@ -13,11 +13,14 @@ import 'package:fitness_domain/domain/workout_schedule.dto.dart';
 import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:oktoast/oktoast.dart';
 
 class ProgrammeService extends AbstractFitnessStorageService<Programme> {
   final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
   final TrainersService trainersService = Get.find();
   final PublishedProgrammeService publishedProgrammeService = Get.find();
+
+  static const String workoutScheduleCollectionName = 'workoutSchedule';
 
   @override
   Programme fromJson(Map<String, dynamic> map) {
@@ -48,9 +51,14 @@ class ProgrammeService extends AbstractFitnessStorageService<Programme> {
     }
   }
 
+  CollectionReference<Map<String, dynamic>> getWorkoutScheduleCollectionRef(String uidProgramme) {
+    return getCollectionReference().doc(uidProgramme).collection(workoutScheduleCollectionName);
+  }
+
   Future<List<Workout>> getAllWorkout(String uidProgramme) {
-    return getCollectionReference().doc(uidProgramme).collection('workouts').get().then((QuerySnapshot<Map<String, dynamic>> value) =>
-        value.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> e) => Workout.fromJson(e.data())).toList());
+    return getWorkoutScheduleCollectionRef(uidProgramme).get().then(
+        (QuerySnapshot<Map<String, dynamic>> value) =>
+            value.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> e) => Workout.fromJson(e.data())).toList());
   }
 
   Future<void> refreshAllPublished() async {
@@ -71,16 +79,19 @@ class ProgrammeService extends AbstractFitnessStorageService<Programme> {
   @override
   Future<void> delete(Programme programme) {
     if (programme.available == true) {
-      return unpublishProgramme(programme);
+      return unpublishProgramme(programme)
+          .catchError((Object? onError) => showToast('Impossible de dépublier le programme : ${onError.toString()}'))
+          .then((_) => super.delete(programme))
+          .catchError((Object? onError) => showToast('Impossible de supprimer le programme : ${onError.toString()}'));
     } else {
-      return super.delete(programme);
+      return super.delete(programme).catchError((Object? onError) => showToast('Impossible de supprimer le programme : ${onError.toString()}'));
     }
   }
 
   ///
   /// Mapping d'un WorkoutSchedule en Future<WorkoutScheduleDto>
   ///
-  Future<WorkoutScheduleDto> mapToFutureWorkoutScheduleDto(WorkoutSchedule workoutSchedule) async {
+  Future<WorkoutScheduleDto?> mapToFutureWorkoutScheduleDto(WorkoutSchedule workoutSchedule) async {
     DocumentSnapshot<Map<String, dynamic>> getWorkoutReference;
     try {
       getWorkoutReference = await trainersService.getWorkoutReference().doc(workoutSchedule.uidWorkout).get();
@@ -95,9 +106,10 @@ class ProgrammeService extends AbstractFitnessStorageService<Programme> {
       dto.nameWorkout = workout.name;
       dto.imageUrlWorkout = workout.imageUrl;
       return dto;
+    } else {
+      print('Impossible de mapper les données du workoutSchedule ${workoutSchedule.uidWorkout} pour en faire un DTO.');
+      return null;
     }
-    return Future<WorkoutScheduleDto>.error(
-        'Impossible de mapper les données du workoutSchedule ${workoutSchedule.uidWorkout} pour en faire un DTO.');
   }
 
   ///

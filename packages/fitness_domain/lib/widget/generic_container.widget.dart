@@ -43,7 +43,7 @@ class FitnessDecorationTextFormField extends StatelessWidget {
   }
 }
 
-class HorizontalGridView<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
+class HorizontalGridView<T extends AbstractStorageDomain> extends StatelessWidget {
   const HorizontalGridView({Key? key, required this.listDomains, required this.onChanged}) : super(key: key);
 
   final List<T> listDomains;
@@ -62,7 +62,7 @@ class HorizontalGridView<T extends AbstractFitnessStorageDomain> extends Statele
   }
 }
 
-class HorizontalGridCard<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
+class HorizontalGridCard<T extends AbstractStorageDomain> extends StatelessWidget {
   const HorizontalGridCard({Key? key, required this.domain, required this.onChanged}) : super(key: key);
 
   final T domain;

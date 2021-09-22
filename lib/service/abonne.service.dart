@@ -36,4 +36,5 @@ class AbonneService extends AbstractFitnessStorageService<Abonne> {
       abonne: domain,
     );
   }
+
 }

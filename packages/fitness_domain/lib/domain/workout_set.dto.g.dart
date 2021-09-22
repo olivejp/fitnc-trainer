@@ -10,6 +10,7 @@ WorkoutSetDto _$WorkoutSetDtoFromJson(Map<String, dynamic> json) {
   return WorkoutSetDto()
     ..uid = json['uid'] as String?
     ..uidExercice = json['uidExercice'] as String?
+    ..uidWorkout = json['uidWorkout'] as String?
     ..consigne = json['consigne'] as String?
     ..order = json['order'] as int
     ..typeExercice = json['typeExercice'] as String?
@@ -24,6 +25,7 @@ Map<String, dynamic> _$WorkoutSetDtoToJson(WorkoutSetDto instance) =>
     <String, dynamic>{
       'uid': instance.uid,
       'uidExercice': instance.uidExercice,
+      'uidWorkout': instance.uidWorkout,
       'consigne': instance.consigne,
       'order': instance.order,
       'typeExercice': instance.typeExercice,

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fitnc_trainer/service/programme.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitness_domain/domain/programme.domain.dart';
 import 'package:fitness_domain/domain/published_programme.domain.dart';
@@ -50,10 +51,10 @@ class PublishedProgrammeService extends AbstractFitnessStorageService<PublishedP
 
     // Lecture de tous les workouts.
     final QuerySnapshot<Map<String, dynamic>> mapWorkouts =
-        await trainersService.getProgrammeReference().doc(programme.uid).collection('workouts').get();
+        await trainersService.getProgrammeReference().doc(programme.uid).collection(ProgrammeService.workoutScheduleCollectionName).get();
 
     for (final QueryDocumentSnapshot<Map<String, dynamic>> docs in mapWorkouts.docs) {
-      final DocumentReference<Map<String, dynamic>> docRef = publishedProgrammeRef.collection('workouts').doc(docs.id);
+      final DocumentReference<Map<String, dynamic>> docRef = publishedProgrammeRef.collection(ProgrammeService.workoutScheduleCollectionName).doc(docs.id);
       batch.set(docRef, docs.data());
     }
 
@@ -70,7 +71,7 @@ class PublishedProgrammeService extends AbstractFitnessStorageService<PublishedP
     batch.delete(programmeRef);
 
     // Suppression de tous les Workouts.
-    final QuerySnapshot<Map<String, dynamic>> values = await programmeRef.collection('workouts').get();
+    final QuerySnapshot<Map<String, dynamic>> values = await programmeRef.collection(ProgrammeService.workoutScheduleCollectionName).get();
 
     for (final QueryDocumentSnapshot<Map<String, dynamic>> element in values.docs) {
       batch.delete(element.reference);

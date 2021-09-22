@@ -12,6 +12,7 @@ class WorkoutSetDto {
   WorkoutSetDto.fromSet(WorkoutSet workoutSet) {
     uid = workoutSet.uid;
     uidExercice = workoutSet.uidExercice;
+    uidWorkout = workoutSet.uidWorkout;
     consigne = workoutSet.consigne;
     order = workoutSet.order;
     lines = ((workoutSet.lines != null) ? workoutSet.lines : <Line>[Line()])!;
@@ -21,6 +22,7 @@ class WorkoutSetDto {
 
   String? uid;
   String? uidExercice;
+  String? uidWorkout;
   String? consigne;
   int order = 0;
 

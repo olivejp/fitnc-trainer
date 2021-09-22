@@ -1,9 +1,9 @@
 import 'package:fitnc_trainer/controller/workout/workout.controller.dart';
-import 'package:fitness_domain/constants.dart';
-import 'package:fitness_domain/widget/generic_container.widget.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.page.dart';
+import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
+import 'package:fitness_domain/widget/generic_container.widget.dart';
 import 'package:fitness_domain/widget/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +29,6 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-
     // Initialisation du controller.
     controller.init(widget.workout);
 
@@ -158,10 +157,31 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
               ),
             ),
           ),
-          Flexible(
-            flex: 2,
-            child: SizedBox(height: 800, child: WorkoutSetPage(workout: widget.workout)),
-          ),
+          Obx(() {
+            if (controller.isWorkoutSaved.value) {
+              return Flexible(
+                flex: 2,
+                child: SizedBox(height: 800, child: WorkoutSetPage(workout: widget.workout)),
+              );
+            } else {
+              return Flexible(
+                flex: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.sports_volleyball_outlined,
+                      color: Theme.of(context).primaryColor,
+                      size: 60,
+                    ),
+                    Center(
+                      child: Text('Remplissez les informations nécessaires pour la création d\'un workout.'),
+                    )
+                  ],
+                ),
+              );
+            }
+          }),
         ],
       ),
     );

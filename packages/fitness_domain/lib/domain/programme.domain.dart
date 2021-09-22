@@ -6,7 +6,7 @@ import 'abstract.domain.dart';
 part 'programme.domain.g.dart';
 
 @JsonSerializable()
-class Programme extends AbstractFitnessStorageDomain implements InterfaceDomainSearchable {
+class Programme extends AbstractStorageDomain implements InterfaceDomainSearchable {
   Programme();
 
   factory Programme.fromJson(Map<String, dynamic> data) => _$ProgrammeFromJson(data);

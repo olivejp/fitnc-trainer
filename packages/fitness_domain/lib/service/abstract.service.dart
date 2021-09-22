@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness_domain/domain/abstract.domain.dart';
 import 'package:get/get.dart';
 
@@ -150,6 +151,7 @@ abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends Get
   ///
   @override
   Future<void> create(T domain) async {
+    domain.creatorUid = FirebaseAuth.instance.currentUser?.uid;
     domain.createDate = FieldValue.serverTimestamp();
     domain.uid ??= getCollectionReference().doc().id;
     return _sendToFireStore(domain);
@@ -181,7 +183,7 @@ abstract class AbstractFitnessCrudService<T extends AbstractDomain> extends Abst
 /// Ce service surcharge les méthodes de save et delete pour aller sauvegarder le storageFile et mettre à jour l'imageUrl de l'entité.
 /// Il supprime également
 ///
-abstract class AbstractFitnessStorageService<T extends AbstractFitnessStorageDomain> extends AbstractFitnessCrudService<T>
+abstract class AbstractFitnessStorageService<T extends AbstractStorageDomain> extends AbstractFitnessCrudService<T>
     with MixinFitnessStorageService<T> {
   Future<void> callUpdateOrCreate(T domain) {
     final bool isUpdate = domain.uid != null;
@@ -198,7 +200,10 @@ abstract class AbstractFitnessStorageService<T extends AbstractFitnessStorageDom
   Future<void> save(T domain) {
     final bool shouldSendToStorage = domain.storageFile?.fileBytes != null && domain.storageFile?.fileName != null;
     if (shouldSendToStorage) {
-      return eraseAndReplaceStorage(domain).then((_) => callUpdateOrCreate(domain)).catchError((Object? error) {
+      return callUpdateOrCreate(domain)
+          .then((_) => eraseAndReplaceStorage(domain))
+          .then((_) => callUpdateOrCreate(domain))
+          .catchError((Object? error) {
         print('Erreur ${error?.toString()}');
         return callUpdateOrCreate(domain);
       });
@@ -209,6 +214,7 @@ abstract class AbstractFitnessStorageService<T extends AbstractFitnessStorageDom
 
   @override
   Future<void> delete(T domain) {
-    return deleteAllFiles(domain).then((_) => super.delete(domain));
+    return super.delete(domain);
+    // return deleteAllFiles(domain).then((_) => super.delete(domain));
   }
 }

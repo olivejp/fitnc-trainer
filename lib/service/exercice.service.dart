@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitness_domain/domain/exercice.domain.dart';
+import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:fitness_domain/service/firebase-storage.service.dart';
 import 'package:get/get.dart';
 
@@ -31,14 +31,6 @@ class ExerciceService extends AbstractFitnessStorageService<Exercice> {
 
   @override
   String getStorageRef(User user, Exercice exercice) {
-    return 'trainers/${user.uid}/exercices/${exercice.uid}/mainImage';
-  }
-
-  String getExerciceStoragePath(Exercice exercice) {
-    final User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return 'trainers/${user.uid}/exercices/${exercice.uid}/mainImage';
-    }
-    throw Exception('Aucun utilisateur connecté');
+    return 'trainers/${user.uid}/exercices/${exercice.uid}';
   }
 }

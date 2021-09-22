@@ -1,6 +1,10 @@
 import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+abstract class InterfaceToJson {
+  Map<String, dynamic> toJson();
+}
+
 abstract class AbstractDomain implements InterfaceToJson {
   AbstractDomain();
 
@@ -8,19 +12,17 @@ abstract class AbstractDomain implements InterfaceToJson {
   String name = '';
   dynamic createDate;
   dynamic updateDate;
+  String? creatorUid;
 }
 
-abstract class AbstractFitnessStorageDomain extends AbstractDomain {
-  AbstractFitnessStorageDomain();
+abstract class AbstractStorageDomain extends AbstractDomain {
+  AbstractStorageDomain();
 
   String? imageUrl;
+  String? imageName;
 
   @JsonKey(ignore: true)
   StorageFile? storageFile;
-}
-
-abstract class InterfaceToJson {
-  Map<String, dynamic> toJson();
 }
 
 abstract class InterfaceDomainSearchable extends InterfaceToJson {

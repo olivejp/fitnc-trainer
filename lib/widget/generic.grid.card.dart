@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 /// La function getCard vous permet de dessiner vous même la card que vous voulez.
 /// Ce paramètre est optionnel et s'il n'est pas précisé une card par défaut sera dessiner.
 ///
-class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
+class FitnessGridView<T extends AbstractStorageDomain> extends StatelessWidget {
   FitnessGridView(
       {Key? key,
       required this.domains,
@@ -85,7 +85,7 @@ class FitnessGridView<T extends AbstractFitnessStorageDomain> extends StatelessW
 ///
 /// Classe Widget pour une Grid Card.
 ///
-class _FitnessGridCard<T extends AbstractFitnessStorageDomain> extends StatelessWidget {
+class _FitnessGridCard<T extends AbstractStorageDomain> extends StatelessWidget {
   const _FitnessGridCard({Key? key, required this.domain, required this.onTap, required this.onDelete, required this.bloc}) : super(key: key);
 
   final T domain;

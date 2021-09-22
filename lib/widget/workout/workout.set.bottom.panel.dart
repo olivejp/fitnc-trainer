@@ -21,7 +21,7 @@ import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
 
 ///
-/// Panel bas qui présente la liste des
+/// Panel bas qui présente la liste des exercices affectés au Workout
 ///
 class WorkoutSetBottomPanel extends StatelessWidget {
   WorkoutSetBottomPanel({Key? key, required this.workout}) : super(key: key);
@@ -193,18 +193,19 @@ class WorkoutSetBottomPanelController extends GetxController {
   void addWorkoutSet(Exercice exerciceDragged) {
     final WorkoutSetDto dto = WorkoutSetDto.empty();
     dto.uid = workoutSetService.getWorkoutSetsReference(_workout!).doc().id;
+    dto.uidWorkout = _workout?.uid;
     dto.uidExercice = exerciceDragged.uid;
     dto.typeExercice = exerciceDragged.typeExercice;
     dto.nameExercice = exerciceDragged.name;
     dto.imageUrlExercice = exerciceDragged.imageUrl;
     dto.order = getMaxOrder(listDtos);
     dto.lines.add(Line());
-    listDtos.add(dto);
-    subjectListDtos.sink.add(listDtos);
 
-    getSetRef(dto)
-        .set(WorkoutSet.fromJson(dto.toJson()).toJson())
-        .catchError((_) => showToast("Une erreur est survenue lors de l'enregistrement du set.", duration: const Duration(seconds: 2)));
+    getSetRef(dto).set(WorkoutSet.fromJson(dto.toJson()).toJson()).then((_) {
+      listDtos.add(dto);
+      subjectListDtos.sink.add(listDtos);
+    }).catchError(
+        (error) => showToast("Une erreur est survenue lors de l'enregistrement du set : ${error.toString()}", duration: const Duration(seconds: 2)));
   }
 
   void deleteFromFireStore(WorkoutSetDto dto) {

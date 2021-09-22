@@ -5,7 +5,7 @@ import 'abstract.domain.dart';
 part 'abonne.domain.g.dart';
 
 @JsonSerializable()
-class Abonne extends AbstractFitnessStorageDomain implements InterfaceDomainSearchable {
+class Abonne extends AbstractStorageDomain implements InterfaceDomainSearchable {
 
   Abonne();
 

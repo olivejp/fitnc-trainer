@@ -10,8 +10,9 @@ import 'package:path/path.dart';
 
 ///
 /// Mixin Service pour implémenter les méthodes de base pour le Firebase storage.
+/// Tous les services qui doivent gérer des AbstractFitnessStorageDomain doivent implémenter cette mixin.
 ///
-abstract class MixinFitnessStorageService<T extends AbstractFitnessStorageDomain> {
+abstract class MixinFitnessStorageService<T extends AbstractStorageDomain> {
   /// Méthode abstraite
   /// Permet de spécifier l'emplacement où sera stocké le fichier dans Firebase Storage.
   /// Cette url sera complétée avec le nom du fichier, ex:
@@ -24,8 +25,10 @@ abstract class MixinFitnessStorageService<T extends AbstractFitnessStorageDomain
   ///
   Future<void> createStorage(T domain) async {
     if (domain.storageFile != null && domain.storageFile!.fileBytes != null && domain.storageFile!.fileName != null) {
+      domain.imageName = domain.storageFile!.fileName;
       domain.imageUrl = await _sendToStorage(domain);
     } else {
+      domain.imageName = null;
       domain.imageUrl = null;
     }
   }
@@ -38,7 +41,7 @@ abstract class MixinFitnessStorageService<T extends AbstractFitnessStorageDomain
     return createStorage(domain);
   }
 
-  User checkUserConnected() {
+  User getUserConnectedOrThrow() {
     final User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       throw Exception('Utilisateur non connecté');
@@ -51,7 +54,7 @@ abstract class MixinFitnessStorageService<T extends AbstractFitnessStorageDomain
   /// Supprime tous les fichiers présents dans le storage à l'adresse indiquée par le getStorageRef().
   ///
   Future<void> deleteAllFiles(T domain) async {
-    final User user = checkUserConnected();
+    final User user = getUserConnectedOrThrow();
     ListResult value = await FirebaseStorage.instance.ref(getStorageRef(user, domain)).listAll();
     final List<Future<void>> listFuture = value.items.map((Reference ref) => ref.delete()).toList();
     await Future.wait(listFuture);
@@ -61,7 +64,7 @@ abstract class MixinFitnessStorageService<T extends AbstractFitnessStorageDomain
   /// Envoi le StorageFile sur Firebase Storage et renvoie l'URL de l'image à partir du Storage Firebase.
   ///
   Future<String?> _sendToStorage(T domain) async {
-    final User user = checkUserConnected();
+    final User user = getUserConnectedOrThrow();
     if (domain.storageFile != null && domain.storageFile!.fileBytes != null && domain.storageFile!.fileName != null) {
       final String url = getStorageRef(user, domain);
       return _sendToStorageAndGetReference(url: '$url/${domain.storageFile!.fileName}', bytes: domain.storageFile!.fileBytes!);

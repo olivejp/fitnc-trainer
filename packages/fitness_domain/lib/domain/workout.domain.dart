@@ -5,7 +5,7 @@ import 'abstract.domain.dart';
 part 'workout.domain.g.dart';
 
 @JsonSerializable()
-class Workout extends AbstractFitnessStorageDomain implements InterfaceDomainSearchable {
+class Workout extends AbstractStorageDomain implements InterfaceDomainSearchable {
   Workout();
 
   factory Workout.fromJson(Map<String, dynamic> data) => _$WorkoutFromJson(data);

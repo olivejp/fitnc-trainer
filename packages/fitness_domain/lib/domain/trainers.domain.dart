@@ -5,7 +5,7 @@ import 'abstract.domain.dart';
 part 'trainers.domain.g.dart';
 
 @JsonSerializable()
-class Trainers extends AbstractFitnessStorageDomain {
+class Trainers extends AbstractStorageDomain {
   Trainers({this.email = '', this.prenom = '', this.telephone = ''}) : super();
 
   factory Trainers.fromJson(Map<String, dynamic> json) {

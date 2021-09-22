@@ -1,6 +1,6 @@
 import 'abstract.domain.dart';
 
-class WorkoutInstance extends AbstractFitnessStorageDomain {
+class WorkoutInstance extends AbstractStorageDomain {
   WorkoutInstance();
 
   factory WorkoutInstance.fromJson(Map<String, dynamic> json) {

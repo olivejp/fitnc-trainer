@@ -45,7 +45,7 @@ class UtilService {
   ///
   /// Permet de récupérer le StorageFile à partir de l'imageUrl du domain.
   ///
-  static Future<StorageFile?> getFutureStorageFile(AbstractFitnessStorageDomain domain) {
+  static Future<StorageFile?> getFutureStorageFile(AbstractStorageDomain domain) {
     final Completer<StorageFile?> completer = Completer<StorageFile?>();
     if (domain.imageUrl != null && domain.imageUrl!.isNotEmpty) {
       _getRemoteImageToUint8List(domain.imageUrl!).then((Uint8List bytes) {

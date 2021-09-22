@@ -36,7 +36,18 @@ class _WorkoutPageState extends State<WorkoutPage> {
         backgroundColor: Colors.transparent,
         floatingActionButton: FloatingActionButton.extended(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          onPressed: () => WorkoutCreatePage.showCreate(context),
+          onPressed: () => showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+              contentPadding: const EdgeInsets.all(0),
+              content: SizedBox(
+                width: 1280,
+                child: WorkoutUpdatePage(
+                  workout: Workout(),
+                ),
+              ),
+            ),
+          ),
           label: Text(
             'Créer un workout',
             style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),

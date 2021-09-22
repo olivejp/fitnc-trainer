@@ -74,22 +74,23 @@ class ProgrammeController extends LocalSearchControllerMixin<Programme, Programm
       }
 
       // On récupère une fois la liste des WorkoutScheduleDto
-      trainersService
-          .getProgrammeReference()
-          .doc(programmeEntered.uid)
-          .collection('workouts')
+      service.getWorkoutScheduleCollectionRef(programmeEntered.uid!)
           .orderBy('dateSchedule')
           .get()
-          .then((QuerySnapshot<Map<String, dynamic>> event) =>
-          event.docs
+          .then((QuerySnapshot<Map<String, dynamic>> event) => event.docs
               .map((QueryDocumentSnapshot<Map<String, dynamic>> queryDoc) => WorkoutSchedule.fromJson(queryDoc.data()))
               .map((WorkoutSchedule workoutSchedule) => service.mapToFutureWorkoutScheduleDto(workoutSchedule))
               .toList())
-          .then((List<Future<WorkoutScheduleDto>> event) => Future.wait(event))
+          .then((List<Future<WorkoutScheduleDto?>> event) => Future.wait(event))
           .catchError((Object? error) => throw Exception('Erreur lors de la récupération du programme ${programmeEntered.uid} : ${error.toString()}'))
-          .then((List<WorkoutScheduleDto> remoteList) {
+          .then((List<WorkoutScheduleDto?> remoteList) {
+        final List<WorkoutScheduleDto> list = [];
+        remoteList.removeWhere((WorkoutScheduleDto? workoutScheduleDto) => workoutScheduleDto == null);
+        for (final WorkoutScheduleDto? element in remoteList) {
+          list.add(element!);
+        }
         listDtos.clear();
-        listDtos.addAll(remoteList);
+        listDtos.addAll(list);
         _streamWorkoutScheduleDto.sink.add(listDtos);
       });
     } else {
@@ -124,12 +125,7 @@ class ProgrammeController extends LocalSearchControllerMixin<Programme, Programm
 
   void addWorkoutSchedule(Workout workout, int dayIndex) {
     final WorkoutScheduleDto dto = WorkoutScheduleDto.empty();
-    dto.uid = trainersService
-        .getProgrammeReference()
-        .doc(programme.value.uid)
-        .collection('workouts')
-        .doc()
-        .id;
+    dto.uid = trainersService.getProgrammeReference().doc(programme.value.uid).collection(ProgrammeService.workoutScheduleCollectionName).doc().id;
     dto.uidWorkout = workout.uid;
     dto.nameWorkout = workout.name;
     dto.imageUrlWorkout = workout.imageUrl;
@@ -137,10 +133,7 @@ class ProgrammeController extends LocalSearchControllerMixin<Programme, Programm
     listDtos.add(dto);
     _streamWorkoutScheduleDto.sink.add(listDtos);
 
-    trainersService
-        .getProgrammeReference()
-        .doc(programme.value.uid)
-        .collection('workouts')
+    service.getWorkoutScheduleCollectionRef(programme.value.uid!)
         .doc(dto.uid)
         .set(dto.toJson())
         .then((_) => showToast('Workout ajouté au programme.', duration: const Duration(seconds: 2)))
@@ -148,15 +141,12 @@ class ProgrammeController extends LocalSearchControllerMixin<Programme, Programm
             (_) => showToast("Une erreur est survenue lors de l'enregistrement du workout au programme.", duration: const Duration(seconds: 2)));
   }
 
-  void deleteWorkoutSchedule(WorkoutScheduleDto workout) {
-    listDtos.remove(workout);
+  void deleteWorkoutSchedule(WorkoutScheduleDto workoutSchedule) {
+    listDtos.remove(workoutSchedule);
     _streamWorkoutScheduleDto.sink.add(listDtos);
 
-    trainersService
-        .getProgrammeReference()
-        .doc(programme.value.uid)
-        .collection('workouts')
-        .doc(workout.uid)
+    service.getWorkoutScheduleCollectionRef(programme.value.uid!)
+        .doc(workoutSchedule.uid)
         .delete()
         .then((_) => showToast('Workout correctement supprimé.'));
   }

@@ -14,6 +14,7 @@ class WorkoutSet {
 
   String? uid;
   String? uidExercice;
+  String? uidWorkout;
   String? consigne;
   int order;
   List<Line>? lines;

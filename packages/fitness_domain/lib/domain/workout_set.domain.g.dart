@@ -13,6 +13,7 @@ WorkoutSet _$WorkoutSetFromJson(Map<String, dynamic> json) {
     order: json['order'] as int,
   )
     ..uid = json['uid'] as String?
+    ..uidWorkout = json['uidWorkout'] as String?
     ..lines = (json['lines'] as List<dynamic>?)
         ?.map((e) => Line.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -22,6 +23,7 @@ Map<String, dynamic> _$WorkoutSetToJson(WorkoutSet instance) =>
     <String, dynamic>{
       'uid': instance.uid,
       'uidExercice': instance.uidExercice,
+      'uidWorkout': instance.uidWorkout,
       'consigne': instance.consigne,
       'order': instance.order,
       'lines': instance.lines?.map((e) => e.toJson()).toList(),

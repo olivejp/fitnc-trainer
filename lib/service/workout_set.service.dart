@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fitnc_trainer/service/exercice.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitness_domain/domain/exercice.domain.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
@@ -9,7 +10,8 @@ import 'package:get/get.dart';
 class WorkoutSetService extends GetxService {
   WorkoutSetService();
 
-  final TrainersService trainersService= Get.find();
+  final TrainersService trainersService = Get.find();
+  final ExerciceService exerciceService = Get.find();
 
   CollectionReference getWorkoutReference() {
     return trainersService.getCurrentTrainerRef().collection('workout');
@@ -20,39 +22,34 @@ class WorkoutSetService extends GetxService {
   }
 
   Stream<List<WorkoutSet?>> listenToWorkoutStep(Workout workout) {
-    return getWorkoutSetsReference(workout).orderBy('order').snapshots().map(
-        (QuerySnapshot event) => event.docs
-            .map((doc) =>
-                WorkoutSet.fromJson(doc.data() as Map<String, dynamic>))
-            .toList());
+    return getWorkoutSetsReference(workout)
+        .orderBy('order')
+        .snapshots()
+        .map((QuerySnapshot event) => event.docs.map((doc) => WorkoutSet.fromJson(doc.data() as Map<String, dynamic>)).toList());
   }
 
   Stream<List<WorkoutSetDto?>> listenToWorkoutStepDto(Workout workout) {
     return getWorkoutSetsReference(workout)
         .orderBy('order')
         .snapshots()
-        .map((event) => event.docs
-            .map((doc) =>
-                WorkoutSet.fromJson(doc.data() as Map<String, dynamic>))
-            .map((workoutSet) => mapToDto(workoutSet))
-            .toList())
+        .map((event) =>
+            event.docs.map((doc) => WorkoutSet.fromJson(doc.data() as Map<String, dynamic>)).map((workoutSet) => mapToDto(workoutSet)).toList())
         .asyncMap((futures) => Future.wait(futures));
   }
 
   Future<WorkoutSetDto> mapToDto(WorkoutSet workoutSet) async {
-    WorkoutSetDto dto = WorkoutSetDto.fromSet(workoutSet);
+    final WorkoutSetDto dto = WorkoutSetDto.fromSet(workoutSet);
 
     // Recherche des infos de l'exercice
     if (workoutSet.uidExercice != null) {
-      final DocumentSnapshot documentSnapshot = await trainersService
-          .getExerciceReference()
-          .doc(workoutSet.uidExercice)
-          .get();
-      final Exercice exercice =
-          Exercice.fromJson(documentSnapshot.data() as Map<String, dynamic>);
-      dto.imageUrlExercice = exercice.imageUrl;
-      dto.nameExercice = exercice.name;
-      dto.typeExercice = exercice.typeExercice;
+      final Exercice? exercice = await exerciceService.read(workoutSet.uidExercice!);
+      if (exercice != null) {
+        dto.imageUrlExercice = exercice.imageUrl;
+        dto.nameExercice = exercice.name;
+        dto.typeExercice = exercice.typeExercice;
+      } else {
+        throw Exception("L'exercice avec l'uid ${workoutSet.uidExercice} n'a pas été trouvé.");
+      }
     }
     return dto;
   }

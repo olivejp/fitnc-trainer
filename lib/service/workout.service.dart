@@ -8,13 +8,13 @@ import 'package:fitness_domain/domain/programme.domain.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:get/get.dart';
+import 'package:oktoast/oktoast.dart';
 
 class WorkoutService extends AbstractFitnessStorageService<Workout> {
   WorkoutService();
 
   final TrainersService trainersService = Get.find();
   final ProgrammeService programmeService = Get.find();
-  final String pathWorkoutMainImage = 'mainImage';
 
   @override
   Workout fromJson(Map<String, dynamic> map) {
@@ -28,7 +28,7 @@ class WorkoutService extends AbstractFitnessStorageService<Workout> {
 
   @override
   String getStorageRef(User user, Workout workout) {
-    return 'trainers/${user.uid}/workouts/${workout.uid}/$pathWorkoutMainImage';
+    return 'trainers/${user.uid}/workouts/${workout.uid}';
   }
 
   @override
@@ -38,11 +38,7 @@ class WorkoutService extends AbstractFitnessStorageService<Workout> {
 
   @override
   Future<void> delete(Workout domain) async {
-    // Vérification s'il y a des programmes qui utilisent ce Workout.
-    // final List<Workout> listWorkout = await programmeService.getAllWorkout(uidProgramme);
-    // listProgramme.forEach((element) {
-    //
-    // })
-    return super.delete(domain);
+    FirebaseFirestore.instance.collectionGroup(ProgrammeService.workoutScheduleCollectionName).get().then((_) => print('test')).catchError((error) => print(error.toString()));
+    return super.delete(domain).catchError((Object? onError) => showToast('Impossible de supprimer le workout : ${onError.toString()}'));
   }
 }

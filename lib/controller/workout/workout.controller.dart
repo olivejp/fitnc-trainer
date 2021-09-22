@@ -13,6 +13,7 @@ class WorkoutController extends LocalSearchControllerMixin<Workout, WorkoutServi
   final WorkoutService workoutService = Get.find();
 
   final Rx<Workout> workout = Workout().obs;
+  final RxBool isWorkoutSaved = false.obs;
   WorkoutSet set = WorkoutSet();
   Exercice? exerciceSelected;
 
@@ -20,6 +21,7 @@ class WorkoutController extends LocalSearchControllerMixin<Workout, WorkoutServi
     if (workout != null) {
       this.workout.value = workout;
       this.workout.value.storageFile = StorageFile();
+      isWorkoutSaved.value = this.workout.value.uid != null;
     } else {
       this.workout.value = Workout();
     }
@@ -39,7 +41,7 @@ class WorkoutController extends LocalSearchControllerMixin<Workout, WorkoutServi
   }
 
   Future<void> saveWorkout() {
-    return workoutService.save(workout.value);
+    return workoutService.save(workout.value).then((_) => init(workout.value));
   }
 
   set name(String value) {

@@ -13,6 +13,7 @@ PublishedProgramme _$PublishedProgrammeFromJson(Map<String, dynamic> json) {
     ..createDate = json['createDate']
     ..updateDate = json['updateDate']
     ..imageUrl = json['imageUrl'] as String?
+    ..imageName = json['imageName'] as String?
     ..numberWeeks = json['numberWeeks'] as String?
     ..available = json['available'] as bool?
     ..description = json['description'] as String?
@@ -30,6 +31,7 @@ Map<String, dynamic> _$PublishedProgrammeToJson(PublishedProgramme instance) =>
       'createDate': instance.createDate,
       'updateDate': instance.updateDate,
       'imageUrl': instance.imageUrl,
+      'imageName': instance.imageName,
       'numberWeeks': instance.numberWeeks,
       'available': instance.available,
       'description': instance.description,
