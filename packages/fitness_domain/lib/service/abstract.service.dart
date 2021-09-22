@@ -17,14 +17,90 @@ abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends Get
   /// Méthode abstraite pour savoir comment désérialiser un objet T à partir d'un JSON.
   T fromJson(Map<String, dynamic> map);
 
+  Future<List<T>> where(
+    Object field, {
+    Object? isEqualTo,
+    Object? isNotEqualTo,
+    Object? isLessThan,
+    Object? isLessThanOrEqualTo,
+    Object? isGreaterThan,
+    Object? isGreaterThanOrEqualTo,
+    Object? arrayContains,
+    List<Object?>? arrayContainsAny,
+    List<Object?>? whereIn,
+    List<Object?>? whereNotIn,
+    bool? isNull,
+  }) {
+    return getFromQuery(getCollectionReference().where(field,
+        isEqualTo: isEqualTo,
+        isNotEqualTo: isNotEqualTo,
+        isLessThan: isLessThan,
+        isLessThanOrEqualTo: isLessThanOrEqualTo,
+        isGreaterThan: isGreaterThan,
+        isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
+        arrayContains: arrayContains,
+        arrayContainsAny: arrayContainsAny,
+        whereIn: whereIn,
+        whereNotIn: whereNotIn,
+        isNull: isNull));
+  }
+
+  Stream<List<T>> whereListen(
+    Object field, {
+    Object? isEqualTo,
+    Object? isNotEqualTo,
+    Object? isLessThan,
+    Object? isLessThanOrEqualTo,
+    Object? isGreaterThan,
+    Object? isGreaterThanOrEqualTo,
+    Object? arrayContains,
+    List<Object?>? arrayContainsAny,
+    List<Object?>? whereIn,
+    List<Object?>? whereNotIn,
+    bool? isNull,
+  }) {
+    return listenFromQuery(getCollectionReference().where(field,
+        isEqualTo: isEqualTo,
+        isNotEqualTo: isNotEqualTo,
+        isLessThan: isLessThan,
+        isLessThanOrEqualTo: isLessThanOrEqualTo,
+        isGreaterThan: isGreaterThan,
+        isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
+        arrayContains: arrayContains,
+        arrayContainsAny: arrayContainsAny,
+        whereIn: whereIn,
+        whereNotIn: whereNotIn,
+        isNull: isNull));
+  }
+
+  // Retourne une Stream de liste de domain sur lesquels on applique une Query.
+  Stream<List<T>> listenFromQuery(Query query) {
+    return query
+        .withConverter<T>(
+          fromFirestore: (DocumentSnapshot<Map<String, dynamic>> snapshot, _) => fromJson(snapshot.data()!),
+          toFirestore: (T domain, _) => domain.toJson(),
+        )
+        .snapshots()
+        .map((QuerySnapshot<T> snapshot) => snapshot.docs.map((QueryDocumentSnapshot<T> e) => e.data()).toList());
+  }
+
+  // Retourne une future avec une liste de domain sur lesquels on applique une Query.
+  Future<List<T>> getFromQuery(Query query) async {
+    Future<QuerySnapshot<T>> ftQuerySnaphot = query
+        .withConverter<T>(
+          fromFirestore: (DocumentSnapshot<Map<String, dynamic>> snapshot, _) => fromJson(snapshot.data()!),
+          toFirestore: (T domain, _) => domain.toJson(),
+        )
+        .get();
+
+    return (await ftQuerySnaphot).docs.map((QueryDocumentSnapshot<T> querySnapshot) => querySnapshot.data()).toList();
+  }
+
   /// Méthode d'écoute d'un objet à partir de son UID.
   @override
   Stream<T> listen(String uid) {
     try {
-      return getCollectionReference()
-          .doc(uid)
-          .snapshots()
-          .map((DocumentSnapshot<Object?> event) => fromJson(event.data() as Map<String, dynamic>));
+      return getCollectionReference().doc(uid).snapshots().map((DocumentSnapshot<Object?> event) => fromJson(event.data() as Map<String, dynamic>));
     } catch (e) {
       throw Exception('Soucis lors de la récupération de la référence du document. ${e.toString()}');
     }
@@ -114,9 +190,8 @@ abstract class AbstractFitnessStorageService<T extends AbstractFitnessStorageDom
 
   @override
   Future<List<T>> getAll() {
-    return getCollectionReference()
-        .get()
-        .then((QuerySnapshot<Object?> value) => value.docs.map((QueryDocumentSnapshot<Object?> e) => fromJson(e as Map<String, dynamic>)).toList());
+    return getCollectionReference().get().then(
+        (QuerySnapshot<Object?> value) => value.docs.map((QueryDocumentSnapshot<Object?> e) => fromJson(e.data() as Map<String, dynamic>)).toList());
   }
 
   @override

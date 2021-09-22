@@ -54,11 +54,7 @@ class ProgrammeService extends AbstractFitnessStorageService<Programme> {
   }
 
   Future<void> refreshAllPublished() async {
-    final List<Programme> listProgramme = (await getCollectionReference().where('available', isEqualTo: true).get())
-        .docs
-        .map((QueryDocumentSnapshot<Object?> e) => fromJson(e.data() as Map<String, dynamic>))
-        .toList();
-
+    final List<Programme> listProgramme = await where('available', isEqualTo: true);
     for (final Programme programme in listProgramme) {
       await refreshPublished(programme);
     }
