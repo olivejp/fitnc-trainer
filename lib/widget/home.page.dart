@@ -128,13 +128,20 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
           elevation: 5,
           extended: controller.isExpanded.value,
           selectedIndex: controller.currentPage.value,
-          trailing: _NavigationRailFolderSection(folders: <_NavigationFolder>[
-            _NavigationFolder(
-              label: 'Déconnexion',
-              iconData: Icons.exit_to_app_outlined,
-              onTap: () => authService.signOut(),
-            ),
-          ]),
+          trailing: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Flexible(
+                child: _NavigationRailFolderSection(folders: <_NavigationFolder>[
+                  _NavigationFolder(
+                    label: 'Déconnexion',
+                    iconData: Icons.exit_to_app_outlined,
+                    onTap: () => authService.signOut(),
+                  ),
+                ]),
+              ),
+            ],
+          ),
           leading: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[

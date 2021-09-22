@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:get/get.dart';
 import 'package:loading_animations/loading_animations.dart';
-import 'package:provider/provider.dart';
 
 /// Panel supérieur proposant une liste d'exercice avec option de recherche.
 /// Les cards exerices sont "draggable".
@@ -18,13 +18,13 @@ class WorkoutSetTopPanel extends StatelessWidget {
     this.maxWidthSearchField = 150,
   }) : super(key: key);
 
+  final WorkoutSetPageController controller = Get.find();
   final MainAxisAlignment alignmentSearchField;
   final double maxWidthSearchField;
   final TextEditingController _searchTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    final WorkoutSetPageVm vm = Provider.of<WorkoutSetPageVm>(context, listen: false);
     return Column(
       children: <Widget>[
         Row(
@@ -45,13 +45,13 @@ class WorkoutSetTopPanel extends StatelessWidget {
                       iconSize: 15,
                       onPressed: () {
                         _searchTextController.clear();
-                        vm.subjectQuery.sink.add(null);
+                        controller.subjectQuery.sink.add(null);
                       },
                       icon: const Icon(Icons.clear)),
                   hintStyle: const TextStyle(fontSize: 14),
                   hintText: 'Recherche...',
                 ),
-                onChanged: (String value) => vm.subjectQuery.sink.add(value),
+                onChanged: (String value) => controller.subjectQuery.sink.add(value),
                 textAlignVertical: TextAlignVertical.bottom,
               ),
             ),
@@ -59,7 +59,7 @@ class WorkoutSetTopPanel extends StatelessWidget {
         ),
         Expanded(
           child: StreamBuilder<List<Exercice?>>(
-            stream: vm.streamListExercice,
+            stream: controller.streamListExercice,
             builder: (BuildContext context, AsyncSnapshot<List<Exercice?>> snapshot) {
               if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
                 return const Center(child: Text('Aucun exercice trouvé.'));
