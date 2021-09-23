@@ -111,10 +111,7 @@ class ExercicePage extends StatelessWidget {
                           child: Container(
                             decoration:
                                 const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
-                            child: Padding(
-                              padding: const EdgeInsets.all(60.0),
-                              child: Obx(() => ExerciceUpdate(exercice: controller.exerciceSelected.value)),
-                            ),
+                            child: Obx(() => ExerciceUpdate(exercice: controller.exerciceSelected.value)),
                           ),
                         ),
                       );

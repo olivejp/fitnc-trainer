@@ -184,12 +184,15 @@ class FormExercice extends StatefulWidget {
 class _FormExerciceState extends State<FormExercice> {
   VideoPlayerController? _videoController;
   YoutubePlayerController? youtubeController;
+  ScrollController scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: widget.formKey,
-      child: SingleChildScrollView(
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(20),
+      controller: scrollController,
+      child: Form(
+        key: widget.formKey,
         child: Column(
           children: <Widget>[
             Padding(

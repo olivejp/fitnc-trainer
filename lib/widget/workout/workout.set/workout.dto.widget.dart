@@ -71,7 +71,7 @@ class _ListTileDtoState extends State<ListTileDto> {
                       child: ListTile(
                           leading:
                               CircleAvatar(foregroundImage: widget.dto.imageUrlExercice != null ? NetworkImage(widget.dto.imageUrlExercice!) : null),
-                          title: Text(widget.dto.nameExercice!)),
+                          title: Text(widget.dto.nameExercice)),
                     ),
                   ),
                   child: const Icon(Icons.view_headline),
@@ -91,7 +91,7 @@ class _ListTileDtoState extends State<ListTileDto> {
                             ),
                             Flexible(
                               child: Text(
-                                widget.dto.nameExercice!,
+                                widget.dto.nameExercice,
                                 style: const TextStyle(fontSize: 14),
                                 overflow: TextOverflow.ellipsis,
                               ),
