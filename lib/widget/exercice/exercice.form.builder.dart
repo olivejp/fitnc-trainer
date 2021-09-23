@@ -240,7 +240,7 @@ class _FormExerciceState extends State<FormExercice> {
                         contentPadding: EdgeInsets.symmetric(horizontal: 10)),
                     paramName: 'type_exercice',
                     initialValue: widget.controller.exercice.value.typeExercice,
-                    onChanged: (String? onChangedValue) => widget.controller.exercice.value.typeExercice = onChangedValue,
+                    onChanged: (String? onChangedValue) => widget.controller.changeExerciceType(onChangedValue),
                   ),
                 ))
               ],

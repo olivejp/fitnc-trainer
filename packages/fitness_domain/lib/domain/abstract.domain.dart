@@ -1,11 +1,15 @@
 import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-abstract class InterfaceToJson {
+abstract class InterfaceDomainToJson {
   Map<String, dynamic> toJson();
 }
 
-abstract class AbstractDomain implements InterfaceToJson {
+abstract class AbstractSubDomain extends AbstractDomain {
+  String getParentUid();
+}
+
+abstract class AbstractDomain implements InterfaceDomainToJson {
   AbstractDomain();
 
   String? uid;
@@ -25,6 +29,9 @@ abstract class AbstractStorageDomain extends AbstractDomain {
   StorageFile? storageFile;
 }
 
-abstract class InterfaceDomainSearchable extends InterfaceToJson {
+
+
+
+abstract class InterfaceDomainSearchable extends InterfaceDomainToJson {
   List<String> searchFields();
 }

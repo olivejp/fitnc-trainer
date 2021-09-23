@@ -8,7 +8,6 @@ import 'package:fitness_domain/domain/exercice.domain.dart';
 import 'package:fitness_domain/domain/line.domain.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/domain/workout_set.domain.dart';
-import 'package:fitness_domain/domain/workout_set.dto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -23,23 +22,23 @@ import 'package:rxdart/rxdart.dart';
 ///
 /// Panel bas qui présente la liste des exercices affectés au Workout
 ///
-class WorkoutSetBottomPanel extends StatelessWidget {
-  WorkoutSetBottomPanel({Key? key, required this.workout}) : super(key: key);
+class WorkoutSetExercicePanel extends StatelessWidget {
+  WorkoutSetExercicePanel({Key? key, required this.workout}) : super(key: key);
 
   static final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
   final Workout workout;
-  final WorkoutSetBottomPanelController controller = Get.put(WorkoutSetBottomPanelController());
+  final WorkoutSetExercicePanelController controller = Get.put(WorkoutSetExercicePanelController());
 
   @override
   Widget build(BuildContext context) {
     controller.init(workout);
     return Container(
       decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10))),
-      child: StreamBuilder<List<WorkoutSetDto>>(
+      child: StreamBuilder<List<WorkoutSet>>(
         stream: controller.obsListWorkoutSet,
-        builder: (BuildContext context, AsyncSnapshot<List<WorkoutSetDto>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<WorkoutSet>> snapshot) {
           if (snapshot.hasData) {
-            final List<WorkoutSetDto?> listWorkoutSetDto = snapshot.data!;
+            final List<WorkoutSet?> listWorkoutSet = snapshot.data!;
             final Widget mainColumn = Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -59,8 +58,8 @@ class WorkoutSetBottomPanel extends StatelessWidget {
                     child: ListView.separated(
                   shrinkWrap: true,
                   separatorBuilder: (BuildContext context, int index) => const Divider(height: 2),
-                  itemCount: listWorkoutSetDto.length,
-                  itemBuilder: (BuildContext context, int index) => _DragTargetDto(dto: listWorkoutSetDto.elementAt(index)!),
+                  itemCount: listWorkoutSet.length,
+                  itemBuilder: (BuildContext context, int index) => _DragTargetDto(dto: listWorkoutSet.elementAt(index)!),
                 )),
               ],
             );
@@ -92,8 +91,8 @@ class WorkoutSetBottomPanel extends StatelessWidget {
 class _DragTargetDto extends StatelessWidget {
   _DragTargetDto({required this.dto});
 
-  final WorkoutSetDto dto;
-  final WorkoutSetBottomPanelController controller = Get.find();
+  final WorkoutSet dto;
+  final WorkoutSetExercicePanelController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -117,10 +116,10 @@ class _DragTargetDto extends StatelessWidget {
         ),
       ),
     );
-    return DragTarget<WorkoutSetDto>(
-      onWillAccept: (WorkoutSetDto? data) => data is WorkoutSetDto && data.uid != dto.uid,
-      onAccept: (WorkoutSetDto data) => controller.switchOrder(data, dto.order),
-      builder: (BuildContext context, List<WorkoutSetDto?> candidateData, List<dynamic> rejectedData) {
+    return DragTarget<WorkoutSet>(
+      onWillAccept: (WorkoutSet? data) => data is WorkoutSet && data.uid != dto.uid,
+      onAccept: (WorkoutSet data) => controller.switchOrder(data, dto.order),
+      builder: (BuildContext context, List<WorkoutSet?> candidateData, List<dynamic> rejectedData) {
         final Widget tile = ListTileDto(dto: dto);
         if (candidateData.isNotEmpty) {
           return Column(children: <Widget>[upWidget, tile]);
@@ -135,43 +134,31 @@ class _DragTargetDto extends StatelessWidget {
 ///
 /// ViewModel pour la partie basse de l'écran de mise à jour d'un workout
 ///
-class WorkoutSetBottomPanelController extends GetxController {
+class WorkoutSetExercicePanelController extends GetxController {
   final WorkoutSetService workoutSetService = Get.find();
   final int debounceTime = 200;
-  final List<WorkoutSetDto> listDtos = <WorkoutSetDto>[];
-  final BehaviorSubject<List<WorkoutSetDto>> subjectListDtos = BehaviorSubject<List<WorkoutSetDto>>();
+  final List<WorkoutSet> listDtos = <WorkoutSet>[];
+  final BehaviorSubject<List<WorkoutSet>> subjectListDtos = BehaviorSubject<List<WorkoutSet>>();
 
-  late Workout? _workout;
+  late Workout _workout;
 
-  Stream<List<WorkoutSetDto>> get obsListWorkoutSet => subjectListDtos.stream;
+  Stream<List<WorkoutSet>> get obsListWorkoutSet => subjectListDtos.stream;
   Timer? _debounce;
 
   void init(Workout workout) {
     listDtos.clear();
     subjectListDtos.sink.add(listDtos);
     _workout = workout;
-    getWorkoutSetDto(_workout!).then((List<WorkoutSetDto> remoteList) {
+    workoutSetService.getAllWorkoutSet(_workout).then((List<WorkoutSet> remoteList) {
       listDtos.addAll(remoteList);
       subjectListDtos.sink.add(listDtos);
     });
   }
 
-  Future<List<WorkoutSetDto>> getWorkoutSetDto(Workout workout) {
-    return workoutSetService
-        .getWorkoutSetsReference(workout)
-        .orderBy('order')
-        .get()
-        .then((QuerySnapshot<Object?> querySnapshot) => querySnapshot.docs
-            .map((QueryDocumentSnapshot<Object?> docSnapshot) => WorkoutSet.fromJson(docSnapshot.data() as Map<String, dynamic>))
-            .map((WorkoutSet workoutSet) => workoutSetService.mapToDto(workoutSet))
-            .toList())
-        .then((List<Future<WorkoutSetDto>> remoteListFuture) => Future.wait(remoteListFuture));
-  }
-
-  int getMaxOrder(List<WorkoutSetDto>? listWorkoutSetDto) {
+  int getMaxOrder(List<WorkoutSet>? listWorkoutSet) {
     int maxOrder = 0;
-    if (listWorkoutSetDto != null) {
-      for (final WorkoutSetDto dto in listWorkoutSetDto) {
+    if (listWorkoutSet != null) {
+      for (final WorkoutSet dto in listWorkoutSet) {
         if (dto.order > maxOrder) {
           maxOrder = dto.order;
         }
@@ -180,41 +167,38 @@ class WorkoutSetBottomPanelController extends GetxController {
     return maxOrder + 1;
   }
 
-  void deleteWorkoutSet(WorkoutSetDto dto) {
+  void deleteWorkoutSet(WorkoutSet dto) {
     listDtos.remove(dto);
     deleteFromFireStore(dto);
     subjectListDtos.sink.add(listDtos);
   }
 
-  DocumentReference<Object?> getSetRef(WorkoutSetDto dto) {
-    return workoutSetService.getWorkoutSetsReference(_workout!).doc(dto.uid);
-  }
-
   void addWorkoutSet(Exercice exerciceDragged) {
-    final WorkoutSetDto dto = WorkoutSetDto.empty();
-    dto.uid = workoutSetService.getWorkoutSetsReference(_workout!).doc().id;
-    dto.uidWorkout = _workout?.uid;
-    dto.uidExercice = exerciceDragged.uid;
-    dto.typeExercice = exerciceDragged.typeExercice;
-    dto.nameExercice = exerciceDragged.name;
-    dto.imageUrlExercice = exerciceDragged.imageUrl;
-    dto.order = getMaxOrder(listDtos);
-    dto.lines.add(Line());
-
-    getSetRef(dto).set(WorkoutSet.fromJson(dto.toJson()).toJson()).then((_) {
-      listDtos.add(dto);
+    final WorkoutSet workoutset = WorkoutSet();
+    workoutset.uid = workoutSetService.getNewUid(_workout);
+    workoutset.uidWorkout = _workout.uid!;
+    workoutset.uidExercice = exerciceDragged.uid!;
+    workoutset.typeExercice = exerciceDragged.typeExercice;
+    workoutset.nameExercice = exerciceDragged.name;
+    workoutset.imageUrlExercice = exerciceDragged.imageUrl;
+    workoutset.order = getMaxOrder(listDtos);
+    workoutset.lines.add(Line());
+    workoutSetService.save(WorkoutSet.fromJson(workoutset.toJson())).then((_) {
+      listDtos.add(workoutset);
       subjectListDtos.sink.add(listDtos);
     }).catchError(
         (error) => showToast("Une erreur est survenue lors de l'enregistrement du set : ${error.toString()}", duration: const Duration(seconds: 2)));
   }
 
-  void deleteFromFireStore(WorkoutSetDto dto) {
-    getSetRef(dto).delete().catchError((Object onError) => showToast('Erreur lors de la suppression du Set.', duration: const Duration(seconds: 2)));
+  void deleteFromFireStore(WorkoutSet dto) {
+    workoutSetService
+        .delete(WorkoutSet.fromJson(dto.toJson()))
+        .catchError((Object onError) => showToast('Erreur lors de la suppression du Set.', duration: const Duration(seconds: 2)));
   }
 
-  void switchOrder(WorkoutSetDto dto, int newOrder) {
+  void switchOrder(WorkoutSet workoutSetToMove, int newOrder) {
     int order = newOrder;
-    final bool isDescente = dto.order < order;
+    final bool isDescente = workoutSetToMove.order < order;
     if (isDescente) {
       order = order - 1;
     }
@@ -222,43 +206,37 @@ class WorkoutSetBottomPanelController extends GetxController {
 
     // Mise à jour des DTO suivants pour les décaler tous.
     if (listDtos.isNotEmpty) {
-      listDtos.where((WorkoutSetDto e) => e.uid != dto.uid).forEach((WorkoutSetDto e) {
-        if (isDescente && e.order > dto.order && e.order <= order) {
+      listDtos.where((WorkoutSet workoutSet) => workoutSet.uid != workoutSetToMove.uid).forEach((WorkoutSet e) {
+        if (isDescente && e.order > workoutSetToMove.order && e.order <= order) {
           e.order = e.order - 1;
-          batch.update(getSetRef(e), {'order': e.order});
+          batch.update(workoutSetService.getSetRef(e), {'order': e.order});
         }
-        if (!isDescente && e.order < dto.order && e.order >= order) {
+        if (!isDescente && e.order < workoutSetToMove.order && e.order >= order) {
           e.order = e.order + 1;
-          batch.update(getSetRef(e), {'order': e.order});
+          batch.update(workoutSetService.getSetRef(e), {'order': e.order});
         }
       });
     }
 
     // Mise à jour du DTO reçu avec son nouvel ordre d'affichage.
-    dto.order = order;
-    batch.update(getSetRef(dto), {'order': dto.order});
+    workoutSetToMove.order = order;
+    batch.update(workoutSetService.getSetRef(workoutSetToMove), {'order': workoutSetToMove.order});
 
     // Trie de la liste locale
-    listDtos.sort((WorkoutSetDto a, WorkoutSetDto b) => a.order.compareTo(b.order));
+    listDtos.sort((WorkoutSet a, WorkoutSet b) => a.order.compareTo(b.order));
     subjectListDtos.sink.add(listDtos);
 
     // Commit du batch pour envoyer toutes les modifications sur Firestore.
     batch.commit();
   }
 
-  void updateFirestoreSet(WorkoutSetDto dto, Map<String, dynamic> values) {
-    getSetRef(dto)
-        .update(values)
+  void updateWorkoutSet(WorkoutSet dto) {
+    workoutSetService
+        .save(dto)
         .catchError((Object onError) => showToast('Erreur lors de la mise à jour du Set.', duration: const Duration(seconds: 2)));
   }
 
-  void updateWorkoutSet(WorkoutSetDto dto) {
-    getSetRef(dto)
-        .set(dto.toJson())
-        .catchError((Object onError) => showToast('Erreur lors de la mise à jour du Set.', duration: const Duration(seconds: 2)));
-  }
-
-  void setReps(WorkoutSetDto dto, Line line, String value) {
+  void setReps(WorkoutSet dto, Line line, String value) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(Duration(milliseconds: debounceTime), () {
       line.reps = value;
@@ -266,7 +244,7 @@ class WorkoutSetBottomPanelController extends GetxController {
     });
   }
 
-  void setWeight(WorkoutSetDto dto, Line line, String value) {
+  void setWeight(WorkoutSet dto, Line line, String value) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(Duration(milliseconds: debounceTime), () {
       line.weight = value;
@@ -274,7 +252,7 @@ class WorkoutSetBottomPanelController extends GetxController {
     });
   }
 
-  void setRestTime(WorkoutSetDto dto, Line line, String? value) {
+  void setRestTime(WorkoutSet dto, Line line, String? value) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(Duration(milliseconds: debounceTime), () {
       line.restTime = value;
@@ -282,7 +260,7 @@ class WorkoutSetBottomPanelController extends GetxController {
     });
   }
 
-  void setTime(WorkoutSetDto dto, Line line, String? value) {
+  void setTime(WorkoutSet dto, Line line, String? value) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(Duration(milliseconds: debounceTime), () {
       line.time = value;

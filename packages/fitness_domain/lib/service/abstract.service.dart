@@ -8,15 +8,76 @@ import 'package:get/get.dart';
 import 'abstract-crud.service.dart';
 import 'abstract.mixin.dart';
 
+/// Méthode abstraite pour savoir comment désérialiser un objet T à partir d'un JSON.
+abstract class InterfaceServiceDeserializer<T> {
+  T fromJson(Map<String, dynamic> map);
+}
+
+abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDomain, U extends AbstractDomain,
+    X extends AbstractFirebaseCrudService<U>> extends GetxService implements InterfaceFirebaseSubcollectionCrudService<T, U>, InterfaceServiceDeserializer<T> {
+
+  final X rootService = Get.find();
+
+  CollectionReference<Map<String, dynamic>> getCollectionReference(String rootDomainUid) {
+    return rootService.getCollectionReference().doc(rootDomainUid).collection(getCollectionName());
+  }
+
+  Future<List<T>> getAll(String rootDomainUid) async {
+    return getCollectionReference(rootDomainUid).get().then((QuerySnapshot<Map<String, dynamic>> value) =>
+        value.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> e) => fromJson(e.data())).toList());
+  }
+
+  Stream<List<T>> listenAll(String rootDomainUid) {
+    return getCollectionReference(rootDomainUid).snapshots().map((QuerySnapshot<Map<String, dynamic>> event) =>
+        event.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> doc) => fromJson(doc.data())).toList());
+  }
+
+  Future<void> _sendToFireStore(T domain) {
+    domain.updateDate = FieldValue.serverTimestamp();
+    return getCollectionReference(domain.getParentUid()).doc(domain.uid).set(domain.toJson());
+  }
+
+  Future<void> save(T domain) {
+    if (domain.uid != null && domain.uid?.isNotEmpty == true) {
+      return update(domain);
+    } else {
+      return create(domain);
+    }
+  }
+
+  Future<void> create(T domainToSave) {
+    domainToSave.creatorUid = FirebaseAuth.instance.currentUser?.uid;
+    domainToSave.createDate = FieldValue.serverTimestamp();
+    domainToSave.uid ??= getCollectionReference(domainToSave.getParentUid()).doc().id;
+    return _sendToFireStore(domainToSave);
+  }
+
+  Future<void> update(T domainToSave) {
+    return _sendToFireStore(domainToSave);
+  }
+
+  Future<void> delete(T domainToSave) {
+    return getCollectionReference(domainToSave.getParentUid()).doc(domainToSave.uid).delete();
+  }
+
+  Future<T?> read(String rootDomainUid, String uidDomain) async {
+    final Map<String, dynamic>? data = (await getCollectionReference(rootDomainUid).doc(uidDomain).get()).data();
+    return data != null ? fromJson(data) : null;
+  }
+}
+
+
 ///
 /// Classe abstraite dont on doit étendre pour récupérer les méthodes par défaut pour le CRUD Firebase.
 ///
-abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends GetxService implements AbstractCrudService<T> {
+abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends GetxService implements InterfaceCrudObserverService<T>, InterfaceServiceDeserializer<T> {
   /// Méthode abstraite qui retournera la collectionReference.
   CollectionReference<Object?> getCollectionReference();
 
-  /// Méthode abstraite pour savoir comment désérialiser un objet T à partir d'un JSON.
-  T fromJson(Map<String, dynamic> map);
+  Future<void> _sendToFireStore(T domain) {
+    domain.updateDate = FieldValue.serverTimestamp();
+    return getCollectionReference().doc(domain.uid).set(domain.toJson()).then((_) {});
+  }
 
   Future<List<T>> where(
     Object field, {
@@ -167,9 +228,11 @@ abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends Get
     return getCollectionReference().doc(domain.uid).delete().then((_) {});
   }
 
-  Future<void> _sendToFireStore(T domain) {
-    domain.updateDate = FieldValue.serverTimestamp();
-    return getCollectionReference().doc(domain.uid).set(domain.toJson()).then((_) {});
+
+  @override
+  Future<List<T>> getAll() {
+    return getCollectionReference().get().then(
+            (QuerySnapshot<Object?> value) => value.docs.map((QueryDocumentSnapshot<Object?> e) => fromJson(e.data() as Map<String, dynamic>)).toList());
   }
 }
 
@@ -191,12 +254,6 @@ abstract class AbstractFitnessStorageService<T extends AbstractStorageDomain> ex
   }
 
   @override
-  Future<List<T>> getAll() {
-    return getCollectionReference().get().then(
-        (QuerySnapshot<Object?> value) => value.docs.map((QueryDocumentSnapshot<Object?> e) => fromJson(e.data() as Map<String, dynamic>)).toList());
-  }
-
-  @override
   Future<void> save(T domain) {
     final bool shouldSendToStorage = domain.storageFile?.fileBytes != null && domain.storageFile?.fileName != null;
     if (shouldSendToStorage) {
@@ -214,7 +271,6 @@ abstract class AbstractFitnessStorageService<T extends AbstractStorageDomain> ex
 
   @override
   Future<void> delete(T domain) {
-    return super.delete(domain);
-    // return deleteAllFiles(domain).then((_) => super.delete(domain));
+    return deleteAllFiles(domain).then((_) => super.delete(domain));
   }
 }

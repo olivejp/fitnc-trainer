@@ -22,8 +22,6 @@ class AbonneUpdateController {
 
   Stream<Uint8List?>? get selectedImageObs => _streamSelectedImage?.stream;
 
-  final String pathAbonneMainImage = 'mainImage';
-
   void init(Abonne? enteredAbonne) {
     _fileBytes = null;
     _fileName = null;
@@ -70,12 +68,12 @@ class AbonneUpdateController {
 
     // Si un fichier est présent, on tente de l'envoyer sur le Storage.
     if (_fileBytes != null && _oldFileName != _fileName) {
-      await deleteAbonneMainImage(abonne);
+      await deleteAbonneImage(abonne);
       await sendToStorage();
     }
 
     if (_fileBytes == null) {
-      await deleteAbonneMainImage(abonne);
+      await deleteAbonneImage(abonne);
       abonne.imageUrl = null;
     }
     return sendToFireStore(collectionReference);
@@ -90,7 +88,7 @@ class AbonneUpdateController {
 
   Future<void> sendToStorage() async {
     abonne.imageUrl = await FirebaseStorage.instance
-        .ref('${abonne.uid}/$pathAbonneMainImage/$_fileName')
+        .ref('${abonne.uid}/$_fileName')
         .putData(_fileBytes!)
         .then((ref) => ref.ref.getDownloadURL());
   }
@@ -100,12 +98,12 @@ class AbonneUpdateController {
   }
 
   Future<void> deleteAbonne(Abonne abonne) {
-    return trainersService.getAbonneReference().doc(abonne.uid).delete().then((value) => deleteAbonneMainImage(abonne));
+    return trainersService.getAbonneReference().doc(abonne.uid).delete().then((value) => deleteAbonneImage(abonne));
   }
 
-  Future<void> deleteAbonneMainImage(Abonne abonne) {
+  Future<void> deleteAbonneImage(Abonne abonne) {
     return FirebaseStorage.instance
-        .ref('${abonne.uid}/$pathAbonneMainImage')
+        .ref('${abonne.uid}')
         .listAll()
         .then((value) => value.items.forEach((element) => element.delete()))
         .catchError((error) => print(error));

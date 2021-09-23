@@ -62,11 +62,6 @@ class WorkoutController extends LocalSearchControllerMixin<Workout, WorkoutServi
 
   String? get timerType => workout.value.timerType;
 
-  void setExercice(Exercice? exerciceSelected) {
-    this.exerciceSelected = exerciceSelected;
-    set.uidExercice = this.exerciceSelected?.uid;
-  }
-
   Future<StorageFile?> getStorageFile() {
     return workoutService.getFutureStorageFile(workout.value);
   }

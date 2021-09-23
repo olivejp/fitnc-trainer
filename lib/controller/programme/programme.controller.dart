@@ -23,7 +23,6 @@ class ProgrammeController extends LocalSearchControllerMixin<Programme, Programm
 
   Stream<List<WorkoutScheduleDto>> get workoutScheduleObs => _streamWorkoutScheduleDto.stream;
 
-  final String pathProgrammeMainImage = 'mainImage';
   final List<WorkoutScheduleDto> listDtos = <WorkoutScheduleDto>[];
   getx.Rx<Programme> programme = Programme().obs;
 

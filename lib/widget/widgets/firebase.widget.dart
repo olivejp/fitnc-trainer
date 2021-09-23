@@ -20,8 +20,8 @@ class FirebaseWidget extends StatelessWidget {
     Get.put(ExerciceService());
     Get.put(PublishedProgrammeService());
     Get.put(ProgrammeService());
-    Get.put(WorkoutSetService());
     Get.put(WorkoutService());
+    Get.put(WorkoutSetService());
     Get.put(FitnessUserService());
   }
 

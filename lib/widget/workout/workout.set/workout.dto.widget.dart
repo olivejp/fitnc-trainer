@@ -1,11 +1,11 @@
-import 'package:fitness_domain/widget/firestore_param_dropdown.widget.dart';
 import 'package:fitness_domain/domain/line.domain.dart';
-import 'package:fitness_domain/domain/workout_set.dto.dart';
+import 'package:fitness_domain/domain/workout_set.domain.dart';
+import 'package:fitness_domain/widget/firestore_param_dropdown.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../workout.set.bottom.panel.dart';
+import '../workout.set.exercice.panel.dart';
 
 class _FitnessWorkoutDtoConstants {
   static const double repsMaxHeight = 25;
@@ -21,7 +21,7 @@ class ListTileDto extends StatefulWidget {
     Key? key,
     required this.dto,
   }) : super(key: key);
-  final WorkoutSetDto dto;
+  final WorkoutSet dto;
   final ValueNotifier<bool> isOpen = ValueNotifier<bool>(false);
 
   @override
@@ -31,7 +31,7 @@ class ListTileDto extends StatefulWidget {
 class _ListTileDtoState extends State<ListTileDto> {
   late BehaviorSubject<List<Line>> streamLines = BehaviorSubject<List<Line>>.seeded(widget.dto.lines);
 
-  final WorkoutSetBottomPanelController controller = Get.find();
+  final WorkoutSetExercicePanelController controller = Get.find();
 
   @override
   void dispose() {
@@ -62,7 +62,7 @@ class _ListTileDtoState extends State<ListTileDto> {
               minLeadingWidth: 20,
               leading: MouseRegion(
                 cursor: SystemMouseCursors.grab,
-                child: Draggable<WorkoutSetDto>(
+                child: Draggable<WorkoutSet>(
                   data: widget.dto,
                   feedback: SizedBox(
                     width: 200,
@@ -142,10 +142,10 @@ class _ListTileDtoState extends State<ListTileDto> {
 class _LineDisplay extends StatelessWidget {
   _LineDisplay({required this.dto, required this.index, required this.stream});
 
-  final WorkoutSetDto dto;
+  final WorkoutSet dto;
   final int index;
   final Subject<List<Line>> stream;
-  final WorkoutSetBottomPanelController controller = Get.find();
+  final WorkoutSetExercicePanelController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -219,9 +219,9 @@ class _LineDisplay extends StatelessWidget {
 class _TimeLineBuilder extends StatelessWidget {
   _TimeLineBuilder({Key? key, required this.line, required this.dto}) : super(key: key);
 
-  final WorkoutSetDto dto;
+  final WorkoutSet dto;
   final Line line;
-  final WorkoutSetBottomPanelController controller = Get.find();
+  final WorkoutSetExercicePanelController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -254,9 +254,9 @@ class _TimeLineBuilder extends StatelessWidget {
 class _RepsOnlyLineBuilder extends StatelessWidget {
   _RepsOnlyLineBuilder({Key? key, required this.dto, required this.line}) : super(key: key);
 
-  final WorkoutSetDto dto;
+  final WorkoutSet dto;
   final Line line;
-  final WorkoutSetBottomPanelController controller = Get.find();
+  final WorkoutSetExercicePanelController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -288,9 +288,9 @@ class _RepsOnlyLineBuilder extends StatelessWidget {
 /// Widget Line dans le cas d'un Reps Weight
 class _RepsWeightLineBuilder extends StatelessWidget {
   _RepsWeightLineBuilder({Key? key, required this.dto, required this.line}) : super(key: key);
-  final WorkoutSetDto dto;
+  final WorkoutSet dto;
   final Line line;
-  final WorkoutSetBottomPanelController controller = Get.find();
+  final WorkoutSetExercicePanelController controller = Get.find();
 
   @override
   Widget build(BuildContext context) {

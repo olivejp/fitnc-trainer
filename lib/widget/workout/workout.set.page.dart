@@ -1,5 +1,5 @@
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitnc_trainer/widget/workout/workout.set.bottom.panel.dart';
+import 'package:fitnc_trainer/widget/workout/workout.set.exercice.panel.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.top.panel.dart';
 import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/domain/exercice.domain.dart';
@@ -12,7 +12,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
 
 class WorkoutSetPageController extends GetxController {
@@ -83,7 +82,7 @@ class _WorkoutSetPageState extends State<WorkoutSetPage> {
                   child: Card(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     color: FitnessNcColors.blue50,
-                    child: WorkoutSetBottomPanel(workout: widget.workout),
+                    child: WorkoutSetExercicePanel(workout: widget.workout),
                   ),
                 ),
               ),

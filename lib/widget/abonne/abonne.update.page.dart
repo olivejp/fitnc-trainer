@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:fitnc_trainer/controller/abonne/abonne_update.vm.dart';
+import 'package:fitnc_trainer/controller/abonne/abonne_update.controller.dart';
 import 'package:fitnc_trainer/widget/widgets/generic_update.widget.dart';
 import 'package:fitness_domain/domain/abonne.domain.dart';
 import 'package:flutter/cupertino.dart';

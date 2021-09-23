@@ -1,56 +1,45 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitnc_trainer/service/exercice.service.dart';
-import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitness_domain/domain/exercice.domain.dart';
+import 'package:fitnc_trainer/service/workout.service.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/domain/workout_set.domain.dart';
-import 'package:fitness_domain/domain/workout_set.dto.dart';
+import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:get/get.dart';
 
-class WorkoutSetService extends GetxService {
+class WorkoutSetService extends AbstractFirebaseSubcollectionCrudService<WorkoutSet, Workout, WorkoutService> {
   WorkoutSetService();
 
-  final TrainersService trainersService = Get.find();
   final ExerciceService exerciceService = Get.find();
+  final WorkoutService workoutService = Get.find();
 
-  CollectionReference getWorkoutReference() {
-    return trainersService.getCurrentTrainerRef().collection('workout');
+  @override
+  WorkoutSet fromJson(Map<String, dynamic> map) {
+    return WorkoutSet.fromJson(map);
   }
 
-  CollectionReference getWorkoutSetsReference(Workout workout) {
-    return getWorkoutReference().doc(workout.uid).collection('sets');
+  @override
+  String getCollectionName() {
+    return 'sets';
   }
 
-  Stream<List<WorkoutSet?>> listenToWorkoutStep(Workout workout) {
-    return getWorkoutSetsReference(workout)
-        .orderBy('order')
-        .snapshots()
-        .map((QuerySnapshot event) => event.docs.map((doc) => WorkoutSet.fromJson(doc.data() as Map<String, dynamic>)).toList());
+  Future<List<WorkoutSet>> getAllWorkoutSet(Workout workout) {
+    return getQuery(getCollectionReference(workout.uid!).orderBy('order'));
   }
 
-  Stream<List<WorkoutSetDto?>> listenToWorkoutStepDto(Workout workout) {
-    return getWorkoutSetsReference(workout)
-        .orderBy('order')
-        .snapshots()
-        .map((event) =>
-            event.docs.map((doc) => WorkoutSet.fromJson(doc.data() as Map<String, dynamic>)).map((workoutSet) => mapToDto(workoutSet)).toList())
-        .asyncMap((futures) => Future.wait(futures));
+  String getNewUid(Workout workout) {
+    return getCollectionReference(workout.uid!).doc().id;
   }
 
-  Future<WorkoutSetDto> mapToDto(WorkoutSet workoutSet) async {
-    final WorkoutSetDto dto = WorkoutSetDto.fromSet(workoutSet);
+  DocumentReference<Object?> getSetRef(WorkoutSet dto) {
+    return getCollectionReference(dto.getParentUid()).doc(dto.uid);
+  }
 
-    // Recherche des infos de l'exercice
-    if (workoutSet.uidExercice != null) {
-      final Exercice? exercice = await exerciceService.read(workoutSet.uidExercice!);
-      if (exercice != null) {
-        dto.imageUrlExercice = exercice.imageUrl;
-        dto.nameExercice = exercice.name;
-        dto.typeExercice = exercice.typeExercice;
-      } else {
-        throw Exception("L'exercice avec l'uid ${workoutSet.uidExercice} n'a pas été trouvé.");
-      }
-    }
-    return dto;
+  Future<List<WorkoutSet>> getQuery(Query<Map<String, dynamic>> query) async {
+    return (await query.get()).docs.map((QueryDocumentSnapshot<Map<String, dynamic>> doc) => WorkoutSet.fromJson(doc.data())).toList();
+  }
+
+  Stream<List<WorkoutSet>> listenQuery(Query<Map<String, dynamic>> query) {
+    return query.snapshots().map((QuerySnapshot<Map<String, dynamic>> event) =>
+        event.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> doc) => WorkoutSet.fromJson(doc.data())).toList());
   }
 }

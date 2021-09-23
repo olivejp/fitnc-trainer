@@ -1,8 +1,12 @@
 import 'dart:async';
 
 import 'package:fitnc_trainer/service/trainers.service.dart';
+import 'package:fitnc_trainer/service/workout.service.dart';
+import 'package:fitnc_trainer/service/workout_set.service.dart';
 import 'package:fitness_domain/domain/exercice.domain.dart';
 import 'package:fitness_domain/domain/storage-file.dart';
+import 'package:fitness_domain/domain/workout.domain.dart';
+import 'package:fitness_domain/domain/workout_set.domain.dart';
 import 'package:fitness_domain/service/firebase-storage.service.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart' as rx;
@@ -13,6 +17,7 @@ abstract class AbstractExerciceController {
   final TrainersService trainersService = Get.find();
   final FirebaseStorageService storageService = Get.find();
   final ExerciceService exerciceService = Get.find();
+  final WorkoutSetService workoutSetService = Get.find();
 
   Rx<Exercice> exercice = Exercice().obs;
 
@@ -38,6 +43,10 @@ abstract class AbstractExerciceController {
         exo.imageUrl = null;
       }
     });
+  }
+
+  Future<void> changeExerciceType(String? onChangedValue) async {
+    exercice.value.typeExercice = onChangedValue;
   }
 }
 
