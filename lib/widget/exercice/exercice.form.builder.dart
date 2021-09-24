@@ -55,6 +55,8 @@ class _ExerciceCreateState extends State<ExerciceCreate> {
 
   @override
   Widget build(BuildContext context) {
+    widget.controller.init(Exercice());
+
     _formKey = GlobalKey<FormState>();
     final Widget saveButton = Padding(
       padding: const EdgeInsets.only(right: 10),

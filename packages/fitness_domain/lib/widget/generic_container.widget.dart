@@ -4,17 +4,18 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 class FitnessDecorationTextFormField extends StatelessWidget {
-  const FitnessDecorationTextFormField(
-      {Key? key,
-      this.initialValue,
-      this.labelText,
-      this.onChanged,
-      this.validator,
-      this.autofocus = false,
-      this.hintText,
-      this.controller,
-      this.inputBorder})
-      : super(key: key);
+  const FitnessDecorationTextFormField({
+    Key? key,
+    this.initialValue,
+    this.labelText,
+    this.onChanged,
+    this.validator,
+    this.autofocus = false,
+    this.hintText,
+    this.controller,
+    this.inputBorder,
+    this.textAlign = TextAlign.start,
+  }) : super(key: key);
 
   final bool autofocus;
   final String? initialValue;
@@ -24,6 +25,7 @@ class FitnessDecorationTextFormField extends StatelessWidget {
   final String? hintText;
   final TextEditingController? controller;
   final InputBorder? inputBorder;
+  final TextAlign textAlign;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,7 @@ class FitnessDecorationTextFormField extends StatelessWidget {
         initialValue: initialValue,
         onChanged: onChanged,
         autofocus: autofocus,
+        textAlign: textAlign,
         decoration: InputDecoration(
           border: inputBorder,
           hintText: hintText,

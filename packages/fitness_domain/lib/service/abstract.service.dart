@@ -57,6 +57,11 @@ class FirebaseCondition {
   dynamic isNull;
 }
 
+///
+/// T represents the main model
+/// U represents the root model
+/// X is the service for the root model
+///
 abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDomain, U extends AbstractDomain,
         X extends AbstractFirebaseCrudService<U>> extends GetxService
     implements InterfaceFirebaseSubcollectionCrudService<T, U>, InterfaceServiceDeserializer<T> {
@@ -64,6 +69,55 @@ abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDom
 
   CollectionReference<Map<String, dynamic>> getCollectionReference(String rootDomainUid) {
     return rootService.getCollectionReference().doc(rootDomainUid).collection(getCollectionName());
+  }
+
+  Stream<List<T>> orderByListen(String rootDomainUid, String orderBy, bool descending){
+    return listenFromQuery(getCollectionReference(rootDomainUid).orderBy(orderBy, descending: descending));
+  }
+
+  Stream<List<T>> whereListen(Object field, String rootDomainUid,
+      {Object? isEqualTo,
+      Object? isNotEqualTo,
+      Object? isLessThan,
+      Object? isLessThanOrEqualTo,
+      Object? isGreaterThan,
+      Object? isGreaterThanOrEqualTo,
+      Object? arrayContains,
+      List<Object?>? arrayContainsAny,
+      List<Object?>? whereIn,
+      List<Object?>? whereNotIn,
+      bool? isNull,
+      String? orderBy,
+      bool orderByDescending = false}) {
+    Query query = getCollectionReference(rootDomainUid).where(field,
+        isEqualTo: isEqualTo,
+        isNotEqualTo: isNotEqualTo,
+        isLessThan: isLessThan,
+        isLessThanOrEqualTo: isLessThanOrEqualTo,
+        isGreaterThan: isGreaterThan,
+        isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
+        arrayContains: arrayContains,
+        arrayContainsAny: arrayContainsAny,
+        whereIn: whereIn,
+        whereNotIn: whereNotIn,
+        isNull: isNull);
+
+    if (orderBy != null) {
+      query = query.orderBy(orderBy, descending: orderByDescending);
+    }
+
+    return listenFromQuery(query);
+  }
+
+  // Retourne une Stream de liste de domain sur lesquels on applique une Query.
+  Stream<List<T>> listenFromQuery(Query query) {
+    return query
+        .withConverter<T>(
+          fromFirestore: (DocumentSnapshot<Map<String, dynamic>> snapshot, _) => fromJson(snapshot.data()!),
+          toFirestore: (T domain, _) => domain.toJson(),
+        )
+        .snapshots()
+        .map((QuerySnapshot<T> snapshot) => snapshot.docs.map((QueryDocumentSnapshot<T> e) => e.data()).toList());
   }
 
   Query compoundQueries(String rootDomainUid, List<FirebaseCondition> listConditions, {String? orderBy, bool orderByDescending = false}) {
