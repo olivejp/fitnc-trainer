@@ -13,13 +13,182 @@ abstract class InterfaceServiceDeserializer<T> {
   T fromJson(Map<String, dynamic> map);
 }
 
-abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDomain, U extends AbstractDomain,
-    X extends AbstractFirebaseCrudService<U>> extends GetxService implements InterfaceFirebaseSubcollectionCrudService<T, U>, InterfaceServiceDeserializer<T> {
+enum Operator {
+  isEqualTo,
+  isNotEqualTo,
+  isLessThan,
+  isLessThanOrEqualTo,
+  isGreaterThan,
+  isGreaterThanOrEqualTo,
+  arrayContains,
+  arrayContainsAny,
+  whereIn,
+  whereNotIn,
+  isNull,
+}
 
+class FirebaseCondition {
+  FirebaseCondition(
+    this.field, {
+    this.isEqualTo,
+    this.isNotEqualTo,
+    this.isLessThan,
+    this.isLessThanOrEqualTo,
+    this.isGreaterThan,
+    this.isGreaterThanOrEqualTo,
+    this.arrayContains,
+    this.arrayContainsAny,
+    this.whereIn,
+    this.whereNotIn,
+    this.isNull,
+  });
+
+  dynamic field;
+  dynamic isEqualTo;
+  dynamic isNotEqualTo;
+  dynamic isLessThan;
+  dynamic isLessThanOrEqualTo;
+  dynamic isGreaterThan;
+  dynamic isGreaterThanOrEqualTo;
+  dynamic arrayContains;
+  dynamic arrayContainsAny;
+  dynamic whereIn;
+  dynamic whereNotIn;
+  dynamic isNull;
+}
+
+abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDomain, U extends AbstractDomain,
+        X extends AbstractFirebaseCrudService<U>> extends GetxService
+    implements InterfaceFirebaseSubcollectionCrudService<T, U>, InterfaceServiceDeserializer<T> {
   final X rootService = Get.find();
 
   CollectionReference<Map<String, dynamic>> getCollectionReference(String rootDomainUid) {
     return rootService.getCollectionReference().doc(rootDomainUid).collection(getCollectionName());
+  }
+
+  Query compoundQueries(String rootDomainUid, List<FirebaseCondition> listConditions, {String? orderBy, bool orderByDescending = false}) {
+    Query? queryFinal;
+    for (FirebaseCondition condition in listConditions) {
+      if (queryFinal == null) {
+        queryFinal = getCollectionReference(rootDomainUid).where(
+          condition.field,
+          isEqualTo: condition.isEqualTo,
+          isNull: condition.isNull,
+          isGreaterThanOrEqualTo: condition.isGreaterThanOrEqualTo,
+          isGreaterThan: condition.isGreaterThan,
+          isLessThanOrEqualTo: condition.isLessThanOrEqualTo,
+          isLessThan: condition.isLessThan,
+          isNotEqualTo: condition.isNotEqualTo,
+          whereNotIn: condition.whereNotIn,
+          whereIn: condition.whereIn,
+          arrayContainsAny: condition.arrayContainsAny,
+          arrayContains: condition.arrayContains,
+        );
+      } else {
+        queryFinal.where(
+          condition.field,
+          isEqualTo: condition.isEqualTo,
+          isNull: condition.isNull,
+          isGreaterThanOrEqualTo: condition.isGreaterThanOrEqualTo,
+          isGreaterThan: condition.isGreaterThan,
+          isLessThanOrEqualTo: condition.isLessThanOrEqualTo,
+          isLessThan: condition.isLessThan,
+          isNotEqualTo: condition.isNotEqualTo,
+          whereNotIn: condition.whereNotIn,
+          whereIn: condition.whereIn,
+          arrayContainsAny: condition.arrayContainsAny,
+          arrayContains: condition.arrayContains,
+        );
+      }
+    }
+    if (orderBy != null) {
+      queryFinal = queryFinal!.orderBy(orderBy, descending: orderByDescending);
+    }
+
+    return queryFinal!;
+  }
+
+  Query createQuery(String rootDomainUid, Object field,
+      {Object? isEqualTo,
+      Object? isNotEqualTo,
+      Object? isLessThan,
+      Object? isLessThanOrEqualTo,
+      Object? isGreaterThan,
+      Object? isGreaterThanOrEqualTo,
+      Object? arrayContains,
+      List<Object?>? arrayContainsAny,
+      List<Object?>? whereIn,
+      List<Object?>? whereNotIn,
+      bool? isNull,
+      String? orderBy,
+      bool orderByDescending = false}) {
+    Query query = getCollectionReference(rootDomainUid).where(field,
+        isEqualTo: isEqualTo,
+        isNotEqualTo: isNotEqualTo,
+        isLessThan: isLessThan,
+        isLessThanOrEqualTo: isLessThanOrEqualTo,
+        isGreaterThan: isGreaterThan,
+        isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
+        arrayContains: arrayContains,
+        arrayContainsAny: arrayContainsAny,
+        whereIn: whereIn,
+        whereNotIn: whereNotIn,
+        isNull: isNull);
+
+    if (orderBy != null) {
+      query = query.orderBy(field, descending: orderByDescending);
+    }
+
+    return query;
+  }
+
+  Future<List<T>> where(String rootDomainUid, Object field,
+      {Object? isEqualTo,
+      Object? isNotEqualTo,
+      Object? isLessThan,
+      Object? isLessThanOrEqualTo,
+      Object? isGreaterThan,
+      Object? isGreaterThanOrEqualTo,
+      Object? arrayContains,
+      List<Object?>? arrayContainsAny,
+      List<Object?>? whereIn,
+      List<Object?>? whereNotIn,
+      bool? isNull,
+      String? orderBy,
+      bool orderByDescending = false}) {
+    return getFromQuery(createQuery(rootDomainUid, field,
+        isEqualTo: isEqualTo,
+        isNotEqualTo: isNotEqualTo,
+        isLessThan: isLessThan,
+        isLessThanOrEqualTo: isLessThanOrEqualTo,
+        isGreaterThan: isGreaterThan,
+        isGreaterThanOrEqualTo: isGreaterThanOrEqualTo,
+        arrayContains: arrayContains,
+        arrayContainsAny: arrayContainsAny,
+        whereIn: whereIn,
+        whereNotIn: whereNotIn,
+        isNull: isNull,
+        orderBy: orderBy,
+        orderByDescending: orderByDescending));
+  }
+
+  // Retourne une future avec une liste de domain sur lesquels on applique une Query.
+  Future<List<T>> getFromQuery(Query query) async {
+    Future<QuerySnapshot<T>> ftQuerySnaphot = query
+        .withConverter<T>(
+          fromFirestore: (DocumentSnapshot<Map<String, dynamic>> snapshot, _) => fromJson(snapshot.data()!),
+          toFirestore: (T domain, _) => domain.toJson(),
+        )
+        .get();
+
+    return (await ftQuerySnaphot).docs.map((QueryDocumentSnapshot<T> querySnapshot) => querySnapshot.data()).toList();
+  }
+
+  Future<List<T>> getAllInAnyRoot() async {
+    final List<T> resultList = <T>[];
+    final List<Future<List<T>>> list = (await rootService.getAll()).map((U rootDomain) => getAll(rootDomain.uid!)).toList();
+    (await Future.wait(list)).forEach((List<T> listT) => resultList.addAll(listT));
+    return resultList;
   }
 
   Future<List<T>> getAll(String rootDomainUid) async {
@@ -66,11 +235,11 @@ abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDom
   }
 }
 
-
 ///
 /// Classe abstraite dont on doit étendre pour récupérer les méthodes par défaut pour le CRUD Firebase.
 ///
-abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends GetxService implements InterfaceCrudObserverService<T>, InterfaceServiceDeserializer<T> {
+abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends GetxService
+    implements InterfaceCrudObserverService<T>, InterfaceServiceDeserializer<T> {
   /// Méthode abstraite qui retournera la collectionReference.
   CollectionReference<Object?> getCollectionReference();
 
@@ -79,21 +248,21 @@ abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends Get
     return getCollectionReference().doc(domain.uid).set(domain.toJson()).then((_) {});
   }
 
-  Future<List<T>> where(
-    Object field, {
-    Object? isEqualTo,
-    Object? isNotEqualTo,
-    Object? isLessThan,
-    Object? isLessThanOrEqualTo,
-    Object? isGreaterThan,
-    Object? isGreaterThanOrEqualTo,
-    Object? arrayContains,
-    List<Object?>? arrayContainsAny,
-    List<Object?>? whereIn,
-    List<Object?>? whereNotIn,
-    bool? isNull,
-  }) {
-    return getFromQuery(getCollectionReference().where(field,
+  Future<List<T>> where(Object field,
+      {Object? isEqualTo,
+      Object? isNotEqualTo,
+      Object? isLessThan,
+      Object? isLessThanOrEqualTo,
+      Object? isGreaterThan,
+      Object? isGreaterThanOrEqualTo,
+      Object? arrayContains,
+      List<Object?>? arrayContainsAny,
+      List<Object?>? whereIn,
+      List<Object?>? whereNotIn,
+      bool? isNull,
+      String? orderBy,
+      bool orderByDescending = false}) {
+    Query query = getCollectionReference().where(field,
         isEqualTo: isEqualTo,
         isNotEqualTo: isNotEqualTo,
         isLessThan: isLessThan,
@@ -104,7 +273,13 @@ abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends Get
         arrayContainsAny: arrayContainsAny,
         whereIn: whereIn,
         whereNotIn: whereNotIn,
-        isNull: isNull));
+        isNull: isNull);
+
+    if (orderBy != null) {
+      query = query.orderBy(field, descending: orderByDescending);
+    }
+
+    return getFromQuery(query);
   }
 
   Stream<List<T>> whereListen(
@@ -228,11 +403,10 @@ abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends Get
     return getCollectionReference().doc(domain.uid).delete().then((_) {});
   }
 
-
   @override
   Future<List<T>> getAll() {
     return getCollectionReference().get().then(
-            (QuerySnapshot<Object?> value) => value.docs.map((QueryDocumentSnapshot<Object?> e) => fromJson(e.data() as Map<String, dynamic>)).toList());
+        (QuerySnapshot<Object?> value) => value.docs.map((QueryDocumentSnapshot<Object?> e) => fromJson(e.data() as Map<String, dynamic>)).toList());
   }
 }
 

@@ -16,9 +16,6 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:oktoast/oktoast.dart';
 
-
-
-
 void main() {
   initServices();
   runApp(MyApp());

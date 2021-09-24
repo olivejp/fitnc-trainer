@@ -1,16 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fitnc_trainer/service/exercice.service.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:fitnc_trainer/service/workout.service.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/domain/workout_set.domain.dart';
 import 'package:fitness_domain/service/abstract.service.dart';
-import 'package:get/get.dart';
 
 class WorkoutSetService extends AbstractFirebaseSubcollectionCrudService<WorkoutSet, Workout, WorkoutService> {
   WorkoutSetService();
-
-  final ExerciceService exerciceService = Get.find();
-  final WorkoutService workoutService = Get.find();
 
   @override
   WorkoutSet fromJson(Map<String, dynamic> map) {
@@ -20,6 +16,16 @@ class WorkoutSetService extends AbstractFirebaseSubcollectionCrudService<Workout
   @override
   String getCollectionName() {
     return 'sets';
+  }
+
+  Future<List<WorkoutSet>> getAllWhereUidExerciceIs(String uidExercice) async {
+    final List<String> listWorkoutUid = (await rootService.getAll()).map((Workout workout) => workout.uid!).toList();
+    final List<Future<List<WorkoutSet>>> listFuture =
+        listWorkoutUid.map((String workoutUid) => where(workoutUid, 'uidExercice', isEqualTo: uidExercice)).toList();
+    return (await Future.wait(listFuture)).fold(<WorkoutSet>[], (List<WorkoutSet> previousValue, List<WorkoutSet> element) {
+      previousValue.addAll(element);
+      return previousValue;
+    }).toList();
   }
 
   Future<List<WorkoutSet>> getAllWorkoutSet(Workout workout) {
