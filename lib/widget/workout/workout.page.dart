@@ -2,7 +2,6 @@ import 'package:fitnc_trainer/controller/workout/workout.controller.dart';
 import 'package:fitnc_trainer/service/workout.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
-import 'package:fitnc_trainer/widget/workout/workout.create.page.dart';
 import 'package:fitnc_trainer/widget/workout/workout.update.page.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:flutter/cupertino.dart';

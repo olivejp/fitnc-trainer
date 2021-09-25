@@ -57,12 +57,22 @@ class WorkoutController extends LocalSearchControllerMixin<Workout, WorkoutServi
   String? get description => workout.value.description;
 
   set timerType(String? value) {
-    workout.value.timerType = value;
+    workout.update((Workout? val) {
+      val!.timerType = value;
+    });
   }
 
   String? get timerType => workout.value.timerType;
 
   Future<StorageFile?> getStorageFile() {
     return workoutService.getFutureStorageFile(workout.value);
+  }
+
+  set totalTime(String? value) {
+    if (value != null) {
+      workout.value.totalTime = int.parse(value);
+    } else {
+      workout.value.totalTime = 0;
+    }
   }
 }

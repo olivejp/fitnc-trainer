@@ -46,27 +46,30 @@ abstract class AbstractExerciceController {
 
   Future<void> changeExerciceType(BuildContext context, String? typeExercice) async {
     if (exercice.value.typeExercice != typeExercice) {
-      final List<WorkoutSet> list = await workoutSetService.getAllWhereUidExerciceIs(exercice.value.uid!);
-      final List<WorkoutSet> listFiltered = list.where((WorkoutSet set) => set.typeExercice != typeExercice).toList();
-      if (listFiltered.isNotEmpty) {
-        final WorkoutSet set = listFiltered.first;
-        showDialog(
-            context: context,
-            builder: (BuildContext context) =>
-                AlertDialog(
-                  title: Text('Attention'),
-                  content: Text('Cet exercice est déjà utilisé dans des workouts avec le type ${set.typeExercice}.\n'
-                      'Le nouveau type choisi ne sera pas répercutée sur les workouts qui utilisent cet exercice.'),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        exercice.value.typeExercice = typeExercice;
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('Continuer'),
-                    ),
-                  ],
-                ));
+      if (exercice.value.uid != null) {
+        final List<WorkoutSet> list = await workoutSetService.getAllWhereUidExerciceIs(exercice.value.uid!);
+        final List<WorkoutSet> listFiltered = list.where((WorkoutSet set) => set.typeExercice != typeExercice).toList();
+        if (listFiltered.isNotEmpty) {
+          final WorkoutSet set = listFiltered.first;
+          showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                    title: Text('Attention'),
+                    content: Text('Cet exercice est déjà utilisé dans des workouts avec le type ${set.typeExercice}.\n'
+                        'Le nouveau type choisi ne sera pas répercutée sur les workouts qui utilisent cet exercice.'),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          exercice.value.typeExercice = typeExercice;
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Continuer'),
+                      ),
+                    ],
+                  ));
+        } else {
+          exercice.value.typeExercice = typeExercice;
+        }
       } else {
         exercice.value.typeExercice = typeExercice;
       }

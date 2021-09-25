@@ -12,6 +12,7 @@ class Workout extends AbstractStorageDomain implements InterfaceDomainSearchable
 
   String? timerType;
   String? description;
+  int? totalTime;
 
   @override
   Map<String, dynamic> toJson() => _$WorkoutToJson(this);

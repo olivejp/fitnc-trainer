@@ -7,6 +7,7 @@ import 'package:fitness_domain/widget/generic_container.widget.dart';
 import 'package:fitness_domain/widget/storage_image.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
 
@@ -140,6 +141,27 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
                         onChanged: (String? value) => controller.timerType = value,
                         value: controller.workout.value.timerType,
                         items: typesWorkout),
+                    Obx(() {
+                      print(controller.workout.value.timerType);
+                      if (['AMRAP', 'EMOM'].contains(controller.workout.value.timerType)) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                            ],
+                            initialValue: controller.workout.value.totalTime?.toString(),
+                            onChanged: (String value) => controller.totalTime = value,
+                            decoration: InputDecoration(
+                              labelText: 'Temps total (en minutes)',
+                            ),
+                          ),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    }),
                     TextFormField(
                       initialValue: controller.workout.value.description,
                       maxLength: 2000,
