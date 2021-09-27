@@ -1,7 +1,72 @@
 import 'package:fitness_domain/domain/abstract.domain.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animations/loading_animations.dart';
 
 import '../constants.dart';
+
+class StreamList<T> extends StatelessWidget {
+  const StreamList({
+    Key? key,
+    required this.stream,
+    required this.builder,
+    this.initialData,
+    this.loading,
+    this.onError,
+    this.physics,
+    this.padding,
+    this.emptyWidget,
+    this.showLoading = true
+  }) : super(key: key);
+  final Stream<List<T>> stream;
+  final List<T>? initialData;
+  final Widget? loading;
+  final Widget? emptyWidget;
+  final ScrollPhysics? physics;
+  final EdgeInsetsGeometry? padding;
+  final Widget Function(Object? error)? onError;
+  final Widget Function(BuildContext context, T domain) builder;
+  final bool showLoading;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<T>>(
+      stream: stream,
+      initialData: initialData,
+      builder: (BuildContext context, AsyncSnapshot<List<T>> snapshot) {
+        if (snapshot.hasError) {
+          return onError != null ? onError!(snapshot.error) : Text(snapshot.error.toString());
+        }
+        if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          final List<T> list = snapshot.data!;
+          return ListView.builder(
+            padding: padding,
+            shrinkWrap: true,
+            physics: physics,
+            itemCount: list.length,
+            itemBuilder: (BuildContext context, int index) {
+              T element = list.elementAt(index);
+              return builder(context, element);
+            },
+          );
+        }
+        if (snapshot.hasData && snapshot.data!.isEmpty) {
+          if (emptyWidget != null) {
+            return emptyWidget!;
+          } else {
+            return Container();
+          }
+        }
+        if (showLoading == false) {
+          return Container();
+        } else {
+          return loading ?? LoadingBouncingGrid.circle(backgroundColor: Theme
+              .of(context)
+              .primaryColor,);
+        }
+      },
+    );
+  }
+}
 
 class FitnessDecorationTextFormField extends StatelessWidget {
   const FitnessDecorationTextFormField({

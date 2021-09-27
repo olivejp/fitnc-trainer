@@ -71,8 +71,12 @@ abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDom
     return rootService.getCollectionReference().doc(rootDomainUid).collection(getCollectionName());
   }
 
-  Stream<List<T>> orderByListen(String rootDomainUid, String orderBy, bool descending){
+  Stream<List<T>> orderByListen(String rootDomainUid, String orderBy, bool descending) {
     return listenFromQuery(getCollectionReference(rootDomainUid).orderBy(orderBy, descending: descending));
+  }
+
+  Future<List<T>> orderByGet(String rootDomainUid, String orderBy, bool descending) {
+    return getFromQuery(getCollectionReference(rootDomainUid).orderBy(orderBy, descending: descending));
   }
 
   Stream<List<T>> whereListen(Object field, String rootDomainUid,
