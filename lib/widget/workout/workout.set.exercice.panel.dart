@@ -244,6 +244,14 @@ class WorkoutSetExercicePanelController extends GetxController {
     });
   }
 
+  void setDist(WorkoutSet dto, Line line, String value) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(Duration(milliseconds: debounceTime), () {
+      line.distance = value;
+      updateWorkoutSet(dto);
+    });
+  }
+
   void setWeight(WorkoutSet dto, Line line, String value) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(Duration(milliseconds: debounceTime), () {

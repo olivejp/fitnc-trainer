@@ -10,6 +10,8 @@ import '../workout.set.exercice.panel.dart';
 class _FitnessWorkoutDtoConstants {
   static const double repsMaxHeight = 25;
   static const double repsMaxWidth = 70;
+  static const double distMaxHeight = 25;
+  static const double distMaxWidth = 100;
   static const double weightMaxHeight = 25;
   static const double weightMaxWidth = 100;
   static const double crossMaxHeight = 25;
@@ -167,6 +169,10 @@ class _LineDisplay extends StatelessWidget {
       case 'TIME':
         returnedWidget = _TimeLineBuilder(key: lineKey, line: line, dto: dto);
         break;
+      case 'DIST':
+        returnedWidget = _DistOnlyLineBuilder(key: lineKey, line: line, dto: dto);
+        break;
+
       default:
         returnedWidget = Container();
     }
@@ -243,6 +249,41 @@ class _TimeLineBuilder extends StatelessWidget {
             hint: const Text('Temps', style: TextStyle(fontSize: 10)),
             initialValue: line.time,
             onChanged: (String? value) => controller.setTime(dto, line, value),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
+/// Widget Line dans le cas d'un Dist
+class _DistOnlyLineBuilder extends StatelessWidget {
+  _DistOnlyLineBuilder({Key? key, required this.dto, required this.line}) : super(key: key);
+
+  final WorkoutSet dto;
+  final Line line;
+  final WorkoutSetExercicePanelController controller = Get.find();
+
+  @override
+  Widget build(BuildContext context) {
+    const TextStyle textStyle = TextStyle(fontSize: 15);
+    const TextStyle textStyleHint = TextStyle(fontSize: 12);
+    return Row(
+      children: <Widget>[
+        LimitedBox(
+          maxHeight: _FitnessWorkoutDtoConstants.distMaxHeight,
+          maxWidth: _FitnessWorkoutDtoConstants.distMaxWidth,
+          child: TextFormField(
+            initialValue: line.reps,
+            buildCounter: (BuildContext context, {required int currentLength, required bool isFocused, int? maxLength}) => null,
+            textAlignVertical: TextAlignVertical.bottom,
+            style: textStyle,
+            onChanged: (String value) => controller.setDist(dto, line, value),
+            decoration: const InputDecoration(
+              hintText: 'Distance',
+              hintStyle: textStyleHint,
+            ),
           ),
         ),
       ],

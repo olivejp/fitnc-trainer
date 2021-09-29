@@ -12,6 +12,7 @@ class Line {
   String? weight;
   String? restTime;
   String? time;
+  String? distance;
   int? order;
 
   Map<String, dynamic> toJson() => _$LineToJson(this);
