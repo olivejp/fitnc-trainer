@@ -6,7 +6,7 @@ import 'package:fitness_domain/service/util.service.dart';
 import 'package:get/get.dart';
 import 'package:rxdart/rxdart.dart';
 
-abstract class LocalSearchControllerMixin<T extends InterfaceDomainSearchable, U extends InterfaceCrudObserverService<T>> extends GetxController {
+abstract class LocalSearchControllerMixin<T extends InterfaceDomainSearchable, U extends ICrudService<T>> extends GetxController {
   LocalSearchControllerMixin();
 
   final U service = Get.find();

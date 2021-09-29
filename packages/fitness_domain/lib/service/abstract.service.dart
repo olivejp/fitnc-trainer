@@ -64,11 +64,18 @@ class FirebaseCondition {
 ///
 abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDomain, U extends AbstractDomain,
         X extends AbstractFirebaseCrudService<U>> extends GetxService
-    implements InterfaceFirebaseSubcollectionCrudService<T, U>, InterfaceServiceDeserializer<T> {
+    implements IFirebaseSubCrudService<T, U>, InterfaceServiceDeserializer<T> {
   final X rootService = Get.find();
 
   CollectionReference<Map<String, dynamic>> getCollectionReference(String rootDomainUid) {
     return rootService.getCollectionReference().doc(rootDomainUid).collection(getCollectionName());
+  }
+
+  Stream<T> listen(String rootDomainUid, String uid) {
+    return getCollectionReference(rootDomainUid)
+        .doc(uid)
+        .snapshots()
+        .map((DocumentSnapshot<Map<String, dynamic>> event) => fromJson(event.data() as Map<String, dynamic>));
   }
 
   Stream<List<T>> orderByListen(String rootDomainUid, String orderBy, bool descending) {
@@ -124,7 +131,8 @@ abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDom
         .map((QuerySnapshot<T> snapshot) => snapshot.docs.map((QueryDocumentSnapshot<T> e) => e.data()).toList());
   }
 
-  Query compoundQueries(String rootDomainUid, List<FirebaseCondition> listConditions, {String? orderBy, bool orderByDescending = false}) {
+  Query compoundQueries(String rootDomainUid, List<FirebaseCondition> listConditions,
+      {String? orderBy, bool orderByDescending = false}) {
     Query? queryFinal;
     for (FirebaseCondition condition in listConditions) {
       if (queryFinal == null) {
@@ -244,7 +252,8 @@ abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDom
 
   Future<List<T>> getAllInAnyRoot() async {
     final List<T> resultList = <T>[];
-    final List<Future<List<T>>> list = (await rootService.getAll()).map((U rootDomain) => getAll(rootDomain.uid!)).toList();
+    final List<Future<List<T>>> list =
+        (await rootService.getAll()).map((U rootDomain) => getAll(rootDomain.uid!)).toList();
     (await Future.wait(list)).forEach((List<T> listT) => resultList.addAll(listT));
     return resultList;
   }
@@ -297,7 +306,7 @@ abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDom
 /// Classe abstraite dont on doit étendre pour récupérer les méthodes par défaut pour le CRUD Firebase.
 ///
 abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends GetxService
-    implements InterfaceCrudObserverService<T>, InterfaceServiceDeserializer<T> {
+    implements ICrudService<T>, InterfaceServiceDeserializer<T> {
   /// Méthode abstraite qui retournera la collectionReference.
   CollectionReference<Object?> getCollectionReference();
 
@@ -395,7 +404,10 @@ abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends Get
   @override
   Stream<T> listen(String uid) {
     try {
-      return getCollectionReference().doc(uid).snapshots().map((DocumentSnapshot<Object?> event) => fromJson(event.data() as Map<String, dynamic>));
+      return getCollectionReference()
+          .doc(uid)
+          .snapshots()
+          .map((DocumentSnapshot<Object?> event) => fromJson(event.data() as Map<String, dynamic>));
     } catch (e) {
       throw Exception('Soucis lors de la récupération de la référence du document. ${e.toString()}');
     }
@@ -463,8 +475,8 @@ abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends Get
 
   @override
   Future<List<T>> getAll() {
-    return getCollectionReference().get().then(
-        (QuerySnapshot<Object?> value) => value.docs.map((QueryDocumentSnapshot<Object?> e) => fromJson(e.data() as Map<String, dynamic>)).toList());
+    return getCollectionReference().get().then((QuerySnapshot<Object?> value) =>
+        value.docs.map((QueryDocumentSnapshot<Object?> e) => fromJson(e.data() as Map<String, dynamic>)).toList());
   }
 }
 

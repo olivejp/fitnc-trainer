@@ -54,7 +54,7 @@ class ParamDropdownButton extends StatelessWidget {
     required this.initialValue,
     required this.onChanged,
     this.icon = defaultIcon,
-    this.onlyValue = false,
+    this.onlyName = false,
     this.hint,
     this.insertNull = false,
     this.nullElement,
@@ -71,7 +71,7 @@ class ParamDropdownButton extends StatelessWidget {
   final void Function(String? onChangedValue) onChanged;
   final Icon? icon;
   final Widget? hint;
-  final bool onlyValue;
+  final bool onlyName;
   final bool insertNull;
   final String? nullElement;
 
@@ -81,7 +81,8 @@ class ParamDropdownButton extends StatelessWidget {
       style: style,
       decoration: decoration,
       initialValue: initialValue,
-      future: paramService.getFutureParamAsDropdown(paramName, onlyValue, insertNull, nullElement),
+      future: paramService.getFutureParamAsDropdown(paramName,
+          onlyName: onlyName, insertNull: insertNull, nullElement: nullElement),
       onChanged: onChanged,
       icon: icon,
       hint: hint,
@@ -100,7 +101,14 @@ class FutureDropdownButton extends StatelessWidget {
   final Future<List<DropdownMenuItem<String?>>> future;
 
   FutureDropdownButton(
-      {this.key, this.decoration, this.style, required this.future, required this.initialValue, required this.onChanged, this.icon, this.hint});
+      {this.key,
+      this.decoration,
+      this.style,
+      required this.future,
+      required this.initialValue,
+      required this.onChanged,
+      this.icon,
+      this.hint});
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +143,14 @@ class FutureDropdownButton extends StatelessWidget {
 
 class StreamDropdownButton extends StatelessWidget {
   const StreamDropdownButton(
-      {this.key, this.decoration, this.style, required this.stream, required this.initialValue, required this.onChanged, this.icon, this.hint});
+      {this.key,
+      this.decoration,
+      this.style,
+      required this.stream,
+      required this.initialValue,
+      required this.onChanged,
+      this.icon,
+      this.hint});
 
   final Key? key;
   final TextStyle? style;

@@ -20,7 +20,7 @@ UserExercice _$UserExerciceFromJson(Map<String, dynamic> json) {
     ..youtubeUrl = json['youtubeUrl'] as String?
     ..description = json['description'] as String
     ..comment = json['comment'] as String?
-    ..workingMax = json['workingMax'] as String?;
+    ..oneRepMax = json['oneRepMax'] as String?;
 }
 
 Map<String, dynamic> _$UserExerciceToJson(UserExercice instance) =>
@@ -37,5 +37,5 @@ Map<String, dynamic> _$UserExerciceToJson(UserExercice instance) =>
       'youtubeUrl': instance.youtubeUrl,
       'description': instance.description,
       'comment': instance.comment,
-      'workingMax': instance.workingMax,
+      'oneRepMax': instance.oneRepMax,
     };

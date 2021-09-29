@@ -17,12 +17,9 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
   }
 
   Stream<List<Param>> listenListParam(String paramName) {
-    return collectionReference
-        .doc(paramName)
-        .collection('values')
-        .orderBy('order')
-        .snapshots()
-        .map((QuerySnapshot<Map<String, dynamic>> querySnapshot) => querySnapshot.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> e) {
+    return collectionReference.doc(paramName).collection('values').orderBy('order').snapshots().map(
+        (QuerySnapshot<Map<String, dynamic>> querySnapshot) =>
+            querySnapshot.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> e) {
               try {
                 return Param.fromJson(e.data());
               } catch (e) {
@@ -55,8 +52,10 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
     );
   }
 
-  List<DropdownMenuItem<String?>> getParamAsDropdown(List<Param> params, bool onlyName, bool insertNull, String? nullElement) {
-    final List<DropdownMenuItem<String?>> list = params.map((param) => mapParamToDropdownItem(param, onlyName: onlyName)).toList();
+  List<DropdownMenuItem<String?>> getParamAsDropdown(
+      List<Param> params, bool onlyName, bool insertNull, String? nullElement) {
+    final List<DropdownMenuItem<String?>> list =
+        params.map((param) => mapParamToDropdownItem(param, onlyName: onlyName)).toList();
 
     if (insertNull) {
       list.add(DropdownMenuItem<String?>(
@@ -67,7 +66,8 @@ class ParamService extends AbstractAbsoluteFirestoreService<Param> {
     return list;
   }
 
-  Future<List<DropdownMenuItem<String?>>> getFutureParamAsDropdown(String paramName, bool onlyName, bool insertNull, String? nullElement) async {
+  Future<List<DropdownMenuItem<String?>>> getFutureParamAsDropdown(String paramName,
+      {bool onlyName = false, bool insertNull = false, String? nullElement}) async {
     final List<DropdownMenuItem<String?>> list =
         (await getListParam(paramName)).map((param) => mapParamToDropdownItem(param, onlyName: onlyName)).toList();
 
