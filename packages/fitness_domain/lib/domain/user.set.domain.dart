@@ -2,8 +2,6 @@ import 'package:fitness_domain/domain/abstract.domain.dart';
 import 'package:fitness_domain/domain/user.line.domain.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import 'line.domain.dart';
-
 part 'user.set.domain.g.dart';
 
 @JsonSerializable(explicitToJson: true)
@@ -20,6 +18,7 @@ class UserSet extends AbstractSubDomain {
   String? nameExercice = '';
   String? typeExercice = '';
   String? imageUrlExercice;
+
   List<UserLine> lines = <UserLine>[];
 
   Map<String, dynamic> toJson() => _$UserSetToJson(this);

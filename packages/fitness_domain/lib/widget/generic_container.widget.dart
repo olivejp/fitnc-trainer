@@ -15,7 +15,9 @@ class StreamList<T> extends StatelessWidget {
     this.physics,
     this.padding,
     this.emptyWidget,
-    this.showLoading = true
+    this.showLoading = true,
+    this.separatorBuilder,
+    this.shrinkWrap = true,
   }) : super(key: key);
   final Stream<List<T>> stream;
   final List<T>? initialData;
@@ -25,7 +27,9 @@ class StreamList<T> extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final Widget Function(Object? error)? onError;
   final Widget Function(BuildContext context, T domain) builder;
+  final IndexedWidgetBuilder? separatorBuilder;
   final bool showLoading;
+  final bool shrinkWrap;
 
   @override
   Widget build(BuildContext context) {
@@ -38,16 +42,30 @@ class StreamList<T> extends StatelessWidget {
         }
         if (snapshot.hasData && snapshot.data!.isNotEmpty) {
           final List<T> list = snapshot.data!;
-          return ListView.builder(
-            padding: padding,
-            shrinkWrap: true,
-            physics: physics,
-            itemCount: list.length,
-            itemBuilder: (BuildContext context, int index) {
-              T element = list.elementAt(index);
-              return builder(context, element);
-            },
-          );
+          if (separatorBuilder != null) {
+            return ListView.separated(
+              shrinkWrap: shrinkWrap,
+              padding: padding,
+              physics: physics,
+              itemCount: list.length,
+              itemBuilder: (BuildContext context, int index) {
+                T element = list.elementAt(index);
+                return builder(context, element);
+              },
+              separatorBuilder: separatorBuilder!,
+            );
+          } else {
+            return ListView.builder(
+              shrinkWrap: shrinkWrap,
+              padding: padding,
+              physics: physics,
+              itemCount: list.length,
+              itemBuilder: (BuildContext context, int index) {
+                T element = list.elementAt(index);
+                return builder(context, element);
+              },
+            );
+          }
         }
         if (snapshot.hasData && snapshot.data!.isEmpty) {
           if (emptyWidget != null) {
@@ -59,9 +77,10 @@ class StreamList<T> extends StatelessWidget {
         if (showLoading == false) {
           return Container();
         } else {
-          return loading ?? LoadingBouncingGrid.circle(backgroundColor: Theme
-              .of(context)
-              .primaryColor,);
+          return loading ??
+              LoadingBouncingGrid.circle(
+                backgroundColor: Theme.of(context).primaryColor,
+              );
         }
       },
     );
@@ -122,7 +141,8 @@ class HorizontalGridView<T extends AbstractStorageDomain> extends StatelessWidge
     return LimitedBox(
       maxHeight: 300,
       child: GridView(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisExtent: 200, childAspectRatio: 1 / 4),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2, mainAxisExtent: 200, childAspectRatio: 1 / 4),
           scrollDirection: Axis.horizontal,
           shrinkWrap: true,
           children: listDomains.map((T e) => HorizontalGridCard<T>(domain: e, onChanged: onChanged)).toList()),
