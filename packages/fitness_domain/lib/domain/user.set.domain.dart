@@ -18,6 +18,7 @@ class UserSet extends AbstractSubDomain {
   String? nameExercice = '';
   String? typeExercice = '';
   String? imageUrlExercice;
+  DateTime? date;
 
   List<UserLine> lines = <UserLine>[];
 

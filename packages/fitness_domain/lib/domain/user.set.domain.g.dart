@@ -21,6 +21,8 @@ UserSet _$UserSetFromJson(Map<String, dynamic> json) {
     ..updateDate = json['updateDate']
     ..creatorUid = json['creatorUid'] as String?
     ..comment = json['comment'] as String?
+    ..date =
+        json['date'] == null ? null : DateTime.parse(json['date'] as String)
     ..lines = (json['lines'] as List<dynamic>)
         .map((e) => UserLine.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -39,5 +41,6 @@ Map<String, dynamic> _$UserSetToJson(UserSet instance) => <String, dynamic>{
       'nameExercice': instance.nameExercice,
       'typeExercice': instance.typeExercice,
       'imageUrlExercice': instance.imageUrlExercice,
+      'date': instance.date?.toIso8601String(),
       'lines': instance.lines.map((e) => e.toJson()).toList(),
     };

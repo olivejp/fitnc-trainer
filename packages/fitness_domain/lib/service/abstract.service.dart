@@ -269,6 +269,9 @@ abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDom
   }
 
   Future<void> _sendToFireStore(T domain) {
+    if (domain.createDate == null) {
+      domain.createDate = FieldValue.serverTimestamp();
+    }
     domain.updateDate = FieldValue.serverTimestamp();
     return getCollectionReference(domain.getParentUid()).doc(domain.uid).set(domain.toJson());
   }
