@@ -4,9 +4,7 @@ import 'package:fitnc_trainer/widget/bottom.widget.dart';
 import 'package:fitnc_trainer/widget/layout-display.widget.dart';
 import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/service/display.service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -90,7 +88,9 @@ class _SignUpPageState extends State<SignUpPage> {
                         children: <Widget>[
                           Text(
                             'Créez votre compte',
-                            style: GoogleFonts.robotoTextTheme().headline6!.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
+                            style: GoogleFonts.robotoTextTheme()
+                                .headline6!
+                                .copyWith(fontSize: 28, fontWeight: FontWeight.bold),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 30),
@@ -190,7 +190,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                       border: defaultBorder,
                                       enabledBorder: defaultBorder,
                                       suffixIcon: IconButton(
-                                        tooltip: hidePasswordController.hidePassword1.value ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
+                                        tooltip: hidePasswordController.hidePassword1.value
+                                            ? 'Afficher le mot de passe'
+                                            : 'Masquer le mot de passe',
                                         onPressed: hidePasswordController.switchPassword1,
                                         icon: hidePasswordController.hidePassword1.value
                                             ? const Icon(Icons.visibility_outlined)
@@ -216,8 +218,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                       enabledBorder: defaultBorder,
                                       labelText: 'Retaper votre mot de passe',
                                       suffixIcon: IconButton(
-                                          tooltip:
-                                              hidePasswordController.hidePassword2.value ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
+                                          tooltip: hidePasswordController.hidePassword2.value
+                                              ? 'Afficher le mot de passe'
+                                              : 'Masquer le mot de passe',
                                           onPressed: hidePasswordController.switchPassword2,
                                           icon: hidePasswordController.hidePassword2.value
                                               ? const Icon(Icons.visibility_outlined)
@@ -237,7 +240,8 @@ class _SignUpPageState extends State<SignUpPage> {
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 55)),
                                 onPressed: () => onPressedEnter(),
-                                child: Text('Créer un compte', style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15)),
+                                child: Text('Créer un compte',
+                                    style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15)),
                               )),
                           Padding(
                             padding: const EdgeInsets.only(top: 30),
@@ -290,7 +294,9 @@ class _SignUpPageState extends State<SignUpPage> {
                 width: 200,
                 decoration: BoxDecoration(
                     gradient: LinearGradient(
-                        begin: Alignment.bottomLeft, end: Alignment.topRight, colors: <Color>[Colors.amber.withAlpha(100), Colors.amber.shade700])),
+                        begin: Alignment.bottomLeft,
+                        end: Alignment.topRight,
+                        colors: <Color>[Colors.amber.withAlpha(100), Colors.amber.shade700])),
               ),
             ),
             Transform(
@@ -301,7 +307,9 @@ class _SignUpPageState extends State<SignUpPage> {
                 width: 20,
                 decoration: BoxDecoration(
                     gradient: LinearGradient(
-                        begin: Alignment.bottomLeft, end: Alignment.topRight, colors: <Color>[Colors.amber.withAlpha(100), Colors.amber.shade700])),
+                        begin: Alignment.bottomLeft,
+                        end: Alignment.topRight,
+                        colors: <Color>[Colors.amber.withAlpha(100), Colors.amber.shade700])),
               ),
             ),
             Builder(builder: (_) {

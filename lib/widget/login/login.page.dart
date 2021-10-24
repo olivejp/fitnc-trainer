@@ -81,7 +81,9 @@ class _LoginPageState extends State<LoginPage> {
               width: 200,
               decoration: BoxDecoration(
                   gradient: LinearGradient(
-                      begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
+                      begin: Alignment.bottomLeft,
+                      end: Alignment.topRight,
+                      colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
             ),
           ),
           Transform(
@@ -92,7 +94,9 @@ class _LoginPageState extends State<LoginPage> {
               width: 20,
               decoration: BoxDecoration(
                   gradient: LinearGradient(
-                      begin: Alignment.bottomLeft, end: Alignment.topRight, colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
+                      begin: Alignment.bottomLeft,
+                      end: Alignment.topRight,
+                      colors: [Colors.amber.withAlpha(100), Colors.amber.shade700])),
             ),
           ),
           Column(
@@ -122,21 +126,24 @@ class _LoginPageState extends State<LoginPage> {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: <Widget>[
                                 Text(
-                                  'Connectez-vous à votre compte',
-                                  style: GoogleFonts.robotoTextTheme().headline6!.copyWith(fontSize: 28, fontWeight: FontWeight.bold),
+                                  'connectToYourAccount'.tr,
+                                  style: GoogleFonts.robotoTextTheme()
+                                      .headline6!
+                                      .copyWith(fontSize: 28, fontWeight: FontWeight.bold),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 30),
                                   child: TextFormField(
                                     style: GoogleFonts.roboto(fontSize: 15),
                                     decoration: InputDecoration(
-                                        labelText: 'Email',
+                                        labelText: 'email'.tr,
                                         hintStyle: GoogleFonts.roboto(fontSize: 15),
                                         focusedBorder: defaultBorder,
                                         border: defaultBorder,
                                         enabledBorder: defaultBorder),
                                     onChanged: (String value) => controller.email = value,
-                                    onFieldSubmitted: (_) => controller.onPressedEnter(_formKey).then((UserCredential value) {
+                                    onFieldSubmitted: (_) =>
+                                        controller.onPressedEnter(_formKey).then((UserCredential value) {
                                       if (widget.callback != null) {
                                         widget.callback!(value);
                                       }
@@ -167,19 +174,23 @@ class _LoginPageState extends State<LoginPage> {
                                           enableSuggestions: false,
                                           autocorrect: false,
                                           decoration: InputDecoration(
-                                              labelText: 'Mot de passe',
-                                              focusedBorder: defaultBorder,
-                                              border: defaultBorder,
-                                              enabledBorder: defaultBorder,
-                                              hintStyle: GoogleFonts.roboto(fontSize: 15),
-                                              suffixIcon: IconButton(
-                                                  tooltip: controller.hidePassword.value ? 'Afficher le mot de passe' : 'Masquer le mot de passe',
-                                                  onPressed: controller.switchHidePassword,
-                                                  icon: controller.hidePassword.value
-                                                      ? const Icon(Icons.visibility_outlined)
-                                                      : const Icon(Icons.visibility_off_outlined))),
+                                            labelText: 'password'.tr,
+                                            focusedBorder: defaultBorder,
+                                            border: defaultBorder,
+                                            enabledBorder: defaultBorder,
+                                            hintStyle: GoogleFonts.roboto(fontSize: 15),
+                                            suffixIcon: IconButton(
+                                              tooltip:
+                                                  controller.hidePassword.value ? 'showPassword'.tr : 'hidePassword'.tr,
+                                              onPressed: controller.switchHidePassword,
+                                              icon: controller.hidePassword.value
+                                                  ? const Icon(Icons.visibility_outlined)
+                                                  : const Icon(Icons.visibility_off_outlined),
+                                            ),
+                                          ),
                                           onChanged: (String value) => controller.password = value,
-                                          onFieldSubmitted: (_) => controller.onPressedEnter(_formKey).then((UserCredential value) {
+                                          onFieldSubmitted: (_) =>
+                                              controller.onPressedEnter(_formKey).then((UserCredential value) {
                                             if (widget.callback != null) {
                                               widget.callback!(value);
                                             }
@@ -187,10 +198,9 @@ class _LoginPageState extends State<LoginPage> {
                                         ),
                                       ),
                                       TextButton(
-                                          onPressed: () => print('hello'),
-                                          child: const Text(
-                                            'Mot de passe oublié ?',
-                                          )),
+                                        onPressed: () => print('hello'),
+                                        child: Text('passwordForgotten'.tr),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -204,13 +214,14 @@ class _LoginPageState extends State<LoginPage> {
                                       }
                                     }),
                                     child: Text(
-                                      'Continuer',
+                                      'continue'.tr,
                                       style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
                                     ),
                                   ),
                                 ),
                                 Obx(
-                                  () => (controller.errors.value != null) ? Text(controller.errors.value!) : Container(),
+                                  () =>
+                                      (controller.errors.value != null) ? Text(controller.errors.value!) : Container(),
                                 ),
                               ],
                             ),
@@ -221,13 +232,14 @@ class _LoginPageState extends State<LoginPage> {
                         padding: const EdgeInsets.only(top: 30, left: 20),
                         child: Row(
                           children: <Widget>[
-                            const Text("Vous n'avez pas de compte ?"),
+                            Text('noAccount'.tr),
                             TextButton(
-                                onPressed: () => Navigator.pushNamed(context, '/sign_up'),
-                                child: const Text(
-                                  "S'incrire",
-                                  style: TextStyle(color: Colors.white),
-                                )),
+                              onPressed: () => Get.offNamed(FitnessConstants.routeSignUp),
+                              child: Text(
+                                'signUp'.tr,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
                           ],
                         ),
                       )

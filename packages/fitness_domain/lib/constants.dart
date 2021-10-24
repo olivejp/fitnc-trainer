@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 class FitnessConstants {
   static const double textFormFieldHeight = 60;
   static const String appTitle = 'Fitness Nc';
+  static const String routeLogin = '/login';
+  static const String routeSignUp = '/sign_up';
+  static const String routeHome = '/home';
 }
 
 class FitnessNcColors {

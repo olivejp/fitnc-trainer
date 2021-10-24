@@ -1,11 +1,8 @@
-
 import 'package:fitnc_trainer/service/abonne.service.dart';
-import 'package:fitness_domain/service/util.service.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:fitness_domain/domain/abonne.domain.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:fitness_domain/service/util.service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -72,16 +69,16 @@ class _AbonnePageState extends State<AbonnePage> {
                   Expanded(
                       flex: 3,
                       child: SelectableText(
-                        'Abonne',
+                        'subscriber'.tr,
                         style: Theme.of(context).textTheme.headline1,
                       )),
                   Expanded(
                     child: TextFormField(
                       onChanged: (String text) => query = text,
-                      decoration: const InputDecoration(
-                        border: UnderlineInputBorder(),
-                        prefixIcon: Icon(Icons.search),
-                        hintText: 'Recherche...',
+                      decoration: InputDecoration(
+                        border: const UnderlineInputBorder(),
+                        prefixIcon: const Icon(Icons.search),
+                        hintText: 'search'.tr,
                       ),
                       textAlignVertical: TextAlignVertical.bottom,
                     ),
@@ -99,7 +96,7 @@ class _AbonnePageState extends State<AbonnePage> {
                     final List<Abonne> listAbonne = snapshot.data!;
                     return FitnessGridView<Abonne>(
                       domains: listAbonne,
-                      bloc: service,
+                      service: service,
                     );
                   }
                 },

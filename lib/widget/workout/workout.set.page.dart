@@ -41,7 +41,7 @@ class _WorkoutSetPageState extends State<WorkoutSetPage> {
 
   @override
   Widget build(BuildContext context) {
-    trainersService.listenToExercice().listen((List<Exercice> event) {
+    trainersService.listenToExercise().listen((List<Exercice> event) {
       widget.controller.listCompleteExercice.clear();
       widget.controller.listCompleteExercice.addAll(event);
       widget.controller.streamListExercice.sink.add(widget.controller.listCompleteExercice);

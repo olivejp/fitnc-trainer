@@ -18,25 +18,25 @@ abstract class AbstractExerciceController {
   final ExerciceService exerciceService = Get.find();
   final WorkoutSetService workoutSetService = Get.find();
 
-  Rx<Exercice> exercice = Exercice().obs;
+  Rx<Exercice> exercise = Exercice().obs;
 
   Future<void> init(Exercice? exerciceEntered) async {
     if (exerciceEntered != null) {
-      exercice.value = exerciceEntered;
+      exercise.value = exerciceEntered;
 
       if (exerciceEntered.imageUrl != null) {
         final StorageFile? value = await storageService.getFutureStorageFile(exerciceEntered.imageUrl);
-        exercice.value.storageFile = value;
+        exercise.value.storageFile = value;
       }
     }
   }
 
   Future<void> saveExercice() async {
-    return exerciceService.save(exercice.value);
+    return exerciceService.save(exercise.value);
   }
 
   void setStoragePair(StorageFile? stFile) {
-    exercice.update((Exercice? exo) {
+    exercise.update((Exercice? exo) {
       if (exo != null) {
         exo.storageFile = stFile ?? StorageFile();
         exo.imageUrl = null;
@@ -45,36 +45,36 @@ abstract class AbstractExerciceController {
   }
 
   Future<void> changeExerciceType(BuildContext context, String? typeExercice) async {
-    if (exercice.value.typeExercice != typeExercice) {
-      if (exercice.value.uid != null) {
-        final List<WorkoutSet> list = await workoutSetService.getAllWhereUidExerciceIs(exercice.value.uid!);
+    if (exercise.value.typeExercice != typeExercice) {
+      if (exercise.value.uid != null) {
+        final List<WorkoutSet> list = await workoutSetService.getAllWhereUidExerciceIs(exercise.value.uid!);
         final List<WorkoutSet> listFiltered = list.where((WorkoutSet set) => set.typeExercice != typeExercice).toList();
         if (listFiltered.isNotEmpty) {
           final WorkoutSet set = listFiltered.first;
           showDialog(
               context: context,
               builder: (BuildContext context) => AlertDialog(
-                    title: Text('Attention'),
+                    title: const Text('Attention'),
                     content: Text('Cet exercice est déjà utilisé dans des workouts avec le type ${set.typeExercice}.\n'
                         'Le nouveau type choisi ne sera pas répercutée sur les workouts qui utilisent cet exercice.'),
                     actions: <Widget>[
                       TextButton(
                         onPressed: () {
-                          exercice.value.typeExercice = typeExercice;
+                          exercise.value.typeExercice = typeExercice;
                           Navigator.of(context).pop();
                         },
-                        child: Text('Continuer'),
+                        child: const Text('Continuer'),
                       ),
                     ],
                   ));
         } else {
-          exercice.value.typeExercice = typeExercice;
+          exercise.value.typeExercice = typeExercice;
         }
       } else {
-        exercice.value.typeExercice = typeExercice;
+        exercise.value.typeExercice = typeExercice;
       }
     } else {
-      exercice.value.typeExercice = typeExercice;
+      exercise.value.typeExercice = typeExercice;
     }
   }
 }
@@ -89,18 +89,18 @@ class ExerciceUpdateController extends GetxController with AbstractExerciceContr
     isSet.value = exerciceEntered != null && exerciceEntered.uid != null;
 
     if (exerciceEntered != null) {
-      exercice.value = exerciceEntered;
+      exercise.value = exerciceEntered;
 
       if (exerciceEntered.imageUrl != null) {
         final StorageFile? value = await storageService.getFutureStorageFile(exerciceEntered.imageUrl);
-        exercice.value.storageFile = value;
+        exercise.value.storageFile = value;
       }
     }
     update();
   }
 
   void deleteExercice(Exercice exerciceDeleted) {
-    if (exerciceDeleted.uid == exercice.value.uid) {
+    if (exerciceDeleted.uid == exercise.value.uid) {
       init(null);
     }
   }

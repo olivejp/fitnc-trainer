@@ -81,7 +81,7 @@ class ProgrammeController extends LocalSearchControllerMixin<Programme, Programm
               .map((WorkoutSchedule workoutSchedule) => service.mapToFutureWorkoutScheduleDto(workoutSchedule))
               .toList())
           .then((List<Future<WorkoutScheduleDto?>> event) => Future.wait(event))
-          .catchError((Object? error) => throw Exception('Erreur lors de la récupération du programme ${programmeEntered.uid} : ${error.toString()}'))
+          .catchError((Object? error) => throw Exception('Erreur lors de la récupération du program ${programmeEntered.uid} : ${error.toString()}'))
           .then((List<WorkoutScheduleDto?> remoteList) {
         final List<WorkoutScheduleDto> list = [];
         remoteList.removeWhere((WorkoutScheduleDto? workoutScheduleDto) => workoutScheduleDto == null);
@@ -135,9 +135,9 @@ class ProgrammeController extends LocalSearchControllerMixin<Programme, Programm
     service.getWorkoutScheduleCollectionRef(programme.value.uid!)
         .doc(dto.uid)
         .set(dto.toJson())
-        .then((_) => showToast('Workout ajouté au programme.', duration: const Duration(seconds: 2)))
+        .then((_) => showToast('Workout ajouté au program.', duration: const Duration(seconds: 2)))
         .catchError(
-            (_) => showToast("Une erreur est survenue lors de l'enregistrement du workout au programme.", duration: const Duration(seconds: 2)));
+            (_) => showToast("Une erreur est survenue lors de l'enregistrement du workout au program.", duration: const Duration(seconds: 2)));
   }
 
   void deleteWorkoutSchedule(WorkoutScheduleDto workoutSchedule) {

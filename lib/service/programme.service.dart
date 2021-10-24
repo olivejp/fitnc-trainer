@@ -29,7 +29,7 @@ class ProgrammeService extends AbstractFitnessStorageService<Programme> {
 
   @override
   Stream<List<Programme>> listenAll() {
-    return trainersService.listenToProgramme();
+    return trainersService.listenToProgram();
   }
 
   @override

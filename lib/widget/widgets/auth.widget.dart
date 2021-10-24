@@ -21,7 +21,7 @@ class AuthWidget extends StatelessWidget {
           final User? user = snapshot.data;
           if (user != null) {
             authController.user.value = user;
-            return MyHomePage();
+            return HomePage();
           } else {
             authController.user.value = null;
             return const LoginPage();

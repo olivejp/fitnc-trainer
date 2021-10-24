@@ -1,10 +1,10 @@
+import 'package:fitness_domain/domain/abstract.domain.dart';
 import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:fitness_domain/service/display.service.dart';
 import 'package:fitness_domain/service/util.service.dart';
-import 'package:fitness_domain/domain/abstract.domain.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 ///
 /// Classe Widget pour une GridView spécialisée pour un AbstractFitnessDomain.
@@ -15,7 +15,7 @@ class FitnessGridView<T extends AbstractStorageDomain> extends StatelessWidget {
   FitnessGridView(
       {Key? key,
       required this.domains,
-      required this.bloc,
+      required this.service,
       this.onTap,
       this.getCard,
       this.childAspectRatio = 13 / 9,
@@ -24,12 +24,12 @@ class FitnessGridView<T extends AbstractStorageDomain> extends StatelessWidget {
       this.defaultTabletColumns = 4,
       this.defaultDesktopColumns = 8})
       : assert((getCard != null && onTap == null) || (getCard == null && onTap != null),
-            "Si vous implémenter la méthode getCard(), vous devriez implémenter la méthode onTap() dans l'implémentation de votre getCard()."),
+            'If you provide getCard(), then you should provide an onTap() method.'),
         super(key: key);
 
   final List<T> domains;
   final void Function(T domain)? onTap;
-  final AbstractFitnessCrudService<T> bloc;
+  final AbstractFitnessCrudService<T> service;
   final double childAspectRatio;
   final double padding;
   final int defaultMobileColumns;
@@ -65,15 +65,14 @@ class FitnessGridView<T extends AbstractStorageDomain> extends StatelessWidget {
           if (getCard != null) {
             return getCard!(domain);
           } else {
-            return _FitnessGridCard<T>(
-              bloc: bloc,
+            return FitnessGridCard<T>(
               domain: domain,
               onTap: (T domain) {
                 if (onTap != null) {
                   onTap!(domain);
                 }
               },
-              onDelete: (T domain) => UtilService.showDeleteDialog(context, domain, bloc),
+              onDelete: (T domain) => UtilService.showDeleteDialog(context, domain, service),
             );
           }
         }).toList(),
@@ -85,14 +84,14 @@ class FitnessGridView<T extends AbstractStorageDomain> extends StatelessWidget {
 ///
 /// Classe Widget pour une Grid Card.
 ///
-class _FitnessGridCard<T extends AbstractStorageDomain> extends StatelessWidget {
-  const _FitnessGridCard({Key? key, required this.domain, required this.onTap, required this.onDelete, required this.bloc}) : super(key: key);
+class FitnessGridCard<T extends AbstractStorageDomain> extends StatelessWidget {
+  const FitnessGridCard({Key? key, required this.domain, this.onTap,  this.onDelete, this.mouseCursor})
+      : super(key: key);
 
   final T domain;
-  final AbstractFitnessCrudService<T> bloc;
-  final void Function(T domain) onTap;
-  final void Function(T domain) onDelete;
-
+  final void Function(T domain)? onTap;
+  final void Function(T domain)? onDelete;
+  final MouseCursor? mouseCursor;
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -100,44 +99,74 @@ class _FitnessGridCard<T extends AbstractStorageDomain> extends StatelessWidget 
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       elevation: 2,
       child: InkWell(
+        mouseCursor: mouseCursor,
         splashColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
         borderRadius: BorderRadius.circular(5),
-        onTap: () => onTap(domain),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        onTap: onTap != null ? () => onTap!(domain) : null,
+        child: Stack(
           children: <Widget>[
-            Expanded(
-              flex: 3,
-              child: (domain.imageUrl?.isNotEmpty == true)
-                  ? Ink.image(image: NetworkImage(domain.imageUrl!), fit: BoxFit.cover)
-                  : Container(decoration: const BoxDecoration(color: Colors.amber)),
-            ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Flexible(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Text(
-                        domain.name,
-                        style: const TextStyle(fontSize: 15),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    tooltip: 'Supprimer',
-                    onPressed: () => onDelete(domain),
-                    icon: const Icon(Icons.delete, color: Colors.grey, size: 24),
-                  )
-                ],
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: <Color>[Colors.black, Colors.white.withOpacity(0)],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                ),
               ),
+            ),
+            if (domain.imageUrl?.isNotEmpty == true)
+              Ink.image(image: NetworkImage(domain.imageUrl!), fit: BoxFit.cover)
+            else
+              Container(
+                decoration: const BoxDecoration(color: Colors.amber),
+              ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: DomainCardNameRow<T>(domain: domain, onDelete: onDelete),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class DomainCardNameRow<T extends AbstractDomain> extends StatelessWidget {
+  const DomainCardNameRow({
+    Key? key,
+    required this.domain,
+    this.onDelete,
+  }) : super(key: key);
+
+  final T domain;
+  final void Function(T domain)? onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: <Widget>[
+        Flexible(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 10, bottom: 10, right: 10),
+            child: Text(
+              domain.name,
+              style: GoogleFonts.nunito(fontSize: 15, color: Colors.white),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+            ),
+          ),
+        ),
+        if (onDelete != null)
+          IconButton(
+            tooltip: 'delete'.tr,
+            onPressed: () => onDelete!(domain),
+            icon: const Icon(Icons.delete, color: Colors.white, size: 24),
+          )
+      ],
     );
   }
 }

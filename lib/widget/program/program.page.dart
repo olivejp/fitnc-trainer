@@ -1,30 +1,26 @@
 import 'package:fitnc_trainer/controller/programme/programme.controller.dart';
 import 'package:fitnc_trainer/service/programme.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
-import 'package:fitnc_trainer/widget/programme/programme.update.page.dart';
+import 'package:fitnc_trainer/widget/program/program.update.page.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:fitness_domain/domain/programme.domain.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-import 'programme.create.page.dart';
+import 'program.create.page.dart';
 
-class ProgrammePage extends StatefulWidget {
-  ProgrammePage({Key? key}) : super(key: key);
+class ProgramPage extends StatefulWidget {
+  ProgramPage({Key? key}) : super(key: key);
   final ProgrammeController controller = Get.put(ProgrammeController());
   final ProgrammeService service = Get.find();
 
   @override
-  State<ProgrammePage> createState() => _ProgrammePageState();
+  State<ProgramPage> createState() => _ProgramPageState();
 }
 
-class _ProgrammePageState extends State<ProgrammePage> {
+class _ProgramPageState extends State<ProgramPage> {
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
 
   @override
@@ -37,7 +33,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
         onPressed: () => ProgrammeCreatePage.showCreate(context),
         label: Text(
-          'Créer un programme',
+          'createProgram'.tr,
           style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
         ),
         icon: Icon(
@@ -55,7 +51,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
                 Expanded(
                     flex: 3,
                     child: Text(
-                      'Programme',
+                      'program'.tr,
                       style: Theme.of(context).textTheme.headline1,
                     )),
                 Expanded(
@@ -65,9 +61,10 @@ class _ProgrammePageState extends State<ProgrammePage> {
                       constraints: const BoxConstraints(maxHeight: 43),
                       border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
                       focusedBorder: OutlineInputBorder(
-                          borderRadius: const BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(color: Theme.of(context).primaryColor)),
+                          borderRadius: const BorderRadius.all(Radius.circular(5)),
+                          borderSide: BorderSide(color: Theme.of(context).primaryColor)),
                       prefixIcon: const Icon(Icons.search),
-                      hintText: 'Recherche...',
+                      hintText: 'search'.tr,
                     ),
                     textAlignVertical: TextAlignVertical.bottom,
                   ),
@@ -80,14 +77,14 @@ class _ProgrammePageState extends State<ProgrammePage> {
               stream: widget.controller.streamList,
               builder: (BuildContext context, AsyncSnapshot<List<Programme>> snapshot) {
                 if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
-                  return const Center(child: Text('Aucun programme trouvé.'));
+                  return Center(child: Text('noProgramFound'.tr));
                 } else {
                   final List<Programme> programmes = snapshot.data!;
                   return FitnessGridView<Programme>(
                     defaultDesktopColumns: 6,
                     childAspectRatio: 15 / 16,
                     domains: programmes,
-                    bloc: widget.service,
+                    service: widget.service,
                     getCard: (Programme pgm) => getProgrammeCard(pgm, context),
                   );
                 }
@@ -128,15 +125,15 @@ class _ProgrammePageState extends State<ProgrammePage> {
                       )),
                       PopupMenuButton<dynamic>(
                         iconSize: 24,
-                        tooltip: 'Voir plus',
+                        tooltip: 'showMore'.tr,
                         icon: const Icon(Icons.more_vert, color: Colors.grey),
                         itemBuilder: (_) => <PopupMenuItem<dynamic>>[
                           PopupMenuItem<dynamic>(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: const <Widget>[
-                                Text('Supprimer'),
-                                Icon(
+                              children: <Widget>[
+                                Text('delete'.tr),
+                                const Icon(
                                   Icons.delete,
                                   color: Colors.grey,
                                 ),
@@ -147,15 +144,16 @@ class _ProgrammePageState extends State<ProgrammePage> {
                                 context: context,
                                 builder: (BuildContext context) => AlertDialog(
                                   title: RichText(
-                                      text: TextSpan(text: 'Êtes-vous sûr de vouloir supprimer : ', children: <InlineSpan>[
+                                      text: TextSpan(text: 'wantToDelete'.tr, children: <InlineSpan>[
                                     TextSpan(text: programme.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                                     const TextSpan(text: ' ?'),
                                   ])),
                                   actions: <Widget>[
                                     TextButton(
-                                        onPressed: () => widget.service.delete(programme).then((_) => Navigator.pop(context)),
-                                        child: const Text('Oui')),
-                                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
+                                        onPressed: () =>
+                                            widget.service.delete(programme).then((_) => Navigator.pop(context)),
+                                        child: Text('yes'.tr)),
+                                    TextButton(onPressed: () => Navigator.pop(context), child: Text('cancel'.tr))
                                   ],
                                 ),
                               );
@@ -169,16 +167,16 @@ class _ProgrammePageState extends State<ProgrammePage> {
               )
             ]),
             if (programme.available == true && programme.publishDate != null)
-              const Positioned(
+              Positioned(
                 top: 5,
                 right: 5,
                 child: Chip(
                   backgroundColor: Colors.green,
                   label: Text(
-                    'Publié',
-                    style: TextStyle(color: Colors.white),
+                    'published'.tr,
+                    style: const TextStyle(color: Colors.white),
                   ),
-                  avatar: Icon(
+                  avatar: const Icon(
                     Icons.public,
                     color: Colors.white,
                   ),
@@ -198,7 +196,7 @@ class _ProgrammePageState extends State<ProgrammePage> {
         contentPadding: const EdgeInsets.all(20),
         content: SizedBox(
           width: 1280,
-          child: ProgrammeUpdatePage(programme: programme),
+          child: ProgramUpdatePage(programme: programme),
         ),
       ),
     );

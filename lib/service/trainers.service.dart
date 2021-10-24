@@ -8,6 +8,7 @@ import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 class TrainersService extends AbstractFitnessStorageService<Trainers> {
   final FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
@@ -41,7 +42,7 @@ class TrainersService extends AbstractFitnessStorageService<Trainers> {
 
   Future<Trainers?> getCurrentTrainer() {
     final User? user = authInstance.currentUser;
-    if (user == null) throw Exception('Aucun utilisateur connecté');
+    if (user == null) throw Exception('noUserConnected'.tr);
     return read(user.uid);
   }
 
@@ -75,30 +76,30 @@ class TrainersService extends AbstractFitnessStorageService<Trainers> {
         event.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> doc) => Abonne.fromJson(doc.data())).toList());
   }
 
-  Stream<List<Exercice>> listenToExercice() {
+  Stream<List<Exercice>> listenToExercise() {
     return getExerciceReference().orderBy('createDate').snapshots().map((QuerySnapshot<Map<String, dynamic>> event) =>
         event.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> doc) => Exercice.fromJson(doc.data())).toList());
   }
 
-  Stream<List<Programme>> listenToProgramme() {
+  Stream<List<Programme>> listenToProgram() {
     return getProgrammeReference().orderBy('createDate').snapshots().map((QuerySnapshot<Map<String, dynamic>> event) =>
         event.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> doc) => Programme.fromJson(doc.data())).toList());
   }
 
-  Stream<List<DropdownMenuItem<Exercice>>> getExerciceStreamDropdownMenuItem() {
+  Stream<List<DropdownMenuItem<Exercice>>> getExerciseStreamDropdownMenuItem() {
     return getExerciceReference().orderBy('name').snapshots().map(
-        (QuerySnapshot<Map<String, dynamic>> querysnapshot) => querysnapshot.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> queryDocSnapshot) {
-              final Exercice exercice = Exercice.fromJson(queryDocSnapshot.data());
-              final ImageProvider? provider = exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null;
+        (QuerySnapshot<Map<String, dynamic>> querySnapshot) => querySnapshot.docs.map((QueryDocumentSnapshot<Map<String, dynamic>> queryDocSnapshot) {
+              final Exercice exercise = Exercice.fromJson(queryDocSnapshot.data());
+              final ImageProvider? provider = exercise.imageUrl != null ? NetworkImage(exercise.imageUrl!) : null;
               return DropdownMenuItem<Exercice>(
-                value: exercice,
+                value: exercise,
                 child: Row(children: <Widget>[
                   CircleAvatar(
                     foregroundImage: provider,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 10.0),
-                    child: Text(exercice.name),
+                    child: Text(exercise.name),
                   ),
                 ]),
               );

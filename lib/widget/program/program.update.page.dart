@@ -8,12 +8,7 @@ import 'package:fitness_domain/domain/workout_schedule.dto.dart';
 import 'package:fitness_domain/widget/firestore_param_dropdown.widget.dart';
 import 'package:fitness_domain/widget/generic_container.widget.dart';
 import 'package:fitness_domain/widget/storage_image.widget.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animations/loading_animations.dart';
@@ -21,8 +16,8 @@ import 'package:oktoast/oktoast.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart' as sf;
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-class ProgrammeUpdatePage extends StatelessWidget {
-  ProgrammeUpdatePage({Key? key, required this.programme}) : super(key: key);
+class ProgramUpdatePage extends StatelessWidget {
+  ProgramUpdatePage({Key? key, required this.programme}) : super(key: key);
 
   final Programme programme;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -42,7 +37,7 @@ class ProgrammeUpdatePage extends StatelessWidget {
             controller.unpublish().then((_) => Navigator.pop(context));
           }
         },
-        label: const Text('Dépublier', style: TextStyle(color: Colors.white)),
+        label: Text('unpublish'.tr, style: const TextStyle(color: Colors.white)),
         icon: const Icon(Icons.public, color: Colors.white),
       ));
     }
@@ -54,7 +49,7 @@ class ProgrammeUpdatePage extends StatelessWidget {
             controller.publish().then((_) => Navigator.pop(context));
           }
         },
-        label: const Text('Publier', style: TextStyle(color: Colors.white)),
+        label: Text('publish'.tr, style: const TextStyle(color: Colors.white)),
         icon: const Icon(Icons.public, color: Colors.white),
       ));
     }
@@ -66,20 +61,20 @@ class ProgrammeUpdatePage extends StatelessWidget {
               controller
                   .save()
                   .then(
-                    (_) => showToast('Exercice sauvegardé', backgroundColor: Colors.green),
+                    (_) => showToast('exerciseSaved'.tr, backgroundColor: Colors.green),
                   )
                   .catchError(
-                    (_) => showToast('Erreur lors de la sauvegarde', backgroundColor: Colors.redAccent),
+                    (_) => showToast('errorWhileSaving'.tr, backgroundColor: Colors.redAccent),
                   );
             }
           },
           icon: const Icon(Icons.save, color: Colors.white),
-          label: const Text('Enregistrer', style: TextStyle(color: Colors.white))),
+          label: Text('save'.tr, style: const TextStyle(color: Colors.white))),
       TextButton.icon(
           style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.close, color: Colors.white),
-          label: const Text('Fermer', style: TextStyle(color: Colors.white))),
+          label: Text('close'.tr, style: const TextStyle(color: Colors.white))),
     ]);
 
     return Form(
@@ -122,10 +117,10 @@ class ProgrammeUpdatePage extends StatelessWidget {
                                               initialValue: controller.programme.value.name,
                                               autofocus: true,
                                               onChanged: (String value) => controller.name = value,
-                                              labelText: 'Nom',
+                                              labelText: 'name'.tr,
                                               validator: (String? value) {
                                                 if (value == null || value.isEmpty) {
-                                                  return 'Merci de renseigner le nom du programme.';
+                                                  return 'fillName'.tr;
                                                 }
                                                 return null;
                                               }),
@@ -137,10 +132,11 @@ class ProgrammeUpdatePage extends StatelessWidget {
                                             ),
                                             child: ParamDropdownButton(
                                                 paramName: 'number_weeks',
-                                                decoration: const InputDecoration(
-                                                    labelText: 'Nombre de semaine',
-                                                    constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight),
-                                                    contentPadding: EdgeInsets.symmetric(horizontal: 10)),
+                                                decoration: InputDecoration(
+                                                    labelText: 'weekNumber'.tr,
+                                                    constraints: const BoxConstraints(
+                                                        maxHeight: FitnessConstants.textFormFieldHeight),
+                                                    contentPadding: const EdgeInsets.symmetric(horizontal: 10)),
                                                 initialValue: controller.programme.value.numberWeeks,
                                                 onChanged: (String? value) => controller.changeNumberWeek(value)),
                                           ),
@@ -165,7 +161,7 @@ class ProgrammeUpdatePage extends StatelessWidget {
               minLines: 5,
               maxLines: 20,
               onChanged: (String value) => controller.description = value,
-              decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionel'),
+              decoration: InputDecoration(labelText: 'description'.tr, helperText: 'optional'.tr),
             ),
             WorkoutSchedulePanel()
           ],
@@ -233,7 +229,15 @@ class _WorkoutChoicePanel extends StatelessWidget {
 
 class WorkoutSchedulePanel extends StatelessWidget {
   static final TextStyle columnTextStyle = GoogleFonts.roboto(fontSize: 10, fontWeight: FontWeight.bold);
-  static final List<String> columnNames = <String>['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+  static final List<String> columnNames = <String>[
+    'monday'.tr,
+    'tuesday'.tr,
+    'wednesday'.tr,
+    'thursday'.tr,
+    'friday'.tr,
+    'saturday'.tr,
+    'sunday'.tr
+  ];
   final ProgrammeController controller = Get.find();
 
   @override
@@ -257,10 +261,11 @@ class WorkoutSchedulePanel extends StatelessWidget {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          final List<WorkoutScheduleDto> list = listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
+          final List<WorkoutScheduleDto> list =
+              listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
 
           return AlertDialog(
-            title: Text('Jour $dayIndex'),
+            title: Text('dayNumber'.trParams({'number': dayIndex.toString()})),
             actions: <Widget>[
               TextButton(
                   onPressed: () => showDialog(
@@ -275,10 +280,10 @@ class WorkoutSchedulePanel extends StatelessWidget {
                           ),
                         ),
                       ),
-                  child: const Text('Créer un workout')),
+                  child: Text('createWorkout'.tr)),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Sortir'),
+                child: Text('close'.tr),
               ),
             ],
             content: PopupDayDetail(dayIndex: dayIndex, list: list),
@@ -358,7 +363,8 @@ class PopupDayDetail extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
-                  decoration: BoxDecoration(border: Border.all(color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
                   child: _WorkoutChoicePanel()),
             ),
           ),
@@ -386,17 +392,19 @@ class _WorkoutSelectedPanel extends StatelessWidget {
         onWillAccept: (Workout? data) => data is Workout,
         builder: (BuildContext context, List<Workout?> candidateData, List<Object?> rejectedData) {
           return Container(
-            decoration: BoxDecoration(border: Border.all(color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
             child: Column(
               children: <Widget>[
-                const Text('Glisser ici les workout de la journée.'),
+                Text('dragWorkoutHere'.tr),
                 StreamBuilder<List<WorkoutScheduleDto>>(
                     initialData: list,
                     stream: controller.workoutScheduleObs,
                     builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
                       if (snapshot.hasData) {
-                        final List<WorkoutScheduleDto> listWorkout =
-                            snapshot.data!.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex - 1).toList();
+                        final List<WorkoutScheduleDto> listWorkout = snapshot.data!
+                            .where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex - 1)
+                            .toList();
                         return ListView.separated(
                           shrinkWrap: true,
                           itemBuilder: (BuildContext context, int index) {
@@ -440,7 +448,8 @@ class _DataCellData {
 /// DataSource du GridData
 ///
 class _WorkoutDataSource extends sf.DataGridSource {
-  _WorkoutDataSource({required this.context, required this.numberWeeks, required this.listAppointment, required this.columnNames}) {
+  _WorkoutDataSource(
+      {required this.context, required this.numberWeeks, required this.listAppointment, required this.columnNames}) {
     _workoutData = getListDataRows(numberWeeks, listAppointment);
   }
 
@@ -451,8 +460,10 @@ class _WorkoutDataSource extends sf.DataGridSource {
   List<String> columnNames;
 
   /// Méthode pour générer une DataCell.
-  sf.DataGridCell<_DataCellData> getDataCell(String columnName, int dayIndex, List<WorkoutScheduleDto> listAppointment) {
-    final List<WorkoutScheduleDto> list = listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
+  sf.DataGridCell<_DataCellData> getDataCell(
+      String columnName, int dayIndex, List<WorkoutScheduleDto> listAppointment) {
+    final List<WorkoutScheduleDto> list =
+        listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
     final _DataCellData data = _DataCellData(list: list, dayIndex: dayIndex);
     return sf.DataGridCell<_DataCellData>(value: data, columnName: columnName);
   }

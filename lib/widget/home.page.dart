@@ -1,25 +1,20 @@
-import 'dart:ui';
-
 import 'package:fitnc_trainer/controller/auth.controller.dart';
 import 'package:fitnc_trainer/controller/home.page.controller.dart';
 import 'package:fitnc_trainer/widget/exercice/exercice.page.dart';
 import 'package:fitnc_trainer/widget/profil/profil.page.dart';
+import 'package:fitnc_trainer/widget/program/program.page.dart';
 import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/service/auth.service.dart';
 import 'package:fitness_domain/service/display.service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 
 import 'abonne/abonne.page.dart';
-import 'programme/programme.page.dart';
 import 'workout/workout.page.dart';
 
 class Destination {
   Destination({required this.page, this.icon, required this.pageName, required this.index, this.child})
-      : assert((icon != null && child == null) || (icon == null && child != null), "icon or child, but not both.");
+      : assert((icon != null && child == null) || (icon == null && child != null), 'icon or child, but not both.');
 
   final Icon? icon;
   final Widget? child;
@@ -28,17 +23,37 @@ class Destination {
   final Widget page;
 }
 
-class MyHomePage extends StatelessWidget {
+class HomePage extends StatelessWidget {
   final HomePageController controller = Get.put(HomePageController());
   final AuthController authController = Get.find();
 
   @override
   Widget build(BuildContext context) {
     final List<Destination> destinations = <Destination>[
-      Destination(icon: const Icon(Icons.account_tree_outlined), pageName: 'Programme', index: 0, page: ProgrammePage()),
-      Destination(icon: const Icon(Icons.sports_volleyball_outlined), pageName: 'Workout', index: 1, page: WorkoutPage()),
-      Destination(icon: const Icon(Icons.sports_handball_outlined), pageName: 'Exercice', index: 2, page: ExercicePage()),
-      Destination(icon: const Icon(Icons.group), pageName: 'Abonné', index: 3, page: AbonnePage()),
+      Destination(
+        icon: const Icon(Icons.account_tree_outlined),
+        pageName: 'program'.tr,
+        index: 0,
+        page: ProgramPage(),
+      ),
+      Destination(
+        icon: const Icon(Icons.sports_volleyball_outlined),
+        pageName: 'workout'.tr,
+        index: 1,
+        page: WorkoutPage(),
+      ),
+      Destination(
+        icon: const Icon(Icons.sports_handball_outlined),
+        pageName: 'exercise'.tr,
+        index: 2,
+        page: ExercisePage(),
+      ),
+      Destination(
+        icon: const Icon(Icons.group),
+        pageName: 'subscriber'.tr,
+        index: 3,
+        page: AbonnePage(),
+      ),
       Destination(
           child: Obx(() {
             if (authController.trainer.value?.imageUrl != null) {
@@ -50,7 +65,7 @@ class MyHomePage extends StatelessWidget {
               return const Icon(Icons.person);
             }
           }),
-          pageName: 'Profil',
+          pageName: 'profile'.tr,
           index: 4,
           page: ProfilPage()),
     ];
@@ -130,11 +145,11 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
           selectedIndex: controller.currentPage.value,
           trailing: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
+            children: <Widget>[
               Flexible(
                 child: _NavigationRailFolderSection(folders: <_NavigationFolder>[
                   _NavigationFolder(
-                    label: 'Déconnexion',
+                    label: 'signOut'.tr,
                     iconData: Icons.exit_to_app_outlined,
                     onTap: () => authService.signOut(),
                   ),
@@ -197,7 +212,8 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
 
 class _NavigationFolder {
   _NavigationFolder({required this.label, this.iconData, required this.onTap, this.child})
-      : assert((iconData != null && child == null) || (iconData == null && child != null), "iconData or child, but not both.");
+      : assert((iconData != null && child == null) || (iconData == null && child != null),
+            'iconData or child, but not both.');
 
   final IconData? iconData;
   final Widget? child;

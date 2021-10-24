@@ -1,10 +1,8 @@
-import 'package:fitness_domain/constants.dart';
 import 'package:fitnc_trainer/controller/programme/programme.controller.dart';
+import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/widget/firestore_param_dropdown.widget.dart';
 import 'package:fitness_domain/widget/storage_image.widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class ProgrammeCreatePage {
@@ -40,16 +38,16 @@ class ProgrammeCreatePage {
                           child: Padding(
                             padding: const EdgeInsets.only(left: 20),
                             child: Row(
-                              children: [
+                              children: <Widget>[
                                 Expanded(
                                   child: TextFormField(
                                       initialValue: controller.programme.value.name,
                                       autofocus: true,
                                       onChanged: (String value) => controller.name = value,
-                                      decoration: const InputDecoration(labelText: 'Nom'),
+                                      decoration: InputDecoration(labelText: 'name'.tr),
                                       validator: (String? value) {
                                         if (value == null || value.isEmpty) {
-                                          return 'Merci de renseigner le nom du programme.';
+                                          return 'fillName'.tr;
                                         }
                                         return null;
                                       }),
@@ -60,9 +58,10 @@ class ProgrammeCreatePage {
                                     child: ParamDropdownButton(
                                         paramName: 'number_weeks',
                                         initialValue: controller.programme.value.numberWeeks,
-                                        decoration: const InputDecoration(
-                                            labelText: 'Nombre de semaine',
-                                            constraints: BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight)),
+                                        decoration: InputDecoration(
+                                            labelText: 'weekNumber'.tr,
+                                            constraints:
+                                                const BoxConstraints(maxHeight: FitnessConstants.textFormFieldHeight)),
                                         onChanged: (String? value) => controller.changeNumberWeek(value)),
                                   ),
                                 )
@@ -79,21 +78,21 @@ class ProgrammeCreatePage {
                     minLines: 5,
                     maxLines: 20,
                     onChanged: (String? value) => controller.description = value,
-                    decoration: const InputDecoration(labelText: 'Description', helperText: 'Optionnel'),
+                    decoration: InputDecoration(labelText: 'description'.tr, helperText: 'optional'.tr),
                   ),
                 ],
               ),
             ),
           ),
           actionsPadding: const EdgeInsets.all(20),
-          actions: [
+          actions: <Widget>[
             FloatingActionButton(
-              tooltip: 'Annuler',
+              tooltip: 'cancel'.tr,
               onPressed: () => Navigator.of(context).pop(),
               child: const Icon(Icons.clear),
             ),
             FloatingActionButton(
-              tooltip: 'Créer',
+              tooltip: 'create'.tr,
               onPressed: () {
                 if (_formKey.currentState?.validate() == true) {
                   controller.save().then((_) => Navigator.of(context).pop());

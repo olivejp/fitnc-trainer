@@ -15,6 +15,7 @@ import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart' as getRx;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_animations/loading_animations.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'exercice.form.builder.dart';
@@ -51,7 +52,7 @@ class ExercicePageController extends LocalSearchControllerMixin<Exercice, Exerci
   }
 }
 
-class ExercicePage extends StatelessWidget {
+class ExercisePage extends StatelessWidget {
   final List<Exercice> listCompleteExercice = <Exercice>[];
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
   final ExerciceService service = Get.find();
@@ -78,7 +79,7 @@ class ExercicePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   SelectableText(
-                    'Exercice',
+                    'exercise'.tr,
                     style: Theme.of(context).textTheme.headline1,
                   ),
                   ElevatedButton(
@@ -88,7 +89,7 @@ class ExercicePage extends StatelessWidget {
                     ),
                     onPressed: () => ExerciceBuilderPage.create(context),
                     child: Text(
-                      'Créer un exercice',
+                      'createExercise'.tr,
                       style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
                     ),
                   )
@@ -109,8 +110,9 @@ class ExercicePage extends StatelessWidget {
                         Expanded(
                           flex: 3,
                           child: Container(
-                            decoration:
-                                const BoxDecoration(color: FitnessNcColors.blue50, borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
+                            decoration: const BoxDecoration(
+                                color: FitnessNcColors.blue50,
+                                borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
                             child: Obx(() => ExerciceUpdate(exercice: controller.exerciceSelected.value)),
                           ),
                         ),
@@ -188,9 +190,10 @@ class _ExerciceListSearchState extends State<_ExerciceListSearch> {
                     constraints: const BoxConstraints(maxHeight: 43),
                     border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
                     focusedBorder: OutlineInputBorder(
-                        borderRadius: const BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(color: Theme.of(context).primaryColor)),
+                        borderRadius: const BorderRadius.all(Radius.circular(5)),
+                        borderSide: BorderSide(color: Theme.of(context).primaryColor)),
                     prefixIcon: const Icon(Icons.search),
-                    hintText: 'Recherche...',
+                    hintText: 'search'.tr,
                   ),
                   onChanged: (String value) => widget.controller.query.value = value,
                   textAlignVertical: TextAlignVertical.bottom,
@@ -239,23 +242,27 @@ class _ExerciceStreamBuilder extends StatelessWidget {
     return StreamBuilder<List<Exercice>>(
       stream: _streamListExercice,
       builder: (BuildContext context, AsyncSnapshot<List<Exercice>> snapshot) {
-        if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
-          return const Center(child: Text('Aucun exercice trouvé.'));
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return LoadingRotating.square();
         } else {
-          final List<Exercice> list = snapshot.data!;
-          return GetBuilder<ExercicePageController>(
-              init: pageController,
-              builder: (ExercicePageController controller) {
-                return (pageController.display.value == 0)
-                    ? FitnessGridView<Exercice>(
-                        defaultDesktopColumns: 3,
-                        defaultTabletColumns: 2,
-                        domains: list,
-                        bloc: service,
-                        onTap: (Exercice exercice) => selectExercice(exercice),
-                      )
-                    : _ExerciceListViewSeparated(list: list);
-              });
+          if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
+            return Center(child: Text('noExerciseFound'.tr));
+          } else {
+            final List<Exercice> list = snapshot.data!;
+            return GetBuilder<ExercicePageController>(
+                init: pageController,
+                builder: (ExercicePageController controller) {
+                  return (pageController.display.value == 0)
+                      ? FitnessGridView<Exercice>(
+                          defaultDesktopColumns: 3,
+                          defaultTabletColumns: 2,
+                          domains: list,
+                          service: service,
+                          onTap: (Exercice exercice) => selectExercice(exercice),
+                        )
+                      : _ExerciceListViewSeparated(list: list);
+                });
+          }
         }
       },
     );
@@ -328,12 +335,14 @@ class ExerciceListTile extends StatelessWidget {
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
                   title: RichText(
-                      text: TextSpan(text: 'Êtes-vous sûr de vouloir supprimer : ', children: <InlineSpan>[
+                      text: TextSpan(text: 'wantToDelete'.tr, children: <InlineSpan>[
                     TextSpan(text: exercice.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                     const TextSpan(text: ' ?'),
                   ])),
                   actions: <Widget>[
-                    TextButton(onPressed: () => service.delete(exercice).then((_) => Navigator.pop(context)), child: const Text('Oui')),
+                    TextButton(
+                        onPressed: () => service.delete(exercice).then((_) => Navigator.pop(context)),
+                        child: const Text('Oui')),
                     TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
                   ],
                 ),

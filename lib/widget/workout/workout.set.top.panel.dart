@@ -1,13 +1,9 @@
+import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/workout/workout.set.page.dart';
 import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/domain/exercice.domain.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:loading_animations/loading_animations.dart';
 
 /// Panel supérieur proposant une liste d'exercice avec option de recherche.
 /// Les cards exerices sont "draggable".
@@ -39,7 +35,7 @@ class WorkoutSetTopPanel extends StatelessWidget {
                   border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: const BorderRadius.all(Radius.circular(5)),
-                      borderSide: BorderSide(width: 1, color: Theme.of(context).primaryColor)),
+                      borderSide: BorderSide(color: Theme.of(context).primaryColor)),
                   prefixIcon: const Icon(Icons.search),
                   suffixIcon: IconButton(
                       iconSize: 15,
@@ -49,7 +45,7 @@ class WorkoutSetTopPanel extends StatelessWidget {
                       },
                       icon: const Icon(Icons.clear)),
                   hintStyle: const TextStyle(fontSize: 14),
-                  hintText: 'Recherche...',
+                  hintText: 'search'.tr,
                 ),
                 onChanged: (String value) => controller.subjectQuery.sink.add(value),
                 textAlignVertical: TextAlignVertical.bottom,
@@ -62,7 +58,7 @@ class WorkoutSetTopPanel extends StatelessWidget {
             stream: controller.streamListExercice,
             builder: (BuildContext context, AsyncSnapshot<List<Exercice?>> snapshot) {
               if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
-                return const Center(child: Text('Aucun exercice trouvé.'));
+                return Center(child: Text('noExerciseFound'.tr));
               } else {
                 return _WorkoutSetExerciceGridView(listExercice: snapshot.data!);
               }
@@ -81,6 +77,8 @@ class _WorkoutSetExerciceGridView extends StatelessWidget {
   final ScrollController _scrollController = ScrollController();
   final int scrollStep = 200;
   final double radiusButtonStep = 10;
+  final double containerWidth = 30;
+  final double arrowIconSize = 18;
 
   @override
   Widget build(BuildContext context) {
@@ -94,8 +92,9 @@ class _WorkoutSetExerciceGridView extends StatelessWidget {
           child: Scrollbar(
             isAlwaysShown: true,
             controller: _scrollController,
+            thickness: 20,
             child: GridView.count(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.only(bottom: 20),
               controller: _scrollController,
               semanticChildCount: listExercice.length,
               shrinkWrap: true,
@@ -105,17 +104,19 @@ class _WorkoutSetExerciceGridView extends StatelessWidget {
               crossAxisSpacing: 5,
               mainAxisSpacing: 5,
               children: listExercice.where((Exercice? exercice) => exercice != null).map((Exercice? exercice) {
-                final Widget gridCard = _WorkoutSetExerciceCard(
-                  exercice: exercice!,
+                final Widget gridCard = FitnessGridCard<Exercice>(
+                  domain: exercice!,
+                  mouseCursor: SystemMouseCursors.grab,
                 );
                 return Draggable<Exercice>(
-                  feedback: gridCard,
-                  data: exercice,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(5),
-                    onTap: () {},
+                  feedback: LimitedBox(
+                    maxWidth: 200,
+                    maxHeight: 100,
                     child: gridCard,
                   ),
+                  data: exercice,
+                  maxSimultaneousDrags: 1,
+                  child: gridCard,
                 );
               }).toList(),
             ),
@@ -128,13 +129,14 @@ class _WorkoutSetExerciceGridView extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                   color: FitnessNcColors.blue50Alpha060,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(radiusButtonStep), bottomLeft: Radius.circular(radiusButtonStep))),
-              width: 30,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(radiusButtonStep), bottomLeft: Radius.circular(radiusButtonStep))),
+              width: containerWidth,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: <Widget>[
                   IconButton(
-                    iconSize: 15,
+                    iconSize: arrowIconSize,
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
                       final double offset = _scrollController.offset;
@@ -151,13 +153,14 @@ class _WorkoutSetExerciceGridView extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                   color: FitnessNcColors.blue50Alpha060,
-                  borderRadius: BorderRadius.only(topRight: Radius.circular(radiusButtonStep), bottomRight: Radius.circular(radiusButtonStep))),
-              width: 30,
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(radiusButtonStep), bottomRight: Radius.circular(radiusButtonStep))),
+              width: containerWidth,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: <Widget>[
                   IconButton(
-                    iconSize: 15,
+                    iconSize: arrowIconSize,
                     icon: const Icon(Icons.arrow_forward),
                     onPressed: () {
                       final double offset = _scrollController.offset;
@@ -168,66 +171,6 @@ class _WorkoutSetExerciceGridView extends StatelessWidget {
               ),
             )),
       ],
-    );
-  }
-}
-
-class _WorkoutSetExerciceCard extends StatelessWidget {
-  const _WorkoutSetExerciceCard({Key? key, required this.exercice}) : super(key: key);
-
-  final Exercice exercice;
-
-  @override
-  Widget build(BuildContext context) {
-    Widget firstChild;
-    if (exercice.imageUrl != null) {
-      firstChild = Image.network(
-        exercice.imageUrl!,
-        fit: BoxFit.cover,
-        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-          if (loadingProgress == null) {
-            return child;
-          }
-          return LoadingRotating.square(
-            backgroundColor: Theme.of(context).primaryColor,
-          );
-        },
-      );
-    } else {
-      firstChild = Container(
-        decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-      );
-    }
-    return LimitedBox(
-      maxHeight: 100,
-      maxWidth: 200,
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-        elevation: 2,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Flexible(flex: 5, child: firstChild),
-            Flexible(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Center(
-                  child: Text(
-                    exercice.name,
-                    maxLines: 1,
-                    textAlign: TextAlign.left,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

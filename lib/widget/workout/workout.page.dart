@@ -33,30 +33,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
     return RoutedPage(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        floatingActionButton: FloatingActionButton.extended(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          onPressed: () => showDialog(
-            context: context,
-            builder: (BuildContext context) => AlertDialog(
-              contentPadding: const EdgeInsets.all(0),
-              content: SizedBox(
-                width: 1280,
-                child: WorkoutUpdatePage(
-                  workout: Workout(),
-                ),
-              ),
-            ),
-          ),
-          label: Text(
-            'Créer un workout',
-            style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
-          ),
-          icon: Icon(
-            Icons.add,
-            color: Color(Colors.white.value),
-            size: 25.0,
-          ),
-        ),
+        floatingActionButton: const WorkoutPageCreateButton(),
         body: Column(
           children: <Widget>[
             Padding(
@@ -66,7 +43,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                   Expanded(
                       flex: 3,
                       child: SelectableText(
-                        'Workout',
+                        'workout'.tr,
                         style: Theme.of(context).textTheme.headline1,
                       )),
                   Expanded(
@@ -78,7 +55,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
                         focusedBorder: OutlineInputBorder(
                             borderRadius: const BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(color: Theme.of(context).primaryColor)),
                         prefixIcon: const Icon(Icons.search),
-                        hintText: 'Recherche...',
+                        hintText: 'search'.tr,
                       ),
                       textAlignVertical: TextAlignVertical.bottom,
                     ),
@@ -95,8 +72,11 @@ class _WorkoutPageState extends State<WorkoutPage> {
                   } else {
                     final List<Workout> listWorkout = snapshot.data!;
                     return FitnessGridView<Workout>(
+                      defaultDesktopColumns: 4,
+                      defaultMobileColumns: 2,
+                      defaultTabletColumns: 3,
                       domains: listWorkout,
-                      bloc: workoutService,
+                      service: workoutService,
                       onTap: (Workout domain) {
                         showDialog(
                           context: context,
@@ -116,6 +96,40 @@ class _WorkoutPageState extends State<WorkoutPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class WorkoutPageCreateButton extends StatelessWidget {
+  const WorkoutPageCreateButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton.extended(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      onPressed: () => showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          contentPadding: const EdgeInsets.all(0),
+          content: SizedBox(
+            width: 1280,
+            child: WorkoutUpdatePage(
+              workout: Workout(),
+            ),
+          ),
+        ),
+      ),
+      label: Text(
+        'createWorkout'.tr,
+        style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
+      ),
+      icon: Icon(
+        Icons.add,
+        color: Color(Colors.white.value),
+        size: 25.0,
       ),
     );
   }
