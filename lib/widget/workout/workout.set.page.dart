@@ -59,7 +59,7 @@ class _WorkoutSetPageState extends State<WorkoutSetPage> {
         Padding(
           padding: const EdgeInsets.only(top: 20, left: 20),
           child: Text(
-            'Composer',
+            'compose'.tr,
             style: Theme.of(context).textTheme.headline1,
           ),
         ),

@@ -46,10 +46,10 @@ class WorkoutSetExercicePanel extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const <Widget>[
+                    children: <Widget>[
                       Text(
-                        'Glisser ici les exercices du workout.',
-                        style: TextStyle(fontStyle: FontStyle.italic),
+                        'dragExerciseHere'.tr,
+                        style: const TextStyle(fontStyle: FontStyle.italic),
                       ),
                     ],
                   ),
@@ -59,7 +59,8 @@ class WorkoutSetExercicePanel extends StatelessWidget {
                   shrinkWrap: true,
                   separatorBuilder: (BuildContext context, int index) => const Divider(height: 2),
                   itemCount: listWorkoutSet.length,
-                  itemBuilder: (BuildContext context, int index) => _DragTargetDto(dto: listWorkoutSet.elementAt(index)!),
+                  itemBuilder: (BuildContext context, int index) =>
+                      _DragTargetDto(dto: listWorkoutSet.elementAt(index)!),
                 )),
               ],
             );
@@ -72,7 +73,9 @@ class WorkoutSetExercicePanel extends StatelessWidget {
                   color = Theme.of(context).primaryColor;
                 }
                 return Container(
-                  decoration: BoxDecoration(borderRadius: const BorderRadius.all(Radius.circular(10)), border: Border.all(color: color, width: 4)),
+                  decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(10)),
+                      border: Border.all(color: color, width: 4)),
                   child: mainColumn,
                 );
               },
@@ -110,7 +113,7 @@ class _DragTargetDto extends StatelessWidget {
                 Icons.arrow_circle_down,
                 color: Theme.of(context).primaryColor,
               ),
-              Center(child: Text('Déplacer ici', style: TextStyle(color: Theme.of(context).primaryColor))),
+              Center(child: Text('moveHere'.tr, style: TextStyle(color: Theme.of(context).primaryColor))),
             ],
           ),
         ),
@@ -132,7 +135,7 @@ class _DragTargetDto extends StatelessWidget {
 }
 
 ///
-/// ViewModel pour la partie basse de l'écran de mise à jour d'un workout
+/// Controller pour la partie basse de l'écran de mise à jour d'un workout
 ///
 class WorkoutSetExercicePanelController extends GetxController {
   final WorkoutSetService workoutSetService = Get.find();
@@ -187,13 +190,20 @@ class WorkoutSetExercicePanelController extends GetxController {
       listDtos.add(workoutset);
       subjectListDtos.sink.add(listDtos);
     }).catchError(
-        (error) => showToast("Une erreur est survenue lors de l'enregistrement du set : ${error.toString()}", duration: const Duration(seconds: 2)));
+      (error) => showToast(
+        "${'errorWhileSaving'.tr} : ${error.toString()}",
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   void deleteFromFireStore(WorkoutSet dto) {
-    workoutSetService
-        .delete(WorkoutSet.fromJson(dto.toJson()))
-        .catchError((Object onError) => showToast('Erreur lors de la suppression du Set.', duration: const Duration(seconds: 2)));
+    workoutSetService.delete(WorkoutSet.fromJson(dto.toJson())).catchError(
+          (Object onError) => showToast(
+            'errorWhileDeleting'.tr,
+            duration: const Duration(seconds: 2),
+          ),
+        );
   }
 
   void switchOrder(WorkoutSet workoutSetToMove, int newOrder) {
@@ -231,9 +241,12 @@ class WorkoutSetExercicePanelController extends GetxController {
   }
 
   void updateWorkoutSet(WorkoutSet dto) {
-    workoutSetService
-        .save(dto)
-        .catchError((Object onError) => showToast('Erreur lors de la mise à jour du Set.', duration: const Duration(seconds: 2)));
+    workoutSetService.save(dto).catchError(
+          (Object onError) => showToast(
+            'errorWhileUpdating'.tr,
+            duration: const Duration(seconds: 2),
+          ),
+        );
   }
 
   void setReps(WorkoutSet dto, Line line, String value) {

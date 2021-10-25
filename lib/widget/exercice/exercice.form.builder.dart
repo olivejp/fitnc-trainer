@@ -184,7 +184,7 @@ class FormExercice extends StatefulWidget {
 }
 
 class _FormExerciceState extends State<FormExercice> {
-  VideoPlayerController? _videoController;
+  // VideoPlayerController? _videoController;
   YoutubePlayerController? youtubeController;
   ScrollController scrollController = ScrollController();
 
@@ -315,7 +315,7 @@ class _FormExerciceState extends State<FormExercice> {
                 children: <Widget>[
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 5),
+                      padding: const EdgeInsets.only(left: 8, top: 8),
                       child: Text(
                         'youtubeVideoHelper'.tr,
                         maxLines: 5,
@@ -324,36 +324,37 @@ class _FormExerciceState extends State<FormExercice> {
                   )
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Obx(
-                    () {
-                      if (widget.controller.exercise.value.videoUrl != null) {
-                        _videoController = VideoPlayerController.network(widget.controller.exercise.value.videoUrl!);
-                        return FutureBuilder<Object?>(
-                          builder: (BuildContext context, AsyncSnapshot<Object?> snapshot) {
-                            if (_videoController?.value.isInitialized == true) {
-                              return LimitedBox(
-                                maxWidth: 500,
-                                child: AspectRatio(
-                                  aspectRatio: _videoController!.value.aspectRatio,
-                                  child: VideoPlayer(_videoController!),
-                                ),
-                              );
-                            } else {
-                              return Container();
-                            }
-                          },
-                          future: _videoController!.initialize(),
-                        );
-                      } else {
-                        return Container();
-                      }
-                    },
-                  )
-                ],
-              ),
+              /// TODO A remettre quand la fonctionnalité des vidéos sera mise en place.
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: <Widget>[
+              //     Obx(
+              //       () {
+              //         if (widget.controller.exercise.value.videoUrl != null) {
+              //           _videoController = VideoPlayerController.network(widget.controller.exercise.value.videoUrl!);
+              //           return FutureBuilder<Object?>(
+              //             builder: (BuildContext context, AsyncSnapshot<Object?> snapshot) {
+              //               if (_videoController?.value.isInitialized == true) {
+              //                 return LimitedBox(
+              //                   maxWidth: 500,
+              //                   child: AspectRatio(
+              //                     aspectRatio: _videoController!.value.aspectRatio,
+              //                     child: VideoPlayer(_videoController!),
+              //                   ),
+              //                 );
+              //               } else {
+              //                 return Container();
+              //               }
+              //             },
+              //             future: _videoController!.initialize(),
+              //           );
+              //         } else {
+              //           return Container();
+              //         }
+              //       },
+              //     )
+              //   ],
+              // ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[

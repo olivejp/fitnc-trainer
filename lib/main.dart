@@ -17,6 +17,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
 
+import 'middleware/is_connected_middleware.dart';
+
 void main() {
   initServices();
   runApp(MyApp());
@@ -38,7 +40,7 @@ class MyApp extends StatelessWidget {
       position: ToastPosition.bottom,
       child: GetMaterialApp(
         title: FitnessConstants.appTitle,
-        locale: const Locale('en', 'US'),
+        locale: Get.deviceLocale,
         fallbackLocale: const Locale('en', 'US'),
         translations: FitnessTranslations(),
         debugShowCheckedModeBanner: false,
@@ -58,11 +60,11 @@ class MyApp extends StatelessWidget {
             ),
           ),
           GetPage<LayoutDisplayNotifier>(
-            name: FitnessConstants.routeHome,
-            page: () => const LayoutDisplayNotifier(
-              child: FirebaseWidget(),
-            ),
-          ),
+              name: FitnessConstants.routeHome,
+              page: () => const LayoutDisplayNotifier(
+                    child: FirebaseWidget(),
+                  ),
+              middlewares: [IsConnectedMiddleware()]),
         ],
       ),
     );

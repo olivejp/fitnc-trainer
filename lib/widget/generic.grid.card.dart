@@ -85,23 +85,36 @@ class FitnessGridView<T extends AbstractStorageDomain> extends StatelessWidget {
 /// Classe Widget pour une Grid Card.
 ///
 class FitnessGridCard<T extends AbstractStorageDomain> extends StatelessWidget {
-  const FitnessGridCard({Key? key, required this.domain, this.onTap,  this.onDelete, this.mouseCursor})
-      : super(key: key);
+  const FitnessGridCard({
+    Key? key,
+    required this.domain,
+    this.onTap,
+    this.onDelete,
+    this.mouseCursor,
+    this.borderRadius = 5,
+    this.splashColor,
+    this.hoverColor,
+  }) : super(key: key);
 
   final T domain;
   final void Function(T domain)? onTap;
   final void Function(T domain)? onDelete;
   final MouseCursor? mouseCursor;
+  final double borderRadius;
+  final Color? splashColor;
+  final Color? hoverColor;
+
   @override
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius)),
       elevation: 2,
       child: InkWell(
         mouseCursor: mouseCursor,
-        splashColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(5),
+        splashColor: splashColor ?? Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+        overlayColor: MaterialStateProperty.all(Theme.of(context).colorScheme.secondary.withOpacity(0.5)),
+        borderRadius: BorderRadius.circular(borderRadius),
         onTap: onTap != null ? () => onTap!(domain) : null,
         child: Stack(
           children: <Widget>[

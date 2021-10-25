@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 class Theming {
   static ThemeData getThemeData() {
     return ThemeData(
-      colorScheme: ColorScheme(
+      colorScheme: const ColorScheme(
         surface: Colors.amber,
         primary: Colors.amber,
         secondary: Colors.amberAccent,

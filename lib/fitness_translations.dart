@@ -44,9 +44,12 @@ class FitnessTranslations extends Translations {
           'exerciseSaved': 'Exercice sauvegardé',
           'exerciseType': "Type d'exercice",
           'errorWhileSaving': 'Erreur lors de la sauvegarde',
+          'errorWhileDeleting': 'Erreur lors de la suppression',
+          'errorWhileUpdating': 'Erreur lors de la mise à jour',
           'save': 'Enregistrer',
           'close': 'Fermer',
           'dragWorkoutHere': 'Glisser ici les workout de la journée.',
+          'dragExerciseHere': 'Glisser ici les exercices du workout.',
           'connectToYourAccount': 'Connectez-vous à votre compte',
           'email': 'Email',
           'password': 'Mot de passe',
@@ -63,6 +66,8 @@ class FitnessTranslations extends Translations {
           'youtubeVideoHelper': "Vous pouvez ici renseigner l'identifiant d'une vidéo YouTube.",
           'youtubeLabel': 'Youtube',
           'youtubeId': 'Identifiant vidéo Youtube',
+          'compose': 'Composer',
+          'moveHere': 'Déplacer ici',
         },
         'en_US': {
           'home': 'Home',
@@ -105,9 +110,12 @@ class FitnessTranslations extends Translations {
           'exerciseSaved': 'Exercise saved',
           'exerciseType': 'Exercise type',
           'errorWhileSaving': 'Error while saving',
+          'errorWhileDeleting': 'Error while deleting',
+          'errorWhileUpdating': 'Error while updating',
           'save': 'Save',
           'close': 'Close',
           'dragWorkoutHere': 'Drag here the workouts of the day.',
+          'dragExerciseHere': 'Drag here the exercises for this workout.',
           'connectToYourAccount': 'Sign in',
           'email': 'Email',
           'password': 'Password',
@@ -124,6 +132,8 @@ class FitnessTranslations extends Translations {
           'youtubeVideoHelper': 'You can provide here a Youtube video ID.',
           'youtubeLabel': 'Youtube',
           'youtubeId': 'Youtube video ID',
+          'compose': 'Compose',
+          'moveHere': 'Move here',
         }
       };
 }
