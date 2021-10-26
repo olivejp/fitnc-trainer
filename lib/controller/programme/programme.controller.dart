@@ -21,12 +21,17 @@ class ProgrammeController extends LocalSearchControllerMixin<Programme, Programm
 
   final BehaviorSubject<List<WorkoutScheduleDto>> _streamWorkoutScheduleDto = BehaviorSubject<List<WorkoutScheduleDto>>();
 
+  final List<WorkoutScheduleDto> listDtos = <WorkoutScheduleDto>[];
+
   Stream<List<WorkoutScheduleDto>> get workoutScheduleObs => _streamWorkoutScheduleDto.stream;
 
-  final List<WorkoutScheduleDto> listDtos = <WorkoutScheduleDto>[];
   getx.Rx<Programme> programme = Programme().obs;
 
   RxInt numberWeekInt = 0.obs;
+
+  bool isPublished(){
+    return programme.value.available == true;
+  }
 
   void changeNumberWeek(String? numberWeek) {
     programme.update((Programme? programme) {

@@ -22,6 +22,7 @@ class ProgramUpdatePage extends StatelessWidget {
   final Programme programme;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final ProgrammeController controller = Get.find();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +30,7 @@ class ProgramUpdatePage extends StatelessWidget {
 
     controller.init(programme);
 
-    if (controller.programme.value.available == true) {
+    if (controller.isPublished()) {
       buttons.add(TextButton.icon(
         style: TextButton.styleFrom(backgroundColor: Colors.red),
         onPressed: () {
@@ -37,11 +38,11 @@ class ProgramUpdatePage extends StatelessWidget {
             controller.unpublish().then((_) => Navigator.pop(context));
           }
         },
-        label: Text('unpublish'.tr, style: const TextStyle(color: Colors.white)),
-        icon: const Icon(Icons.public, color: Colors.white),
+        label:
+            Text('unpublish'.tr, style: const TextStyle(color: Colors.white)),
+        icon: const Icon(Icons.public_off, color: Colors.white),
       ));
-    }
-    if (controller.programme.value.available == null || controller.programme.value.available == false) {
+    } else {
       buttons.add(TextButton.icon(
         style: TextButton.styleFrom(backgroundColor: Colors.green),
         onPressed: () {
@@ -61,10 +62,12 @@ class ProgramUpdatePage extends StatelessWidget {
               controller
                   .save()
                   .then(
-                    (_) => showToast('exerciseSaved'.tr, backgroundColor: Colors.green),
+                    (_) => showToast('exerciseSaved'.tr,
+                        backgroundColor: Colors.green),
                   )
                   .catchError(
-                    (_) => showToast('errorWhileSaving'.tr, backgroundColor: Colors.redAccent),
+                    (_) => showToast('errorWhileSaving'.tr,
+                        backgroundColor: Colors.redAccent),
                   );
             }
           },
@@ -80,6 +83,7 @@ class ProgramUpdatePage extends StatelessWidget {
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
+        controller: _scrollController,
         child: Column(
           children: <Widget>[
             Padding(
@@ -114,12 +118,15 @@ class ProgramUpdatePage extends StatelessWidget {
                                       children: <Widget>[
                                         Expanded(
                                           child: FitnessDecorationTextFormField(
-                                              initialValue: controller.programme.value.name,
+                                              initialValue: controller
+                                                  .programme.value.name,
                                               autofocus: true,
-                                              onChanged: (String value) => controller.name = value,
+                                              onChanged: (String value) =>
+                                                  controller.name = value,
                                               labelText: 'name'.tr,
                                               validator: (String? value) {
-                                                if (value == null || value.isEmpty) {
+                                                if (value == null ||
+                                                    value.isEmpty) {
                                                   return 'fillName'.tr;
                                                 }
                                                 return null;
@@ -134,11 +141,22 @@ class ProgramUpdatePage extends StatelessWidget {
                                                 paramName: 'number_weeks',
                                                 decoration: InputDecoration(
                                                     labelText: 'weekNumber'.tr,
-                                                    constraints: const BoxConstraints(
-                                                        maxHeight: FitnessConstants.textFormFieldHeight),
-                                                    contentPadding: const EdgeInsets.symmetric(horizontal: 10)),
-                                                initialValue: controller.programme.value.numberWeeks,
-                                                onChanged: (String? value) => controller.changeNumberWeek(value)),
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                            maxHeight:
+                                                                FitnessConstants
+                                                                    .textFormFieldHeight),
+                                                    contentPadding:
+                                                        const EdgeInsets
+                                                                .symmetric(
+                                                            horizontal: 10)),
+                                                initialValue: controller
+                                                    .programme
+                                                    .value
+                                                    .numberWeeks,
+                                                onChanged: (String? value) =>
+                                                    controller.changeNumberWeek(
+                                                        value)),
                                           ),
                                         )
                                       ],
@@ -161,9 +179,13 @@ class ProgramUpdatePage extends StatelessWidget {
               minLines: 5,
               maxLines: 20,
               onChanged: (String value) => controller.description = value,
-              decoration: InputDecoration(labelText: 'description'.tr, helperText: 'optional'.tr),
+              decoration: InputDecoration(
+                  labelText: 'description'.tr, helperText: 'optional'.tr),
             ),
-            WorkoutSchedulePanel()
+            Scrollbar(
+              controller: _scrollController,
+              child: WorkoutSchedulePanel(),
+            )
           ],
         ),
       ),
@@ -175,14 +197,15 @@ class _WorkoutChoicePanel extends StatelessWidget {
   final TrainersService trainersService = Get.find();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(_) {
     return StreamBuilder<List<Workout?>>(
       stream: trainersService.listenToWorkout(),
-      builder: (BuildContext context, AsyncSnapshot<List<Workout?>> snapshot) {
+      builder: (_, AsyncSnapshot<List<Workout?>> snapshot) {
         if (snapshot.hasData) {
           final List<Workout?> list = snapshot.data!;
           return ListView.separated(
-            separatorBuilder: (BuildContext context, int index) => const Divider(height: 2.0),
+            separatorBuilder: (_, __) =>
+                const Divider(height: 2.0),
             itemCount: list.length,
             itemBuilder: (BuildContext context, int index) {
               final Workout? workout = list.elementAt(index);
@@ -195,8 +218,12 @@ class _WorkoutChoicePanel extends StatelessWidget {
                         child: ListTile(
                       title: Text(list[index]!.name),
                       leading: (workout?.imageUrl != null)
-                          ? CircleAvatar(backgroundImage: NetworkImage(workout!.imageUrl!), radius: 10)
-                          : CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
+                          ? CircleAvatar(
+                              backgroundImage: NetworkImage(workout!.imageUrl!),
+                              radius: 10)
+                          : CircleAvatar(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              radius: 10),
                     )),
                   ),
                   data: list[index],
@@ -208,9 +235,13 @@ class _WorkoutChoicePanel extends StatelessWidget {
                 title: Row(
                   children: <Widget>[
                     if (workout?.imageUrl != null)
-                      CircleAvatar(backgroundImage: NetworkImage(workout!.imageUrl!), radius: 10)
+                      CircleAvatar(
+                          backgroundImage: NetworkImage(workout!.imageUrl!),
+                          radius: 10)
                     else
-                      CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
+                      CircleAvatar(
+                          backgroundColor: Theme.of(context).primaryColor,
+                          radius: 10),
                     Padding(
                       padding: const EdgeInsets.only(left: 10),
                       child: Text(list[index]!.name),
@@ -228,7 +259,10 @@ class _WorkoutChoicePanel extends StatelessWidget {
 }
 
 class WorkoutSchedulePanel extends StatelessWidget {
-  static final TextStyle columnTextStyle = GoogleFonts.roboto(fontSize: 10, fontWeight: FontWeight.bold);
+  WorkoutSchedulePanel({Key? key}) : super(key: key);
+
+  static final TextStyle columnTextStyle =
+      GoogleFonts.roboto(fontSize: 10, fontWeight: FontWeight.bold);
   static final List<String> columnNames = <String>[
     'monday'.tr,
     'tuesday'.tr,
@@ -253,7 +287,8 @@ class WorkoutSchedulePanel extends StatelessWidget {
         .toList();
 
     /// Méthode permettant d'afficher l'affectation des Workouts à une date.
-    void onCellTap(sf.DataGridCellTapDetails details, List<WorkoutScheduleDto> listAppointment) {
+    void onCellTap(sf.DataGridCellTapDetails details,
+        List<WorkoutScheduleDto> listAppointment) {
       final int columnIndex = details.rowColumnIndex.columnIndex;
       final int rowIndex = details.rowColumnIndex.rowIndex;
       final int dayIndex = ((rowIndex - 1) * 7) + columnIndex + 1;
@@ -261,40 +296,20 @@ class WorkoutSchedulePanel extends StatelessWidget {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          final List<WorkoutScheduleDto> list =
-              listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
+          final List<WorkoutScheduleDto> list = listAppointment
+              .where((WorkoutScheduleDto element) =>
+                  element.dateSchedule == dayIndex)
+              .toList();
 
-          return AlertDialog(
-            title: Text('dayNumber'.trParams({'number': dayIndex.toString()})),
-            actions: <Widget>[
-              TextButton(
-                  onPressed: () => showDialog(
-                        context: context,
-                        builder: (BuildContext context) => AlertDialog(
-                          contentPadding: const EdgeInsets.all(0),
-                          content: SizedBox(
-                            width: 1280,
-                            child: WorkoutUpdatePage(
-                              workout: Workout(),
-                            ),
-                          ),
-                        ),
-                      ),
-                  child: Text('createWorkout'.tr)),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('close'.tr),
-              ),
-            ],
-            content: PopupDayDetail(dayIndex: dayIndex, list: list),
-          );
+          return AlertCreateWorkout(dayIndex: dayIndex, list: list);
         },
       );
     }
 
     return StreamBuilder<List<WorkoutScheduleDto>>(
       stream: controller.workoutScheduleObs,
-      builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
+      builder: (BuildContext context,
+          AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
         if (snapshot.hasData) {
           final List<WorkoutScheduleDto> listScheduledWorkouts = snapshot.data!;
           return Padding(
@@ -303,10 +318,13 @@ class WorkoutSchedulePanel extends StatelessWidget {
               () => SizedBox(
                 height: (controller.numberWeekInt.value * 150) + 55,
                 child: Container(
-                  decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
+                  decoration:
+                      BoxDecoration(border: Border.all(color: Colors.grey)),
                   padding: const EdgeInsets.all(1),
                   child: sf.SfDataGrid(
-                    onCellTap: (sf.DataGridCellTapDetails details) => onCellTap(details, listScheduledWorkouts),
+                    verticalScrollPhysics: const NeverScrollableScrollPhysics(),
+                    onCellTap: (sf.DataGridCellTapDetails details) =>
+                        onCellTap(details, listScheduledWorkouts),
                     highlightRowOnHover: false,
                     headerGridLinesVisibility: GridLinesVisibility.both,
                     columnWidthMode: ColumnWidthMode.fill,
@@ -332,6 +350,46 @@ class WorkoutSchedulePanel extends StatelessWidget {
           return LoadingBouncingGrid.circle();
         }
       },
+    );
+  }
+}
+
+class AlertCreateWorkout extends StatelessWidget {
+  const AlertCreateWorkout({
+    Key? key,
+    required this.dayIndex,
+    required this.list,
+  }) : super(key: key);
+
+  final int dayIndex;
+  final List<WorkoutScheduleDto> list;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('dayNumber'
+          .trParams(<String, String>{'number': dayIndex.toString()})),
+      actions: <Widget>[
+        TextButton(
+            onPressed: () => showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    contentPadding: const EdgeInsets.all(0),
+                    content: SizedBox(
+                      width: 1280,
+                      child: WorkoutUpdatePage(
+                        workout: Workout(),
+                      ),
+                    ),
+                  ),
+                ),
+            child: Text('createWorkout'.tr)),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text('close'.tr),
+        ),
+      ],
+      content: PopupDayDetail(dayIndex: dayIndex, list: list),
     );
   }
 }
@@ -364,7 +422,8 @@ class PopupDayDetail extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Container(
                   decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: const BorderRadius.all(Radius.circular(5))),
                   child: _WorkoutChoicePanel()),
             ),
           ),
@@ -388,39 +447,36 @@ class _WorkoutSelectedPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DragTarget<Workout>(
-        onAccept: (Workout workout) => controller.addWorkoutSchedule(workout, dayIndex - 1),
+        onAccept: (Workout workout) =>
+            controller.addWorkoutSchedule(workout, dayIndex - 1),
         onWillAccept: (Workout? data) => data is Workout,
-        builder: (BuildContext context, List<Workout?> candidateData, List<Object?> rejectedData) {
+        builder: (BuildContext context, List<Workout?> candidateData,
+            List<Object?> rejectedData) {
           return Container(
             decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey), borderRadius: const BorderRadius.all(Radius.circular(5))),
+                border: Border.all(color: Colors.grey),
+                borderRadius: const BorderRadius.all(Radius.circular(5))),
             child: Column(
               children: <Widget>[
                 Text('dragWorkoutHere'.tr),
                 StreamBuilder<List<WorkoutScheduleDto>>(
                     initialData: list,
                     stream: controller.workoutScheduleObs,
-                    builder: (BuildContext context, AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<WorkoutScheduleDto>> snapshot) {
                       if (snapshot.hasData) {
-                        final List<WorkoutScheduleDto> listWorkout = snapshot.data!
-                            .where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex - 1)
+                        final List<WorkoutScheduleDto> listWorkout = snapshot
+                            .data!
+                            .where((WorkoutScheduleDto element) =>
+                                element.dateSchedule == dayIndex - 1)
                             .toList();
                         return ListView.separated(
                           shrinkWrap: true,
-                          itemBuilder: (BuildContext context, int index) {
-                            final WorkoutScheduleDto dto = listWorkout.elementAt(index);
-                            return ListTile(
-                              leading: (dto.imageUrlWorkout != null)
-                                  ? CircleAvatar(backgroundImage: NetworkImage(dto.imageUrlWorkout!), radius: 10)
-                                  : CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10),
-                              title: Text(dto.nameWorkout!),
-                              trailing: IconButton(
-                                onPressed: () => controller.deleteWorkoutSchedule(dto),
-                                icon: const Icon(Icons.close),
-                              ),
-                            );
-                          },
-                          separatorBuilder: (BuildContext context, int index) => const Divider(height: 2.0),
+                          itemBuilder: (_, int index) => WorkoutTile(
+                            dto: listWorkout.elementAt(index),
+                          ),
+                          separatorBuilder: (_, __) =>
+                              const Divider(height: 2.0),
                           itemCount: listWorkout.length,
                         );
                       } else {
@@ -431,6 +487,29 @@ class _WorkoutSelectedPanel extends StatelessWidget {
             ),
           );
         });
+  }
+}
+
+class WorkoutTile extends StatelessWidget {
+  WorkoutTile({Key? key, required this.dto}) : super(key: key);
+
+  final WorkoutScheduleDto dto;
+  final ProgrammeController controller = Get.find();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: (dto.imageUrlWorkout != null)
+          ? CircleAvatar(
+              backgroundImage: NetworkImage(dto.imageUrlWorkout!), radius: 10)
+          : CircleAvatar(
+              backgroundColor: Theme.of(context).primaryColor, radius: 10),
+      title: Text(dto.nameWorkout!),
+      trailing: IconButton(
+        onPressed: () => controller.deleteWorkoutSchedule(dto),
+        icon: const Icon(Icons.close),
+      ),
+    );
   }
 }
 
@@ -449,7 +528,10 @@ class _DataCellData {
 ///
 class _WorkoutDataSource extends sf.DataGridSource {
   _WorkoutDataSource(
-      {required this.context, required this.numberWeeks, required this.listAppointment, required this.columnNames}) {
+      {required this.context,
+      required this.numberWeeks,
+      required this.listAppointment,
+      required this.columnNames}) {
     _workoutData = getListDataRows(numberWeeks, listAppointment);
   }
 
@@ -460,17 +542,20 @@ class _WorkoutDataSource extends sf.DataGridSource {
   List<String> columnNames;
 
   /// Méthode pour générer une DataCell.
-  sf.DataGridCell<_DataCellData> getDataCell(
-      String columnName, int dayIndex, List<WorkoutScheduleDto> listAppointment) {
-    final List<WorkoutScheduleDto> list =
-        listAppointment.where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex).toList();
+  sf.DataGridCell<_DataCellData> getDataCell(String columnName, int dayIndex,
+      List<WorkoutScheduleDto> listAppointment) {
+    final List<WorkoutScheduleDto> list = listAppointment
+        .where((WorkoutScheduleDto element) => element.dateSchedule == dayIndex)
+        .toList();
     final _DataCellData data = _DataCellData(list: list, dayIndex: dayIndex);
     return sf.DataGridCell<_DataCellData>(value: data, columnName: columnName);
   }
 
   /// Méthode pour générer une DataRow.
-  sf.DataGridRow getDataRow(int weekIndex, List<WorkoutScheduleDto> listAppointment) {
-    final List<sf.DataGridCell<_DataCellData>> list = <sf.DataGridCell<_DataCellData>>[];
+  sf.DataGridRow getDataRow(
+      int weekIndex, List<WorkoutScheduleDto> listAppointment) {
+    final List<sf.DataGridCell<_DataCellData>> list =
+        <sf.DataGridCell<_DataCellData>>[];
     for (int i = 0; i < 7; i++) {
       final int dayIndex = (7 * weekIndex) + i;
       list.add(getDataCell(columnNames[i], dayIndex, listAppointment));
@@ -479,7 +564,8 @@ class _WorkoutDataSource extends sf.DataGridSource {
   }
 
   /// Méthode pour générer toutes les DataRow du tableau.
-  List<sf.DataGridRow> getListDataRows(int numberWeeks, List<WorkoutScheduleDto> listAppointment) {
+  List<sf.DataGridRow> getListDataRows(
+      int numberWeeks, List<WorkoutScheduleDto> listAppointment) {
     final List<sf.DataGridRow> list = <sf.DataGridRow>[];
 
     for (int i = 0; i < numberWeeks; i++) {
@@ -500,25 +586,10 @@ class _WorkoutDataSource extends sf.DataGridSource {
       final ScrollController _controller = ScrollController();
       final List<WorkoutScheduleDto> listWorkout = dataCell.list;
       final List<Widget> listListTile = listWorkout
-          .map((WorkoutScheduleDto dto) => Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Row(
-                  children: <Widget>[
-                    if (dto.imageUrlWorkout != null)
-                      Expanded(child: CircleAvatar(backgroundImage: NetworkImage(dto.imageUrlWorkout!), radius: 10))
-                    else
-                      Expanded(child: CircleAvatar(backgroundColor: Theme.of(context).primaryColor, radius: 10)),
-                    Expanded(
-                      flex: 5,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8),
-                        child: Text(dto.nameWorkout!),
-                      ),
-                    )
-                  ],
-                ),
-              ))
+          .map((WorkoutScheduleDto dto) =>
+              _WorkoutDataSourceTile(context: context, workoutScheduleDto: dto))
           .toList();
+
       return MouseRegion(
         cursor: SystemMouseCursors.click,
         child: Stack(
@@ -540,5 +611,45 @@ class _WorkoutDataSource extends sf.DataGridSource {
         ),
       );
     }).toList());
+  }
+}
+
+class _WorkoutDataSourceTile extends StatelessWidget {
+  const _WorkoutDataSourceTile({
+    Key? key,
+    required this.context,
+    required this.workoutScheduleDto,
+  }) : super(key: key);
+
+  final BuildContext context;
+  final WorkoutScheduleDto workoutScheduleDto;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Row(
+        children: <Widget>[
+          if (workoutScheduleDto.imageUrlWorkout != null)
+            Expanded(
+                child: CircleAvatar(
+                    backgroundImage:
+                        NetworkImage(workoutScheduleDto.imageUrlWorkout!),
+                    radius: 10))
+          else
+            Expanded(
+                child: CircleAvatar(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    radius: 10)),
+          Expanded(
+            flex: 5,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Text(workoutScheduleDto.nameWorkout!),
+            ),
+          )
+        ],
+      ),
+    );
   }
 }
