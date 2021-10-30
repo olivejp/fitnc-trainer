@@ -7,6 +7,8 @@ class FitnessConstants {
   static const String routeSignUp = '/sign_up';
   static const String routePoliciesMobile = '/policies_mobile';
   static const String routeHome = '/home';
+  static const String profileCommandLineArgument = 'PROFILE';
+  static const String firebaseRegion = 'australia-southeast1';
 }
 
 class FitnessNcColors {
