@@ -57,6 +57,14 @@ class _PoliciesMobilePageState extends State<PoliciesMobilePage> {
                     'demander leur suppression ou leur modification à n\'importe quel moment.',
                     style: Theme.of(context).textTheme.headline3,
                   ),
+                  Text(
+                    'Récupération, modification ou suppression des données personnelles',
+                    style: Theme.of(context).textTheme.headline2,
+                  ),
+                  Text(
+                    'Si vous souhaitez récupérer, modifier ou supprimer merci d\'envoyer un mail précisant votre nom et prénom à l\'adresse orlanth23@gmail.com.',
+                    style: Theme.of(context).textTheme.headline3,
+                  ),
                 ],
               ),
             ),
