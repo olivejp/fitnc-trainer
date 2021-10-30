@@ -6,6 +6,7 @@ import 'package:fitnc_trainer/theming.dart';
 import 'package:fitnc_trainer/widget/layout-display.widget.dart';
 import 'package:fitnc_trainer/widget/login/login.page.dart';
 import 'package:fitnc_trainer/widget/login/sign-up.page.dart';
+import 'package:fitnc_trainer/widget/policies_mobile/policies_mobile.page.dart';
 import 'package:fitnc_trainer/widget/widgets/firebase.widget.dart';
 import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/service/auth.service.dart';
@@ -50,14 +51,20 @@ class MyApp extends StatelessWidget {
           GetPage<LoginPage>(
             name: FitnessConstants.routeLogin,
             page: () => LoginPage(
-              callback: (UserCredential userCredential) => Get.offNamed(FitnessConstants.routeHome),
+              callback: (UserCredential userCredential) =>
+                  Get.offNamed(FitnessConstants.routeHome),
             ),
           ),
           GetPage<SignUpPage>(
             name: FitnessConstants.routeSignUp,
             page: () => SignUpPage(
-              callback: (UserCredential userCredential) => Get.offNamed(FitnessConstants.routeHome),
+              callback: (UserCredential userCredential) =>
+                  Get.offNamed(FitnessConstants.routeHome),
             ),
+          ),
+          GetPage<PoliciesMobilePage>(
+            name: FitnessConstants.routePoliciesMobile,
+            page: () => const PoliciesMobilePage(),
           ),
           GetPage<LayoutDisplayNotifier>(
               name: FitnessConstants.routeHome,

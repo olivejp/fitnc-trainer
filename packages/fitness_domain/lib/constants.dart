@@ -5,6 +5,7 @@ class FitnessConstants {
   static const String appTitle = 'Fitness Nc';
   static const String routeLogin = '/login';
   static const String routeSignUp = '/sign_up';
+  static const String routePoliciesMobile = '/policies_mobile';
   static const String routeHome = '/home';
 }
 
