@@ -9,22 +9,21 @@ import 'package:fitnc_trainer/service/firebase/firebase_init_functions.service.d
 import 'package:fitnc_trainer/service/fitness-user.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
 import 'package:fitnc_trainer/theming.dart';
-import 'package:fitnc_trainer/widget/layout-display.widget.dart';
 import 'package:fitnc_trainer/widget/login/login.page.dart';
 import 'package:fitnc_trainer/widget/login/sign-up.page.dart';
 import 'package:fitnc_trainer/widget/policies_mobile/policies_mobile.page.dart';
 import 'package:fitnc_trainer/widget/widgets/auth.widget.dart';
 import 'package:fitness_domain/constants.dart';
+import 'package:fitness_domain/middleware/is_connected_middleware.dart';
+import 'package:fitness_domain/middleware/layout_notifier_middleware.dart';
 import 'package:fitness_domain/service/auth.service.dart';
 import 'package:fitness_domain/service/display.service.dart';
 import 'package:fitness_domain/service/firebase-storage.service.dart';
+import 'package:fitness_domain/widget/layout-display.widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
-
-import 'middleware/is_connected_middleware.dart';
-import 'middleware/layout_notifier_middleware.dart';
 
 void main() {
   runApp(MyApp());

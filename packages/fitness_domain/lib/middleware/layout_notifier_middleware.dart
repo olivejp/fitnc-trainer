@@ -1,4 +1,4 @@
-import 'package:fitnc_trainer/widget/layout-display.widget.dart';
+import 'package:fitness_domain/widget/layout-display.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitnc_trainer/controller/login/sign-up.controller.dart';
 import 'package:fitnc_trainer/widget/bottom.widget.dart';
-import 'package:fitnc_trainer/widget/layout-display.widget.dart';
 import 'package:fitness_domain/constants.dart';
 import 'package:fitness_domain/service/display.service.dart';
+import 'package:fitness_domain/widget/layout-display.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
