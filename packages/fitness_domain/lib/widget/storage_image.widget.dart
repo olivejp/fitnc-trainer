@@ -100,7 +100,11 @@ class StorageImageWidget extends StatelessWidget {
 
   void onTap() {
     FilePicker.platform
-        .pickFiles(type: FileType.custom, allowedExtensions: allowedExtensions)
+        .pickFiles(
+      type: FileType.custom,
+      allowedExtensions: allowedExtensions,
+      withData: true,
+    )
         .then((FilePickerResult? result) {
       if (result != null) {
         final StorageFile storageFileResult = StorageFile();
