@@ -1,10 +1,18 @@
+import 'dart:developer' as developer;
 
 import 'package:fitness_domain/service/display.service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class LayoutDisplayNotifier extends StatefulWidget {
-  const LayoutDisplayNotifier({
+///
+/// Ce Widget permet de notifier à traver le service DisplayTypeService
+/// Si l'écran est un desktop, une tablette ou un mobile.
+///
+/// Pour notifier tous les composants enfants d'un changement de résolution il faut s'injecter le service
+/// DisplayTypeService et écouter l'observable displayType.
+///
+class LayoutNotifier extends StatefulWidget {
+  const LayoutNotifier({
     Key? key,
     required this.child,
     this.desktopSize = 1280,
@@ -15,27 +23,33 @@ class LayoutDisplayNotifier extends StatefulWidget {
   final Widget child;
 
   @override
-  State<LayoutDisplayNotifier> createState() => _LayoutDisplayNotifierState();
+  State<LayoutNotifier> createState() => _LayoutNotifierState();
 }
 
-class _LayoutDisplayNotifierState extends State<LayoutDisplayNotifier> {
-  final DisplayTypeService displayTypeController = Get.find();
+class _LayoutNotifierState extends State<LayoutNotifier> {
+  final DisplayTypeService displayTypeService = Get.find();
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (_, BoxConstraints constraints) {
-        /// Mise à jour du displayType selon la largeur de l'écran.
+        // Mise à jour du displayType selon la largeur de l'écran.
         DisplayType displayType = DisplayType.desktop;
+
+        // Calcul de la nouvelle taille de l'écran.
         if (constraints.maxWidth >= widget.desktopSize) {
           displayType = DisplayType.desktop;
-        } else if (constraints.maxWidth >= widget.tabletSize && constraints.maxWidth <= widget.desktopSize - 1) {
+        } else if (constraints.maxWidth >= widget.tabletSize &&
+            constraints.maxWidth <= widget.desktopSize - 1) {
           displayType = DisplayType.tablet;
         } else {
           displayType = DisplayType.mobile;
         }
+
+        // Notification au service que la taille de l'écran a changé.
         WidgetsBinding.instance!.addPostFrameCallback((Duration timeStamp) {
-          displayTypeController.changeDisplay(displayType);
+          developer.log('displayType is now : $displayType');
+          displayTypeService.changeDisplay(displayType);
         });
 
         return widget.child;

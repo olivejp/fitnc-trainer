@@ -3,20 +3,20 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitnc_trainer/service/programme.service.dart';
 import 'package:fitnc_trainer/service/trainers.service.dart';
-import 'package:fitness_domain/controller/abstract.controller.dart';
 import 'package:fitness_domain/domain/programme.domain.dart';
 import 'package:fitness_domain/domain/storage-file.dart';
 import 'package:fitness_domain/domain/workout.domain.dart';
 import 'package:fitness_domain/domain/workout_schedule.domain.dart';
 import 'package:fitness_domain/domain/workout_schedule.dto.dart';
-
+import 'package:fitness_domain/mixin/search.mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart' as getx;
 import 'package:oktoast/oktoast.dart';
 import 'package:rxdart/rxdart.dart';
 
-class ProgrammeController extends LocalSearchControllerMixin<Programme, ProgrammeService> {
+class ProgrammeController extends GetxController with SearchMixin<Programme> {
+  final ProgrammeService service = Get.find();
   final TrainersService trainersService = Get.find();
 
   final BehaviorSubject<List<WorkoutScheduleDto>> _streamWorkoutScheduleDto = BehaviorSubject<List<WorkoutScheduleDto>>();

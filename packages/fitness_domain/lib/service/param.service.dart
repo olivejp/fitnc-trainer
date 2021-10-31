@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase/service/abstract.absolute-firestore.service.dart';
 import 'package:fitness_domain/domain/param.domain.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ParamService extends AbstractAbsoluteFirestoreService<Param> {

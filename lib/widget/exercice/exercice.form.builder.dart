@@ -7,13 +7,14 @@ import 'package:fitness_domain/widget/storage_image.widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
-import 'package:video_player/video_player.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class ExerciceBuilderPage {
   /// Permet de créer une AlertDialog pour la création d'un exercice.
   static void create(BuildContext context) {
     showDialog(
+      useSafeArea: true,
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: Text('createExercise'.tr),
@@ -25,6 +26,8 @@ class ExerciceBuilderPage {
   /// Permet de créer une AlertDialog pour la mise à jour d'un exercice.
   static void update({required BuildContext context, required Exercice exercice}) {
     showDialog(
+      useSafeArea: true,
+      barrierDismissible: false,
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: Text('update'.tr),
@@ -38,10 +41,9 @@ class ExerciceBuilderPage {
 
 /// Composant Création
 class ExerciceCreate extends StatefulWidget {
-  ExerciceCreate({Key? key, this.isCreation = true, this.displayCloseButton = true}) : super(key: key);
+  ExerciceCreate({Key? key, this.isCreation = true}) : super(key: key);
 
   final bool isCreation;
-  final bool displayCloseButton;
   final ExerciceCreateController controller = Get.put(ExerciceCreateController());
 
   @override
@@ -57,6 +59,7 @@ class _ExerciceCreateState extends State<ExerciceCreate> {
     widget.controller.init(Exercice());
 
     _formKey = GlobalKey<FormState>();
+
     final Widget saveButton = Padding(
       padding: const EdgeInsets.only(right: 10),
       child: TextButton(
@@ -64,32 +67,37 @@ class _ExerciceCreateState extends State<ExerciceCreate> {
         onPressed: () {
           if (_formKey.currentState?.validate() == true) {
             widget.controller.saveExercice().then((_) {
-              showToast(widget.isCreation ? 'exerciseCreated'.tr : 'exerciseUpdated'.tr, backgroundColor: Colors.green);
-              if (widget.isCreation) {
+              showToast('exerciseCreated'.tr, backgroundColor: Colors.green);
                 Navigator.of(context).pop();
-              }
             }).catchError((_) => showToast('errorWhileSaving'.tr, backgroundColor: Colors.redAccent));
           }
         },
-        child: Text(widget.isCreation ? 'create'.tr : 'save'.tr, style: const TextStyle(color: Colors.white)),
+        child: Text('create'.tr, style: const TextStyle(color: Colors.white)),
       ),
     );
 
-    final Widget closeButton = TextButton(
+    return FormExercice(
+      buttons: [saveButton, CloseButton()],
+      formKey: _formKey,
+      controller: widget.controller,
+    );
+  }
+}
+
+class CloseButton extends StatelessWidget {
+  const CloseButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
       style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
       onPressed: () => Navigator.pop(context),
       child: Text(
         'close'.tr,
         style: const TextStyle(color: Colors.white),
       ),
-    );
-
-    final List<Widget> buttons = widget.displayCloseButton ? <Widget>[saveButton, closeButton] : <Widget>[saveButton];
-
-    return FormExercice(
-      buttons: buttons,
-      formKey: _formKey,
-      controller: widget.controller,
     );
   }
 }
@@ -130,16 +138,7 @@ class _ExerciceUpdateState extends State<ExerciceUpdate> {
       ),
     );
 
-    final Widget closeButton = TextButton(
-      style: TextButton.styleFrom(backgroundColor: FitnessNcColors.blue600),
-      onPressed: () => Navigator.pop(context),
-      child: Text(
-        'close'.tr,
-        style: const TextStyle(color: Colors.white),
-      ),
-    );
-
-    final List<Widget> buttons = widget.displayCloseButton ? <Widget>[saveButton, closeButton] : <Widget>[saveButton];
+    final List<Widget> buttons = widget.displayCloseButton ? <Widget>[saveButton, CloseButton()] : <Widget>[saveButton];
 
     return GetBuilder<ExerciceUpdateController>(
       init: widget.controller,
@@ -396,7 +395,7 @@ class _FormExerciceState extends State<FormExercice> {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 20.0),
-                child: Row(mainAxisAlignment: MainAxisAlignment.end, children: widget.buttons),
+                child: Row(children: widget.buttons),
               ),
             ],
           ),

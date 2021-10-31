@@ -22,10 +22,11 @@ class ProgramPage extends StatefulWidget {
 
 class _ProgramPageState extends State<ProgramPage> {
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
+  final TextEditingController textSearchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    widget.controller.refreshSearchController();
+    widget.controller.initSearchList(getStreamList: widget.service.listenAll);
     return RoutedPage(
         child: Scaffold(
       backgroundColor: Colors.transparent,
@@ -34,7 +35,8 @@ class _ProgramPageState extends State<ProgramPage> {
         onPressed: () => ProgrammeCreatePage.showCreate(context),
         label: Text(
           'createProgram'.tr,
-          style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
+          style: GoogleFonts.roboto(
+              fontSize: 15, color: Color(Colors.white.value)),
         ),
         icon: Icon(
           Icons.add,
@@ -56,14 +58,25 @@ class _ProgramPageState extends State<ProgramPage> {
                     )),
                 Expanded(
                   child: TextFormField(
-                    onChanged: (String text) => widget.controller.query.value = text,
+                    controller: textSearchController,
+                    onChanged: (String text) => widget.controller.search(text),
                     decoration: InputDecoration(
                       constraints: const BoxConstraints(maxHeight: 43),
-                      border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
+                      border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(5))),
                       focusedBorder: OutlineInputBorder(
-                          borderRadius: const BorderRadius.all(Radius.circular(5)),
-                          borderSide: BorderSide(color: Theme.of(context).primaryColor)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(5)),
+                          borderSide: BorderSide(
+                              color: Theme.of(context).primaryColor)),
                       prefixIcon: const Icon(Icons.search),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          widget.controller.clearSearch();
+                          textSearchController.clear();
+                        },
+                        icon: const Icon(Icons.clear),
+                      ),
                       hintText: 'search'.tr,
                     ),
                     textAlignVertical: TextAlignVertical.bottom,
@@ -75,8 +88,10 @@ class _ProgramPageState extends State<ProgramPage> {
           Expanded(
             child: StreamBuilder<List<Programme>>(
               stream: widget.controller.streamList,
-              builder: (BuildContext context, AsyncSnapshot<List<Programme>> snapshot) {
-                if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<Programme>> snapshot) {
+                if (!snapshot.hasData ||
+                    (snapshot.hasData && snapshot.data!.isEmpty)) {
                   return Center(child: Text('noProgramFound'.tr));
                 } else {
                   final List<Programme> programmes = snapshot.data!;
@@ -104,12 +119,16 @@ class _ProgramPageState extends State<ProgramPage> {
       child: InkWell(
         child: Stack(
           children: <Widget>[
-            Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
+            Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <
+                Widget>[
               Expanded(
                 flex: 3,
                 child: (programme.imageUrl?.isNotEmpty == true)
-                    ? Ink.image(image: NetworkImage(programme.imageUrl!), fit: BoxFit.cover)
-                    : Container(decoration: const BoxDecoration(color: Colors.amber)),
+                    ? Ink.image(
+                        image: NetworkImage(programme.imageUrl!),
+                        fit: BoxFit.cover)
+                    : Container(
+                        decoration: const BoxDecoration(color: Colors.amber)),
               ),
               Expanded(
                 child: Padding(
@@ -144,16 +163,25 @@ class _ProgramPageState extends State<ProgramPage> {
                                 context: context,
                                 builder: (BuildContext context) => AlertDialog(
                                   title: RichText(
-                                      text: TextSpan(text: 'wantToDelete'.tr, children: <InlineSpan>[
-                                    TextSpan(text: programme.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                                    const TextSpan(text: ' ?'),
-                                  ])),
+                                      text: TextSpan(
+                                          text: 'wantToDelete'.tr,
+                                          children: <InlineSpan>[
+                                        TextSpan(
+                                            text: programme.name,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                        const TextSpan(text: ' ?'),
+                                      ])),
                                   actions: <Widget>[
                                     TextButton(
-                                        onPressed: () =>
-                                            widget.service.delete(programme).then((_) => Navigator.pop(context)),
+                                        onPressed: () => widget.service
+                                            .delete(programme)
+                                            .then(
+                                                (_) => Navigator.pop(context)),
                                         child: Text('yes'.tr)),
-                                    TextButton(onPressed: () => Navigator.pop(context), child: Text('cancel'.tr))
+                                    TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text('cancel'.tr))
                                   ],
                                 ),
                               );

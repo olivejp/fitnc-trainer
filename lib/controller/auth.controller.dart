@@ -10,7 +10,8 @@ class AuthController extends GetxController {
     user.listen((User? _user) {
       if (_user != null) {
         cancelTrainerSubscription();
-        trainerSubscription = trainersService.listen(_user.uid).listen((Trainers _trainer) {
+        trainerSubscription =
+            trainersService.listen(_user.uid).listen((Trainers _trainer) {
           trainer.value = _trainer;
         });
       } else {
@@ -26,9 +27,7 @@ class AuthController extends GetxController {
   StreamSubscription<Trainers?>? trainerSubscription;
 
   void cancelTrainerSubscription() {
-    if (trainerSubscription != null) {
-      trainerSubscription!.cancel();
-    }
+    trainerSubscription?.cancel();
   }
 
   @override

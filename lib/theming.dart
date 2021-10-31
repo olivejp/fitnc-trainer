@@ -35,7 +35,7 @@ class Theming {
             .headline1!
             .copyWith(color: FitnessNcColors.blue600, fontSize: 35, fontWeight: FontWeight.bold),
         headline2:
-            GoogleFonts.alfaSlabOneTextTheme().headline2!.copyWith(color: FitnessNcColors.orange500, fontSize: 25),
+            GoogleFonts.permanentMarkerTextTheme().headline2!.copyWith(color: FitnessNcColors.orange500, fontSize: 35),
         headline3: GoogleFonts.workSansTextTheme().headline3!.copyWith(color: FitnessNcColors.blue800, fontSize: 18),
         headline5:
             GoogleFonts.workSansTextTheme().headline5!.copyWith(color: FitnessNcColors.black900Alpha011, fontSize: 50),

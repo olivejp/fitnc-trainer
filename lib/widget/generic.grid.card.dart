@@ -38,6 +38,23 @@ class FitnessGridView<T extends AbstractStorageDomain> extends StatelessWidget {
   final Widget Function(T domain)? getCard;
   final DisplayTypeService displayTypeController = Get.find();
 
+  void _showDeleteDialog(BuildContext context, AbstractDomain domain, AbstractFitnessCrudService<AbstractDomain> service) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: RichText(
+            text: TextSpan(text: 'Êtes-vous sûr de vouloir supprimer : ', children: <InlineSpan>[
+              TextSpan(text: domain.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+              const TextSpan(text: ' ?'),
+            ])),
+        actions: <Widget>[
+          TextButton(onPressed: () => service.delete(domain).then((_) => Navigator.pop(context)), child: const Text('Oui')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
@@ -72,7 +89,7 @@ class FitnessGridView<T extends AbstractStorageDomain> extends StatelessWidget {
                   onTap!(domain);
                 }
               },
-              onDelete: (T domain) => UtilService.showDeleteDialog(context, domain, service),
+              onDelete: (T domain) => _showDeleteDialog(context, domain, service),
             );
           }
         }).toList(),
@@ -183,3 +200,5 @@ class DomainCardNameRow<T extends AbstractDomain> extends StatelessWidget {
     );
   }
 }
+
+

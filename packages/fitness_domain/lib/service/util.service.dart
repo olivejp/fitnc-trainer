@@ -2,13 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:fitness_domain/domain/abstract.domain.dart';
-import 'package:fitness_domain/domain/storage-file.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:path/path.dart';
 import 'package:rxdart/rxdart.dart';
-
-import 'abstract.service.dart';
 
 class UtilService {
   ///
@@ -19,7 +14,8 @@ class UtilService {
   ///  List<T> listCompleteDomain : la liste dans laquelle on va rechercher
   ///  Subject<List<T>> stream : le stream dans lequel on va émettre les résultats.
   ///
-  static void search<T extends InterfaceDomainSearchable>(String? query, List<T> listCompleteDomain, Subject<List<T>> stream) {
+  static void search<T extends InterfaceDomainSearchable>(
+      String? query, List<T> listCompleteDomain, Subject<List<T>> stream) {
     final String? text = query?.toUpperCase();
     List<T> listFiltered;
     if (text != null && text.isNotEmpty) {
@@ -43,40 +39,9 @@ class UtilService {
   }
 
   ///
-  /// Permet de récupérer le StorageFile à partir de l'imageUrl du domain.
+  /// Renvoie dans une Future les bytes de l'image qui se trouve à l'adresse passée en paramètre.
   ///
-  static Future<StorageFile?> getFutureStorageFile(AbstractStorageDomain domain) {
-    final Completer<StorageFile?> completer = Completer<StorageFile?>();
-    if (domain.imageUrl != null && domain.imageUrl!.isNotEmpty) {
-      _getRemoteImageToUint8List(domain.imageUrl!).then((Uint8List bytes) {
-        domain.storageFile!.fileName = basename(domain.imageUrl!);
-        domain.storageFile!.fileBytes = bytes;
-        completer.complete(domain.storageFile);
-      });
-    } else if (domain.storageFile != null) {
-      completer.complete(null);
-    }
-    return completer.future;
-  }
-
-  static Future<Uint8List> _getRemoteImageToUint8List(String imageUrl) {
+  static Future<Uint8List> fetchImageBytes(String imageUrl) {
     return http.readBytes(Uri.parse(imageUrl));
-  }
-
-  static void showDeleteDialog(BuildContext context, AbstractDomain domain, AbstractFitnessCrudService<AbstractDomain> service) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: RichText(
-            text: TextSpan(text: 'Êtes-vous sûr de vouloir supprimer : ', children: <InlineSpan>[
-          TextSpan(text: domain.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-          const TextSpan(text: ' ?'),
-        ])),
-        actions: <Widget>[
-          TextButton(onPressed: () => service.delete(domain).then((_) => Navigator.pop(context)), child: const Text('Oui')),
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
-        ],
-      ),
-    );
   }
 }

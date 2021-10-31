@@ -30,7 +30,7 @@ class _WorkoutUpdatePageState extends State<WorkoutUpdatePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Initialisation du controller.
+    // Initialisation du mixin.
     controller.init(widget.workout);
 
     final List<Widget> buttons = <Widget>[

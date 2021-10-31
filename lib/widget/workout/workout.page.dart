@@ -26,10 +26,11 @@ class WorkoutPage extends StatefulWidget {
 class _WorkoutPageState extends State<WorkoutPage> {
   final DateFormat dateFormat = DateFormat('dd/MM/yyyy - kk:mm');
   final WorkoutService workoutService = Get.find();
+  final TextEditingController textSearchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    widget.controller.refreshSearchController();
+    widget.controller.initSearchList(getStreamList: workoutService.listenAll);
     return RoutedPage(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -48,13 +49,26 @@ class _WorkoutPageState extends State<WorkoutPage> {
                       )),
                   Expanded(
                     child: TextFormField(
-                      onChanged: (String text) => widget.controller.query.value = text,
+                      controller: textSearchController,
+                      onChanged: (String text) =>
+                          widget.controller.search(text),
                       decoration: InputDecoration(
                         constraints: const BoxConstraints(maxHeight: 43),
-                        border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
+                        border: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
                         focusedBorder: OutlineInputBorder(
-                            borderRadius: const BorderRadius.all(Radius.circular(5)), borderSide: BorderSide(color: Theme.of(context).primaryColor)),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(5)),
+                            borderSide: BorderSide(
+                                color: Theme.of(context).primaryColor)),
                         prefixIcon: const Icon(Icons.search),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            widget.controller.clearSearch();
+                            textSearchController.clear();
+                          },
+                          icon: const Icon(Icons.clear),
+                        ),
                         hintText: 'search'.tr,
                       ),
                       textAlignVertical: TextAlignVertical.bottom,
@@ -66,8 +80,10 @@ class _WorkoutPageState extends State<WorkoutPage> {
             Expanded(
               child: StreamBuilder<List<Workout>>(
                 stream: widget.controller.streamList,
-                builder: (BuildContext context, AsyncSnapshot<List<Workout>> snapshot) {
-                  if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<Workout>> snapshot) {
+                  if (!snapshot.hasData ||
+                      (snapshot.hasData && snapshot.data!.isEmpty)) {
                     return const Center(child: Text('Aucun workout trouvé.'));
                   } else {
                     final List<Workout> listWorkout = snapshot.data!;
@@ -124,7 +140,8 @@ class WorkoutPageCreateButton extends StatelessWidget {
       ),
       label: Text(
         'createWorkout'.tr,
-        style: GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
+        style:
+            GoogleFonts.roboto(fontSize: 15, color: Color(Colors.white.value)),
       ),
       icon: Icon(
         Icons.add,

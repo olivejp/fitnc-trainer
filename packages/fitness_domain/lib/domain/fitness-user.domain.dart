@@ -18,8 +18,8 @@ class FitnessUser extends AbstractStorageDomain implements InterfaceDomainSearch
       ..prenom = json['prenom'] as String?
       ..sexe = json['sexe'] as String?
       ..dateNaissance = json['dateNaissance'] as String?
-      ..telephone1 = json['telephone1'] as int?
-      ..telephone2 = json['telephone2'] as int?
+      ..telephone1 = json['telephone1'] as String?
+      ..telephone2 = json['telephone2'] as String?
       ..email = json['email'] as String?
       ..adresse1 = json['adresse1'] as String?
       ..adresse2 = json['adresse2'] as String?
@@ -29,8 +29,8 @@ class FitnessUser extends AbstractStorageDomain implements InterfaceDomainSearch
   String? prenom;
   String? sexe;
   String? dateNaissance;
-  int? telephone1;
-  int? telephone2;
+  String? telephone1;
+  String? telephone2;
   String? email;
   String? adresse1;
   String? adresse2;

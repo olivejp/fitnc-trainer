@@ -68,6 +68,7 @@ class FitnessTranslations extends Translations {
           'youtubeId': 'Identifiant vidéo Youtube',
           'compose': 'Composer',
           'moveHere': 'Déplacer ici',
+          'firebaseInitFailed': "L'application Firebase n'a pas été démarrée correctement.",
         },
         'en_US': {
           'home': 'Home',
@@ -134,6 +135,7 @@ class FitnessTranslations extends Translations {
           'youtubeId': 'Youtube video ID',
           'compose': 'Compose',
           'moveHere': 'Move here',
+          'firebaseInitFailed': 'Firebase initialization has failed.',
         }
       };
 }

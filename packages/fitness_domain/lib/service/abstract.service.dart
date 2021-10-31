@@ -6,56 +6,10 @@ import 'package:fitness_domain/domain/abstract.domain.dart';
 import 'package:get/get.dart';
 
 import 'abstract-crud.service.dart';
-import 'abstract.mixin.dart';
+import 'mixin/m_fitness_storage_service.dart';
+import 'firebase_query_condition.dart';
+import 'interface/i_from_json.dart';
 
-/// Méthode abstraite pour savoir comment désérialiser un objet T à partir d'un JSON.
-abstract class InterfaceServiceDeserializer<T> {
-  T fromJson(Map<String, dynamic> map);
-}
-
-enum Operator {
-  isEqualTo,
-  isNotEqualTo,
-  isLessThan,
-  isLessThanOrEqualTo,
-  isGreaterThan,
-  isGreaterThanOrEqualTo,
-  arrayContains,
-  arrayContainsAny,
-  whereIn,
-  whereNotIn,
-  isNull,
-}
-
-class FirebaseCondition {
-  FirebaseCondition(
-    this.field, {
-    this.isEqualTo,
-    this.isNotEqualTo,
-    this.isLessThan,
-    this.isLessThanOrEqualTo,
-    this.isGreaterThan,
-    this.isGreaterThanOrEqualTo,
-    this.arrayContains,
-    this.arrayContainsAny,
-    this.whereIn,
-    this.whereNotIn,
-    this.isNull,
-  });
-
-  dynamic field;
-  dynamic isEqualTo;
-  dynamic isNotEqualTo;
-  dynamic isLessThan;
-  dynamic isLessThanOrEqualTo;
-  dynamic isGreaterThan;
-  dynamic isGreaterThanOrEqualTo;
-  dynamic arrayContains;
-  dynamic arrayContainsAny;
-  dynamic whereIn;
-  dynamic whereNotIn;
-  dynamic isNull;
-}
 
 ///
 /// T represents the main model
@@ -64,7 +18,7 @@ class FirebaseCondition {
 ///
 abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDomain, U extends AbstractDomain,
         X extends AbstractFirebaseCrudService<U>> extends GetxService
-    implements IFirebaseSubCrudService<T, U>, InterfaceServiceDeserializer<T> {
+    implements IFirebaseSubCrudService<T, U>, IFromJson<T> {
   final X rootService = Get.find();
 
   CollectionReference<Map<String, dynamic>> getCollectionReference(String rootDomainUid) {
@@ -131,10 +85,10 @@ abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDom
         .map((QuerySnapshot<T> snapshot) => snapshot.docs.map((QueryDocumentSnapshot<T> e) => e.data()).toList());
   }
 
-  Query compoundQueries(String rootDomainUid, List<FirebaseCondition> listConditions,
+  Query compoundQueries(String rootDomainUid, List<FirebaseQueryCondition> listConditions,
       {String? orderBy, bool orderByDescending = false}) {
     Query? queryFinal;
-    for (FirebaseCondition condition in listConditions) {
+    for (FirebaseQueryCondition condition in listConditions) {
       if (queryFinal == null) {
         queryFinal = getCollectionReference(rootDomainUid).where(
           condition.field,
@@ -309,7 +263,7 @@ abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDom
 /// Classe abstraite dont on doit étendre pour récupérer les méthodes par défaut pour le CRUD Firebase.
 ///
 abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends GetxService
-    implements ICrudService<T>, InterfaceServiceDeserializer<T> {
+    implements ICrudService<T>, IFromJson<T> {
   /// Méthode abstraite qui retournera la collectionReference.
   CollectionReference<Object?> getCollectionReference();
 
@@ -494,7 +448,7 @@ abstract class AbstractFitnessCrudService<T extends AbstractDomain> extends Abst
 /// Il supprime également
 ///
 abstract class AbstractFitnessStorageService<T extends AbstractStorageDomain> extends AbstractFitnessCrudService<T>
-    with MixinFitnessStorageService<T> {
+    with MFitnessStorageService<T> {
   Future<void> callUpdateOrCreate(T domain) {
     final bool isUpdate = domain.uid != null;
     return isUpdate ? update(domain) : create(domain);

@@ -3,14 +3,10 @@ import 'package:fitnc_trainer/service/exercice.service.dart';
 import 'package:fitnc_trainer/widget/generic.grid.card.dart';
 import 'package:fitnc_trainer/widget/widgets/routed.page.dart';
 import 'package:fitness_domain/constants.dart';
-import 'package:fitness_domain/controller/abstract.controller.dart';
 import 'package:fitness_domain/domain/exercice.domain.dart';
+import 'package:fitness_domain/mixin/search.mixin.dart';
 import 'package:fitness_domain/service/display.service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart' as getRx;
 import 'package:google_fonts/google_fonts.dart';
@@ -20,7 +16,7 @@ import 'package:rxdart/rxdart.dart';
 
 import 'exercice.form.builder.dart';
 
-class ExercicePageController extends LocalSearchControllerMixin<Exercice, ExerciceService> {
+class ExercicePageController extends GetxController with SearchMixin<Exercice> {
   RxList<bool> toggleSelections = <bool>[true, false].obs;
 
   void toggleSelection(int index) {
@@ -58,14 +54,18 @@ class ExercisePage extends StatelessWidget {
   final ExerciceService service = Get.find();
   final DisplayTypeService displayTypeController = Get.find();
   final ExercicePageController controller = Get.put(ExercicePageController());
-  final ExerciceUpdateController updateController = Get.put(ExerciceUpdateController());
+  final ExerciceUpdateController updateController =
+      Get.put(ExerciceUpdateController());
 
   @override
   Widget build(BuildContext context) {
-    controller.refreshSearchController();
-    controller.setDualScreen(isDualScreen: displayTypeController.displayType.value == DisplayType.desktop);
+    controller.initSearchList(getStreamList: service.listenAll);
+    controller.setDualScreen(
+        isDualScreen:
+            displayTypeController.displayType.value == DisplayType.desktop);
     displayTypeController.displayType.listen((DisplayType displayType) {
-      controller.setDualScreen(isDualScreen: displayType == DisplayType.desktop);
+      controller.setDualScreen(
+          isDualScreen: displayType == DisplayType.desktop);
     });
 
     return RoutedPage(
@@ -90,7 +90,8 @@ class ExercisePage extends StatelessWidget {
                     onPressed: () => ExerciceBuilderPage.create(context),
                     child: Text(
                       'createExercise'.tr,
-                      style: GoogleFonts.roboto(color: Color(Colors.white.value), fontSize: 15),
+                      style: GoogleFonts.roboto(
+                          color: Color(Colors.white.value), fontSize: 15),
                     ),
                   )
                 ],
@@ -112,8 +113,10 @@ class ExercisePage extends StatelessWidget {
                           child: Container(
                             decoration: const BoxDecoration(
                                 color: FitnessNcColors.blue50,
-                                borderRadius: BorderRadius.only(topLeft: Radius.circular(10))),
-                            child: Obx(() => ExerciceUpdate(exercice: controller.exerciceSelected.value)),
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(10))),
+                            child: Obx(() => ExerciceUpdate(
+                                exercice: controller.exerciceSelected.value)),
                           ),
                         ),
                       );
@@ -144,6 +147,9 @@ class _ExerciceListSearch extends StatefulWidget {
 }
 
 class _ExerciceListSearchState extends State<_ExerciceListSearch> {
+
+  final TextEditingController textSearchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -163,7 +169,8 @@ class _ExerciceListSearchState extends State<_ExerciceListSearch> {
                       borderColor: Colors.grey,
                       borderWidth: 1,
                       selectedBorderColor: FitnessNcColors.orange400,
-                      constraints: const BoxConstraints(minHeight: 40, maxHeight: 40),
+                      constraints:
+                          const BoxConstraints(minHeight: 40, maxHeight: 40),
                       borderRadius: BorderRadius.circular(5),
                       isSelected: widget.controller.toggleSelections.toList(),
                       onPressed: (int index) {
@@ -185,17 +192,29 @@ class _ExerciceListSearchState extends State<_ExerciceListSearch> {
                 ),
               ),
               Expanded(
-                child: TextField(
+                child: TextFormField(
+                  controller: textSearchController,
                   decoration: InputDecoration(
                     constraints: const BoxConstraints(maxHeight: 43),
-                    border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
+                    border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(5))),
                     focusedBorder: OutlineInputBorder(
-                        borderRadius: const BorderRadius.all(Radius.circular(5)),
-                        borderSide: BorderSide(color: Theme.of(context).primaryColor)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(5)),
+                        borderSide:
+                            BorderSide(color: Theme.of(context).primaryColor)),
                     prefixIcon: const Icon(Icons.search),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        widget.controller.clearSearch();
+                        textSearchController.clear();
+                      },
+                      icon: const Icon(Icons.clear),
+                    ),
                     hintText: 'search'.tr,
                   ),
-                  onChanged: (String value) => widget.controller.query.value = value,
+                  onChanged: (String value) =>
+                      widget.controller.search(value),
                   textAlignVertical: TextAlignVertical.bottom,
                 ),
               ),
@@ -233,7 +252,8 @@ class _ExerciceStreamBuilder extends StatelessWidget {
           context: context,
           builder: (BuildContext context) => AlertDialog(
             insetPadding: const EdgeInsets.all(10),
-            content: ExerciceUpdate(exercice: exercice, displayCloseButton: true),
+            content:
+                ExerciceUpdate(exercice: exercice, displayCloseButton: true),
           ),
         );
       }
@@ -245,7 +265,8 @@ class _ExerciceStreamBuilder extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return LoadingRotating.square();
         } else {
-          if (!snapshot.hasData || (snapshot.hasData && snapshot.data!.isEmpty)) {
+          if (!snapshot.hasData ||
+              (snapshot.hasData && snapshot.data!.isEmpty)) {
             return Center(child: Text('noExerciseFound'.tr));
           } else {
             final List<Exercice> list = snapshot.data!;
@@ -258,7 +279,8 @@ class _ExerciceStreamBuilder extends StatelessWidget {
                           defaultTabletColumns: 2,
                           domains: list,
                           service: service,
-                          onTap: (Exercice exercice) => selectExercice(exercice),
+                          onTap: (Exercice exercice) =>
+                              selectExercice(exercice),
                         )
                       : _ExerciceListViewSeparated(list: list);
                 });
@@ -315,7 +337,8 @@ class ExerciceListTile extends StatelessWidget {
           context: context,
           builder: (BuildContext context) => AlertDialog(
             insetPadding: const EdgeInsets.all(10),
-            content: ExerciceUpdate(exercice: exercice, displayCloseButton: true),
+            content:
+                ExerciceUpdate(exercice: exercice, displayCloseButton: true),
           ),
         );
       }
@@ -327,7 +350,10 @@ class ExerciceListTile extends StatelessWidget {
         contentPadding: const EdgeInsets.all(20),
         selected: controller.exerciceSelected.value.uid == exercice.uid,
         selectedTileColor: FitnessNcColors.blue50,
-        leading: CircleAvatar(foregroundImage: exercice.imageUrl != null ? NetworkImage(exercice.imageUrl!) : null),
+        leading: CircleAvatar(
+            foregroundImage: exercice.imageUrl != null
+                ? NetworkImage(exercice.imageUrl!)
+                : null),
         title: Text(exercice.name),
         trailing: IconButton(
             onPressed: () {
@@ -335,15 +361,24 @@ class ExerciceListTile extends StatelessWidget {
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
                   title: RichText(
-                      text: TextSpan(text: 'wantToDelete'.tr, children: <InlineSpan>[
-                    TextSpan(text: exercice.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const TextSpan(text: ' ?'),
-                  ])),
+                      text: TextSpan(
+                          text: 'wantToDelete'.tr,
+                          children: <InlineSpan>[
+                        TextSpan(
+                            text: exercice.name,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
+                        const TextSpan(text: ' ?'),
+                      ])),
                   actions: <Widget>[
                     TextButton(
-                        onPressed: () => service.delete(exercice).then((_) => Navigator.pop(context)),
+                        onPressed: () => service
+                            .delete(exercice)
+                            .then((_) => Navigator.pop(context)),
                         child: const Text('Oui')),
-                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
+                    TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Annuler'))
                   ],
                 ),
               );

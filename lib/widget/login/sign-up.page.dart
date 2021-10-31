@@ -281,7 +281,7 @@ class _SignUpPageState extends State<SignUpPage> {
       ],
     );
 
-    return LayoutDisplayNotifier(
+    return LayoutNotifier(
       child: Scaffold(
         backgroundColor: FitnessNcColors.blue50,
         body: Stack(
