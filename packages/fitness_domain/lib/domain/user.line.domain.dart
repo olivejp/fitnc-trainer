@@ -12,6 +12,7 @@ class UserLine {
   String? weight;
   String? restTime;
   String? time;
+  String? dist;
   int? order;
   bool checked = false;
 

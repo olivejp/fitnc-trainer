@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+enum TypeExercice {
+  REPS_WEIGHT,
+  REPS_ONLY,
+  TIME,
+  DIST
+}
+
 class FitnessConstants {
   static const double textFormFieldHeight = 60;
   static const String appTitle = 'Fitness Nc';
