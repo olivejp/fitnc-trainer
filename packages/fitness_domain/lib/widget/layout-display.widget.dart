@@ -47,7 +47,7 @@ class _LayoutNotifierState extends State<LayoutNotifier> {
         }
 
         // Notification au service que la taille de l'écran a changé.
-        WidgetsBinding.instance!.addPostFrameCallback((Duration timeStamp) {
+        WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
           developer.log('displayType is now : $displayType');
           displayTypeService.changeDisplay(displayType);
         });

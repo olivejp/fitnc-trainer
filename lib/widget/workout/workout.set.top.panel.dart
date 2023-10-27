@@ -90,7 +90,7 @@ class _WorkoutSetExerciceGridView extends StatelessWidget {
           left: 30,
           right: 30,
           child: Scrollbar(
-            isAlwaysShown: true,
+            thumbVisibility: true,
             controller: _scrollController,
             thickness: 20,
             child: GridView.count(

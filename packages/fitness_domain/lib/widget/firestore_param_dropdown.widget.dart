@@ -91,15 +91,6 @@ class ParamDropdownButton extends StatelessWidget {
 }
 
 class FutureDropdownButton extends StatelessWidget {
-  final Key? key;
-  final TextStyle? style;
-  final String? initialValue;
-  final InputDecoration? decoration;
-  final void Function(String? onChangedValue) onChanged;
-  final Icon? icon;
-  final Widget? hint;
-  final Future<List<DropdownMenuItem<String?>>> future;
-
   FutureDropdownButton(
       {this.key,
       this.decoration,
@@ -109,6 +100,14 @@ class FutureDropdownButton extends StatelessWidget {
       required this.onChanged,
       this.icon,
       this.hint});
+  final Key? key;
+  final TextStyle? style;
+  final String? initialValue;
+  final InputDecoration? decoration;
+  final void Function(String? onChangedValue) onChanged;
+  final Icon? icon;
+  final Widget? hint;
+  final Future<List<DropdownMenuItem<String?>>> future;
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +132,7 @@ class FutureDropdownButton extends StatelessWidget {
             icon: icon,
             onChanged: onChanged,
             value: initialValue,
-            items: [],
+            items: <DropdownMenuItem<String?>>[],
             hint: hint,
             decoration: decoration,
           );

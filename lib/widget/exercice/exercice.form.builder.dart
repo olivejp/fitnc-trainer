@@ -68,7 +68,7 @@ class _ExerciceCreateState extends State<ExerciceCreate> {
           if (_formKey.currentState?.validate() == true) {
             widget.controller.saveExercice().then((_) {
               showToast('exerciseCreated'.tr, backgroundColor: Colors.green);
-                Navigator.of(context).pop();
+              Navigator.of(context).pop();
             }).catchError((_) => showToast('errorWhileSaving'.tr, backgroundColor: Colors.redAccent));
           }
         },
@@ -194,7 +194,7 @@ class _FormExerciceState extends State<FormExercice> {
       padding: const EdgeInsets.all(50),
       controller: scrollController,
       child: Scrollbar(
-        isAlwaysShown: true,
+        thumbVisibility: true,
         controller: scrollController,
         child: Form(
           key: widget.formKey,
@@ -323,6 +323,7 @@ class _FormExerciceState extends State<FormExercice> {
                   )
                 ],
               ),
+
               /// TODO A remettre quand la fonctionnalité des vidéos sera mise en place.
               // Row(
               //   mainAxisAlignment: MainAxisAlignment.center,
@@ -357,40 +358,36 @@ class _FormExerciceState extends State<FormExercice> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Obx(
-                    () {
-                      if (widget.controller.exercise.value.youtubeUrl != null &&
-                          widget.controller.exercise.value.youtubeUrl!.isNotEmpty) {
-                        return FutureBuilder<void>(
-                          future: closeYoutubeController(),
-                          builder: (_, AsyncSnapshot<void> snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done) {
-                              youtubeController = YoutubePlayerController(
-                                initialVideoId: widget.controller.exercise.value.youtubeUrl!,
-                                params: const YoutubePlayerParams(
-                                  autoPlay: false,
-                                  showControls: false
-                                ),
-                              );
-                              return LimitedBox(
-                                maxWidth: 500,
-                                child: YoutubePlayerIFrame(
-                                  controller: youtubeController,
-                                ),
-                              );
-                            }
-                            return Container();
-                          },
-                        );
-                      } else {
-                        if (youtubeController != null) {
-                          youtubeController!.reset();
-                          youtubeController = null;
-                        }
-                        return Container();
-                      }
-                    },
-                  )
+                  // Obx(
+                  //   () {
+                  //     if (widget.controller.exercise.value.youtubeUrl != null &&
+                  //         widget.controller.exercise.value.youtubeUrl!.isNotEmpty) {
+                  //       return FutureBuilder<void>(
+                  //         future: closeYoutubeController(),
+                  //         builder: (_, AsyncSnapshot<void> snapshot) {
+                  //           if (snapshot.connectionState == ConnectionState.done) {
+                  //             youtubeController = YoutubePlayerController(
+                  //               params: const YoutubePlayerParams(showControls: false),
+                  //             );
+                  //             return LimitedBox(
+                  //               maxWidth: 500,
+                  //               child: YoutubePlayer(
+                  //                 controller: youtubeController,
+                  //               ),
+                  //             );
+                  //           }
+                  //           return Container();
+                  //         },
+                  //       );
+                  //     } else {
+                  //       if (youtubeController != null) {
+                  //         youtubeController!.reset();
+                  //         youtubeController = null;
+                  //       }
+                  //       return Container();
+                  //     }
+                  //   },
+                  // )
                 ],
               ),
               Padding(

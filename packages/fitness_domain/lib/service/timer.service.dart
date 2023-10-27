@@ -3,6 +3,11 @@ import 'package:fitness_domain/domain/param.domain.dart';
 import 'package:flutter/material.dart';
 
 class TimerService {
+
+  TimerService._() {
+    _instance = this;
+    timerArray.sort((a, b) => a.order!.compareTo(b.order!));
+  }
   final ParamService paramService = ParamService.getInstance();
   List<Param> timerArray = [
     Param(nom: '5 sec', libelle: '5 secondes', valeur: '5_SEC', order: 1),
@@ -27,11 +32,6 @@ class TimerService {
   ];
 
   static TimerService? _instance;
-
-  TimerService._() {
-    _instance = this;
-    timerArray.sort((a, b) => a.order!.compareTo(b.order!));
-  }
 
   static TimerService getInstance() {
     _instance ??= TimerService._();

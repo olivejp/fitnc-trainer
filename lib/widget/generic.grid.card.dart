@@ -1,7 +1,6 @@
 import 'package:fitness_domain/domain/abstract.domain.dart';
 import 'package:fitness_domain/service/abstract.service.dart';
 import 'package:fitness_domain/service/display.service.dart';
-import 'package:fitness_domain/service/util.service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,17 +37,19 @@ class FitnessGridView<T extends AbstractStorageDomain> extends StatelessWidget {
   final Widget Function(T domain)? getCard;
   final DisplayTypeService displayTypeController = Get.find();
 
-  void _showDeleteDialog(BuildContext context, AbstractDomain domain, AbstractFitnessCrudService<AbstractDomain> service) {
+  void _showDeleteDialog(
+      BuildContext context, AbstractDomain domain, AbstractFitnessCrudService<AbstractDomain> service) {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: RichText(
             text: TextSpan(text: 'Êtes-vous sûr de vouloir supprimer : ', children: <InlineSpan>[
-              TextSpan(text: domain.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              const TextSpan(text: ' ?'),
-            ])),
+          TextSpan(text: domain.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+          const TextSpan(text: ' ?'),
+        ])),
         actions: <Widget>[
-          TextButton(onPressed: () => service.delete(domain).then((_) => Navigator.pop(context)), child: const Text('Oui')),
+          TextButton(
+              onPressed: () => service.delete(domain).then((_) => Navigator.pop(context)), child: const Text('Oui')),
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler'))
         ],
       ),
@@ -200,5 +201,3 @@ class DomainCardNameRow<T extends AbstractDomain> extends StatelessWidget {
     );
   }
 }
-
-

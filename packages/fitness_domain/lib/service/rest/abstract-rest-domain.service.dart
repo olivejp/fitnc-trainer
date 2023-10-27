@@ -4,14 +4,12 @@ import 'package:tuple/tuple.dart';
 
 /// Classe abstraite permettant de gérer un domain au travers d'un RestHttpService.
 abstract class RestDomainService<T> {
+  RestDomainService(String path, {String authority = '', bool isHttps = false}) {
+    this.restHttpService = RestHttpService(path, authority: authority, isHttps: isHttps);
+  }
   T mapResponseToDomain(http.Response response);
 
   List<T> mapResponseToListDomain(http.Response response);
-
-  RestDomainService(String path, {String authority = '', bool isHttps= false}) {
-    this.restHttpService =
-        RestHttpService(path, authority: authority, isHttps: isHttps);
-  }
 
   late RestHttpService restHttpService;
 
@@ -20,7 +18,7 @@ abstract class RestDomainService<T> {
     return this
         .restHttpService
         .find(id, headers: headers, queryParameters: queryParameters)
-        .then((response) => Tuple2(mapResponseToDomain(response), response));
+        .then((http.Response response) => Tuple2<T, http.Response>(mapResponseToDomain(response), response));
   }
 
   Future<Tuple2<List<T>, http.Response>> findAll(
@@ -28,18 +26,14 @@ abstract class RestDomainService<T> {
     return this
         .restHttpService
         .findAll(headers: headers, queryParameters: queryParameters)
-        .then(
-            (response) => Tuple2(mapResponseToListDomain(response), response));
+        .then((http.Response response) => Tuple2<List<T>, http.Response>(mapResponseToListDomain(response), response));
   }
 
-  Future<bool> delete(String id,
-      {Object? body,
-      Map<String, String>? headers,
-      Map<String, dynamic>? queryParameters}) {
+  Future<bool> delete(String id, {Object? body, Map<String, String>? headers, Map<String, dynamic>? queryParameters}) {
     return this
         .restHttpService
         .delete(id, headers: headers, queryParameters: queryParameters)
-        .then((response) => true)
+        .then((http.Response response) => true)
         .catchError((error) => false);
   }
 
@@ -48,7 +42,7 @@ abstract class RestDomainService<T> {
     return this
         .restHttpService
         .save(id, body, headers: headers, queryParameters: queryParameters)
-        .then((response) => Tuple2(mapResponseToDomain(response), response));
+        .then((http.Response response) => Tuple2<T, http.Response>(mapResponseToDomain(response), response));
   }
 
   Future<Tuple2<T, http.Response>> update(String id, Object body, String path,
@@ -56,6 +50,6 @@ abstract class RestDomainService<T> {
     return this
         .restHttpService
         .update(id, body, headers: headers, queryParameters: queryParameters)
-        .then((response) => Tuple2(mapResponseToDomain(response), response));
+        .then((http.Response response) => Tuple2<T, http.Response>(mapResponseToDomain(response), response));
   }
 }

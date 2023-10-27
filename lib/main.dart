@@ -1,9 +1,12 @@
 import 'dart:developer' as developer;
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:fitnc_trainer/firebase_options.dart';
 import 'package:fitnc_trainer/fitness_translations.dart';
 import 'package:fitnc_trainer/middleware/init_domain_service_middleware.dart';
 import 'package:fitnc_trainer/service/config.service.dart';
+import 'package:fitnc_trainer/service/debug_printer.dart';
 import 'package:fitnc_trainer/service/firebase/firebase_init_firestore.service.dart';
 import 'package:fitnc_trainer/service/firebase/firebase_init_functions.service.dart';
 import 'package:fitnc_trainer/service/fitness-user.service.dart';
@@ -25,8 +28,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:oktoast/oktoast.dart';
 
-void main() {
-  runApp(MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)
+      .then((FirebaseApp value) => runApp(MyApp()))
+      .onError((Object? error, StackTrace stackTrace) => DebugPrinter.printLn(error));
 }
 
 class MyApp extends StatelessWidget {
@@ -57,7 +64,6 @@ class MyApp extends StatelessWidget {
     developer.log('onInit() called');
 
     final ConfigService conf = Get.find();
-
     Get.lazyPut(() => DisplayTypeService());
     Get.put(FirebaseInitFirestoreService(emulate: conf.emulateFirestore()));
     Get.put(FirebaseInitFunctionsService(
@@ -79,8 +85,7 @@ class MyApp extends StatelessWidget {
         name: FitnessConstants.routeSignUp,
         middlewares: <GetMiddleware>[LayoutNotifierMiddleware()],
         page: () => SignUpPage(
-          callback: (UserCredential userCredential) =>
-              Get.offNamed(FitnessConstants.routeHome),
+          callback: (UserCredential userCredential) => Get.offNamed(FitnessConstants.routeHome),
         ),
       ),
       GetPage<PoliciesMobilePage>(
@@ -101,8 +106,7 @@ class MyApp extends StatelessWidget {
         name: FitnessConstants.routeLogin,
         middlewares: <GetMiddleware>[LayoutNotifierMiddleware()],
         page: () => LoginPage(
-          callback: (UserCredential userCredential) =>
-              Get.offNamed(FitnessConstants.routeHome),
+          callback: (UserCredential userCredential) => Get.offNamed(FitnessConstants.routeHome),
         ),
       ),
     ];
