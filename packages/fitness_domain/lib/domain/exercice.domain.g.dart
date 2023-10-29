@@ -6,20 +6,19 @@ part of 'exercice.domain.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Exercice _$ExerciceFromJson(Map<String, dynamic> json) {
-  return Exercice()
-    ..uid = json['uid'] as String?
-    ..name = json['name'] as String
-    ..createDate = json['createDate']
-    ..updateDate = json['updateDate']
-    ..creatorUid = json['creatorUid'] as String?
-    ..imageUrl = json['imageUrl'] as String?
-    ..imageName = json['imageName'] as String?
-    ..typeExercice = json['typeExercice'] as String?
-    ..videoUrl = json['videoUrl'] as String?
-    ..youtubeUrl = json['youtubeUrl'] as String?
-    ..description = json['description'] as String;
-}
+Exercice _$ExerciceFromJson(Map<String, dynamic> json) => Exercice()
+  ..uid = json['uid'] as String?
+  ..name = json['name'] as String
+  ..createDate = json['createDate']
+  ..updateDate = json['updateDate']
+  ..creatorUid = json['creatorUid'] as String?
+  ..imageUrl = json['imageUrl'] as String?
+  ..imageName = json['imageName'] as String?
+  ..typeExercice = json['typeExercice'] as String?
+  ..videoUrl = json['videoUrl'] as String?
+  ..youtubeUrl = json['youtubeUrl'] as String?
+  ..description = json['description'] as String
+  ..group = json['group'] as String?;
 
 Map<String, dynamic> _$ExerciceToJson(Exercice instance) => <String, dynamic>{
       'uid': instance.uid,
@@ -33,4 +32,5 @@ Map<String, dynamic> _$ExerciceToJson(Exercice instance) => <String, dynamic>{
       'videoUrl': instance.videoUrl,
       'youtubeUrl': instance.youtubeUrl,
       'description': instance.description,
+      'group': instance.group,
     };

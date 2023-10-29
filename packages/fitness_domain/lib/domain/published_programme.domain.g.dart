@@ -6,23 +6,22 @@ part of 'published_programme.domain.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-PublishedProgramme _$PublishedProgrammeFromJson(Map<String, dynamic> json) {
-  return PublishedProgramme()
-    ..uid = json['uid'] as String?
-    ..name = json['name'] as String
-    ..createDate = json['createDate']
-    ..updateDate = json['updateDate']
-    ..imageUrl = json['imageUrl'] as String?
-    ..imageName = json['imageName'] as String?
-    ..numberWeeks = json['numberWeeks'] as String?
-    ..available = json['available'] as bool?
-    ..description = json['description'] as String?
-    ..publishDate = json['publishDate']
-    ..creatorUid = json['creatorUid'] as String?
-    ..creatorImageUrl = json['creatorImageUrl'] as String?
-    ..creatorName = json['creatorName'] as String?
-    ..creatorPrenom = json['creatorPrenom'] as String?;
-}
+PublishedProgramme _$PublishedProgrammeFromJson(Map<String, dynamic> json) =>
+    PublishedProgramme()
+      ..uid = json['uid'] as String?
+      ..name = json['name'] as String
+      ..createDate = json['createDate']
+      ..updateDate = json['updateDate']
+      ..imageUrl = json['imageUrl'] as String?
+      ..imageName = json['imageName'] as String?
+      ..numberWeeks = json['numberWeeks'] as String?
+      ..available = json['available'] as bool?
+      ..description = json['description'] as String?
+      ..publishDate = json['publishDate']
+      ..creatorUid = json['creatorUid'] as String?
+      ..creatorImageUrl = json['creatorImageUrl'] as String?
+      ..creatorName = json['creatorName'] as String?
+      ..creatorPrenom = json['creatorPrenom'] as String?;
 
 Map<String, dynamic> _$PublishedProgrammeToJson(PublishedProgramme instance) =>
     <String, dynamic>{

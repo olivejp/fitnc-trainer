@@ -6,22 +6,21 @@ part of 'user.exercice.domain.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-UserExercice _$UserExerciceFromJson(Map<String, dynamic> json) {
-  return UserExercice()
-    ..uid = json['uid'] as String?
-    ..name = json['name'] as String
-    ..createDate = json['createDate']
-    ..updateDate = json['updateDate']
-    ..creatorUid = json['creatorUid'] as String?
-    ..imageUrl = json['imageUrl'] as String?
-    ..imageName = json['imageName'] as String?
-    ..typeExercice = json['typeExercice'] as String?
-    ..videoUrl = json['videoUrl'] as String?
-    ..youtubeUrl = json['youtubeUrl'] as String?
-    ..description = json['description'] as String
-    ..comment = json['comment'] as String?
-    ..oneRepMax = json['oneRepMax'] as String?;
-}
+UserExercice _$UserExerciceFromJson(Map<String, dynamic> json) => UserExercice()
+  ..uid = json['uid'] as String?
+  ..name = json['name'] as String
+  ..createDate = json['createDate']
+  ..updateDate = json['updateDate']
+  ..creatorUid = json['creatorUid'] as String?
+  ..imageUrl = json['imageUrl'] as String?
+  ..imageName = json['imageName'] as String?
+  ..typeExercice = json['typeExercice'] as String?
+  ..videoUrl = json['videoUrl'] as String?
+  ..youtubeUrl = json['youtubeUrl'] as String?
+  ..description = json['description'] as String
+  ..group = json['group'] as String?
+  ..comment = json['comment'] as String?
+  ..oneRepMax = json['oneRepMax'] as String?;
 
 Map<String, dynamic> _$UserExerciceToJson(UserExercice instance) =>
     <String, dynamic>{
@@ -36,6 +35,7 @@ Map<String, dynamic> _$UserExerciceToJson(UserExercice instance) =>
       'videoUrl': instance.videoUrl,
       'youtubeUrl': instance.youtubeUrl,
       'description': instance.description,
+      'group': instance.group,
       'comment': instance.comment,
       'oneRepMax': instance.oneRepMax,
     };

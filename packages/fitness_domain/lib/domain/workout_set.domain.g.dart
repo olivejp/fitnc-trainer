@@ -6,25 +6,23 @@ part of 'workout_set.domain.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-WorkoutSet _$WorkoutSetFromJson(Map<String, dynamic> json) {
-  return WorkoutSet(
-    uidExercice: json['uidExercice'] as String,
-    consigne: json['consigne'] as String?,
-    order: json['order'] as int,
-    uidWorkout: json['uidWorkout'] as String,
-    nameExercice: json['nameExercice'] as String,
-  )
-    ..uid = json['uid'] as String?
-    ..name = json['name'] as String
-    ..createDate = json['createDate']
-    ..updateDate = json['updateDate']
-    ..creatorUid = json['creatorUid'] as String?
-    ..typeExercice = json['typeExercice'] as String?
-    ..imageUrlExercice = json['imageUrlExercice'] as String?
-    ..lines = (json['lines'] as List<dynamic>)
-        .map((e) => Line.fromJson(e as Map<String, dynamic>))
-        .toList();
-}
+WorkoutSet _$WorkoutSetFromJson(Map<String, dynamic> json) => WorkoutSet(
+      uidExercice: json['uidExercice'] as String? ?? '',
+      consigne: json['consigne'] as String? ?? '',
+      order: json['order'] as int? ?? 0,
+      uidWorkout: json['uidWorkout'] as String? ?? '',
+      nameExercice: json['nameExercice'] as String? ?? '',
+    )
+      ..uid = json['uid'] as String?
+      ..name = json['name'] as String
+      ..createDate = json['createDate']
+      ..updateDate = json['updateDate']
+      ..creatorUid = json['creatorUid'] as String?
+      ..typeExercice = json['typeExercice'] as String?
+      ..imageUrlExercice = json['imageUrlExercice'] as String?
+      ..lines = (json['lines'] as List<dynamic>)
+          .map((e) => Line.fromJson(e as Map<String, dynamic>))
+          .toList();
 
 Map<String, dynamic> _$WorkoutSetToJson(WorkoutSet instance) =>
     <String, dynamic>{

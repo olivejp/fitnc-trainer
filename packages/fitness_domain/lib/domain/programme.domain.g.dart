@@ -6,20 +6,18 @@ part of 'programme.domain.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Programme _$ProgrammeFromJson(Map<String, dynamic> json) {
-  return Programme()
-    ..uid = json['uid'] as String?
-    ..name = json['name'] as String
-    ..createDate = json['createDate']
-    ..updateDate = json['updateDate']
-    ..creatorUid = json['creatorUid'] as String?
-    ..imageUrl = json['imageUrl'] as String?
-    ..imageName = json['imageName'] as String?
-    ..numberWeeks = json['numberWeeks'] as String?
-    ..available = json['available'] as bool?
-    ..description = json['description'] as String?
-    ..publishDate = json['publishDate'];
-}
+Programme _$ProgrammeFromJson(Map<String, dynamic> json) => Programme()
+  ..uid = json['uid'] as String?
+  ..name = json['name'] as String
+  ..createDate = json['createDate']
+  ..updateDate = json['updateDate']
+  ..creatorUid = json['creatorUid'] as String?
+  ..imageUrl = json['imageUrl'] as String?
+  ..imageName = json['imageName'] as String?
+  ..numberWeeks = json['numberWeeks'] as String?
+  ..available = json['available'] as bool?
+  ..description = json['description'] as String?
+  ..publishDate = json['publishDate'];
 
 Map<String, dynamic> _$ProgrammeToJson(Programme instance) => <String, dynamic>{
       'uid': instance.uid,

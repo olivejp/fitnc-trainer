@@ -12,13 +12,14 @@ class Exercice extends AbstractStorageDomain implements InterfaceDomainSearchabl
   String? videoUrl;
   String? youtubeUrl;
   String description = '';
+  String? group = '';
 
   @override
   Map<String, dynamic> toJson() => _$ExerciceToJson(this);
 
   @override
   List<String> searchFields() {
-    return <String>['name', 'description'];
+    return <String>['name', 'description', 'group'];
   }
 
   static Exercice fromJson(Map<String, dynamic> json) {
@@ -31,6 +32,7 @@ class Exercice extends AbstractStorageDomain implements InterfaceDomainSearchabl
       ..typeExercice = json['typeExercice'] as String?
       ..videoUrl = json['videoUrl'] as String?
       ..youtubeUrl = json['youtubeUrl'] as String?
+      ..group = json['group'] as String?
       ..description = json['description'] as String? ?? '';
   }
 }
