@@ -2,21 +2,13 @@ import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get/get.dart';
 
-class AuthService extends GetxService {
-  AuthService({this.emulate = false});
-
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  final bool emulate;
-
+class AuthService {
   ///
   /// A l'initialisation du service
   /// si le dev mode est activé, on va se brancher sur l'émulator.
   ///
-  @override
-  void onInit() {
-    super.onInit();
+  AuthService({this.emulate = false}) {
     if (emulate) {
       developer.log(
         '[WARNING] Application launched with emulate mode : Firebase Auth emulator will be used.',
@@ -26,6 +18,9 @@ class AuthService extends GetxService {
       _firebaseAuth.useAuthEmulator('localhost', 9099);
     }
   }
+
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final bool emulate;
 
   ///
   /// Méthode static permettant de savoir si un utilisateur est connecté ou pas.
@@ -55,8 +50,7 @@ class AuthService extends GetxService {
     return _firebaseAuth.authStateChanges();
   }
 
-  Future<UserCredential> signInWithEmailPassword(
-      String email, String password) {
+  Future<UserCredential> signInWithEmailPassword(String email, String password) {
     return _firebaseAuth.signInWithEmailAndPassword(
       email: email,
       password: password,

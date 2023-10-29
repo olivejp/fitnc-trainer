@@ -35,7 +35,7 @@ class FitnessGridView<T extends AbstractStorageDomain> extends StatelessWidget {
   final int defaultTabletColumns;
   final int defaultDesktopColumns;
   final Widget Function(T domain)? getCard;
-  final DisplayTypeService displayTypeController = Get.find();
+  final DisplayTypeNotifier displayTypeController = Get.find();
 
   void _showDeleteDialog(
       BuildContext context, AbstractDomain domain, AbstractFitnessCrudService<AbstractDomain> service) {

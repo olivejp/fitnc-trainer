@@ -112,7 +112,7 @@ class _FitnessDrawerState extends State<FitnessDrawer> with SingleTickerProvider
   late Animation<double> _animation;
   final AuthService authService = Get.find();
   final HomePageController controller = Get.find();
-  final DisplayTypeService displayTypeController = Get.find();
+  final DisplayTypeNotifier displayTypeController = Get.find();
 
   @override
   void dispose() {

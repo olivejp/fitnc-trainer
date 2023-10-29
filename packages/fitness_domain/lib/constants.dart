@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum TypeExercice {
-  REPS_WEIGHT,
-  REPS_ONLY,
-  TIME,
-  DIST
-}
+enum TypeExercice { REPS_WEIGHT, REPS_ONLY, TIME, DIST }
 
 class FitnessConstants {
   static const double textFormFieldHeight = 60;
@@ -18,6 +13,14 @@ class FitnessConstants {
 }
 
 class FitnessNcColors {
+  static const Color primaryDark = Color(0xff37474f);
+  static const Color secondaryDark = Color(0xffffca28);
+  static const Color accentDark = Color(0xffffca28);
+
+  static const Color primary = Color(0xfff0eddd);
+  static const Color secondary = Color(0xfff4f1e4);
+  static const Color accent = Color(0xffffca28);
+
   static const Color white50 = Color(0xFFFFFFFF);
 
   static const Color black800 = Color(0xFF121212);

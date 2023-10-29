@@ -3,13 +3,12 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness_domain/domain/abstract.domain.dart';
-import 'package:get/get.dart';
+import 'package:get_it/get_it.dart';
 
 import 'abstract-crud.service.dart';
-import 'mixin/m_fitness_storage_service.dart';
 import 'firebase_query_condition.dart';
 import 'interface/i_from_json.dart';
-
+import 'mixin/m_fitness_storage_service.dart';
 
 ///
 /// T represents the main model
@@ -17,9 +16,8 @@ import 'interface/i_from_json.dart';
 /// X is the service for the root model
 ///
 abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDomain, U extends AbstractDomain,
-        X extends AbstractFirebaseCrudService<U>> extends GetxService
-    implements IFirebaseSubCrudService<T, U>, IFromJson<T> {
-  final X rootService = Get.find();
+    X extends AbstractFirebaseCrudService<U>> implements IFirebaseSubCrudService<T, U>, IFromJson<T> {
+  final X rootService = GetIt.I.get();
 
   CollectionReference<Map<String, dynamic>> getCollectionReference(String rootDomainUid) {
     return rootService.getCollectionReference().doc(rootDomainUid).collection(getCollectionName());
@@ -262,8 +260,7 @@ abstract class AbstractFirebaseSubcollectionCrudService<T extends AbstractSubDom
 ///
 /// Classe abstraite dont on doit étendre pour récupérer les méthodes par défaut pour le CRUD Firebase.
 ///
-abstract class AbstractFirebaseCrudService<T extends AbstractDomain> extends GetxService
-    implements ICrudService<T>, IFromJson<T> {
+abstract class AbstractFirebaseCrudService<T extends AbstractDomain> implements ICrudService<T>, IFromJson<T> {
   /// Méthode abstraite qui retournera la collectionReference.
   CollectionReference<Object?> getCollectionReference();
 

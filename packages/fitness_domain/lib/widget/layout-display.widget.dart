@@ -2,7 +2,7 @@ import 'dart:developer' as developer;
 
 import 'package:fitness_domain/service/display.service.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 ///
 /// Ce Widget permet de notifier à traver le service DisplayTypeService
@@ -27,8 +27,6 @@ class LayoutNotifier extends StatefulWidget {
 }
 
 class _LayoutNotifierState extends State<LayoutNotifier> {
-  final DisplayTypeService displayTypeService = Get.find();
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -39,8 +37,7 @@ class _LayoutNotifierState extends State<LayoutNotifier> {
         // Calcul de la nouvelle taille de l'écran.
         if (constraints.maxWidth >= widget.desktopSize) {
           displayType = DisplayType.desktop;
-        } else if (constraints.maxWidth >= widget.tabletSize &&
-            constraints.maxWidth <= widget.desktopSize - 1) {
+        } else if (constraints.maxWidth >= widget.tabletSize && constraints.maxWidth <= widget.desktopSize - 1) {
           displayType = DisplayType.tablet;
         } else {
           displayType = DisplayType.mobile;
@@ -49,7 +46,7 @@ class _LayoutNotifierState extends State<LayoutNotifier> {
         // Notification au service que la taille de l'écran a changé.
         WidgetsBinding.instance.addPostFrameCallback((Duration timeStamp) {
           developer.log('displayType is now : $displayType');
-          displayTypeService.changeDisplay(displayType);
+          Provider.of<DisplayTypeNotifier>(context, listen: false).changeDisplay(displayType);
         });
 
         return widget.child;

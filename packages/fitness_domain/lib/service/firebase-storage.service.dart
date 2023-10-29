@@ -1,30 +1,23 @@
-import 'dart:developer' as developer;
-
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fitness_domain/domain/storage-file.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 
-class FirebaseStorageService extends GetxService {
-  FirebaseStorageService({this.emulate = false});
-
+class FirebaseStorageService {
   final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-
   final bool emulate;
 
   ///
   /// A l'initialisation du service
   /// si le dev mode est activé, on va se brancher sur l'émulator.
   ///
-  @override
-  void onInit() {
-    super.onInit();
+  FirebaseStorageService({this.emulate = false}) {
     if (emulate) {
       developer.log(
         '[WARNING] Application launched with emulate mode : Firebase Storage emulator will be used.',
@@ -37,8 +30,7 @@ class FirebaseStorageService extends GetxService {
   ///
   /// Supprime tous les documents présents dans Firebase Storage à l'adresse indiquée puis pousse le nouveau StorageFile.
   ///
-  Future<String> eraseAndReplaceStorage(
-      String path, StorageFile storageFile) async {
+  Future<String> eraseAndReplaceStorage(String path, StorageFile storageFile) async {
     await deleteAllFiles(path);
     return sendToStorage(path, storageFile);
   }
@@ -69,8 +61,7 @@ class FirebaseStorageService extends GetxService {
       return Future<String>.error('Aucun utilisateur connecté.');
     }
     if (storageFile.fileBytes != null && storageFile.fileName != null) {
-      return _sendToStorageAndGetReference(
-          url: '$path/${storageFile.fileName}', bytes: storageFile.fileBytes!);
+      return _sendToStorageAndGetReference(url: '$path/${storageFile.fileName}', bytes: storageFile.fileBytes!);
     } else {
       return Future<String>.error(
           "Le StorageFile n'est pas complet. L'attribut fileBytes et fileName sont obligatoires.");
@@ -99,14 +90,9 @@ class FirebaseStorageService extends GetxService {
   /// Pousse un fichier binaire à l'adresse url indiquée.
   /// Possibilité de spécifier le type de contenu.
   ///
-  Future<String> _sendToStorageAndGetReference(
-      {required String url, required Uint8List bytes, String? contentType}) {
-    final SettableMetadata metadata = SettableMetadata(
-        cacheControl: 'max-age=36000', contentType: contentType);
-    return _firebaseStorage
-        .ref(url)
-        .putData(bytes, metadata)
-        .then((TaskSnapshot ref) => ref.ref.getDownloadURL());
+  Future<String> _sendToStorageAndGetReference({required String url, required Uint8List bytes, String? contentType}) {
+    final SettableMetadata metadata = SettableMetadata(cacheControl: 'max-age=36000', contentType: contentType);
+    return _firebaseStorage.ref(url).putData(bytes, metadata).then((TaskSnapshot ref) => ref.ref.getDownloadURL());
   }
 
   ///

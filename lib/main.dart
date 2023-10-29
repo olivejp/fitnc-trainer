@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
     developer.log('onInit() called');
 
     final ConfigService conf = Get.find();
-    Get.lazyPut(() => DisplayTypeService());
+    Get.lazyPut(() => DisplayTypeNotifier());
     Get.put(FirebaseInitFirestoreService(emulate: conf.emulateFirestore()));
     Get.put(FirebaseInitFunctionsService(
       emulate: conf.emulateFunctions(),

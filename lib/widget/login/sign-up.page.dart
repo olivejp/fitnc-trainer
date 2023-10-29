@@ -26,7 +26,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   final SignUpController controller = Get.put(SignUpController());
   final HidePasswordController hidePasswordController = Get.put(HidePasswordController());
-  final DisplayTypeService displayTypeService = Get.find();
+  final DisplayTypeNotifier displayTypeService = Get.find();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
