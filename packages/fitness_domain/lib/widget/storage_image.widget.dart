@@ -19,6 +19,7 @@ class StorageImageWidget extends StatelessWidget {
     this.allowedExtensions = defaultAllowedExtensions,
     this.onDeleted,
     this.radius = 50,
+    this.readOnly = false,
   });
 
   static const List<String> defaultAllowedExtensions = <String>['jpg', 'jpeg', 'png', 'gif'];
@@ -29,13 +30,16 @@ class StorageImageWidget extends StatelessWidget {
   final String? imageUrl;
   final StorageFile? storageFile;
   final double radius;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
-    const Widget icon = Icon(
-      Icons.add_photo_alternate,
-      color: Colors.white,
-    );
+    Widget? icon = readOnly
+        ? null
+        : Icon(
+            Icons.add_photo_alternate,
+            color: Colors.white,
+          );
 
     final Color color = Theme.of(context).primaryColor;
 
@@ -65,30 +69,31 @@ class StorageImageWidget extends StatelessWidget {
     return Stack(
       children: <Widget>[
         InkWell(
-          onTap: () => onTap(),
+          onTap: readOnly ? null : () => onTap(),
           borderRadius: const BorderRadius.all(Radius.circular(50)),
           child: Padding(
             padding: const EdgeInsets.all(15.0),
             child: child,
           ),
         ),
-        Positioned(
-          bottom: 0,
-          right: 0,
-          child: IconButton(
-            padding: EdgeInsets.all(0),
-            tooltip: 'Supprimer la photo',
-            onPressed: () {
-              if (onDeleted != null) {
-                onDeleted!();
-              }
-            },
-            icon: Icon(
-              Icons.delete,
-              color: Theme.of(context).primaryColor,
+        if (!readOnly)
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: IconButton(
+              padding: EdgeInsets.all(0),
+              tooltip: 'Supprimer la photo',
+              onPressed: () {
+                if (onDeleted != null) {
+                  onDeleted!();
+                }
+              },
+              icon: Icon(
+                Icons.delete,
+                color: Theme.of(context).primaryColor,
+              ),
             ),
-          ),
-        )
+          )
       ],
     );
   }

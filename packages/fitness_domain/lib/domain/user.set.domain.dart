@@ -6,7 +6,15 @@ part 'user.set.domain.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class UserSet extends AbstractSubDomain {
-  UserSet({this.uidExercice = '', this.order = 0, this.uidWorkout = '', this.nameExercice = '', this.imageUrlExercice, this.typeExercice = '',this.date = null});
+  UserSet({
+    this.uidExercice = '',
+    this.order = 0,
+    this.uidWorkout = '',
+    this.nameExercice = '',
+    this.imageUrlExercice,
+    this.typeExercice = '',
+    this.date = null,
+  });
 
   factory UserSet.fromJson(Map<String, dynamic> data) => _$UserSetFromJson(data);
 
