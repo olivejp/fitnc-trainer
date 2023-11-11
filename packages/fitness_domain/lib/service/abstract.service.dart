@@ -5,10 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fitness_domain/domain/abstract.domain.dart';
 import 'package:get_it/get_it.dart';
 
+import '../mixin/m_fitness_storage_service.dart';
 import 'abstract-crud.service.dart';
 import 'firebase_query_condition.dart';
 import 'interface/i_from_json.dart';
-import 'mixin/m_fitness_storage_service.dart';
 
 ///
 /// T represents the main model

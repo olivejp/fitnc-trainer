@@ -8,8 +8,7 @@ import 'package:rxdart/rxdart.dart';
 ///
 /// Classe utilitaire pour rechercher dans une liste.
 ///
-abstract class SearchMixin<
-    T extends InterfaceDomainSearchable> {
+mixin SearchMixin<T extends InterfaceDomainSearchable> {
   final BehaviorSubject<List<T>> streamList = BehaviorSubject<List<T>>();
   final List<T> _listComplete = <T>[];
   final RxString searchQuery = ''.obs;
@@ -27,7 +26,8 @@ abstract class SearchMixin<
     Future<List<T>> Function()? getFutureList,
     List<T> Function()? getLocalList,
   }) {
-    assert(getStreamList != null || getFutureList != null || getLocalList != null, 'initSearchList called without any parameter. Please provide at least one of these method : getStreamList, getFutureList, getLocalList.');
+    assert(getStreamList != null || getFutureList != null || getLocalList != null,
+        'initSearchList called without any parameter. Please provide at least one of these method : getStreamList, getFutureList, getLocalList.');
 
     _fetchList(getStreamList, getFutureList, getLocalList);
     searchQuery.listen((String queryValue) {
@@ -51,8 +51,7 @@ abstract class SearchMixin<
     }
 
     if (getStreamList != null) {
-      getStreamList()
-          .listen((List<T> listValues) => _initialization(listValues));
+      getStreamList().listen((List<T> listValues) => _initialization(listValues));
       return;
     }
   }

@@ -13,11 +13,11 @@ import 'package:provider/provider.dart';
 ///
 class LayoutNotifier extends StatefulWidget {
   const LayoutNotifier({
-    Key? key,
+    super.key,
     required this.child,
     this.desktopSize = 1280,
     this.tabletSize = 800,
-  }) : super(key: key);
+  });
   final int desktopSize;
   final int tabletSize;
   final Widget child;

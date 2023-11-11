@@ -13,7 +13,7 @@ import 'package:path/path.dart';
 /// Mixin Service pour implémenter les méthodes de base pour le Firebase storage.
 /// Tous les services qui doivent gérer des AbstractFitnessStorageDomain DOIVENT implémenter cette mixin.
 ///
-abstract class MFitnessStorageService<T extends AbstractStorageDomain> {
+mixin MFitnessStorageService<T extends AbstractStorageDomain> {
   /// Méthode abstraite
   /// Permet de spécifier l'emplacement où sera stocké le fichier dans Firebase Storage.
   /// Cette url sera complétée avec le nom du fichier, ex:
@@ -46,14 +46,11 @@ abstract class MFitnessStorageService<T extends AbstractStorageDomain> {
       return Future<void>.error('domain.storageFile is null');
     }
 
-    if (domain.storageFile!.fileBytes == null ||
-        domain.storageFile!.fileBytes!.isEmpty) {
-      return Future<void>.error(
-          'domain.storageFile.fileBytes is null or empty');
+    if (domain.storageFile!.fileBytes == null || domain.storageFile!.fileBytes!.isEmpty) {
+      return Future<void>.error('domain.storageFile.fileBytes is null or empty');
     }
 
-    if (domain.storageFile!.fileName == null ||
-        domain.storageFile!.fileName!.trim().isEmpty) {
+    if (domain.storageFile!.fileName == null || domain.storageFile!.fileName!.trim().isEmpty) {
       return Future<void>.error('domain.storageFile.fileName is null or empty');
     }
 
@@ -76,12 +73,9 @@ abstract class MFitnessStorageService<T extends AbstractStorageDomain> {
   Future<void> deleteAllFiles(T domain) async {
     final User user = AuthService.getUserConnectedOrThrow();
 
-    ListResult value = await FirebaseStorage.instance
-        .ref(getStorageRef(user, domain))
-        .listAll();
+    ListResult value = await FirebaseStorage.instance.ref(getStorageRef(user, domain)).listAll();
 
-    final List<Future<void>> listFuture =
-        value.items.map((Reference ref) => ref.delete()).toList();
+    final List<Future<void>> listFuture = value.items.map((Reference ref) => ref.delete()).toList();
 
     await Future.wait(listFuture);
   }
@@ -108,13 +102,10 @@ abstract class MFitnessStorageService<T extends AbstractStorageDomain> {
   ///
   Future<String?> _sendToStorage(T domain) async {
     final User user = AuthService.getUserConnectedOrThrow();
-    if (domain.storageFile != null &&
-        domain.storageFile!.fileBytes != null &&
-        domain.storageFile!.fileName != null) {
+    if (domain.storageFile != null && domain.storageFile!.fileBytes != null && domain.storageFile!.fileName != null) {
       final String url = getStorageRef(user, domain);
       return _sendToStorageAndGetReference(
-          url: '$url/${domain.storageFile!.fileName}',
-          bytes: domain.storageFile!.fileBytes!);
+          url: '$url/${domain.storageFile!.fileName}', bytes: domain.storageFile!.fileBytes!);
     } else {
       return Future<String?>.value(null);
     }
@@ -134,7 +125,6 @@ abstract class MFitnessStorageService<T extends AbstractStorageDomain> {
         .ref(url)
         .putData(bytes, metadata)
         .then((TaskSnapshot ref) => ref.ref.getDownloadURL())
-        .catchError((Object? error) =>
-            Future<String>.error("Error while uploading. ${error.toString()}"));
+        .catchError((Object? error) => Future<String>.error("Error while uploading. ${error.toString()}"));
   }
 }
